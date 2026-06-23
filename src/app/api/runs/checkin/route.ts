@@ -4,8 +4,8 @@ import { isRunnerBanned } from '@/lib/mock-ban-store';
 
 // Earth radius in meters
 const EARTH_RADIUS_METERS = 6371000;
-// Max allowed check-in distance
-const DISTANCE_THRESHOLD = 50;
+// Max allowed check-in distance (increased from 50m to 100m to handle mobile GPS inaccuracy)
+const DISTANCE_THRESHOLD = 100;
 
 // Haversine formula to compute distance between two coordinates
 function calculateHaversineDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {

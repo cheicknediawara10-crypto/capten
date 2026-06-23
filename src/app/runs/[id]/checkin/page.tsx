@@ -528,7 +528,7 @@ function CheckinFormContent() {
               <p className="text-xs font-bold text-black uppercase text-center leading-normal">{checkinError}</p>
               {distance !== null && (
                 <p className="text-[11px] font-black text-[#FF0000] uppercase tracking-wide">
-                  Distance : {distance}m (Seuil : 50m max)
+                  Distance : {distance}m (Seuil : 100m max)
                 </p>
               )}
               <button 
