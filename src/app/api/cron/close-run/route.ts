@@ -4,42 +4,6 @@ import { mockMembers } from '@/lib/broadcast';
 
 export const dynamic = 'force-dynamic';
 
-// Helper pour l'envoi de SMS via Twilio
-async function sendTwilioSMS(to: string, body: string): Promise<boolean> {
-  const accountSid = process.env.TWILIO_ACCOUNT_SID || '';
-  const authToken = process.env.TWILIO_AUTH_TOKEN || '';
-  const fromNumber = process.env.TWILIO_PHONE_NUMBER || '';
-
-  if (!accountSid || !authToken || !fromNumber || accountSid.includes('votre_') || authToken.includes('votre_')) {
-    console.warn(`[Twilio Simulation] SMS à ${to} : "${body}"`);
-    return true;
-  }
-
-  try {
-    const url = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
-    const auth = Buffer.from(`${accountSid}:${authToken}`).toString('base64');
-    
-    const params = new URLSearchParams();
-    params.append('To', to);
-    params.append('From', fromNumber);
-    params.append('Body', body);
-
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Basic ${auth}`,
-        'Content-Type': 'application/x-www-form-urlencoded'
-      },
-      body: params.toString()
-    });
-
-    return res.ok;
-  } catch (err) {
-    console.error(`Error sending Twilio SMS to ${to}:`, err);
-    return false;
-  }
-}
-
 export async function POST(request: Request) {
   return handleCloseRun(request);
 }
@@ -69,17 +33,13 @@ async function handleCloseRun(request: Request) {
       
       // Simulation pour un athlète fictif qui fait son 2ème no-show
       const mockAthlete = mockMembers[0] || { id: 'm1', name: 'Petit Noah', firstname: 'Noah', phone: '+33 6 78 90 12 34', streak: 9 };
-      const mockRunTitle = "Interval Session (Démo)";
       
-      const smsMessage = `Hey ${mockAthlete.firstname} ! 🔴 Vous avez manqué 2 runs du club sans annuler. Vos inscriptions sont temporairement bloquées pour laisser la place aux autres. Contactez le Captain pour réactiver votre profil.`;
-      await sendTwilioSMS(mockAthlete.phone, smsMessage);
-
       return NextResponse.json({
         success: true,
         demoMode: true,
         message: "[MODE DÉMO] Clôture et calcul de pénalités simulés. Noah Petit a été bloqué pour 2 absences consécutives.",
         banned_member: mockAthlete.name,
-        sms_sent: mockAthlete.phone
+        sms_sent: false
       });
     }
 
@@ -167,21 +127,9 @@ async function handleCloseRun(request: Request) {
           continue;
         }
 
-        // Si blacklisté, envoyer une notification par SMS
+        // Si blacklisté, ajouter à la liste
         if (isBlacklisted) {
           blacklistedMembers.push(memberId);
-          
-          // Récupérer le numéro de téléphone de l'athlète
-          const { data: member } = await supabase
-            .from('members')
-            .select('*')
-            .eq('id', memberId)
-            .single();
-
-          if (member && member.phone) {
-            const smsMsg = `Hey ${member.firstname || 'runner'} ! 🔴 Vous avez manqué 2 runs sans annuler votre inscription. Vos réservations sont maintenant suspendues. Veuillez contacter le Captain de votre club.`;
-            await sendTwilioSMS(member.phone, smsMsg);
-          }
         }
       }
 
