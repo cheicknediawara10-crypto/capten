@@ -1,0 +1,104 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* LINEAR X NIKE FUSION: Precision Refined */
+  * {
+    text-shadow: none !important;
+    outline: none !important;
+    -webkit-font-smoothing: antialiased;
+    transition: all 0.1s ease-out; /* HYPER-FLUIDITY */
+  }
+
+  /* TACTILE FEEDBACK */
+  button:active, a:active {
+    transform: scale(0.98);
+  }
+
+  body {
+    @apply bg-[#F4F5F7] text-[#111111] font-sans antialiased;
+  }
+
+  h1, h2, h3, h4 {
+    @apply font-display italic font-black uppercase tracking-tighter leading-none;
+  }
+}
+
+@layer components {
+  /* CARD: Fixed 1px precision */
+  .linear-card {
+    @apply bg-white border-[1px] border-[#E5E5E5] rounded-[12px] p-7 transition-all duration-200;
+  }
+
+  /* REFINED BUTTON: More compact, more precise */
+  .athletic-btn {
+    @apply bg-[#FF5C00] text-white font-sans font-black uppercase px-6 py-2.5 rounded-[6px] 
+           text-[10px] tracking-[0.15em] border-none hover:bg-black transition-all active:scale-95;
+  }
+
+  .thin-label {
+    @apply font-sans text-[10px] text-[#A3A3A3] font-bold uppercase tracking-[0.2em];
+  }
+
+  /* Standard Brutalist Buttons */
+  .btn-primary {
+    @apply h-11 px-5 bg-[#FF5C00] text-white font-sans font-black uppercase tracking-[0.15em] text-[10px] rounded-[6px] hover:bg-black transition-all active:scale-[0.97] flex items-center justify-center gap-2 cursor-pointer;
+  }
+
+  .btn-secondary {
+    @apply h-11 px-5 bg-white border border-black/10 text-black font-sans font-black uppercase tracking-[0.15em] text-[10px] rounded-[6px] hover:bg-black hover:text-white transition-all active:scale-[0.97] flex items-center justify-center gap-2 cursor-pointer;
+  }
+
+  .btn-sm {
+    @apply h-8 px-3 bg-black text-white font-sans font-black uppercase tracking-[0.1em] text-[8.5px] rounded-[4px] hover:bg-[#FF5C00] transition-all active:scale-[0.97] flex items-center justify-center gap-1.5 cursor-pointer;
+  }
+
+  .btn-lg-cta {
+    @apply h-12 w-full px-5 bg-black text-white font-sans font-black uppercase tracking-[0.15em] text-[10px] rounded-[6px] hover:bg-[#FF5C00] transition-all active:scale-[0.97] flex items-center justify-center gap-2 cursor-pointer;
+  }
+
+  /* Standard Brutalist Form Inputs */
+  .brutalist-input {
+    @apply w-full h-11 px-4 bg-[#F4F5F7] border border-black/10 rounded-[6px] text-[12px] font-bold text-black placeholder:text-neutral-400 focus:outline-none focus:border-[#FF5C00] focus:bg-white transition-all;
+  }
+
+  /* MICRO-TRANSITIONS FOR PAGES */
+  .page-transition {
+    animation: fadeIn 0.15s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+}
+
+/* HIGH-FIDELITY MOBILE TRANSITIONS */
+.animate-fade-in {
+  animation: fadeInEffect 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-slide-in-right {
+  animation: slideInRightEffect 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-scale-up {
+  animation: scaleUpEffect 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes fadeInEffect {
+  from { opacity: 0; backdrop-filter: blur(0px); }
+  to { opacity: 1; backdrop-filter: blur(8px); }
+}
+
+@keyframes slideInRightEffect {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes scaleUpEffect {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
