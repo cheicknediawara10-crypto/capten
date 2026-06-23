@@ -25,6 +25,7 @@ function CheckinFormContent() {
   // Location / Geofencing states
   const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const [geoError, setGeoError] = useState<string | null>(null);
+  const [gpsAccuracy, setGpsAccuracy] = useState<number | null>(null);
   const [isLocating, setIsLocating] = useState(false);
   const [distance, setDistance] = useState<number | null>(null);
 
@@ -114,6 +115,7 @@ function CheckinFormContent() {
 
     setIsLocating(true);
     setGeoError(null);
+    setGpsAccuracy(null);
 
     if (!navigator.geolocation) {
       setGeoError("La géolocalisation n'est pas supportée par votre navigateur.");
@@ -124,6 +126,16 @@ function CheckinFormContent() {
     const acquirePosition = (highAccuracy: boolean) => {
       navigator.geolocation.getCurrentPosition(
         (position) => {
+          const acc = position.coords.accuracy;
+          setGpsAccuracy(acc);
+
+          // Si la précision du signal est trop mauvaise (supérieure à 100m)
+          if (acc > 100) {
+            setGeoError(`Signal GPS trop faible (Marge d'erreur : ±${Math.round(acc)}m). Attends quelques secondes au grand air et réessaye.`);
+            setIsLocating(false);
+            return;
+          }
+
           setLocation({
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
@@ -140,13 +152,13 @@ function CheckinFormContent() {
           let errorMessage = "Erreur de géolocalisation inconnue.";
           switch (error.code) {
             case error.PERMISSION_DENIED:
-              errorMessage = "Veuillez autoriser l'accès à votre position dans votre navigateur/téléphone pour effectuer le pointage GPS.";
+              errorMessage = "Accès GPS refusé. Veuillez autoriser CAPTEN dans les réglages de votre téléphone/navigateur pour pointer.";
               break;
             case error.POSITION_UNAVAILABLE:
-              errorMessage = "Les informations de localisation sont indisponibles. Activez votre puce GPS.";
+              errorMessage = "Impossible de détecter votre position. Es-tu dans un sous-sol ou un tunnel ?";
               break;
             case error.TIMEOUT:
-              errorMessage = "La demande de localisation a expiré. Veuillez recharger la page ou vous déplacer vers un espace dégagé.";
+              errorMessage = "Le délai d'attente GPS est dépassé. Veuillez réessayer dans un espace plus dégagé.";
               break;
           }
           setGeoError(errorMessage);
@@ -154,8 +166,8 @@ function CheckinFormContent() {
         },
         {
           enableHighAccuracy: highAccuracy,
-          timeout: highAccuracy ? 15000 : 10000,
-          maximumAge: 0
+          timeout: 10000, // 10 secondes maximum d'attente pour capter les satellites
+          maximumAge: 0   // Interdit l'utilisation d'une position stockée en cache
         }
       );
     };
@@ -516,6 +528,11 @@ function CheckinFormContent() {
                 <Navigation size={24} className="text-[#56E39F] animate-pulse" />
               </div>
               <p className="text-xs font-bold text-[#56E39F] uppercase tracking-wider">Position Acquise ✓</p>
+              {gpsAccuracy !== null && (
+                <p className="text-[9px] font-mono text-neutral-400">
+                  Précision du signal : ±{Math.round(gpsAccuracy)} mètres
+                </p>
+              )}
               <p className="text-[10px] text-[#A3A3A3] text-center px-4 leading-normal">
                 Prêt pour la validation de présence GPS.
               </p>
