@@ -7,6 +7,15 @@ import { useBroadcast } from '@/context/BroadcastContext';
 
 type TabFilter = 'upcoming' | 'past';
 
+const getInitials = (name: string) => {
+  if (!name) return "";
+  const parts = name.trim().split(/\s+/);
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
+  return name.slice(0, 2).toUpperCase();
+};
+
 export default function RunsPage() {
   const { triggerUndoToast } = useBroadcast();
   const [activeTab, setActiveTab] = useState<TabFilter>('upcoming');
@@ -272,7 +281,7 @@ export default function RunsPage() {
     }
 
     // fallback or local state update
-    const myParticipant = { name: 'Moi (Vous)', img: 'https://i.pravatar.cc/100?u=me', status: 'registered' };
+    const myParticipant = { name: 'Moi (Vous)', img: '', status: 'registered' };
     
     const updatedRuns = runs.map((r: any) => {
       if (r.id === run.id) {
@@ -572,8 +581,8 @@ export default function RunsPage() {
                     
                     <div className="space-y-2 max-h-[160px] overflow-y-auto">
                       {(selectedRun.participants.length > 0 ? selectedRun.participants : [
-                        { name: 'Alex Rivière', img: 'https://i.pravatar.cc/100?u=a1', status: 'present' },
-                        { name: 'Sophie Lemaire', img: 'https://i.pravatar.cc/100?u=a2', status: 'present' }
+                        { name: 'Alex Rivière', img: '', status: 'present' },
+                        { name: 'Sophie Lemaire', img: '', status: 'present' }
                       ])
                         .filter((p: any) => p.name.toLowerCase().includes(participantSearch.toLowerCase()))
                         .map((p: any, i: number) => (
@@ -582,7 +591,13 @@ export default function RunsPage() {
                           className="flex items-center justify-between py-2 px-3 rounded-control bg-white border-[0.5px] border-black/10 hover:border-black/20 transition-all"
                         >
                           <div className="flex items-center gap-3">
-                            <img src={p.img} className="w-7 h-7 rounded-full border-[0.5px] border-black/5 object-cover" alt="" />
+                            {p.img && !p.img.includes('pravatar.cc') ? (
+                              <img src={p.img} className="w-7 h-7 rounded-full border-[0.5px] border-black/5 object-cover shrink-0" alt="" />
+                            ) : (
+                              <div className="w-7 h-7 rounded-full bg-slate-200 text-slate-800 border-[0.5px] border-black/10 font-black text-[9px] flex items-center justify-center uppercase shrink-0">
+                                {getInitials(p.name)}
+                              </div>
+                            )}
                             <span className="text-[11px] font-bold text-black uppercase">{p.name}</span>
                           </div>
                           

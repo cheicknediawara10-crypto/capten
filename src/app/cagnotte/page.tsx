@@ -22,6 +22,15 @@ interface Contributor {
   img: string;
 }
 
+const getInitials = (name: string) => {
+  if (!name) return "";
+  const parts = name.trim().split(/\s+/);
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
+  return name.slice(0, 2).toUpperCase();
+};
+
 export default function CagnottePage() {
   const [solde, setSolde] = useState(0);
   const [toast, setToast] = useState<string | null>(null);
@@ -379,7 +388,13 @@ export default function CagnottePage() {
                   <div key={idx} className="flex items-center justify-between group cursor-default">
                     <div className="flex items-center gap-4">
                        <span className="text-[10px] font-black text-[#D1D1D1] italic">{idx + 1}.</span>
-                       <img src={c.img} alt={c.name} className="w-8 h-8 rounded-full grayscale hover:grayscale-0 transition-all border-[0.5px] border-black/5" />
+                       {c.img && !c.img.includes('pravatar.cc') ? (
+                         <img src={c.img} alt={c.name} className="w-8 h-8 rounded-full grayscale hover:grayscale-0 transition-all border-[0.5px] border-black/5 object-cover shrink-0" />
+                       ) : (
+                         <div className="w-8 h-8 rounded-full bg-slate-200 text-slate-800 border-[0.5px] border-black/10 font-black text-[10px] flex items-center justify-center uppercase shrink-0">
+                           {getInitials(c.name)}
+                         </div>
+                       )}
                        <span className="text-[12px] font-bold text-black uppercase tracking-tight">{c.name}</span>
                     </div>
                     <span className="text-[14px] font-display italic font-black text-black">{c.amount}</span>

@@ -85,7 +85,7 @@ export default function SponsorPage() {
         const newContributor = {
           name: contributorName,
           amount: `${selectedPlan.price}€`,
-          img: `https://i.pravatar.cc/150?u=${Math.floor(Math.random() * 100)}`
+          img: ''
         };
         localStorage.setItem('capten_cagnotte_contributors_v3', JSON.stringify([newContributor, ...contributors]));
 

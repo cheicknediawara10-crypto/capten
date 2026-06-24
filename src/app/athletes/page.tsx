@@ -5,6 +5,15 @@ import Link from 'next/link';
 import { Search, Plus, Zap, Activity, CheckCircle2, XCircle, RefreshCw, X, Phone, AlertTriangle, Heart, Mail, MapPin, Shield, MessageSquare, Copy, Check } from 'lucide-react';
 import { getSupabase } from '@/lib/supabase';
 
+const getInitials = (name: string) => {
+  if (!name) return "";
+  const parts = name.trim().split(/\s+/);
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
+  return name.slice(0, 2).toUpperCase();
+};
+
 interface Athlete {
   initial: string;
   name: string;
@@ -241,7 +250,13 @@ export default function AthletesPage() {
           <div key={idx} onClick={() => setSelectedAthlete(athlete)} className="bg-white border-[0.5px] border-[#E5E5E5] rounded-card-outer p-6 space-y-5 shadow-sm hover:border-black/20 transition-all group cursor-pointer">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <img src={athlete.img} alt={athlete.name} className="w-11 h-11 rounded-card-inner object-cover border-[0.5px] border-black/5 group-hover:scale-105 transition-transform" />
+                {athlete.img && !athlete.img.includes('pravatar.cc') ? (
+                  <img src={athlete.img} alt={athlete.name} className="w-11 h-11 rounded-card-inner object-cover border-[0.5px] border-black/5 group-hover:scale-105 transition-transform" />
+                ) : (
+                  <div className="w-11 h-11 rounded-card-inner bg-slate-200 text-slate-800 border-[0.5px] border-black/10 font-black text-[14px] flex items-center justify-center uppercase shrink-0 group-hover:scale-105 transition-transform">
+                    {athlete.initial || getInitials(athlete.name)}
+                  </div>
+                )}
                 <div className="space-y-0.5">
                   <div className="flex items-center gap-1.5">
                     <h2 className="text-[16px] font-display italic font-black uppercase text-black leading-none tracking-tight">{athlete.name}</h2>
@@ -297,7 +312,13 @@ export default function AthletesPage() {
             {/* Header */}
             <div className="p-6 sm:p-8 pb-6 border-b-[0.5px] border-[#E5E5E5]">
               <div className="flex items-center gap-6">
-                <img src={selectedAthlete.img} alt={selectedAthlete.name} className="w-20 h-20 rounded-card-inner object-cover border-[0.5px] border-black/5" />
+                {selectedAthlete.img && !selectedAthlete.img.includes('pravatar.cc') ? (
+                  <img src={selectedAthlete.img} alt={selectedAthlete.name} className="w-20 h-20 rounded-card-inner object-cover border-[0.5px] border-black/5" />
+                ) : (
+                  <div className="w-20 h-20 rounded-card-inner bg-slate-200 text-slate-800 border-[0.5px] border-black/10 font-black text-[24px] flex items-center justify-center uppercase shrink-0">
+                    {selectedAthlete.initial || getInitials(selectedAthlete.name)}
+                  </div>
+                )}
                 <div className="space-y-2">
                   <h2 className="text-[28px] font-display italic font-black uppercase text-black leading-none tracking-tight">{selectedAthlete.name}</h2>
                   <div className="flex items-center gap-3">
@@ -626,7 +647,7 @@ export default function AthletesPage() {
                     totalKm: "0 km",
                     lastRun: "Jamais",
                     runs: 0,
-                    img: `https://i.pravatar.cc/150?u=${randomId}`,
+                    img: '',
                     streak: 0,
                     tier: "BRONZE",
                     tierColor: "#CD7F32",
