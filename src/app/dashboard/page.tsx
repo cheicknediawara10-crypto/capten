@@ -35,6 +35,15 @@ function getWeatherDesc(code: number): { emoji: string; desc: string; isStorm: b
 }
 // === FIN HELPERS MÉTÉO ===
 
+const getInitials = (name: string) => {
+  if (!name) return "";
+  const parts = name.trim().split(/\s+/);
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
+  return name.slice(0, 2).toUpperCase();
+};
+
 export default function DashboardPage() {
   const [quotaExceeded, setQuotaExceeded] = useState(false);
   const [time, setTime] = useState<Date | null>(null);
@@ -1131,7 +1140,13 @@ export default function DashboardPage() {
                 .map((athlete, idx) => (
                   <div key={idx} className="flex items-center justify-between group cursor-default">
                     <div className="flex items-center gap-4">
-                      <img src={athlete.img} alt={athlete.name} className="w-8 h-8 rounded-full grayscale hover:grayscale-0 transition-all border-[0.5px] border-black/5" />
+                      {athlete.img && !athlete.img.includes('pravatar.cc') ? (
+                        <img src={athlete.img} alt={athlete.name} className="w-8 h-8 rounded-full grayscale hover:grayscale-0 transition-all border-[0.5px] border-black/5 object-cover shrink-0" />
+                      ) : (
+                        <div className="w-8 h-8 rounded-full bg-slate-200 text-slate-800 border-[0.5px] border-black/10 font-black text-[10px] flex items-center justify-center uppercase shrink-0">
+                          {getInitials(athlete.name)}
+                        </div>
+                      )}
                       <span className="text-[12px] font-bold text-black uppercase tracking-tight">{athlete.name}</span>
                     </div>
                     <span className="text-[11px] font-black uppercase text-neutral-450 tracking-wider">
