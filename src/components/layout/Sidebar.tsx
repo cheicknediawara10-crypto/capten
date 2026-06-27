@@ -87,9 +87,9 @@ export default function Sidebar() {
       title: "PILOTAGE",
       items: [
         { name: "Dashboard", icon: <LayoutDashboard size={18} strokeWidth={1.5} />, href: "/dashboard" },
-        { name: "Coureurs", icon: <Users size={18} strokeWidth={1.5} />, href: "/athletes" },
-        { name: "Run", icon: <Map size={18} strokeWidth={1.5} />, href: "/runs" },
-        { name: "Message auto", icon: <MessageSquare size={18} strokeWidth={1.5} />, href: "/messages" },
+        { name: "Le Crew", icon: <Users size={18} strokeWidth={1.5} />, href: "/athletes" },
+        { name: "Les Runs", icon: <Map size={18} strokeWidth={1.5} />, href: "/runs" },
+        { name: "Messages", icon: <MessageSquare size={18} strokeWidth={1.5} />, href: "/messages" },
       ]
     },
     {
@@ -102,7 +102,7 @@ export default function Sidebar() {
     {
       title: "COMPTE",
       items: [
-        { name: "Plan", icon: <CreditCard size={18} strokeWidth={1.5} />, href: "/plan" },
+        { name: "Abonnement", icon: <CreditCard size={18} strokeWidth={1.5} />, href: "/plan" },
         { name: "Réglages", icon: <Settings size={18} strokeWidth={1.5} />, href: "/settings" },
       ]
     }

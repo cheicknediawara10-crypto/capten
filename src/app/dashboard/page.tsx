@@ -465,7 +465,7 @@ export default function DashboardPage() {
                 )}
               </time>
               <Link href="/runs?openPlanifier=true" className="flex-1 sm:flex-initial bg-[#FF5C00] text-white px-4 sm:px-5 py-2.5 rounded-control text-[10px] sm:text-[11px] font-black uppercase tracking-wider flex items-center justify-center gap-2 hover:bg-black transition-all shadow-sm active:scale-95">
-                <Plus size={14} /> CRÉER UN RUN +
+                <Plus size={14} /> LANCER UN RUN +
               </Link>
             </div>
           </div>
@@ -571,7 +571,7 @@ export default function DashboardPage() {
 
               <p className="text-[13px] font-sans text-[#9B9B93] leading-relaxed">
                 Tes coureurs peuvent déjà s&apos;inscrire.<br />
-                Crée ton premier run quand tu veux.
+                Lance ton premier run quand tu veux.
               </p>
 
               <button
@@ -609,7 +609,7 @@ export default function DashboardPage() {
                 href="/runs?openPlanifier=true"
                 className="w-full bg-[#FF5C00] text-white py-4 rounded-control text-[14px] font-bold font-sans hover:bg-black transition-all active:scale-95 cursor-pointer shadow-sm text-center block"
               >
-                + Créer mon premier run →
+                + Lancer mon premier run →
               </Link>
 
               <button
@@ -671,7 +671,7 @@ export default function DashboardPage() {
                 )}
               </time>
               <Link href="/runs?openPlanifier=true" className="flex-1 sm:flex-initial bg-[#FF5C00] text-white px-4 sm:px-5 py-2.5 rounded-control text-[10px] sm:text-[11px] font-black uppercase tracking-wider flex items-center justify-center gap-2 hover:bg-black transition-all shadow-sm active:scale-95">
-                <Plus size={14} /> CRÉER UN RUN +
+                <Plus size={14} /> LANCER UN RUN +
               </Link>
             </div>
           </div>
@@ -794,7 +794,7 @@ export default function DashboardPage() {
                       <span className="text-[#FF5C00] font-black text-[9px] uppercase tracking-widest animate-pulse">● À FAIRE</span>
                     )}
                   </div>
-                  <h4 className="text-[13px] font-bold text-black uppercase tracking-wider mb-2">Crée ta première course</h4>
+                  <h4 className="text-[13px] font-bold text-black uppercase tracking-wider mb-2">Lance ton premier run</h4>
                   <p className="text-[11px] text-[#71717A] uppercase tracking-wider leading-normal">
                     Planifie une session pour que tes coureurs puissent valider leur présence ce soir.
                   </p>
@@ -805,7 +805,7 @@ export default function DashboardPage() {
                       href="/runs?openPlanifier=true"
                       className="w-full bg-[#FF5C00] text-white px-4 py-2.5 rounded-control text-[10px] font-black uppercase tracking-wider flex items-center justify-center gap-2 hover:bg-black transition-all active:scale-95 cursor-pointer shadow-sm text-center block"
                     >
-                      🗺️ CRÉER UN RUN +
+                      🗺️ LANCER UN RUN +
                     </Link>
                   ) : (
                     <div className="space-y-2">
@@ -877,15 +877,15 @@ export default function DashboardPage() {
  
       {/* TOP ROW: 4 MINIMALIST KPI CARDS */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-        {/* Card 1: COUREURS */}
+        {/* Card 1: LE CREW */}
         <Link 
           href="/athletes" 
           className="bg-white border-[0.5px] border-[#E5E5E5] rounded-card-outer p-6 space-y-2 shadow-sm group hover:border-[#FF5C00]/40 hover:shadow-md transition-all duration-300 cursor-pointer"
         >
-           <p className="text-[9px] font-black text-[#D1D1D1] uppercase tracking-[0.2em] italic">COUREURS</p>
-           <h3 className="text-[32px] font-display italic font-black text-black">{activeMembersCount}</h3>
+           <p className="text-[9px] font-black text-[#D1D1D1] uppercase tracking-[0.2em] italic">LE CREW</p>
+           <h3 className="text-[32px] font-display italic font-black text-black">{activeMembersCount > 0 ? activeMembersCount : "—"}</h3>
            <p className="text-[9px] font-medium text-[#A3A3A3] uppercase tracking-widest">
-             {activeMembersCount > 0 ? `${activeMembersCount} COUREURS INSCRITS` : "Partage ton lien →"}
+             {activeMembersCount > 0 ? `${activeMembersCount} MEMBRES` : "Partage ton lien, ton crew arrive."}
            </p>
         </Link>
 
@@ -1018,10 +1018,9 @@ export default function DashboardPage() {
                 <h2 className="text-[44px] sm:text-[94px] font-display italic font-black uppercase leading-none tracking-tighter text-black/20 transition-all duration-700">
                   AUCUNE <br /> <span className="text-black/10">SESSION</span>
                 </h2>
-                <div className="flex items-center gap-2 mt-4 opacity-50">
-                   <MapPin size={16} className="text-black/40" />
-                   {/* Removed PROGRAMME VIDE label */}
-                </div>
+                <p className="text-[11px] font-medium text-neutral-500 uppercase tracking-widest leading-relaxed mt-2 text-left">
+                   Ton premier run, et ça commence.
+                </p>
              </div>
              
              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 relative z-10">
@@ -1029,7 +1028,7 @@ export default function DashboardPage() {
                    <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#F4F5F7] border-2 border-white flex items-center justify-center text-[10px] font-black text-[#A3A3A3]">{activeMembersCount}</div>
                 </div>
                 <Link href="/runs?openPlanifier=true" className="w-full sm:w-auto bg-black text-white px-6 sm:px-8 py-3.5 sm:py-4 rounded-control text-[11px] sm:text-[12px] font-black uppercase tracking-[0.2em] hover:bg-[#FF5C00] transition-all flex items-center justify-center gap-3 active:scale-95">
-                   <Plus size={16} /> CRÉER UN RUN +
+                   <Plus size={16} /> LANCER UN RUN +
                 </Link>
              </div>
     
@@ -1157,7 +1156,7 @@ export default function DashboardPage() {
             </div>
           ) : (
             <div className="flex items-center justify-center py-10 opacity-50">
-               <p className="text-[11px] font-black text-[#A3A3A3] uppercase tracking-widest text-center">AUCUNE PARTICIPATION ENREGISTRÉE<br/>CRÉEZ VOTRE PREMIÈRE SESSION</p>
+               <p className="text-[11px] font-black text-[#A3A3A3] uppercase tracking-widest text-center">AUCUNE PARTICIPATION ENREGISTRÉE<br/>LANCEZ VOTRE PREMIÈRE SESSION</p>
             </div>
           )}
         </div>

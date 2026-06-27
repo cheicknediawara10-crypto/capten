@@ -160,7 +160,7 @@ export default function AthletesPage() {
         setAthletes(updatedList);
         setSelectedAthlete(prev => prev ? { ...prev, role: prev.role.toLowerCase().includes("banni") ? prev.role : prev.role + " (Banni)" } : null);
       }
-      alert(`L'athlète ${athlete.name} a été suspendu.`);
+      alert(`Le membre ${athlete.name} a été suspendu.`);
     } catch (err) {
       console.error(err);
       alert("Erreur lors du bannissement.");
@@ -216,7 +216,7 @@ export default function AthletesPage() {
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 w-full">
             <div className="flex items-center gap-4">
               <h1 className="text-[28px] sm:text-[42px] font-display italic font-black uppercase text-black leading-none tracking-tight">
-                ATHLÈTES
+                LE CREW
               </h1>
             </div>
             <button 
@@ -234,7 +234,7 @@ export default function AthletesPage() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#D1D1D1]" size={16} />
           <input 
             type="text" 
-            placeholder="Rechercher un athlète..." 
+            placeholder="Rechercher un coureur..." 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full h-11 pl-10 pr-4 bg-[#F4F5F7] border border-black/10 rounded-control text-[12px] font-bold text-black placeholder:text-neutral-400 focus:outline-none focus:border-[#FF5C00] focus:bg-white transition-all" 
@@ -460,7 +460,7 @@ export default function AthletesPage() {
                       <div className="space-y-1">
                         <span className="text-[10px] font-black text-amber-700 uppercase tracking-widest">VULNÉRABILITÉ JURIDIQUE</span>
                         <p className="text-xs text-amber-800 font-medium leading-relaxed">
-                          Cet athlète n&apos;a pas encore signé la décharge de responsabilité. Il est légalement exposé en cas d&apos;accident corporel.
+                          Ce membre n&apos;a pas encore signé la décharge de responsabilité. Il est légalement exposé en cas d&apos;accident corporel.
                         </p>
                       </div>
                     </div>
@@ -493,7 +493,7 @@ export default function AthletesPage() {
                           const athleteIdParam = match ? match[1] : "";
                           const waiverUrl = `${window.location.origin}/waiver?athleteId=${athleteIdParam}`;
                           const cleanPhone = selectedAthlete.phone ? selectedAthlete.phone.replace(/[^+\d]/g, "") : "";
-                          const firstName = selectedAthlete.name ? selectedAthlete.name.split(" ")[0] : "athlète";
+                          const firstName = selectedAthlete.name ? selectedAthlete.name.split(" ")[0] : "coureur";
                           const message = `Salut ${firstName} ! C'est ton Capitaine de course 🏃‍♂️. Peux-tu prendre 1 minute pour signer la décharge de responsabilité CAPTEN obligatoire pour participer à nos runs ? C'est super rapide, voici le lien unique : ${waiverUrl}`;
                           const waUrl = `https://api.whatsapp.com/send?phone=${encodeURIComponent(cleanPhone)}&text=${encodeURIComponent(message)}`;
                           window.open(waUrl, "_blank");

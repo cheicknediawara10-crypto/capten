@@ -271,14 +271,14 @@ export default function DebriefPage() {
                 <Coins size={20} />
               </div>
               <div className="text-left">
-                <h2 className="text-xs font-mono font-black uppercase text-neutral-400 leading-none">Cagnotte & Ravito</h2>
-                <p className="text-[16px] font-bold text-black pt-1">Participer au ravito d'après-run</p>
+                <h2 className="text-xs font-mono font-black uppercase text-neutral-400 leading-none">Cagnotte</h2>
+                <p className="text-[16px] font-bold text-black pt-1">Participer à la cagnotte d&apos;après-run</p>
               </div>
             </div>
 
             <div className="border-t border-neutral-200/60 pt-4 space-y-4">
               <p className="text-xs text-neutral-550 leading-relaxed text-left">
-                Pour que les sessions restent gratuites et chaleureuses, contribuez à hauteur de ce que vous voulez / pouvez pour le ravito (boissons, snacks, café).
+                Pour que les sessions restent gratuites et chaleureuses, contribuez à hauteur de ce que vous voulez / pouvez pour la cagnotte (boissons, snacks, café).
               </p>
 
               {/* Button to open payment link */}

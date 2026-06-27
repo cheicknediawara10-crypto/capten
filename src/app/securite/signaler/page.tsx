@@ -131,7 +131,7 @@ export default function PublicIncidentReportPage() {
               🛡️ <strong>Charte de respect &amp; sécurité :</strong>
               <ul className="list-disc list-inside mt-2 space-y-1 text-black font-bold uppercase tracking-wide text-[8.5px] font-mono">
                 <li>Zéro tolérance pour le harcèlement sexiste ou moral.</li>
-                <li>Respect absolu du niveau de chaque athlète.</li>
+                <li>Respect absolu du niveau de chaque coureur.</li>
                 <li>Obligation de secours en cas de malaise sur un run.</li>
               </ul>
             </div>

@@ -56,7 +56,7 @@ const TEMPLATES_DATABASE: MessageTemplate[] = [
   {
     id: "1.1",
     category: "avant_run",
-    label: "Rappel standard J-0",
+    label: "Rappel run J-0",
     contextHint: "À envoyer 30-60 min avant un run classique.",
     templateText: "{{club_name}} 📍\nCe soir, on se retrouve à {{run_time}} pour notre run habituel.\n{{run_distance}}km, {{weather}}.\n{{run_url}}"
   },
@@ -1356,13 +1356,13 @@ export default function MessagesPage() {
         ) : (
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <p className="text-xs font-medium text-neutral-500 uppercase tracking-tight">
-              Crée d&apos;abord un run pour générer tes messages →
+              Lance d&apos;abord un run pour générer tes messages →
             </p>
             <Link 
               href="/runs" 
               className="px-4 py-2.5 bg-[#FF5C00] text-white rounded-control text-[10px] font-black uppercase tracking-widest hover:bg-black transition-all text-center block active:scale-95 shadow-sm"
             >
-              + CRÉER MON PREMIER RUN
+              + LANCER MON PREMIER RUN
             </Link>
           </div>
         )}

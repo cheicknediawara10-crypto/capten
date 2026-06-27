@@ -264,7 +264,7 @@ export default function RunDashboardClient({ run, initialRegistrations, isDemo }
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400" size={16} />
             <input 
               type="text"
-              placeholder="Rechercher un athlète par nom ou téléphone..."
+              placeholder="Rechercher un coureur par nom ou téléphone..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full bg-[#F4F5F7] border border-black/5 rounded-xl pl-10 pr-4 py-3 text-xs text-black font-bold outline-none placeholder-neutral-400 focus:bg-white focus:border-black focus:ring-1 focus:ring-black transition-all"
@@ -280,12 +280,12 @@ export default function RunDashboardClient({ run, initialRegistrations, isDemo }
           )}
         </div>
 
-        {/* LISTE DES INSCRITS */}
+        {/* LE CREW */}
         <div className="space-y-3">
           {filteredRegistrations.length === 0 ? (
             <div className="py-12 text-center text-neutral-500 border border-dashed border-black/10 rounded-[16px] space-y-2">
               <HelpCircle className="mx-auto text-neutral-300" size={28} />
-              <p className="text-xs font-bold uppercase tracking-wider text-black">Aucun athlète trouvé</p>
+              <p className="text-xs font-bold uppercase tracking-wider text-black">Aucun coureur trouvé</p>
               <p className="text-[10px] text-neutral-400">Essayez une autre recherche ou vérifiez l'orthographe.</p>
             </div>
           ) : (
@@ -301,7 +301,7 @@ export default function RunDashboardClient({ run, initialRegistrations, isDemo }
                 }`}
               >
                 
-                {/* DETAILS ATHLETE */}
+                {/* DETAILS COUREUR */}
                 <div className="flex items-center gap-3">
                   {/* Photo de profil factice */}
                   <div className="w-9 h-9 rounded-full bg-[#F4F5F7] border-[0.5px] border-black/5 flex items-center justify-center font-display italic font-black text-xs text-neutral-400 shrink-0">
@@ -326,11 +326,11 @@ export default function RunDashboardClient({ run, initialRegistrations, isDemo }
                   
                   {/* Badge de statut */}
                   <div className="flex flex-wrap items-center gap-2">
-                    {/* Statut Ravito / Cagnotte */}
+                    {/* Statut Cagnotte / Contribution */}
                     {reg.cagnotte_status === 'declared' && (
                       <div className="flex items-center gap-1">
                         <span className="bg-[#FFF8E6] text-[#B37400] border border-[#FFE8B3] px-2.5 py-1.5 rounded-[6px] text-[9px] font-black uppercase tracking-wider inline-flex items-center gap-1 animate-scale-up">
-                          <Clock size={12} className="text-[#FF9900]" /> ⏳ Ravito Déclaré
+                          <Clock size={12} className="text-[#FF9900]" /> ⏳ Contribution Déclarée
                         </span>
                         <button
                           onClick={() => handleVerifyCagnotte(reg.runners.id)}
@@ -344,7 +344,7 @@ export default function RunDashboardClient({ run, initialRegistrations, isDemo }
 
                     {reg.cagnotte_status === 'verified' && (
                       <span className="bg-[#ECFDF5] text-emerald-700 border border-emerald-200 px-2.5 py-1.5 rounded-[6px] text-[9px] font-black uppercase tracking-wider inline-flex items-center gap-1 animate-scale-up">
-                        <CheckCircle2 size={12} className="text-emerald-500" /> 🟢 Ravito Validé
+                        <CheckCircle2 size={12} className="text-emerald-500" /> 🟢 Contribution Validée
                       </span>
                     )}
 

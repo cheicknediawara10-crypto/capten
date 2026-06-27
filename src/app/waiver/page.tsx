@@ -632,7 +632,7 @@ export default function WaiverPage() {
             </span>
           </div>
           <span className="text-[10px] font-black text-[#94A3B8] uppercase tracking-widest">
-            PORTAIL SÉCURISÉ DES ATHLÈTES
+            PORTAIL SÉCURISÉ DU CREW
           </span>
         </div>
       </header>

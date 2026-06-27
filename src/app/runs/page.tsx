@@ -350,7 +350,7 @@ export default function RunsPage() {
             onClick={() => setIsCreateModalOpen(true)}
             className="w-full sm:w-auto btn-primary"
           >
-            <Plus size={13} strokeWidth={4} /> NOUVEAU RUN
+            <Plus size={13} strokeWidth={4} /> LANCER UN RUN
           </button>
         </div>
       </header>
@@ -650,7 +650,7 @@ export default function RunsPage() {
                     </>
                   )}
                   <Link href="/athletes" className="btn-secondary h-11">
-                    LES ATHLÈTES
+                    LE CREW
                   </Link>
                 </div>
               </div>
@@ -675,10 +675,10 @@ export default function RunsPage() {
             <div className="space-y-1.5 pb-4 border-b-[0.5px] border-black/10">
               <div className="flex items-center gap-2">
                 <div className="w-2.5 h-2.5 bg-[#FF5C00] rounded-full" />
-                <h3 className="text-[18px] font-display italic font-black uppercase text-black">PLANIFIER UNE SORTIE</h3>
+                <h3 className="text-[18px] font-display italic font-black uppercase text-black">LANCER UN RUN</h3>
               </div>
               <p className="text-[9px] font-bold text-[#A3A3A3] uppercase tracking-wider">
-                PROGRAMMATION DE LA PROCHAINE SESSION
+                LANCEMENT DE LA PROCHAINE SESSION
               </p>
             </div>
 
@@ -1028,10 +1028,10 @@ export default function RunsPage() {
                   {isSubmitting ? (
                     <>
                       <div className="w-3.5 h-3.5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-                      CRÉATION EN COURS...
+                      LANCEMENT EN COURS...
                     </>
                   ) : (
-                    "CRÉER LE RUN ⚡"
+                    "LANCER LE RUN ⚡"
                   )}
                 </button>
               </form>
