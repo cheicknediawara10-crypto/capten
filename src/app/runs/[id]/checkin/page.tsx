@@ -189,7 +189,8 @@ function CheckinFormContent() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: inputName.trim(),
-          phone: inputPhone.trim()
+          phone: inputPhone.trim(),
+          run_id: runId
         })
       });
 

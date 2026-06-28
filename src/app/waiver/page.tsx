@@ -170,14 +170,46 @@ function WaiverForm() {
     const token = `sha256:${Math.random().toString(16).substring(2, 10)}...${Math.random().toString(16).substring(2, 4)}`;
     setSignatureToken(token);
 
-    // 1. Update signed status via secure API route
-    if (runnerId) {
+    let activeRunnerId = runnerId;
+
+    // 1. If runnerId is not present, identify/create the runner first using the name and phone
+    if (!activeRunnerId) {
+      try {
+        const name = `${firstName.trim()} ${lastName.trim()}`;
+        const resIdentify = await fetch('/api/runners/identify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name,
+            phone: phone.trim(),
+            run_id: runId
+          })
+        });
+
+        if (resIdentify.ok) {
+          const dataIdentify = await resIdentify.json();
+          if (dataIdentify && dataIdentify.success && dataIdentify.runner) {
+            activeRunnerId = dataIdentify.runner.id;
+            if (typeof window !== "undefined") {
+              localStorage.setItem('capten_runner_profile', JSON.stringify(dataIdentify.runner));
+            }
+          } else {
+            console.error("Waiver auto-identify failed:", dataIdentify.error);
+          }
+        }
+      } catch (err) {
+        console.error("Waiver auto-identify network error:", err);
+      }
+    }
+
+    // 2. Update signed status via secure API route
+    if (activeRunnerId) {
       try {
         const res = await fetch('/api/waiver/sign', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            runner_id: runnerId,
+            runner_id: activeRunnerId,
             token,
             emergency_name: emergencyName,
             emergency_phone: emergencyPhone,
@@ -191,42 +223,23 @@ function WaiverForm() {
           })
         });
 
-        if (!res.ok) {
+        if (res.ok) {
+          // Fetch updated profile to ensure it is in LocalStorage with signed_waiver: true
+          const resProfile = await fetch(`/api/runners/profile?id=${encodeURIComponent(activeRunnerId)}`);
+          if (resProfile.ok) {
+            const dataProfile = await resProfile.json();
+            if (dataProfile && dataProfile.success && dataProfile.runner) {
+              if (typeof window !== "undefined") {
+                localStorage.setItem('capten_runner_profile', JSON.stringify(dataProfile.runner));
+              }
+            }
+          }
+        } else {
           const errData = await res.json().catch(() => ({}));
           console.error('API error updating waiver:', errData.error || res.statusText);
         }
       } catch (err) {
         console.error('Network error during waiver update:', err);
-      }
-    }
-
-    // 2. Update LocalStorage runner profile
-    if (typeof window !== "undefined") {
-      const stored = localStorage.getItem('capten_runner_profile');
-      if (stored) {
-        try {
-          const profile = JSON.parse(stored);
-          if (profile.id === runnerId) {
-            const updated = {
-              ...profile,
-              signed_waiver: true,
-              waiver_date: new Date().toISOString(),
-              waiver_token: token,
-              emergency_name: emergencyName,
-              emergency_phone: emergencyPhone,
-              emergency_relation: emergencyRelation,
-              birth_date: dob,
-              blood_type: bloodType,
-              allergies: allergies,
-              health_issues: healthIssues,
-              insurance: insurance,
-              address: address
-            };
-            localStorage.setItem('capten_runner_profile', JSON.stringify(updated));
-          }
-        } catch (e) {
-          console.error("Error updating LocalStorage waiver status:", e);
-        }
       }
     }
 

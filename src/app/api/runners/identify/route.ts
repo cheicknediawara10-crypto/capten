@@ -4,7 +4,7 @@ import { getSupabaseAdmin } from '@/lib/supabase';
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { name, phone } = body;
+    const { name, phone, run_id, club_id } = body;
 
     if (!name || !phone) {
       return NextResponse.json(
@@ -38,12 +38,35 @@ export async function POST(request: Request) {
       });
     }
 
-    // 1. Search for existing runner by phone number
-    const { data: existingRunner, error: findError } = await supabaseAdmin
+    // Resolve club_id from run_id if not directly provided
+    let resolvedClubId = club_id;
+    if (!resolvedClubId && run_id) {
+      const { data: runData, error: runError } = await supabaseAdmin
+        .from('runs')
+        .select('club_id')
+        .eq('id', run_id)
+        .maybeSingle();
+
+      if (runError) {
+        console.error("Error resolving club_id from run:", runError);
+      } else if (runData) {
+        resolvedClubId = runData.club_id;
+      }
+    }
+
+    // 1. Search for existing runner by phone number AND club_id
+    let query = supabaseAdmin
       .from('runners')
       .select('*')
-      .eq('phone', cleanPhone)
-      .maybeSingle();
+      .eq('phone', cleanPhone);
+      
+    if (resolvedClubId) {
+      query = query.eq('club_id', resolvedClubId);
+    } else {
+      query = query.is('club_id', null);
+    }
+
+    const { data: existingRunner, error: findError } = await query.maybeSingle();
 
     if (findError) {
       console.error("Error looking up runner:", findError);
@@ -70,13 +93,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: true, runner: existingRunner });
     }
 
-    // 3. Create a new runner profile
+    // 3. Create a new runner profile scoped to the club
     const { data: newRunner, error: insertError } = await supabaseAdmin
       .from('runners')
       .insert({
         name,
         phone: cleanPhone,
-        signed_waiver: false
+        signed_waiver: false,
+        club_id: resolvedClubId || null
       })
       .select()
       .single();
