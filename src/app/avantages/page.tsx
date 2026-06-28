@@ -557,7 +557,7 @@ export default function AvantagesPage() {
                     </div>
                     <div className="flex justify-between items-center py-2.5">
                       <span className="text-[9px] font-black text-[#A3A3A3] uppercase tracking-widest">EMAIL B2B</span>
-                      <a href="mailto:operations@capten.run" className="text-[11px] font-bold text-[#FF5C00] uppercase hover:underline">operations@capten.run</a>
+                      <a href="mailto:operations@capten.app" className="text-[11px] font-bold text-[#FF5C00] uppercase hover:underline">operations@capten.app</a>
                     </div>
                   </div>
                 </section>

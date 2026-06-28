@@ -1,14 +1,14 @@
 import { Athlete, Run, CagnotteData, DashboardStats } from "@/types/capten";
 
 export const mockAthletes: Athlete[] = [
-  { id: "1", name: "Lucas Martin", initials: "LM", reliability: 98, performance: "4:15/K", email: "lucas@capten.run" },
-  { id: "2", name: "Sofia Dubois", initials: "SD", reliability: 94, performance: "4:42/K", email: "sofia@capten.run" },
-  { id: "3", name: "Théo Bernard", initials: "TB", reliability: 87, performance: "5:10/K", email: "theo@capten.run" },
-  { id: "4", name: "Emma Leroy", initials: "EL", reliability: 92, performance: "4:55/K", email: "emma@capten.run" },
-  { id: "5", name: "Noah Moreau", initials: "NM", reliability: 76, performance: "5:30/K", email: "noah@capten.run" },
-  { id: "6", name: "Chloé Petit", initials: "CP", reliability: 100, performance: "4:08/K", email: "chloe@capten.run" },
-  { id: "7", name: "Raphaël Simon", initials: "RS", reliability: 85, performance: "5:22/K", email: "raphael@capten.run" },
-  { id: "8", name: "Léa Laurent", initials: "LL", reliability: 91, performance: "4:48/K", email: "lea@capten.run" },
+  { id: "1", name: "Lucas Martin", initials: "LM", reliability: 98, performance: "4:15/K", email: "lucas@capten.app" },
+  { id: "2", name: "Sofia Dubois", initials: "SD", reliability: 94, performance: "4:42/K", email: "sofia@capten.app" },
+  { id: "3", name: "Théo Bernard", initials: "TB", reliability: 87, performance: "5:10/K", email: "theo@capten.app" },
+  { id: "4", name: "Emma Leroy", initials: "EL", reliability: 92, performance: "4:55/K", email: "emma@capten.app" },
+  { id: "5", name: "Noah Moreau", initials: "NM", reliability: 76, performance: "5:30/K", email: "noah@capten.app" },
+  { id: "6", name: "Chloé Petit", initials: "CP", reliability: 100, performance: "4:08/K", email: "chloe@capten.app" },
+  { id: "7", name: "Raphaël Simon", initials: "RS", reliability: 85, performance: "5:22/K", email: "raphael@capten.app" },
+  { id: "8", name: "Léa Laurent", initials: "LL", reliability: 91, performance: "4:48/K", email: "lea@capten.app" },
 ];
 
 export const mockRuns: Run[] = [

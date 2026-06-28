@@ -122,16 +122,16 @@ export default function SettingsPage() {
         setCoaches(JSON.parse(savedCoaches));
       } catch (e) {
         setCoaches([
-          { name: "Moi (Propriétaire)", email: "contact@capten.run", role: "Créateur" },
-          { name: "Alexandre Dupont", email: "alex@capten.run", role: "Coach Principal" },
-          { name: "Julie Martin", email: "julie@capten.run", role: "Meneuse d'Allure" }
+          { name: "Moi (Propriétaire)", email: "contact@capten.app", role: "Créateur" },
+          { name: "Alexandre Dupont", email: "alex@capten.app", role: "Coach Principal" },
+          { name: "Julie Martin", email: "julie@capten.app", role: "Meneuse d'Allure" }
         ]);
       }
     } else {
       const defaultCoaches = [
-        { name: "Moi (Propriétaire)", email: "contact@capten.run", role: "Créateur" },
-        { name: "Alexandre Dupont", email: "alex@capten.run", role: "Coach Principal" },
-        { name: "Julie Martin", email: "julie@capten.run", role: "Meneuse d'Allure" }
+        { name: "Moi (Propriétaire)", email: "contact@capten.app", role: "Créateur" },
+        { name: "Alexandre Dupont", email: "alex@capten.app", role: "Coach Principal" },
+        { name: "Julie Martin", email: "julie@capten.app", role: "Meneuse d'Allure" }
       ];
       setCoaches(defaultCoaches);
       localStorage.setItem('capten_coaches', JSON.stringify(defaultCoaches));
