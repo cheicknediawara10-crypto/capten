@@ -1,17 +1,34 @@
 import { NextResponse } from 'next/server';
 import { getSupabase } from '@/lib/supabase';
+import { getAuthenticatedCaptainId } from '@/lib/auth-server';
 
-// GET /api/runs — Lister tous les runs
-export async function GET() {
+export const dynamic = 'force-dynamic';
+
+// GET /api/runs — Lister les runs (scopés par club)
+export async function GET(request: Request) {
   const supabase = getSupabase();
   if (!supabase) {
     return NextResponse.json({ message: 'Supabase non configuré. Utilisez le mode local.' }, { status: 200 });
   }
 
   try {
+    const { searchParams } = new URL(request.url);
+    const paramClubId = searchParams.get('club_id');
+
+    // Résoudre le club_id (soit via session capitaine, soit via paramètre public)
+    let clubId = paramClubId;
+    if (!clubId) {
+      clubId = await getAuthenticatedCaptainId();
+    }
+
+    if (!clubId) {
+      return NextResponse.json({ error: 'club_id manquant ou non authentifié' }, { status: 400 });
+    }
+
     const { data, error } = await supabase
       .from('runs')
       .select('*')
+      .eq('club_id', clubId)
       .order('date_start', { ascending: true });
 
     if (error) {
@@ -23,7 +40,7 @@ export async function GET() {
   }
 }
 
-// POST /api/runs — Créer un nouveau run
+// POST /api/runs — Créer un nouveau run (scopé par session capitaine)
 export async function POST(request: Request) {
   const supabase = getSupabase();
   if (!supabase) {
@@ -31,8 +48,13 @@ export async function POST(request: Request) {
   }
 
   try {
+    const captainId = await getAuthenticatedCaptainId();
+    if (!captainId) {
+      return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
+    }
+
     const body = await request.json().catch(() => ({}));
-    const { title, description, date_start, location_start, gpx_route_url, max_slots, reminder_offset_minutes } = body;
+    const { title, description, date_start, location_start, gpx_route_url, max_slots, reminder_offset_minutes, vibe, coach } = body;
 
     if (!title || !date_start || !location_start) {
       return NextResponse.json({ error: 'Champs obligatoires : title, date_start, location_start' }, { status: 400 });
@@ -54,6 +76,10 @@ export async function POST(request: Request) {
         status: 'scheduled',
         scheduled_at: date_start,
         reminder_offset_minutes: reminder_offset_minutes !== undefined ? parseInt(String(reminder_offset_minutes)) : 30,
+        club_id: captainId,
+        captain_id: captainId,
+        vibe: vibe || 'Social & Chill',
+        coach: coach || 'Alex Rivière'
       }])
       .select()
       .single();

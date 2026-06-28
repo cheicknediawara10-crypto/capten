@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Search, Plus, Zap, Activity, CheckCircle2, XCircle, RefreshCw, X, Phone, AlertTriangle, Heart, Mail, MapPin, Shield, MessageSquare, Copy, Check } from 'lucide-react';
 import { getSupabase } from '@/lib/supabase';
+import { useAuth } from '@/context/AuthContext';
 
 const getInitials = (name: string) => {
   if (!name) return "";
@@ -15,6 +16,7 @@ const getInitials = (name: string) => {
 };
 
 interface Athlete {
+  id?: string;
   initial: string;
   name: string;
   firstName: string;
@@ -47,7 +49,48 @@ interface Athlete {
   waiverToken?: string;
 }
 
+const mapRunnerToAthlete = (runner: any): Athlete => {
+  const nameParts = (runner.name || '').trim().split(/\s+/);
+  const firstName = nameParts[0] || '';
+  const lastName = nameParts.slice(1).join(' ') || '';
+  
+  return {
+    id: runner.id,
+    initial: runner.name ? getInitials(runner.name) : '',
+    name: runner.name || '',
+    firstName,
+    lastName,
+    role: runner.is_blacklisted ? `${runner.role || 'Membre'} (Banni)` : (runner.role || 'Membre'),
+    reliability: runner.reliability ?? 90,
+    pace: runner.pace || '5:00/K',
+    totalKm: `${runner.total_km ?? 0} km`,
+    lastRun: runner.last_run || 'Jamais',
+    runs: runner.runs_count ?? 0,
+    img: runner.avatar_url || '',
+    streak: runner.streak_count ?? 0,
+    tier: runner.reliability >= 95 ? "OR" : (runner.reliability >= 85 ? "ARGENT" : "BRONZE"),
+    tierColor: runner.reliability >= 95 ? "#FFD700" : (runner.reliability >= 85 ? "#C0C0C0" : "#CD7F32"),
+    phone: runner.phone || '',
+    email: runner.email || '',
+    emergencyName: runner.emergency_name || '',
+    emergencyPhone: runner.emergency_phone || '',
+    emergencyRelation: runner.emergency_relation || 'Conjoint',
+    birthDate: runner.birth_date || '',
+    bloodType: runner.blood_type || 'A+',
+    allergies: runner.allergies || 'Aucune',
+    healthIssues: runner.health_issues || 'Aucun',
+    insurance: runner.insurance || 'Non spécifiée',
+    joinDate: runner.join_date || 'Juin 2026',
+    address: runner.address || 'Non spécifiée',
+    waiverStatus: runner.signed_waiver ? "SIGNÉE" : "NON SIGNÉE",
+    waiverDate: runner.waiver_date ? new Date(runner.waiver_date).toLocaleDateString('fr-FR') : undefined,
+    waiverIp: runner.waiver_ip,
+    waiverToken: runner.waiver_token
+  };
+};
+
 export default function AthletesPage() {
+  const { user, isMock } = useAuth();
   const [selectedAthlete, setSelectedAthlete] = useState<Athlete | null>(null);
   const [athletes, setAthletes] = useState<Athlete[]>([]);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -83,6 +126,35 @@ export default function AthletesPage() {
   // States for search function
   const [searchQuery, setSearchQuery] = useState("");
 
+  const loadAthletes = async () => {
+    if (isMock) {
+      const stored = localStorage.getItem('capten_athletes_v3');
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          setAthletes(parsed);
+        } catch (e) {
+          console.error(e);
+        }
+      } else {
+        setAthletes([]);
+        localStorage.setItem('capten_athletes_v3', JSON.stringify([]));
+      }
+    } else {
+      try {
+        const res = await fetch('/api/runners');
+        if (res.ok) {
+          const runners = await res.json();
+          if (Array.isArray(runners)) {
+            setAthletes(runners.map(mapRunnerToAthlete));
+          }
+        }
+      } catch (err) {
+        console.error("Error loading athletes from server:", err);
+      }
+    }
+  };
+
   const handlePardonAthlete = async (athlete: Athlete) => {
     if (!window.confirm(`Voulez-vous vraiment lever la suspension de ${athlete.name} ?`)) return;
 
@@ -111,21 +183,24 @@ export default function AthletesPage() {
         }
       }
 
-      // 3. Update localStorage and local state
-      const stored = localStorage.getItem('capten_athletes_v3');
-      if (stored) {
-        const list = JSON.parse(stored);
-        const updatedList = list.map((a: any) => {
-          if (a.name.toLowerCase() === athlete.name.toLowerCase()) {
-            const cleanRole = a.role.replace(/\s*\(Banni\)/gi, "");
-            return { ...a, role: cleanRole };
-          }
-          return a;
-        });
-        localStorage.setItem('capten_athletes_v3', JSON.stringify(updatedList));
-        setAthletes(updatedList);
-        setSelectedAthlete(prev => prev ? { ...prev, role: prev.role.replace(/\s*\(Banni\)/gi, "") } : null);
+      if (isMock) {
+        // Update localStorage
+        const stored = localStorage.getItem('capten_athletes_v3');
+        if (stored) {
+          const list = JSON.parse(stored);
+          const updatedList = list.map((a: any) => {
+            if (a.name.toLowerCase() === athlete.name.toLowerCase()) {
+              const cleanRole = a.role.replace(/\s*\(Banni\)/gi, "");
+              return { ...a, role: cleanRole };
+            }
+            return a;
+          });
+          localStorage.setItem('capten_athletes_v3', JSON.stringify(updatedList));
+        }
       }
+
+      await loadAthletes();
+      setSelectedAthlete(prev => prev ? { ...prev, role: prev.role.replace(/\s*\(Banni\)/gi, "") } : null);
       alert(`La suspension de ${athlete.name} a été levée avec succès.`);
     } catch (err) {
       console.error(err);
@@ -146,20 +221,23 @@ export default function AthletesPage() {
         })
       });
 
-      // Update LocalStorage and local state
-      const stored = localStorage.getItem('capten_athletes_v3');
-      if (stored) {
-        const list = JSON.parse(stored);
-        const updatedList = list.map((a: any) => {
-          if (a.name.toLowerCase() === athlete.name.toLowerCase()) {
-            return { ...a, role: a.role.toLowerCase().includes("banni") ? a.role : a.role + " (Banni)" };
-          }
-          return a;
-        });
-        localStorage.setItem('capten_athletes_v3', JSON.stringify(updatedList));
-        setAthletes(updatedList);
-        setSelectedAthlete(prev => prev ? { ...prev, role: prev.role.toLowerCase().includes("banni") ? prev.role : prev.role + " (Banni)" } : null);
+      if (isMock) {
+        // Update LocalStorage
+        const stored = localStorage.getItem('capten_athletes_v3');
+        if (stored) {
+          const list = JSON.parse(stored);
+          const updatedList = list.map((a: any) => {
+            if (a.name.toLowerCase() === athlete.name.toLowerCase()) {
+              return { ...a, role: a.role.toLowerCase().includes("banni") ? a.role : a.role + " (Banni)" };
+            }
+            return a;
+          });
+          localStorage.setItem('capten_athletes_v3', JSON.stringify(updatedList));
+        }
       }
+
+      await loadAthletes();
+      setSelectedAthlete(prev => prev ? { ...prev, role: prev.role.toLowerCase().includes("banni") ? prev.role : prev.role + " (Banni)" } : null);
       alert(`Le membre ${athlete.name} a été suspendu.`);
     } catch (err) {
       console.error(err);
@@ -167,31 +245,7 @@ export default function AthletesPage() {
     }
   };
 
-  const initialAthletes: Athlete[] = [];
-
   useEffect(() => {
-    const loadAthletes = () => {
-      const stored = localStorage.getItem('capten_athletes_v3');
-      if (stored) {
-        try {
-          const parsed = JSON.parse(stored);
-          setAthletes(parsed);
-          
-          // Refresh selected athlete details to update waiver status immediately
-          setSelectedAthlete(prev => {
-            if (!prev) return null;
-            const updated = parsed.find((a: Athlete) => a.role === prev.role);
-            return updated || prev;
-          });
-        } catch (e) {
-          console.error(e);
-        }
-      } else {
-        setAthletes(initialAthletes);
-        localStorage.setItem('capten_athletes_v3', JSON.stringify(initialAthletes));
-      }
-    };
-
     loadAthletes();
 
     if (typeof window !== 'undefined') {
@@ -206,7 +260,17 @@ export default function AthletesPage() {
         window.removeEventListener('focus', loadAthletes);
       };
     }
-  }, []);
+  }, [isMock]);
+
+  // Keep selected athlete in sync when athletes list changes (like waiver signed)
+  useEffect(() => {
+    if (selectedAthlete) {
+      const updated = athletes.find(a => a.phone === selectedAthlete.phone || a.id === selectedAthlete.id);
+      if (updated) {
+        setSelectedAthlete(updated);
+      }
+    }
+  }, [athletes]);
 
 
   return (
@@ -625,19 +689,18 @@ export default function AthletesPage() {
                 </button>
               </div>
             ) : (
-              <form onSubmit={(e) => {
+              <form onSubmit={async (e) => {
                 e.preventDefault();
                 setIsSubmitting(true);
-                setTimeout(() => {
-                  const randomId = Math.floor(Math.random() * 100) + 10;
-                  const initial = formData.firstName.charAt(0).toUpperCase();
-                  const fullName = `${formData.firstName} ${formData.lastName}`.trim();
-                  const recruitIdNumber = athletes.length + 1;
-                  const roleWithId = `${formData.role} · ID: M${recruitIdNumber}`;
-                  const athleteIdParam = `M${recruitIdNumber}`;
+                
+                const fullName = `${formData.firstName} ${formData.lastName}`.trim();
+                const recruitIdNumber = athletes.length + 1;
+                const roleWithId = `${formData.role} · ID: M${recruitIdNumber}`;
+                const athleteIdParam = `M${recruitIdNumber}`;
 
+                if (isMock) {
                   const newAthlete: Athlete = {
-                    initial,
+                    initial: formData.firstName.charAt(0).toUpperCase(),
                     name: fullName,
                     firstName: formData.firstName,
                     lastName: formData.lastName,
@@ -672,29 +735,65 @@ export default function AthletesPage() {
 
                   const link = `${window.location.origin}/waiver?athleteId=${athleteIdParam}`;
                   setNewAthleteLink(link);
-                  setIsSubmitting(false);
-                  setIsSuccess(true);
-                  
-                  // Reset form fields
-                  setFormData({
-                    firstName: "",
-                    lastName: "",
-                    role: "Membre",
-                    reliability: "90",
-                    pace: "5:00/K",
-                    phone: "",
-                    email: "",
-                    address: "",
-                    birthDate: "",
-                    bloodType: "A+",
-                    allergies: "Aucune",
-                    healthIssues: "Aucun",
-                    insurance: "",
-                    emergencyName: "",
-                    emergencyRelation: "Conjoint",
-                    emergencyPhone: "",
-                  });
-                }, 1000);
+                } else {
+                  try {
+                    const res = await fetch('/api/runners', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        name: fullName,
+                        phone: formData.phone,
+                        email: formData.email,
+                        role: formData.role,
+                        reliability: parseInt(formData.reliability) || 90,
+                        pace: formData.pace,
+                        emergency_name: formData.emergencyName,
+                        emergency_phone: formData.emergencyPhone,
+                        emergency_relation: formData.emergencyRelation,
+                        birth_date: formData.birthDate,
+                        blood_type: formData.bloodType,
+                        allergies: formData.allergies,
+                        health_issues: formData.healthIssues,
+                        insurance: formData.insurance,
+                        address: formData.address
+                      })
+                    });
+                    if (res.ok) {
+                      const newRunner = await res.json();
+                      await loadAthletes();
+                      const link = `${window.location.origin}/waiver?runnerId=${newRunner.id}`;
+                      setNewAthleteLink(link);
+                    } else {
+                      alert("Erreur lors de l'enregistrement du coureur.");
+                    }
+                  } catch (err) {
+                    console.error("Error creating runner:", err);
+                    alert("Erreur lors de la création du coureur.");
+                  }
+                }
+
+                setIsSubmitting(false);
+                setIsSuccess(true);
+                
+                // Reset form fields
+                setFormData({
+                  firstName: "",
+                  lastName: "",
+                  role: "Membre",
+                  reliability: "90",
+                  pace: "5:00/K",
+                  phone: "",
+                  email: "",
+                  address: "",
+                  birthDate: "",
+                  bloodType: "A+",
+                  allergies: "Aucune",
+                  healthIssues: "Aucun",
+                  insurance: "",
+                  emergencyName: "",
+                  emergencyRelation: "Conjoint",
+                  emergencyPhone: "",
+                });
               }} className="space-y-4">
                 
                 <div className="grid grid-cols-2 gap-4">

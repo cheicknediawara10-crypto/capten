@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { LayoutDashboard, Users, MapPin, Wallet, Zap, MessageSquare, ArrowRight, Plus, Trophy, Activity, Globe, Heart, Flame, CheckCircle2, RefreshCw } from 'lucide-react';
 import { getSupabase } from '@/lib/supabase';
+import { useAuth } from '@/context/AuthContext';
 
 // === HELPERS MÉTÉO ===
 function getCoordinates(location: string): { latitude: number; longitude: number } {
@@ -45,9 +46,9 @@ const getInitials = (name: string) => {
 };
 
 export default function DashboardPage() {
+  const { user, club, isMock, refreshClub } = useAuth();
   const [quotaExceeded, setQuotaExceeded] = useState(false);
   const [time, setTime] = useState<Date | null>(null);
-
 
   useEffect(() => {
     setTime(new Date());
@@ -78,58 +79,99 @@ export default function DashboardPage() {
   const [skipOnboarding, setSkipOnboarding] = useState(false);
 
   useEffect(() => {
-    // Load Onboarding States
-    const savedStep = localStorage.getItem('capten_onboarding_step');
-    if (savedStep) setOnboardingStep(parseInt(savedStep));
+    if (!isMock && club) {
+      // Sync Onboarding States from Supabase B2B club metadata
+      setOnboardingStep(club.branding?.onboarding_step || 1);
+      setSkipOnboarding(club.branding?.onboarding_skipped === true);
+      setClubName(club.name || '');
+      setOnboardingClubName(club.name || '');
+      setHasLogo(!!club.branding?.logo);
+      setInstagramCopied(club.branding?.instagram_copied === true);
+      setChecklistCollapsed(club.branding?.checklist_collapsed === true);
+      setIsChecklistVisible(club.branding?.checklist_hidden !== true);
+      setCagnotteUrl(club.cagnotte_url || null);
+      setSpotName(club.spot_name || null);
 
-    const skipped = localStorage.getItem('capten_onboarding_skipped') === 'true';
-    setSkipOnboarding(skipped);
-
-    // Load Brand Setup Status
-    const savedName = localStorage.getItem('capten_club_name') || localStorage.getItem('capten_onboarding_s2_name') || '';
-    setClubName(savedName);
-    if (savedName) setOnboardingClubName(savedName);
-    
-    const savedLogo = localStorage.getItem('capten_logo') || '';
-    setHasLogo(!!savedLogo);
-
-    // Load Plan Run Status
-    const storedRuns = localStorage.getItem('capten_runs_v3');
-    if (storedRuns) {
-      try {
-        const parsed = JSON.parse(storedRuns);
-        if (Array.isArray(parsed)) {
-          setRuns(parsed);
-          setHasRuns(parsed.length > 0);
+      // Fetch runs and athletes from Supabase B2B endpoints
+      const fetchServerData = async () => {
+        try {
+          const [runsRes, runnersRes] = await Promise.all([
+            fetch('/api/runs'),
+            fetch('/api/runners')
+          ]);
+          if (runsRes.ok) {
+            const runsData = await runsRes.json();
+            if (Array.isArray(runsData)) {
+              setRuns(runsData);
+              setHasRuns(runsData.length > 0);
+            }
+          }
+          if (runnersRes.ok) {
+            const runnersData = await runnersRes.json();
+            if (Array.isArray(runnersData)) {
+              setAthletes(runnersData);
+            }
+          }
+        } catch (e) {
+          console.error("Error fetching dashboard server data:", e);
         }
-      } catch (e) {
-        setHasRuns(false);
+      };
+      fetchServerData();
+    } else {
+      // Load Onboarding States from LocalStorage (Mock Fallback)
+      const savedStep = localStorage.getItem('capten_onboarding_step');
+      if (savedStep) setOnboardingStep(parseInt(savedStep));
+
+      const skipped = localStorage.getItem('capten_onboarding_skipped') === 'true';
+      setSkipOnboarding(skipped);
+
+      // Load Brand Setup Status
+      const savedName = localStorage.getItem('capten_club_name') || localStorage.getItem('capten_onboarding_s2_name') || '';
+      setClubName(savedName);
+      if (savedName) setOnboardingClubName(savedName);
+      
+      const savedLogo = localStorage.getItem('capten_logo') || '';
+      setHasLogo(!!savedLogo);
+
+      // Load Plan Run Status
+      const storedRuns = localStorage.getItem('capten_runs_v3');
+      if (storedRuns) {
+        try {
+          const parsed = JSON.parse(storedRuns);
+          if (Array.isArray(parsed)) {
+            setRuns(parsed);
+            setHasRuns(parsed.length > 0);
+          }
+        } catch (e) {
+          setHasRuns(false);
+        }
+      }
+
+      // Load Instagram Status
+      const isInstaCopied = localStorage.getItem('capten_onboarding_instagram_copied') === 'true';
+      setInstagramCopied(isInstaCopied);
+
+      // Load collapse state
+      const collapsed = localStorage.getItem('capten_onboarding_collapsed') === 'true';
+      setChecklistCollapsed(collapsed);
+
+      // Load hidden state
+      const hidden = localStorage.getItem('capten_onboarding_hidden') === 'true';
+      setIsChecklistVisible(!hidden);
+
+      // Load Local Storage values for cagnotte, spot and athletes
+      const savedCagnotte = localStorage.getItem('capten_cagnotte_url');
+      if (savedCagnotte) setCagnotteUrl(savedCagnotte);
+      const savedSpot = localStorage.getItem('capten_spot_name');
+      if (savedSpot) setSpotName(savedSpot);
+      const storedAthletes = localStorage.getItem('capten_athletes_v3');
+      if (storedAthletes) {
+        try {
+          setAthletes(JSON.parse(storedAthletes));
+        } catch (e) {}
       }
     }
 
-    // Load Instagram Status
-    const isInstaCopied = localStorage.getItem('capten_onboarding_instagram_copied') === 'true';
-    setInstagramCopied(isInstaCopied);
-
-    // Load collapse state
-    const collapsed = localStorage.getItem('capten_onboarding_collapsed') === 'true';
-    setChecklistCollapsed(collapsed);
-
-    // Load hidden state
-    const hidden = localStorage.getItem('capten_onboarding_hidden') === 'true';
-    setIsChecklistVisible(!hidden);
-
-    // Load Local Storage values for cagnotte, spot and athletes
-    const savedCagnotte = localStorage.getItem('capten_cagnotte_url');
-    if (savedCagnotte) setCagnotteUrl(savedCagnotte);
-    const savedSpot = localStorage.getItem('capten_spot_name');
-    if (savedSpot) setSpotName(savedSpot);
-    const storedAthletes = localStorage.getItem('capten_athletes_v3');
-    if (storedAthletes) {
-      try {
-        setAthletes(JSON.parse(storedAthletes));
-      } catch (e) {}
-    }
     // Load notifications
     const savedNotifs = localStorage.getItem('capten_inapp_notifications');
     if (savedNotifs) {
@@ -172,13 +214,32 @@ export default function DashboardPage() {
       setNotifications(defaultNotifs);
       localStorage.setItem('capten_inapp_notifications', JSON.stringify(defaultNotifs));
     }
-  }, []);
+  }, [club, isMock]);
 
-  const handleCopyClubLink = () => {
-    const clubUrl = `${window.location.origin}/the-crew-trail`;
-    navigator.clipboard.writeText(clubUrl);
+  const handleCopyClubLink = async () => {
+    const clubUrl = `${window.location.origin}/${generateSlug(clubName)}`;
+    await navigator.clipboard.writeText(clubUrl);
     setInstagramCopied(true);
-    localStorage.setItem('capten_onboarding_instagram_copied', 'true');
+
+    if (isMock) {
+      localStorage.setItem('capten_onboarding_instagram_copied', 'true');
+    } else {
+      try {
+        await fetch('/api/club/settings', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            branding: {
+              ...club?.branding,
+              instagram_copied: true
+            }
+          })
+        });
+        await refreshClub();
+      } catch (e) {
+        console.error(e);
+      }
+    }
     alert("Lien du club copié ! Collez-le dans votre bio Instagram.");
   };
 
@@ -249,41 +310,19 @@ export default function DashboardPage() {
               setFirstName(extractFirstName(fn));
             }
 
-            const { data: club, error } = await supabase
+            const { data: dbClub, error } = await supabase
               .from('clubs')
               .select('whatsapp_messages_sent_this_month, whatsapp_display_name, cagnotte_url, spot_name')
               .eq('id', user.id)
               .single();
 
-            if (error || !club) {
-              const defaultName = user.user_metadata?.club_name || 'MON RUN CLUB';
-              await supabase
-                .from('clubs')
-                .insert({
-                  id: user.id,
-                  whatsapp_display_name: defaultName
-                });
-              
-              if (!clubName) {
-                setClubName(defaultName);
-                localStorage.setItem('capten_onboarding_s2_name', defaultName);
-              }
-            } else {
-              if (club.whatsapp_messages_sent_this_month >= 200) {
+            if (!error && dbClub) {
+              if (dbClub.whatsapp_messages_sent_this_month >= 200) {
                 setQuotaExceeded(true);
               }
-              if (club.whatsapp_display_name && !clubName) {
-                setClubName(club.whatsapp_display_name);
-                localStorage.setItem('capten_onboarding_s2_name', club.whatsapp_display_name);
-                setFirstName(extractFirstName(club.whatsapp_display_name));
-              }
-              if (club.cagnotte_url) {
-                setCagnotteUrl(club.cagnotte_url);
-                localStorage.setItem('capten_cagnotte_url', club.cagnotte_url);
-              }
-              if (club.spot_name) {
-                setSpotName(club.spot_name);
-                localStorage.setItem('capten_spot_name', club.spot_name);
+              if (dbClub.whatsapp_display_name && !clubName) {
+                setClubName(dbClub.whatsapp_display_name);
+                setFirstName(extractFirstName(dbClub.whatsapp_display_name));
               }
             }
           }
@@ -317,8 +356,6 @@ export default function DashboardPage() {
     a.emergencyPhone && a.emergencyPhone.trim() !== ''
   ).length;
 
-
-
   useEffect(() => {
     setWeatherInfo(null);
     async function fetchWeather() {
@@ -342,11 +379,24 @@ export default function DashboardPage() {
     fetchWeather();
   }, [latestRun?.id, latestRun?.location]);
 
-  const handleCancelRun = (runId: string) => {
+  const handleCancelRun = async (runId: string) => {
     if (window.confirm("Voulez-vous vraiment annuler ce run ?")) {
-      const updatedRuns = runs.filter((r: any) => r.id !== runId);
-      setRuns(updatedRuns);
-      localStorage.setItem('capten_runs_v3', JSON.stringify(updatedRuns));
+      if (isMock) {
+        const updatedRuns = runs.filter((r: any) => r.id !== runId);
+        setRuns(updatedRuns);
+        localStorage.setItem('capten_runs_v3', JSON.stringify(updatedRuns));
+      } else {
+        try {
+          await fetch(`/api/runs?id=${runId}`, { method: 'DELETE' });
+          const runsRes = await fetch('/api/runs');
+          if (runsRes.ok) {
+            const runsData = await runsRes.json();
+            setRuns(runsData);
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      }
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new Event('capten_runs_change'));
       }
@@ -368,25 +418,27 @@ export default function DashboardPage() {
     if (!onboardingClubName.trim()) return;
     const finalClubName = onboardingClubName.trim();
     setClubName(finalClubName);
-    localStorage.setItem('capten_club_name', finalClubName);
-    localStorage.setItem('capten_onboarding_s2_name', finalClubName);
     
-    // Save to Supabase
-    try {
-      const supabase = getSupabase();
-      if (supabase) {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user) {
-          await supabase
-            .from('clubs')
-            .upsert({
-              id: user.id,
-              whatsapp_display_name: finalClubName
-            });
-        }
+    if (isMock) {
+      localStorage.setItem('capten_club_name', finalClubName);
+      localStorage.setItem('capten_onboarding_s2_name', finalClubName);
+    } else {
+      try {
+        await fetch('/api/club/settings', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            whatsapp_display_name: finalClubName,
+            branding: {
+              ...club?.branding,
+              onboarding_step: 2
+            }
+          })
+        });
+        await refreshClub();
+      } catch (e) {
+        console.error(e);
       }
-    } catch (e) {
-      console.error(e);
     }
 
     // Trigger branding change event
@@ -397,14 +449,50 @@ export default function DashboardPage() {
     updateStep(2);
   };
 
-  const handleGoToDashboard = () => {
+  const handleGoToDashboard = async () => {
     setSkipOnboarding(true);
-    localStorage.setItem('capten_onboarding_skipped', 'true');
+    if (isMock) {
+      localStorage.setItem('capten_onboarding_skipped', 'true');
+    } else {
+      try {
+        await fetch('/api/club/settings', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            branding: {
+              ...club?.branding,
+              onboarding_skipped: true
+            }
+          })
+        });
+        await refreshClub();
+      } catch (e) {
+        console.error(e);
+      }
+    }
   };
 
-  const updateStep = (step: number) => {
+  const updateStep = async (step: number) => {
     setOnboardingStep(step);
-    localStorage.setItem('capten_onboarding_step', String(step));
+    if (isMock) {
+      localStorage.setItem('capten_onboarding_step', String(step));
+    } else {
+      try {
+        await fetch('/api/club/settings', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            branding: {
+              ...club?.branding,
+              onboarding_step: step
+            }
+          })
+        });
+        await refreshClub();
+      } catch (e) {
+        console.error(e);
+      }
+    }
   };
 
   const renderProgressSteps = (step: number) => {
@@ -415,6 +503,9 @@ export default function DashboardPage() {
         <span className={step === 2 ? "text-[#FF5C00] font-bold" : "text-[#9B9B93]"}>② Ton lien</span>
         <span className="text-neutral-300">———</span>
         <span className={step === 3 ? "text-[#FF5C00] font-bold" : "text-[#9B9B93]"}>③ Ton premier run</span>
+      </div>
+    );
+  };ext-[#FF5C00] font-bold" : "text-[#9B9B93]"}>③ Ton premier run</span>
       </div>
     );
   };
@@ -701,10 +792,28 @@ export default function DashboardPage() {
                 </div>
               )}
               <button
-                onClick={() => {
+                onClick={async () => {
                   const nextCollapsed = !checklistCollapsed;
                   setChecklistCollapsed(nextCollapsed);
-                  localStorage.setItem('capten_onboarding_collapsed', nextCollapsed.toString());
+                  if (isMock) {
+                    localStorage.setItem('capten_onboarding_collapsed', nextCollapsed.toString());
+                  } else {
+                    try {
+                      await fetch('/api/club/settings', {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                          branding: {
+                            ...club?.branding,
+                            checklist_collapsed: nextCollapsed
+                          }
+                        })
+                      });
+                      await refreshClub();
+                    } catch (e) {
+                      console.error(e);
+                    }
+                  }
                 }}
                 className="px-2.5 py-1.5 border border-[#E5E5E5] rounded-control text-[9px] font-bold uppercase tracking-wider bg-neutral-50 hover:bg-neutral-100 hover:text-black transition-all cursor-pointer"
               >
@@ -750,16 +859,36 @@ export default function DashboardPage() {
                         className="w-full px-3 py-2 border border-[#E5E5E5] rounded-control text-[11px] font-bold uppercase tracking-wider focus:outline-none focus:border-[#FF5C00] bg-white shadow-inner"
                       />
                       <button
-                        onClick={() => {
+                        onClick={async () => {
                           if (clubName.trim()) {
-                            localStorage.setItem('capten_club_name', clubName.trim());
-                            localStorage.setItem('capten_onboarding_s2_name', clubName.trim());
-                            localStorage.setItem('capten_onboarding_s2_saved', 'true');
+                            const trimmedName = clubName.trim();
+                            setClubName(trimmedName);
+                            if (isMock) {
+                              localStorage.setItem('capten_club_name', trimmedName);
+                              localStorage.setItem('capten_onboarding_s2_name', trimmedName);
+                              localStorage.setItem('capten_onboarding_s2_saved', 'true');
+                            } else {
+                              try {
+                                await fetch('/api/club/settings', {
+                                  method: 'PATCH',
+                                  headers: { 'Content-Type': 'application/json' },
+                                  body: JSON.stringify({
+                                    whatsapp_display_name: trimmedName,
+                                    branding: {
+                                      ...club?.branding,
+                                      onboarding_s2_saved: true
+                                    }
+                                  })
+                                });
+                                await refreshClub();
+                              } catch (e) {
+                                        console.error(e);
+                              }
+                            }
                             if (typeof window !== 'undefined') {
                               window.dispatchEvent(new Event('capten_branding_change'));
                             }
                             alert("Nom du club configuré !");
-                            setClubName(clubName.trim());
                           }
                         }}
                         className="w-full bg-[#FF5C00] text-white px-4 py-2 rounded-control text-[10px] font-black uppercase tracking-wider hover:bg-black transition-all active:scale-95 cursor-pointer shadow-sm"
@@ -862,9 +991,27 @@ export default function DashboardPage() {
                 </p>
               </div>
               <button
-                onClick={() => {
+                onClick={async () => {
                   setIsChecklistVisible(false);
-                  localStorage.setItem('capten_onboarding_hidden', 'true');
+                  if (isMock) {
+                    localStorage.setItem('capten_onboarding_hidden', 'true');
+                  } else {
+                    try {
+                      await fetch('/api/club/settings', {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                          branding: {
+                            ...club?.branding,
+                            checklist_hidden: true
+                          }
+                        })
+                      });
+                      await refreshClub();
+                    } catch (e) {
+                      console.error(e);
+                    }
+                  }
                 }}
                 className="w-full sm:w-auto px-6 py-2.5 bg-black text-white hover:bg-red-650 transition-all rounded-control text-[10px] font-black uppercase tracking-widest text-center cursor-pointer active:scale-95 shadow-sm"
               >

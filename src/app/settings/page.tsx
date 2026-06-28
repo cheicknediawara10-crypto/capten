@@ -4,8 +4,10 @@ import React from 'react';
 import Link from 'next/link';
 import { Settings, Share2, Shield, Wallet, Users, Monitor, Globe, Bell, CheckCircle2, AlertTriangle, Plus, ArrowRight, Smartphone, Sliders, Sparkles, CreditCard, ExternalLink, Check, DollarSign } from 'lucide-react';
 import { getSupabase } from '@/lib/supabase';
+import { useAuth } from '@/context/AuthContext';
 
 export default function SettingsPage() {
+  const { user, club, isMock, refreshClub } = useAuth();
   const [toast, setToast] = React.useState<string | null>(null);
   const [isSaving, setIsSaving] = React.useState(false);
   const [whatsappStatus, setWhatsappStatus] = React.useState<'loading' | 'connected' | 'disconnected'>('loading');
@@ -23,7 +25,7 @@ export default function SettingsPage() {
   const [cagnotteUrl, setCagnotteUrl] = React.useState('');
   const [isSavingCagnotte, setIsSavingCagnotte] = React.useState(false);
 
-  // New Interactive States for the Club Organizer
+  // Interactive States for the Club Organizer
   const [logoUrl, setLogoUrl] = React.useState<string | null>(null);
   const [primaryColor, setPrimaryColor] = React.useState('#FF5C00');
   const [sosNumbers, setSosNumbers] = React.useState('17, 18, 112');
@@ -81,8 +83,66 @@ export default function SettingsPage() {
     }
   };
 
+  // Sync settings with current club context
   React.useEffect(() => {
-    // Load subscription plan
+    if (!isMock && club) {
+      setCagnotteUrl(club.cagnotte_url || '');
+      setLogoUrl(club.branding?.logo || null);
+      setPrimaryColor(club.branding?.primary_color || '#FF5C00');
+      setSosNumbers(club.branding?.sos_numbers || '17, 18, 112');
+      setSafetyContact(club.branding?.safety_contact || '+33 6 99 88 77 66 (Adjoint)');
+      setIsSafeZoneActive(club.branding?.safezone_active !== false);
+      setZeroPressureMode(club.branding?.zero_pressure !== false);
+      setAutoRound(club.branding?.auto_round !== false);
+      setCoaches(club.coaches || []);
+    } else {
+      // LocalStorage Mode Fallback
+      const savedLogo = localStorage.getItem('capten_logo');
+      if (savedLogo) setLogoUrl(savedLogo);
+
+      const savedColor = localStorage.getItem('capten_primary_color');
+      if (savedColor) setPrimaryColor(savedColor);
+
+      const savedSos = localStorage.getItem('capten_sos_numbers');
+      if (savedSos) setSosNumbers(savedSos);
+
+      const savedSafety = localStorage.getItem('capten_safety_contact');
+      if (savedSafety) setSafetyContact(savedSafety);
+
+      const savedSafeZone = localStorage.getItem('capten_safezone_active');
+      if (savedSafeZone !== null) setIsSafeZoneActive(savedSafeZone === 'true');
+
+      const savedZeroPressure = localStorage.getItem('capten_zero_pressure');
+      if (savedZeroPressure !== null) setZeroPressureMode(savedZeroPressure === 'true');
+
+      const savedAutoRound = localStorage.getItem('capten_auto_round');
+      if (savedAutoRound !== null) setAutoRound(savedAutoRound === 'true');
+
+      const savedCagnotte = localStorage.getItem('capten_cagnotte_url');
+      if (savedCagnotte) setCagnotteUrl(savedCagnotte);
+
+      const savedCoaches = localStorage.getItem('capten_coaches');
+      if (savedCoaches) {
+        try {
+          setCoaches(JSON.parse(savedCoaches));
+        } catch (e) {
+          setCoaches([
+            { name: "Moi (Propriétaire)", email: "contact@capten.app", role: "Créateur" },
+            { name: "Alexandre Dupont", email: "alex@capten.app", role: "Coach Principal" },
+            { name: "Julie Martin", email: "julie@capten.app", role: "Meneuse d'Allure" }
+          ]);
+        }
+      } else {
+        const defaultCoaches = [
+          { name: "Moi (Propriétaire)", email: "contact@capten.app", role: "Créateur" },
+          { name: "Alexandre Dupont", email: "alex@capten.app", role: "Coach Principal" },
+          { name: "Julie Martin", email: "julie@capten.app", role: "Meneuse d'Allure" }
+        ];
+        setCoaches(defaultCoaches);
+        localStorage.setItem('capten_coaches', JSON.stringify(defaultCoaches));
+      }
+    }
+
     const savedPlan = localStorage.getItem('capten_plan');
     if (savedPlan) {
       setCurrentPlan(savedPlan);
@@ -91,118 +151,65 @@ export default function SettingsPage() {
       setCurrentPlan('PRO');
     }
 
-    // Load Local Settings
-    const savedLogo = localStorage.getItem('capten_logo');
-    if (savedLogo) setLogoUrl(savedLogo);
-
-    const savedColor = localStorage.getItem('capten_primary_color');
-    if (savedColor) setPrimaryColor(savedColor);
-
-    const savedSos = localStorage.getItem('capten_sos_numbers');
-    if (savedSos) setSosNumbers(savedSos);
-
-    const savedSafety = localStorage.getItem('capten_safety_contact');
-    if (savedSafety) setSafetyContact(savedSafety);
-
-    const savedSafeZone = localStorage.getItem('capten_safezone_active');
-    if (savedSafeZone !== null) setIsSafeZoneActive(savedSafeZone === 'true');
-
-    const savedZeroPressure = localStorage.getItem('capten_zero_pressure');
-    if (savedZeroPressure !== null) setZeroPressureMode(savedZeroPressure === 'true');
-
-    const savedAutoRound = localStorage.getItem('capten_auto_round');
-    if (savedAutoRound !== null) setAutoRound(savedAutoRound === 'true');
-
-    const savedCagnotte = localStorage.getItem('capten_cagnotte_url');
-    if (savedCagnotte) setCagnotteUrl(savedCagnotte);
-
-    const savedCoaches = localStorage.getItem('capten_coaches');
-    if (savedCoaches) {
-      try {
-        setCoaches(JSON.parse(savedCoaches));
-      } catch (e) {
-        setCoaches([
-          { name: "Moi (Propriétaire)", email: "contact@capten.app", role: "Créateur" },
-          { name: "Alexandre Dupont", email: "alex@capten.app", role: "Coach Principal" },
-          { name: "Julie Martin", email: "julie@capten.app", role: "Meneuse d'Allure" }
-        ]);
-      }
-    } else {
-      const defaultCoaches = [
-        { name: "Moi (Propriétaire)", email: "contact@capten.app", role: "Créateur" },
-        { name: "Alexandre Dupont", email: "alex@capten.app", role: "Coach Principal" },
-        { name: "Julie Martin", email: "julie@capten.app", role: "Meneuse d'Allure" }
-      ];
-      setCoaches(defaultCoaches);
-      localStorage.setItem('capten_coaches', JSON.stringify(defaultCoaches));
-    }
-
     const loadSupabaseData = async () => {
       try {
         const supabase = getSupabase();
-        if (supabase) {
-          const { data: { user } } = await supabase.auth.getUser();
-          if (user) {
-            // Fetch Stripe SaaS Profile
-            const { data: prof } = await supabase
-              .from('profiles')
-              .select('*')
-              .eq('id', user.id)
-              .maybeSingle();
-            if (prof) {
-              setProfile(prof);
-            }
-
-            // Fetch Club Cagnotte URL
-            const { data: club } = await supabase
-              .from('clubs')
-              .select('cagnotte_url')
-              .eq('id', user.id)
-              .maybeSingle();
-            if (club && club.cagnotte_url) {
-              setCagnotteUrl(club.cagnotte_url);
-            }
+        if (supabase && user) {
+          // Fetch Stripe SaaS Profile
+          const { data: prof } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', user.id)
+            .maybeSingle();
+          if (prof) {
+            setProfile(prof);
           }
         }
       } catch (e) {
-        console.error("Error loading profile or club cagnotte:", e);
+        console.error("Error loading profile:", e);
       }
     };
     loadSupabaseData();
     fetchWhatsappStatus();
-  }, []);
+  }, [club, isMock, user]);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     setIsSaving(true);
     
-    // Save to localStorage
-    localStorage.setItem('capten_logo', logoUrl || '');
-    localStorage.setItem('capten_primary_color', primaryColor);
-    localStorage.setItem('capten_sos_numbers', sosNumbers);
-    localStorage.setItem('capten_safety_contact', safetyContact);
-    localStorage.setItem('capten_safezone_active', isSafeZoneActive.toString());
-    localStorage.setItem('capten_zero_pressure', zeroPressureMode.toString());
-    localStorage.setItem('capten_auto_round', autoRound.toString());
-    localStorage.setItem('capten_cagnotte_url', cagnotteUrl);
-
-    // Save cagnotte URL to Supabase
-    const saveCagnotteToSupabase = async () => {
+    if (isMock) {
+      // Save to localStorage
+      localStorage.setItem('capten_logo', logoUrl || '');
+      localStorage.setItem('capten_primary_color', primaryColor);
+      localStorage.setItem('capten_sos_numbers', sosNumbers);
+      localStorage.setItem('capten_safety_contact', safetyContact);
+      localStorage.setItem('capten_safezone_active', isSafeZoneActive.toString());
+      localStorage.setItem('capten_zero_pressure', zeroPressureMode.toString());
+      localStorage.setItem('capten_auto_round', autoRound.toString());
+      localStorage.setItem('capten_cagnotte_url', cagnotteUrl);
+    } else {
+      // Save to Supabase B2B configs
       try {
-        const supabase = getSupabase();
-        if (supabase) {
-          const { data: { user } } = await supabase.auth.getUser();
-          if (user) {
-            await supabase
-              .from('clubs')
-              .update({ cagnotte_url: cagnotteUrl })
-              .eq('id', user.id);
-          }
-        }
+        await fetch('/api/club/settings', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            cagnotte_url: cagnotteUrl,
+            branding: {
+              logo: logoUrl || '',
+              primary_color: primaryColor,
+              sos_numbers: sosNumbers,
+              safety_contact: safetyContact,
+              safezone_active: isSafeZoneActive,
+              zero_pressure: zeroPressureMode,
+              auto_round: autoRound
+            }
+          })
+        });
+        await refreshClub();
       } catch (err) {
-        console.error("Failed saving cagnotte_url:", err);
+        console.error("Failed saving club B2B settings:", err);
       }
-    };
-    saveCagnotteToSupabase();
+    }
 
     // Dispatch dynamic branding update event
     if (typeof window !== 'undefined') {
@@ -698,10 +705,23 @@ export default function SettingsPage() {
                     </span>
                     {coach.role !== "Créateur" && (
                       <button
-                        onClick={() => {
+                        onClick={async () => {
                           const updated = coaches.filter((_, i) => i !== index);
                           setCoaches(updated);
-                          localStorage.setItem('capten_coaches', JSON.stringify(updated));
+                          if (isMock) {
+                            localStorage.setItem('capten_coaches', JSON.stringify(updated));
+                          } else {
+                            try {
+                              await fetch('/api/club/settings', {
+                                method: 'PATCH',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ coaches: updated })
+                              });
+                              await refreshClub();
+                            } catch (e) {
+                              console.error(e);
+                            }
+                          }
                           showToast("MEMBRE RETIRÉ DE L'ÉQUIPE !");
                         }}
                         className="text-red-500 hover:text-red-400 text-[10px] font-bold uppercase transition-colors"
@@ -716,7 +736,7 @@ export default function SettingsPage() {
 
             {/* Form to add coach */}
             <form 
-              onSubmit={(e) => {
+              onSubmit={async (e) => {
                 e.preventDefault();
                 const formData = new FormData(e.currentTarget);
                 const name = formData.get('name') as string;
@@ -727,7 +747,21 @@ export default function SettingsPage() {
                 const newCoach = { name, email, role };
                 const updated = [...coaches, newCoach];
                 setCoaches(updated);
-                localStorage.setItem('capten_coaches', JSON.stringify(updated));
+                
+                if (isMock) {
+                  localStorage.setItem('capten_coaches', JSON.stringify(updated));
+                } else {
+                  try {
+                    await fetch('/api/club/settings', {
+                      method: 'PATCH',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ coaches: updated })
+                    });
+                    await refreshClub();
+                  } catch (err) {
+                    console.error(err);
+                  }
+                }
                 showToast("NOUVEAU COACH INVITÉ !");
                 e.currentTarget.reset();
               }}

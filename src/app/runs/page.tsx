@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Plus, MapPin, Zap, ArrowRight, Sun, Cloud, History, Users, Clock, CheckCircle2, X, Calendar, Route, TrendingUp, ChevronRight, Timer, UserCheck, UserX, Flame, Pencil, Search, Send, Copy } from 'lucide-react';
 import { useBroadcast } from '@/context/BroadcastContext';
+import { useAuth } from '@/context/AuthContext';
 
 type TabFilter = 'upcoming' | 'past';
 
@@ -17,6 +18,7 @@ const getInitials = (name: string) => {
 };
 
 export default function RunsPage() {
+  const { club, isMock } = useAuth();
   const { triggerUndoToast } = useBroadcast();
   const [activeTab, setActiveTab] = useState<TabFilter>('upcoming');
   const [selectedRun, setSelectedRun] = useState<any>(null);
@@ -145,28 +147,36 @@ export default function RunsPage() {
 
     fetchRuns();
 
-    // Load custom coaches list from localStorage if defined
-    const storedCoaches = localStorage.getItem('capten_coaches');
-    if (storedCoaches) {
-      try {
-        const parsed = JSON.parse(storedCoaches);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          const names = parsed.map((c: any) => c.name);
-          setCoachesList(names);
-          // If the default coach in formData is not in this list, update it to the first coach
-          setFormData(prev => {
-            if (!names.includes(prev.coach)) {
-              return { ...prev, coach: names[0] };
-            }
-            return prev;
-          });
+    // Load custom coaches list from context or localStorage
+    if (isMock) {
+      const storedCoaches = localStorage.getItem('capten_coaches');
+      if (storedCoaches) {
+        try {
+          const parsed = JSON.parse(storedCoaches);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            const names = parsed.map((c: any) => c.name);
+            setCoachesList(names);
+            setFormData(prev => {
+              if (!names.includes(prev.coach)) {
+                return { ...prev, coach: names[0] };
+              }
+              return prev;
+            });
+          }
+        } catch (e) {
+          console.error("Failed to parse coaches list", e);
         }
-      } catch (e) {
-        console.error("Failed to parse coaches list", e);
       }
+    } else if (club && Array.isArray(club.coaches) && club.coaches.length > 0) {
+      const names = club.coaches.map((c: any) => c.name);
+      setCoachesList(names);
+      setFormData(prev => {
+        if (!names.includes(prev.coach)) {
+          return { ...prev, coach: names[0] };
+        }
+        return prev;
+      });
     }
-
-
 
     if (typeof window !== 'undefined' && window.location.search.includes('openPlanifier=true')) {
       setIsCreateModalOpen(true);
@@ -191,7 +201,7 @@ export default function RunsPage() {
 
       window.history.replaceState({}, document.title, window.location.pathname);
     }
-  }, []);
+  }, [isMock, club]);
 
   const handleToggleParticipantStatus = async (participantName: string, forceNextStatus?: 'registered' | 'present' | 'absent') => {
     if (!selectedRun) return;

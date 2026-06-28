@@ -7,6 +7,7 @@ import {
   Copy, Search, Sliders, ArrowRight, Share2, Sparkles, HelpCircle
 } from 'lucide-react';
 import { getSupabase } from '@/lib/supabase';
+import { useAuth } from '@/context/AuthContext';
 
 // === HELPERS MÉTÉO ===
 function getCoordinates(location: string): { latitude: number; longitude: number } {
@@ -878,6 +879,7 @@ MessageEditorModal.displayName = "MessageEditorModal";
 
 // --- MAIN PAGE LAYOUT ---
 export default function MessagesPage() {
+  const { club, isMock, refreshClub } = useAuth();
   const [simulator, setSimulator] = useState({
     club_name: "The Crew Trail",
     run_name: "Morning Vibes",
@@ -934,15 +936,20 @@ export default function MessagesPage() {
 
   // Load custom configurations and runs on mount
   useEffect(() => {
-    const saved = localStorage.getItem('capten_custom_templates_v2026');
     let loadedTemplates = TEMPLATES_DATABASE;
-    if (saved) {
-      try {
-        loadedTemplates = JSON.parse(saved).filter((t: any) => t.id !== "PROMO");
-        setTemplates(loadedTemplates);
-      } catch (e) {
-        console.error("Failed to parse custom templates:", e);
+    if (isMock) {
+      const saved = localStorage.getItem('capten_custom_templates_v2026');
+      if (saved) {
+        try {
+          loadedTemplates = JSON.parse(saved).filter((t: any) => t.id !== "PROMO");
+          setTemplates(loadedTemplates);
+        } catch (e) {
+          console.error("Failed to parse custom templates:", e);
+        }
       }
+    } else if (club && club.message_templates && Array.isArray(club.message_templates)) {
+      loadedTemplates = club.message_templates;
+      setTemplates(loadedTemplates);
     }
 
     if (typeof window !== 'undefined') {
@@ -977,7 +984,7 @@ export default function MessagesPage() {
         window.history.replaceState({}, document.title, window.location.pathname);
       }
     }
-  }, []);
+  }, [club, isMock]);
 
   // Fetch runs list (Supabase with localStorage fallback)
   useEffect(() => {
@@ -1089,7 +1096,9 @@ export default function MessagesPage() {
   // Sync selected run variables to simulator state
   useEffect(() => {
     const origin = typeof window !== 'undefined' ? window.location.origin : 'capten.app';
-    const clubName = localStorage.getItem('capten_club_name') || 'The Crew Trail';
+    const clubName = isMock 
+      ? (localStorage.getItem('capten_club_name') || 'The Crew Trail')
+      : (club?.whatsapp_display_name || club?.name || 'The Crew Trail');
     
     if (selectedRun) {
       setSimulator(prev => ({
@@ -1119,7 +1128,7 @@ export default function MessagesPage() {
         report_url: `${origin}/securite/signaler`,
       }));
     }
-  }, [selectedRun, weatherText, nextRunDateText]);
+  }, [selectedRun, weatherText, nextRunDateText, club, isMock]);
 
   // Set local state when selectedTemplate changes
   useEffect(() => {
@@ -1212,7 +1221,7 @@ export default function MessagesPage() {
   }, [editedText]);
 
   // Handle master template save permanently
-  const handleSaveBaseTemplate = useCallback((id: string) => {
+  const handleSaveBaseTemplate = useCallback(async (id: string) => {
     const updated = templates.map(t => {
       if (t.id === id) {
         return {
@@ -1225,17 +1234,31 @@ export default function MessagesPage() {
       return t;
     });
     setTemplates(updated);
-    localStorage.setItem('capten_custom_templates_v2026', JSON.stringify(updated));
+
+    if (isMock) {
+      localStorage.setItem('capten_custom_templates_v2026', JSON.stringify(updated));
+    } else {
+      try {
+        await fetch('/api/club/settings', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message_templates: updated })
+        });
+        await refreshClub();
+      } catch (err) {
+        console.error("Failed to save message templates to DB:", err);
+      }
+    }
     
     const found = updated.find(t => t.id === id);
     if (found) {
       setSelectedTemplate(found);
     }
     setIsEditingBase(false);
-  }, [templates, editBaseLabel, editBaseHint, editBaseText]);
+  }, [templates, editBaseLabel, editBaseHint, editBaseText, isMock, refreshClub]);
 
   // Reset custom template base to original hardcoded configuration
-  const handleResetToDefault = useCallback((id: string) => {
+  const handleResetToDefault = useCallback(async (id: string) => {
     const original = TEMPLATES_DATABASE.find(t => t.id === id);
     if (!original) return;
     
@@ -1247,7 +1270,21 @@ export default function MessagesPage() {
     });
     
     setTemplates(updated);
-    localStorage.setItem('capten_custom_templates_v2026', JSON.stringify(updated));
+
+    if (isMock) {
+      localStorage.setItem('capten_custom_templates_v2026', JSON.stringify(updated));
+    } else {
+      try {
+        await fetch('/api/club/settings', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message_templates: updated })
+        });
+        await refreshClub();
+      } catch (err) {
+        console.error("Failed to reset message template in DB:", err);
+      }
+    }
     
     setEditBaseLabel(original.label);
     setEditBaseHint(original.contextHint);
@@ -1257,7 +1294,7 @@ export default function MessagesPage() {
     if (found) {
       setSelectedTemplate(found);
     }
-  }, [templates]);
+  }, [templates, isMock, refreshClub]);
 
   // Simulator handles
   const handleSimulatorChange = useCallback((key: string, value: string) => {

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useAuth } from '@/context/AuthContext';
 import { 
   ShieldAlert, Users, FileText, Lock, MessageSquare, AlertTriangle, 
   CheckCircle2, ArrowRight, X, UserX, Shield, EyeOff, Eye, Send, Trash2, Plus,
@@ -28,6 +29,7 @@ interface SignedAthlete {
 }
 
 export default function SecuritePage() {
+  const { isMock } = useAuth();
   const [incidents, setIncidents] = useState<Incident[]>([]);
 
   // Modal State
@@ -162,20 +164,8 @@ export default function SecuritePage() {
         setBanSuccessMessage(`Le membre ${nameOrInvolved} a été banni avec succès.`);
         setTimeout(() => setBanSuccessMessage(null), 4000);
         
-        // Update local athletes storage if found
-        const stored = localStorage.getItem('capten_athletes_v3');
-        if (stored) {
-          try {
-            const list = JSON.parse(stored);
-            const updatedList = list.map((a: any) => 
-              a.name.toLowerCase() === nameOrInvolved.toLowerCase()
-                ? { ...a, waiverStatus: "NON SIGNÉE", role: a.role + " (Banni)" }
-                : a
-            );
-            localStorage.setItem('capten_athletes_v3', JSON.stringify(updatedList));
-            setAthletes(updatedList);
-          } catch(e) {}
-        }
+        // Reload athletes
+        await loadAthletesList();
       } else {
         alert(data.error || "Une erreur s'est produite lors du bannissement.");
       }
@@ -186,30 +176,66 @@ export default function SecuritePage() {
     }
   };
 
-  useEffect(() => {
-    const loadAthletes = () => {
+  const loadAthletesList = async () => {
+    if (isMock) {
       const stored = localStorage.getItem('capten_athletes_v3');
       if (stored) {
         try {
-          setAthletes(JSON.parse(stored));
+          const list = JSON.parse(stored);
+          setAthletes(list.map((a: any) => ({
+            id: a.id || a.name,
+            name: a.name,
+            phone: a.phone || '06 00 00 00 00',
+            waiverStatus: a.waiverStatus || "NON SIGNÉE",
+            waiverDate: a.waiverDate || null,
+            waiverIp: a.waiverIp || "127.0.0.1",
+            waiverToken: a.waiverToken || "sha256:unknown",
+            role: a.role || "Runner",
+            status: a.status || "ACTIF"
+          })));
         } catch (e) {
           console.error(e);
         }
       }
-    };
+    } else {
+      try {
+        const res = await fetch('/api/runners');
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data)) {
+            const mapped = data.map((a: any) => ({
+              id: a.id,
+              name: a.name || a.email,
+              phone: a.phone || '06 00 00 00 00',
+              waiverStatus: a.waiver_signed_at ? "SIGNÉE" : "NON SIGNÉE",
+              waiverDate: a.waiver_signed_at ? new Date(a.waiver_signed_at).toLocaleDateString('fr-FR') : null,
+              waiverIp: a.waiver_ip || "127.0.0.1",
+              waiverToken: a.waiver_token || "sha256:unknown",
+              role: a.reliability || "Runner",
+              status: a.is_blacklisted ? "BANNI" : "ACTIF"
+            }));
+            setAthletes(mapped);
+          }
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  };
 
-    loadAthletes();
+  useEffect(() => {
+    loadAthletesList();
 
     if (typeof window !== 'undefined') {
-      window.addEventListener('focus', loadAthletes);
+      window.addEventListener('focus', loadAthletesList);
       return () => {
-        window.removeEventListener('focus', loadAthletes);
+        window.removeEventListener('focus', loadAthletesList);
       };
     }
-  }, []);
+  }, [isMock]);
 
   const signedList = athletes
-    .filter(a => a.waiverStatus === "SIGNÉE")
+    .filter(a => a.waiverStatus === "SIGNÉE" && a.status !== "BANNI")
     .map(a => ({
       id: a.role,
       name: a.name,
@@ -219,13 +245,13 @@ export default function SecuritePage() {
     }));
 
   const unsignedList = athletes
-    .filter(a => a.waiverStatus !== "SIGNÉE")
+    .filter(a => a.waiverStatus !== "SIGNÉE" && a.status !== "BANNI")
     .map(a => ({
       name: a.name,
       phone: a.phone || "06 00 00 00 00"
     }));
 
-  const athletesList = athletes.map(a => a.name);
+  const athletesList = athletes.filter(a => a.status !== "BANNI").map(a => a.name);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

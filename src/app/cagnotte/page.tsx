@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { getSupabase } from '@/lib/supabase';
+import { useAuth } from '@/context/AuthContext';
 import { 
   Wallet, History, Globe, Trophy, Zap, ArrowRight, Sun, Coffee, 
   X, ShieldCheck, Check, CreditCard, Building, Award,
@@ -32,6 +33,7 @@ const getInitials = (name: string) => {
 };
 
 export default function CagnottePage() {
+  const { club, isMock, refreshClub } = useAuth();
   const [solde, setSolde] = useState(0);
   const [toast, setToast] = useState<string | null>(null);
   
@@ -49,49 +51,39 @@ export default function CagnottePage() {
   const [contributors, setContributors] = useState<Contributor[]>([]);
   const [logs, setLogs] = useState<ContributionLog[]>([]);
 
-  // Load from local storage on mount and fetch Supabase details
+  // Load cagnotte data from Supabase club context or local storage fallback
   useEffect(() => {
     if (typeof window !== "undefined") {
       setOrigin(window.location.origin);
-      const storedSolde = localStorage.getItem('capten_solde_v3');
-      if (storedSolde) setSolde(parseInt(storedSolde));
-      
-      const storedBerlin = localStorage.getItem('capten_berlin_v3');
-      if (storedBerlin) setBerlinRaised(parseInt(storedBerlin));
-
-      const storedLogs = localStorage.getItem('capten_cagnotte_logs_v3');
-      if (storedLogs) setLogs(JSON.parse(storedLogs));
-
-      const storedContributors = localStorage.getItem('capten_cagnotte_contributors_v3');
-      if (storedContributors) setContributors(JSON.parse(storedContributors));
-
-      const savedCagnotte = localStorage.getItem('capten_cagnotte_url');
-      if (savedCagnotte) setCagnotteUrl(savedCagnotte);
     }
 
-    const loadCagnotteUrl = async () => {
-      try {
-        const supabase = getSupabase();
-        if (supabase) {
-          const { data: { user } } = await supabase.auth.getUser();
-          if (user) {
-            const { data: club } = await supabase
-              .from('clubs')
-              .select('cagnotte_url')
-              .eq('id', user.id)
-              .maybeSingle();
-            if (club && club.cagnotte_url) {
-              setCagnotteUrl(club.cagnotte_url);
-              localStorage.setItem('capten_cagnotte_url', club.cagnotte_url);
-            }
-          }
-        }
-      } catch (e) {
-        console.error("Error loading club cagnotte:", e);
+    if (!isMock && club) {
+      setCagnotteUrl(club.cagnotte_url || '');
+      const data = club.cagnotte_data || {};
+      setSolde(data.balance || 0);
+      setBerlinRaised(data.berlin_raised || 0);
+      setLogs(data.transactions || []);
+      setContributors(data.contributors || []);
+    } else {
+      // LocalStorage Mode Fallback
+      if (typeof window !== "undefined") {
+        const storedSolde = localStorage.getItem('capten_solde_v3');
+        if (storedSolde) setSolde(parseInt(storedSolde));
+        
+        const storedBerlin = localStorage.getItem('capten_berlin_v3');
+        if (storedBerlin) setBerlinRaised(parseInt(storedBerlin));
+
+        const storedLogs = localStorage.getItem('capten_cagnotte_logs_v3');
+        if (storedLogs) setLogs(JSON.parse(storedLogs));
+
+        const storedContributors = localStorage.getItem('capten_cagnotte_contributors_v3');
+        if (storedContributors) setContributors(JSON.parse(storedContributors));
+
+        const savedCagnotte = localStorage.getItem('capten_cagnotte_url');
+        if (savedCagnotte) setCagnotteUrl(savedCagnotte);
       }
-    };
-    loadCagnotteUrl();
-  }, []);
+    }
+  }, [club, isMock]);
 
   // Modals state
   const [isVirementModalOpen, setIsVirementModalOpen] = useState(false);
@@ -111,14 +103,13 @@ export default function CagnottePage() {
     setIsProcessingVirement(true);
     setVirementSuccess(false);
 
-    setTimeout(() => {
+    setTimeout(async () => {
       setIsProcessingVirement(false);
       setVirementSuccess(true);
 
       const amount = parseInt(virementAmount) || 0;
       const newSolde = solde + amount;
       setSolde(newSolde);
-      localStorage.setItem('capten_solde_v3', String(newSolde));
 
       // Append to Transparency logs
       const today = new Date();
@@ -133,7 +124,29 @@ export default function CagnottePage() {
       };
       const updatedLogs = [newLog, ...logs];
       setLogs(updatedLogs);
-      localStorage.setItem('capten_cagnotte_logs_v3', JSON.stringify(updatedLogs));
+
+      if (isMock) {
+        localStorage.setItem('capten_solde_v3', String(newSolde));
+        localStorage.setItem('capten_cagnotte_logs_v3', JSON.stringify(updatedLogs));
+      } else {
+        try {
+          await fetch('/api/club/settings', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              cagnotte_data: {
+                balance: newSolde,
+                berlin_raised: berlinRaised,
+                transactions: updatedLogs,
+                contributors: contributors
+              }
+            })
+          });
+          await refreshClub();
+        } catch (e) {
+          console.error(e);
+        }
+      }
 
       setTimeout(() => {
         setIsVirementModalOpen(false);
@@ -146,15 +159,13 @@ export default function CagnottePage() {
     setIsProcessingPayout(true);
     setPayoutSuccess(false);
 
-    setTimeout(() => {
+    setTimeout(async () => {
       setIsProcessingPayout(false);
       setPayoutSuccess(true);
 
-      // Save state and update localStorage
       const oldSolde = solde;
       const newSolde = 0;
       setSolde(newSolde);
-      localStorage.setItem('capten_solde_v3', String(newSolde));
 
       // Append to Transparency logs
       const today = new Date();
@@ -169,7 +180,29 @@ export default function CagnottePage() {
       };
       const updatedLogs = [newLog, ...logs];
       setLogs(updatedLogs);
-      localStorage.setItem('capten_cagnotte_logs_v3', JSON.stringify(updatedLogs));
+
+      if (isMock) {
+        localStorage.setItem('capten_solde_v3', String(newSolde));
+        localStorage.setItem('capten_cagnotte_logs_v3', JSON.stringify(updatedLogs));
+      } else {
+        try {
+          await fetch('/api/club/settings', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              cagnotte_data: {
+                balance: newSolde,
+                berlin_raised: berlinRaised,
+                transactions: updatedLogs,
+                contributors: contributors
+              }
+            })
+          });
+          await refreshClub();
+        } catch (e) {
+          console.error(e);
+        }
+      }
 
       setTimeout(() => {
         setIsGererFluxModalOpen(false);
