@@ -33,18 +33,17 @@ export async function GET(request: Request) {
         // Calculer trial_ends_at : 14 jours à partir de maintenant (ou étendre si déjà actif)
         const trialEndsAt = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString();
 
-        const { error: upsertError } = await supabase
+        const { error: updateError } = await supabase
           .from('clubs')
-          .upsert({
-            id: clubId,
+          .update({
             stripe_plan: planName,
             stripe_subscription_status: 'active',
-            trial_ends_at: trialEndsAt,
-            whatsapp_display_name: 'CAPTEN RUN CLUB' // Valeur requise par défaut
-          }, { onConflict: 'id' });
+            trial_ends_at: trialEndsAt
+          })
+          .eq('id', clubId);
 
-        if (upsertError) {
-          console.error('[Stripe Verify Hook Error] Failed upserting club plan:', upsertError);
+        if (updateError) {
+          console.error('[Stripe Verify Hook Error] Failed updating club plan:', updateError);
         } else {
           console.log(`[Stripe Verify Hook Success] Club ${clubId} upgraded to ${planName}, trial_ends_at: ${trialEndsAt}`);
         }
@@ -88,18 +87,17 @@ export async function POST(request: Request) {
           if (supabase && clubId && clubId !== 'demo-captain-id') {
             const trialEndsAt = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString();
 
-            const { error: upsertError } = await supabase
+            const { error: updateError } = await supabase
               .from('clubs')
-              .upsert({
-                id: clubId,
+              .update({
                 stripe_plan: planName,
                 stripe_subscription_status: 'active',
-                trial_ends_at: trialEndsAt,
-                whatsapp_display_name: 'CAPTEN RUN CLUB'
-              }, { onConflict: 'id' });
+                trial_ends_at: trialEndsAt
+              })
+              .eq('id', clubId);
 
-            if (upsertError) {
-              console.error('[Stripe Webhook Error] Failed upserting club plan:', upsertError);
+            if (updateError) {
+              console.error('[Stripe Webhook Error] Failed updating club plan:', updateError);
             } else {
               console.log(`[Stripe Webhook Success] Club ${clubId} upgraded to ${planName}, trial_ends_at: ${trialEndsAt}`);
             }
