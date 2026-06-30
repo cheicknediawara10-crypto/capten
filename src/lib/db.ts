@@ -18,6 +18,7 @@ export interface RunnerProfile {
   insurance?: string;
   address?: string;
   is_blacklisted?: boolean;
+  club_id?: string;
 }
 
 export interface RunDetails {

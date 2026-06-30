@@ -9,15 +9,19 @@ export async function POST(request: Request) {
     const bodyText = await request.text();
     const sigHeader = request.headers.get('stripe-signature') || '';
     const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || '';
-
     let event;
 
     try {
-      if (webhookSecret && sigHeader) {
-        event = stripe.webhooks.constructEvent(bodyText, sigHeader, webhookSecret);
+      if (!webhookSecret || !sigHeader) {
+        if (process.env.NODE_ENV !== 'production') {
+          console.warn('[Stripe Webhook Warning] Signature not verified in development mode');
+          event = JSON.parse(bodyText);
+        } else {
+          console.error('[Stripe Webhook Error] Missing STRIPE_WEBHOOK_SECRET or stripe-signature header in production');
+          return NextResponse.json({ error: 'Signature verification required' }, { status: 400 });
+        }
       } else {
-        // Fallback for local testing or if webhook secret is not set
-        event = JSON.parse(bodyText);
+        event = stripe.webhooks.constructEvent(bodyText, sigHeader, webhookSecret);
       }
     } catch (err: any) {
       console.error(`[Stripe Webhook Signature Error]: ${err.message}`);

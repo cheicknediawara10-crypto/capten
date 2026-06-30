@@ -25,7 +25,8 @@ function WaiverForm() {
   const [insurance, setInsurance] = useState("");
   const [address, setAddress] = useState("");
   const [acceptWaiver, setAcceptWaiver] = useState(false);
-  const [acceptPhoto, setAcceptPhoto] = useState(true);
+  const [acceptPhoto, setAcceptPhoto] = useState(false);
+  const [acceptHealth, setAcceptHealth] = useState(false);
   const [signatureTyped, setSignatureTyped] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -164,6 +165,13 @@ function WaiverForm() {
     e.preventDefault();
     if (!acceptWaiver || (!hasSignedCanvas && !signatureTyped)) return;
 
+    // GDPR validation: if health info is provided, acceptHealth checkbox is required
+    const hasMedicalData = !!(emergencyName || emergencyPhone || dob || allergies || healthIssues || insurance || address);
+    if (hasMedicalData && !acceptHealth) {
+      alert("Veuillez cocher la case autorisant la conservation de vos données de santé et de contact d'urgence pour soumettre ce formulaire.");
+      return;
+    }
+
     setIsSubmitting(true);
     
     // Generate signature validation token
@@ -211,15 +219,18 @@ function WaiverForm() {
           body: JSON.stringify({
             runner_id: activeRunnerId,
             token,
-            emergency_name: emergencyName,
-            emergency_phone: emergencyPhone,
-            emergency_relation: emergencyRelation,
-            birth_date: dob,
-            blood_type: bloodType,
-            allergies: allergies,
-            health_issues: healthIssues,
-            insurance: insurance,
-            address: address
+            emergency_name: acceptHealth ? emergencyName : null,
+            emergency_phone: acceptHealth ? emergencyPhone : null,
+            emergency_relation: acceptHealth ? emergencyRelation : null,
+            birth_date: acceptHealth ? dob : null,
+            blood_type: acceptHealth ? bloodType : null,
+            allergies: acceptHealth ? allergies : null,
+            health_issues: acceptHealth ? healthIssues : null,
+            insurance: acceptHealth ? insurance : null,
+            address: acceptHealth ? address : null,
+            accept_photo: acceptPhoto,
+            accept_health: acceptHealth,
+            accept_waiver: acceptWaiver
           })
         });
 
@@ -590,7 +601,19 @@ function WaiverForm() {
                 className="mt-1 accent-[#FF5C00] h-4 w-4 rounded border-slate-300"
               />
               <span className="text-xs text-neutral-600 font-medium leading-relaxed">
-                J&apos;accepte et je signe électroniquement cette décharge de responsabilité. Je certifie que toutes les informations saisies sont exactes.
+                <strong>[Case A - Obligatoire]</strong> J&apos;accepte et je signe électroniquement cette décharge de responsabilité et les conditions d&apos;utilisation (CGU). Je certifie que toutes les informations saisies sont exactes.
+              </span>
+            </label>
+
+            <label className="flex items-start gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={acceptHealth}
+                onChange={e => setAcceptHealth(e.target.checked)}
+                className="mt-1 accent-[#FF5C00] h-4 w-4 rounded border-slate-300"
+              />
+              <span className="text-xs text-neutral-600 font-medium leading-relaxed">
+                <strong>[Case B - Optionnelle]</strong> J&apos;autorise expressément le stockage chiffré et sécurisé de mes informations médicales et de contact d&apos;urgence pour assurer ma sécurité lors des entraînements.
               </span>
             </label>
 
@@ -602,7 +625,7 @@ function WaiverForm() {
                 className="mt-1 accent-[#FF5C00] h-4 w-4 rounded border-slate-300"
               />
               <span className="text-xs text-neutral-600 font-medium leading-relaxed">
-                J&apos;autorise le Run Club à utiliser les photographies prises lors des runs pour la promotion interne du club.
+                <strong>[Case C - Optionnelle]</strong> J&apos;autorise le Run Club à utiliser les photographies prises lors des runs pour la promotion interne du club et à m&apos;envoyer des notifications et rappels de sécurité par WhatsApp/SMS.
               </span>
             </label>
           </div>

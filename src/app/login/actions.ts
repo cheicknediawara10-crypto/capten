@@ -1,7 +1,8 @@
 "use server"
 
-import { cookies } from 'next/headers'
+import { cookies, headers } from 'next/headers'
 import { createServerClient } from '@supabase/ssr'
+import { rateLimit } from '@/lib/rate-limit'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -12,6 +13,13 @@ const isSupabaseConfigured =
   !supabaseUrl.includes('votre-projet')
 
 export async function loginWithPassword(formData: FormData) {
+  const clientHeaders = headers()
+  const ip = clientHeaders.get('x-forwarded-for')?.split(',')[0] || '127.0.0.1'
+  const limitRes = await rateLimit(`login_pass:${ip}`, 5, 60)
+  if (!limitRes.success) {
+    return { error: 'Trop de tentatives de connexion. Veuillez réessayer dans une minute.' }
+  }
+
   const email = formData.get('email') as string
   const password = formData.get('password') as string
 
@@ -65,13 +73,20 @@ export async function loginWithPassword(formData: FormData) {
   })
 
   if (error) {
-    return { error: error.message }
+    return { error: 'Identifiants de connexion invalides. Veuillez vérifier votre adresse e-mail et votre mot de passe.' }
   }
 
   return { success: true }
 }
 
 export async function loginWithOtp(formData: FormData) {
+  const clientHeaders = headers()
+  const ip = clientHeaders.get('x-forwarded-for')?.split(',')[0] || '127.0.0.1'
+  const limitRes = await rateLimit(`login_otp:${ip}`, 3, 60)
+  if (!limitRes.success) {
+    return { error: 'Trop de demandes de Magic Link. Veuillez réessayer dans une minute.' }
+  }
+
   const email = formData.get('email') as string
 
   if (!email) {
@@ -112,21 +127,25 @@ export async function loginWithOtp(formData: FormData) {
     }
   )
 
-  const { error } = await supabase.auth.signInWithOtp({
-    email,
+  await supabase.auth.signInWithOtp({
+    email: email.trim().toLowerCase(),
     options: {
       emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/auth/callback`,
+      shouldCreateUser: false, // Prevents creating new random users via OTP
     },
   })
 
-  if (error) {
-    return { error: error.message }
-  }
-
-  return { success: true }
+  return { success: true, message: "Si un compte correspond, un lien t'attend dans ta boîte mail." }
 }
 
 export async function resetPassword(formData: FormData) {
+  const clientHeaders = headers()
+  const ip = clientHeaders.get('x-forwarded-for')?.split(',')[0] || '127.0.0.1'
+  const limitRes = await rateLimit(`reset_pass:${ip}`, 3, 60)
+  if (!limitRes.success) {
+    return { error: 'Trop de demandes de réinitialisation. Veuillez réessayer dans une minute.' }
+  }
+
   const email = formData.get('email') as string
 
   if (!email) {
@@ -158,18 +177,21 @@ export async function resetPassword(formData: FormData) {
     }
   )
 
-  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+  await supabase.auth.resetPasswordForEmail(email.trim().toLowerCase(), {
     redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/auth/callback?next=/reset-password`,
   })
 
-  if (error) {
-    return { error: error.message }
-  }
-
-  return { success: true }
+  return { success: true, message: "Si un compte correspond, un lien t'attend dans ta boîte mail." }
 }
 
 export async function signUp(formData: FormData) {
+  const clientHeaders = headers()
+  const ip = clientHeaders.get('x-forwarded-for')?.split(',')[0] || '127.0.0.1'
+  const limitRes = await rateLimit(`signup:${ip}`, 5, 60)
+  if (!limitRes.success) {
+    return { error: 'Trop d\'inscriptions. Veuillez réessayer dans une minute.' }
+  }
+
   const email = formData.get('email') as string
   const password = formData.get('password') as string
   const clubName = formData.get('clubName') as string

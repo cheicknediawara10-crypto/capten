@@ -50,8 +50,8 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // Fallback au cookie de session de simulation si Supabase n'est pas configuré ou l'utilisateur n'est pas connecté
-  if (!isLoggedIn) {
+  // Fallback au cookie de session de simulation si Supabase n'est pas configuré
+  if (!isLoggedIn && !isSupabaseConfigured) {
     const mockSession = request.cookies.get('capten_mock_session')
     if (mockSession && mockSession.value === 'active') {
       isLoggedIn = true
@@ -115,9 +115,8 @@ export async function middleware(request: NextRequest) {
           if (club) {
             const now = new Date()
             const trialEnds = new Date(club.trial_ends_at)
-            const isTrialExpired = 
-              (club.stripe_subscription_status !== 'active' && club.stripe_subscription_status !== 'trialing') ||
-              (now > trialEnds && club.stripe_subscription_status !== 'active')
+            const isSubscribed = club.stripe_subscription_status === 'active' || club.stripe_subscription_status === 'trialing';
+            const isTrialExpired = !isSubscribed && (now > trialEnds);
 
             if (isTrialExpired) {
               const url = request.nextUrl.clone()
