@@ -3,6 +3,8 @@
 -- =======================================================
 
 -- 1. Enable RLS on all tables in public schema
+ALTER TABLE IF EXISTS public.incidents ADD COLUMN IF NOT EXISTS club_id UUID REFERENCES auth.users(id) ON DELETE CASCADE;
+
 ALTER TABLE IF EXISTS public.clubs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE IF EXISTS public.runs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE IF EXISTS public.members ENABLE ROW LEVEL SECURITY;
