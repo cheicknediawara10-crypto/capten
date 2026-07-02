@@ -30,6 +30,12 @@ export default function MobileNav() {
         if (supabase) {
           const { data: { user } } = await supabase.auth.getUser();
           if (user) {
+            if (user.email?.toLowerCase() === 'cheicknediawara10@gmail.com') {
+              setIsTrialExpired(false);
+              localStorage.setItem('capten_plan', 'PRO');
+              return;
+            }
+
             const { data: club } = await supabase
               .from('clubs')
               .select('trial_ends_at, stripe_subscription_status')

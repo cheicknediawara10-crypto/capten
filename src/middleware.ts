@@ -107,6 +107,11 @@ export async function middleware(request: NextRequest) {
         )
         const { data: { user } } = await supabase.auth.getUser()
         if (user) {
+          // Lifetime VIP Free Access for account owner
+          if (user.email?.toLowerCase() === 'cheicknediawara10@gmail.com') {
+            return response
+          }
+
           const { data: club } = await supabase
             .from('clubs')
             .select('trial_ends_at, stripe_subscription_status')
