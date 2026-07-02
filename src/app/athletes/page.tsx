@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Search, Plus, Zap, Activity, CheckCircle2, XCircle, RefreshCw, X, Phone, AlertTriangle, Heart, Mail, MapPin, Shield, MessageSquare, Copy, Check } from 'lucide-react';
 import { getSupabase } from '@/lib/supabase';
 import { useAuth } from '@/context/AuthContext';
+import { getAppUrl } from '@/lib/domain';
 
 const getInitials = (name: string) => {
   if (!name) return "";
@@ -534,7 +535,7 @@ export default function AthletesPage() {
                         onClick={() => {
                           const match = selectedAthlete.role.match(/ID:\s*(M\d+)/i);
                           const athleteIdParam = match ? match[1] : "";
-                          const waiverUrl = `${window.location.origin}/waiver?athleteId=${athleteIdParam}`;
+                          const waiverUrl = `${getAppUrl()}/waiver?athleteId=${athleteIdParam}`;
                           navigator.clipboard.writeText(waiverUrl);
                           setCopiedWaiverAthleteId(selectedAthlete.role);
                           setTimeout(() => setCopiedWaiverAthleteId(null), 2000);
@@ -555,7 +556,7 @@ export default function AthletesPage() {
                         onClick={() => {
                           const match = selectedAthlete.role.match(/ID:\s*(M\d+)/i);
                           const athleteIdParam = match ? match[1] : "";
-                          const waiverUrl = `${window.location.origin}/waiver?athleteId=${athleteIdParam}`;
+                          const waiverUrl = `${getAppUrl()}/waiver?athleteId=${athleteIdParam}`;
                           const cleanPhone = selectedAthlete.phone ? selectedAthlete.phone.replace(/[^+\d]/g, "") : "";
                           const firstName = selectedAthlete.name ? selectedAthlete.name.split(" ")[0] : "coureur";
                           const message = `Salut ${firstName} ! C'est ton Capitaine de course 🏃‍♂️. Peux-tu prendre 1 minute pour signer la décharge de responsabilité CAPTEN obligatoire pour participer à nos runs ? C'est super rapide, voici le lien unique : ${waiverUrl}`;
@@ -733,7 +734,7 @@ export default function AthletesPage() {
                   setAthletes(updatedAthletes);
                   localStorage.setItem("capten_athletes_v3", JSON.stringify(updatedAthletes));
 
-                  const link = `${window.location.origin}/waiver?athleteId=${athleteIdParam}`;
+                  const link = `${getAppUrl()}/waiver?athleteId=${athleteIdParam}`;
                   setNewAthleteLink(link);
                 } else {
                   try {
@@ -761,7 +762,7 @@ export default function AthletesPage() {
                     if (res.ok) {
                       const newRunner = await res.json();
                       await loadAthletes();
-                      const link = `${window.location.origin}/waiver?runnerId=${newRunner.id}`;
+                      const link = `${getAppUrl()}/waiver?runnerId=${newRunner.id}`;
                       setNewAthleteLink(link);
                     } else {
                       alert("Erreur lors de l'enregistrement du coureur.");
