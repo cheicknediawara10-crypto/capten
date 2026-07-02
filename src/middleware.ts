@@ -115,10 +115,11 @@ export async function middleware(request: NextRequest) {
           if (club) {
             const now = new Date()
             const trialEnds = new Date(club.trial_ends_at)
-            const isSubscribed = club.stripe_subscription_status === 'active' || club.stripe_subscription_status === 'trialing';
-            const isTrialExpired = !isSubscribed && (now > trialEnds);
+            const isActiveSubscriber = club.stripe_subscription_status === 'active'
+            const isTrialValid = club.stripe_subscription_status === 'trialing' && now <= trialEnds
+            const hasAccess = isActiveSubscriber || isTrialValid
 
-            if (isTrialExpired) {
+            if (!hasAccess) {
               const url = request.nextUrl.clone()
               url.pathname = '/plan'
               url.searchParams.set('trial_expired', 'true')
