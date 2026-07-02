@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
+import { getAppUrl } from '@/lib/domain';
 import { 
   ShieldAlert, Users, FileText, Lock, MessageSquare, AlertTriangle, 
   CheckCircle2, ArrowRight, X, UserX, Shield, EyeOff, Eye, Send, Trash2, Plus,
@@ -47,7 +48,7 @@ export default function SecuritePage() {
   const [copiedReport, setCopiedReport] = useState(false);
 
   const copyReportLink = () => {
-    const reportUrl = `${window.location.origin}/securite/signaler`;
+    const reportUrl = `${getAppUrl()}/securite/signaler`;
     navigator.clipboard.writeText(reportUrl);
     setCopiedReport(true);
     setTimeout(() => setCopiedReport(false), 2000);
@@ -108,7 +109,7 @@ export default function SecuritePage() {
   };
 
   useEffect(() => {
-    setOrigin(window.location.origin);
+    setOrigin(getAppUrl());
     fetchIncidents();
   }, []);
 
@@ -289,7 +290,7 @@ export default function SecuritePage() {
   };
 
   const copyWaiverLink = () => {
-    const waiverUrl = `${window.location.origin}/waiver`;
+    const waiverUrl = `${getAppUrl()}/waiver`;
     navigator.clipboard.writeText(waiverUrl);
     setCopiedLink(true);
     setTimeout(() => setCopiedLink(false), 2000);

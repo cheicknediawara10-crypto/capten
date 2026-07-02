@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { LayoutDashboard, Users, MapPin, Wallet, Zap, MessageSquare, ArrowRight, Plus, Trophy, Activity, Globe, Heart, Flame, CheckCircle2, RefreshCw } from 'lucide-react';
 import { getSupabase } from '@/lib/supabase';
 import { useAuth } from '@/context/AuthContext';
+import { getAppUrl } from '@/lib/domain';
 
 // === HELPERS MÉTÉO ===
 function getCoordinates(location: string): { latitude: number; longitude: number } {
@@ -217,7 +218,7 @@ export default function DashboardPage() {
   }, [club, isMock]);
 
   const handleCopyClubLink = async () => {
-    const clubUrl = `${window.location.origin}/${generateSlug(clubName)}`;
+    const clubUrl = `${getAppUrl()}/${generateSlug(clubName)}`;
     await navigator.clipboard.writeText(clubUrl);
     setInstagramCopied(true);
 
