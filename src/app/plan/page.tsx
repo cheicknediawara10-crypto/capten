@@ -78,6 +78,20 @@ export default function PlanPage() {
         if (supabase) {
           const { data: { user } } = await supabase.auth.getUser();
           if (user) {
+            if (user.email?.toLowerCase() === 'cheicknediawara10@gmail.com') {
+              setTrialExpired(false);
+              setCurrentPlan('PRO');
+              localStorage.setItem('capten_plan', 'PRO');
+              document.cookie = "capten_mock_trial_expired=false; path=/; max-age=31536000";
+              setProfile({
+                stripe_subscription_status: 'active',
+                subscription_ends_at: '2099-12-31'
+              });
+              if (typeof window !== 'undefined' && window.location.search.includes('trial_expired')) {
+                window.history.replaceState({}, '', window.location.pathname);
+              }
+              return;
+            }
             const { data: prof } = await supabase
               .from('profiles')
               .select('*')
@@ -96,18 +110,42 @@ export default function PlanPage() {
   }, []);
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('trial_expired') === 'true') {
-      setTrialExpired(true);
-    }
+    const checkVipAndParams = async () => {
+      const supabase = getSupabase();
+      let isVip = false;
+      if (supabase) {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user?.email?.toLowerCase() === 'cheicknediawara10@gmail.com') {
+          isVip = true;
+        }
+      }
 
-    const saved = localStorage.getItem('capten_plan');
-    if (saved) {
-      setCurrentPlan(saved);
-    } else {
-      localStorage.setItem('capten_plan', 'PRO');
-      setCurrentPlan('PRO');
-    }
+      if (isVip) {
+        setTrialExpired(false);
+        setCurrentPlan('PRO');
+        localStorage.setItem('capten_plan', 'PRO');
+        document.cookie = "capten_mock_trial_expired=false; path=/; max-age=31536000";
+        if (typeof window !== 'undefined' && window.location.search.includes('trial_expired')) {
+          window.history.replaceState({}, '', window.location.pathname);
+        }
+        return;
+      }
+
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('trial_expired') === 'true') {
+        setTrialExpired(true);
+      }
+
+      const saved = localStorage.getItem('capten_plan');
+      if (saved) {
+        setCurrentPlan(saved);
+      } else {
+        localStorage.setItem('capten_plan', 'PRO');
+        setCurrentPlan('PRO');
+      }
+    };
+
+    checkVipAndParams();
 
     // Capture Stripe redirection success
     const sessionId = params.get('session_id');

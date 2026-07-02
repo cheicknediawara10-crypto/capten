@@ -154,6 +154,16 @@ export default function SettingsPage() {
     const loadSupabaseData = async () => {
       try {
         const supabase = getSupabase();
+        if (user?.email?.toLowerCase() === 'cheicknediawara10@gmail.com') {
+          setCurrentPlan('PRO');
+          localStorage.setItem('capten_plan', 'PRO');
+          document.cookie = "capten_mock_trial_expired=false; path=/; max-age=31536000";
+          setProfile({
+            stripe_subscription_status: 'active',
+            subscription_ends_at: '2099-12-31'
+          });
+          return;
+        }
         if (supabase && user) {
           // Fetch Stripe SaaS Profile
           const { data: prof } = await supabase
