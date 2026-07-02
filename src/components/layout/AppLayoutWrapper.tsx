@@ -13,20 +13,23 @@ interface AppLayoutWrapperProps {
 export default function AppLayoutWrapper({ children }: AppLayoutWrapperProps) {
   const pathname = usePathname();
 
-  // Pages publiques sans sidebar ni navigation admin
+  const cleanPath = (pathname || "").split("?")[0];
+
+  // Pages publiques sans sidebar ni header mobile admin
   const isPublicPage =
-    pathname === "/" ||
-    pathname === "/login" ||
-    pathname === "/reset-password" ||
-    pathname === "/waiver" ||
-    pathname === "/cgu" ||
-    pathname === "/mentions-legales" ||
-    pathname === "/rgpd" ||
-    (pathname?.startsWith("/runs/") && pathname?.includes("/checkin")) ||
-    pathname === "/runners/manage" ||
-    pathname === "/securite/signaler" ||
-    pathname?.startsWith("/cagnotte/contribuer") ||
-    pathname?.startsWith("/cagnotte/sponsor");
+    cleanPath === "/" ||
+    cleanPath === "/login" ||
+    cleanPath.startsWith("/login") ||
+    cleanPath.startsWith("/reset-password") ||
+    cleanPath.startsWith("/waiver") ||
+    cleanPath === "/cgu" ||
+    cleanPath === "/mentions-legales" ||
+    cleanPath === "/rgpd" ||
+    cleanPath.includes("/checkin") ||
+    cleanPath.startsWith("/runners/manage") ||
+    cleanPath.startsWith("/securite/signaler") ||
+    cleanPath.startsWith("/cagnotte/contribuer") ||
+    cleanPath.startsWith("/cagnotte/sponsor");
 
   if (isPublicPage) {
     return (
