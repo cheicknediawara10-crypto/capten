@@ -14,7 +14,19 @@ export default function AppLayoutWrapper({ children }: AppLayoutWrapperProps) {
   const pathname = usePathname();
 
   // Pages publiques sans sidebar ni navigation admin
-  const isPublicPage = pathname === "/" || pathname === "/login";
+  const isPublicPage =
+    pathname === "/" ||
+    pathname === "/login" ||
+    pathname === "/reset-password" ||
+    pathname === "/waiver" ||
+    pathname === "/cgu" ||
+    pathname === "/mentions-legales" ||
+    pathname === "/rgpd" ||
+    (pathname?.startsWith("/runs/") && pathname?.includes("/checkin")) ||
+    pathname === "/runners/manage" ||
+    pathname === "/securite/signaler" ||
+    pathname?.startsWith("/cagnotte/contribuer") ||
+    pathname?.startsWith("/cagnotte/sponsor");
 
   if (isPublicPage) {
     return (

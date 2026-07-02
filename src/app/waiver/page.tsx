@@ -656,23 +656,6 @@ export default function WaiverPage() {
   return (
     <div className="min-h-screen bg-[#F4F5F7] text-[#0F172A] flex flex-col justify-between">
       
-      {/* Mini Header */}
-      <header className="bg-white border-b border-black/5 py-5 px-6">
-        <div className="max-w-6xl mx-auto flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-control bg-[#FF5C00] flex items-center justify-center text-white">
-              <Navigation size={14} className="rotate-45 fill-white text-white translate-y-[-0.5px]" />
-            </div>
-            <span className="font-display italic font-black text-lg tracking-tight uppercase text-black">
-              CAPTEN
-            </span>
-          </div>
-          <span className="text-[10px] font-black text-[#94A3B8] uppercase tracking-widest">
-            PORTAIL SÉCURISÉ DU CREW
-          </span>
-        </div>
-      </header>
-
       {/* Main Form content wrapped in Suspense */}
       <main className="flex-1 flex items-center justify-center p-6">
         <Suspense fallback={
