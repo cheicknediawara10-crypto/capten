@@ -767,6 +767,9 @@ export default function DashboardPage() {
           </div>
       </header>
  
+      {/* COPILOT BRIEFING IA */}
+      <CopilotWidget />
+
       {/* VICTORY CHECKLIST (ONBOARDING) */}
       {isChecklistVisible && (
         <div className="bg-white border border-[#E5E5E5] rounded-card-outer p-6 sm:p-8 space-y-6 shadow-sm relative overflow-hidden transition-all duration-300 hover:border-black/15">
