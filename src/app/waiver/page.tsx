@@ -299,10 +299,10 @@ function WaiverForm() {
           </p>
           <div className="bg-[#F4F5F7] border border-black/5 rounded-card-inner p-4 text-[10px] font-mono text-neutral-600 space-y-1 w-full text-left">
             <p className="text-[#FF5C00] font-black uppercase tracking-wider text-[8px] mb-1">📝 CERTIFICAT DE SIGNATURE NUMÉRIQUE</p>
-            <p><span className="font-bold text-neutral-800">TIMESTAMP :</span> {new Date().toISOString()}</p>
+            <p><span className="font-bold text-neutral-800">HORODATAGE :</span> {new Date().toISOString()}</p>
             <p><span className="font-bold text-neutral-800">IP SIGNATAIRE :</span> 194.2.16.8</p>
             <p><span className="font-bold text-neutral-800">EMPREINTE :</span> {signatureToken}</p>
-            <p><span className="font-bold text-neutral-800">VERSION DÉCHARGE :</span> CAPTEN Waiver v1.5</p>
+            <p><span className="font-bold text-neutral-800">VERSION DÉCHARGE :</span> Décharge CAPTEN v1.5</p>
           </div>
 
           {runId && (
@@ -331,7 +331,7 @@ function WaiverForm() {
               DÉCHARGE DE RESPONSABILITÉ
             </h2>
             <p className="text-xs text-[#94A3B8] font-bold uppercase tracking-wider">
-              CAPTEN LEGAL SHIELD — WAIVER
+              PROTECTION JURIDIQUE CAPTEN — DÉCHARGE DE RESPONSABILITÉ
             </p>
           </div>
 
@@ -670,7 +670,7 @@ export default function WaiverPage() {
 
       {/* Mini Footer */}
       <footer className="bg-white border-t border-black/5 py-6 text-center text-[10px] text-[#94A3B8] font-bold uppercase tracking-wider">
-        © {new Date().getFullYear()} CAPTEN LEGAL SHIELD • TOUS DROITS RÉSERVÉS.
+        © {new Date().getFullYear()} PROTECTION JURIDIQUE CAPTEN • TOUS DROITS RÉSERVÉS.
       </footer>
 
     </div>

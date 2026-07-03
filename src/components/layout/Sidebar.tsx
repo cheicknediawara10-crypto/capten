@@ -92,7 +92,7 @@ export default function Sidebar() {
     {
       title: "PILOTAGE",
       items: [
-        { name: "Dashboard", icon: <LayoutDashboard size={18} strokeWidth={1.5} />, href: "/dashboard" },
+        { name: "Tableau de bord", icon: <LayoutDashboard size={18} strokeWidth={1.5} />, href: "/dashboard" },
         { name: "Le Crew", icon: <Users size={18} strokeWidth={1.5} />, href: "/athletes" },
         { name: "Les Runs", icon: <Map size={18} strokeWidth={1.5} />, href: "/runs" },
         { name: "Messages", icon: <MessageSquare size={18} strokeWidth={1.5} />, href: "/messages" },

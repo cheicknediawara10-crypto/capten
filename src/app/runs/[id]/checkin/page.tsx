@@ -429,7 +429,7 @@ function CheckinFormContent() {
               Décharge Obligatoire
             </h1>
             <p className="text-[10px] font-black text-rose-600 uppercase tracking-widest">
-              CAPTEN LEGAL SHIELD
+              PROTECTION JURIDIQUE CAPTEN
             </p>
           </div>
 
@@ -473,7 +473,7 @@ function CheckinFormContent() {
         {/* Streak Counter display */}
         <div className="absolute top-6 right-6 bg-[#FF5C00]/10 border border-[#FF5C00]/20 text-[#FF5C00] rounded-full px-3 py-1 flex items-center gap-1.5 text-[10px] font-black tracking-wider uppercase select-none">
           <Award className="w-3.5 h-3.5 fill-[#FF5C00]/10" />
-          STREAK: {runner.streak_count || 0}
+          ASSIDUITÉ : {runner.streak_count || 0}
         </div>
 
         {/* Header */}
@@ -565,7 +565,7 @@ function CheckinFormContent() {
               </div>
               <h2 className="text-[20px] font-display italic font-black uppercase text-[#56E39F]">Présence Validée !</h2>
               <p className="text-xs text-neutral-500 leading-normal px-4">
-                Assiduité enregistrée. Votre compteur de Streak passe à <strong>{runner.streak_count}</strong>. Bon run !
+                Assiduité enregistrée. Votre compteur d&apos;assiduité passe à <strong>{runner.streak_count}</strong>. Bon run !
               </p>
               {distance !== null && (
                 <p className="text-[9px] font-mono text-neutral-400">
