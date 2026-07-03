@@ -59,7 +59,7 @@ export default function CagnottePage() {
 
     if (!isMock && club) {
       setCagnotteUrl(club.cagnotte_url || '');
-      const data = club.cagnotte_data || {};
+      const data = (club.cagnotte_data || {}) as any;
       setSolde(data.balance || 0);
       setBerlinRaised(data.berlin_raised || 0);
       setLogs(data.transactions || []);

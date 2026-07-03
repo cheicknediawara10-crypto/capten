@@ -6,6 +6,7 @@ import { LayoutDashboard, Users, MapPin, Wallet, Zap, MessageSquare, ArrowRight,
 import { getSupabase } from '@/lib/supabase';
 import { useAuth } from '@/context/AuthContext';
 import { getAppUrl } from '@/lib/domain';
+import CopilotWidget from '@/components/copilot/CopilotWidget';
 
 // === HELPERS MÉTÉO ===
 function getCoordinates(location: string): { latitude: number; longitude: number } {
@@ -81,15 +82,15 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (!isMock && club) {
-      // Sync Onboarding States from Supabase B2B club metadata
-      setOnboardingStep(club.branding?.onboarding_step || 1);
-      setSkipOnboarding(club.branding?.onboarding_skipped === true);
+      const branding = (club.branding || {}) as any;
+      setOnboardingStep(branding.onboarding_step || 1);
+      setSkipOnboarding(branding.onboarding_skipped === true);
       setClubName(club.name || '');
       setOnboardingClubName(club.name || '');
-      setHasLogo(!!club.branding?.logo);
-      setInstagramCopied(club.branding?.instagram_copied === true);
-      setChecklistCollapsed(club.branding?.checklist_collapsed === true);
-      setIsChecklistVisible(club.branding?.checklist_hidden !== true);
+      setHasLogo(!!branding.logo);
+      setInstagramCopied(branding.instagram_copied === true);
+      setChecklistCollapsed(branding.checklist_collapsed === true);
+      setIsChecklistVisible(branding.checklist_hidden !== true);
       setCagnotteUrl(club.cagnotte_url || null);
       setSpotName(club.spot_name || null);
 
@@ -504,9 +505,6 @@ export default function DashboardPage() {
         <span className={step === 2 ? "text-[#FF5C00] font-bold" : "text-[#9B9B93]"}>② Ton lien</span>
         <span className="text-neutral-300">———</span>
         <span className={step === 3 ? "text-[#FF5C00] font-bold" : "text-[#9B9B93]"}>③ Ton premier run</span>
-      </div>
-    );
-  };ext-[#FF5C00] font-bold" : "text-[#9B9B93]"}>③ Ton premier run</span>
       </div>
     );
   };
