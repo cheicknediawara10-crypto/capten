@@ -148,6 +148,7 @@ export default function PlanPage() {
     checkVipAndParams();
 
     // Capture Stripe redirection success
+    const params = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
     const sessionId = params.get('session_id');
     const success = params.get('success');
     const planNameParam = params.get('planName');
