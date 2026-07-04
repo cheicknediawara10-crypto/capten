@@ -128,30 +128,40 @@ export default function AthletesPage() {
   const [searchQuery, setSearchQuery] = useState("");
 
   const loadAthletes = async () => {
-    if (isMock) {
-      const stored = localStorage.getItem('capten_athletes_v3');
-      if (stored) {
-        try {
-          const parsed = JSON.parse(stored);
-          setAthletes(parsed);
-        } catch (e) {
-          console.error(e);
-        }
-      } else {
-        setAthletes([]);
-        localStorage.setItem('capten_athletes_v3', JSON.stringify([]));
-      }
-    } else {
+    let serverAthletes: Athlete[] | null = null;
+
+    if (!isMock) {
       try {
         const res = await fetch('/api/runners');
         if (res.ok) {
           const runners = await res.json();
-          if (Array.isArray(runners)) {
-            setAthletes(runners.map(mapRunnerToAthlete));
+          if (Array.isArray(runners) && runners.length > 0) {
+            serverAthletes = runners.map(mapRunnerToAthlete);
           }
         }
       } catch (err) {
         console.error("Error loading athletes from server:", err);
+      }
+    }
+
+    if (serverAthletes !== null) {
+      setAthletes(serverAthletes);
+    } else {
+      // Fallback to localStorage
+      const stored = localStorage.getItem('capten_athletes_v3');
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed)) {
+            setAthletes(parsed);
+          } else {
+            setAthletes([]);
+          }
+        } catch (e) {
+          setAthletes([]);
+        }
+      } else {
+        setAthletes([]);
       }
     }
   };
@@ -699,44 +709,40 @@ export default function AthletesPage() {
                 const roleWithId = `${formData.role} · ID: M${recruitIdNumber}`;
                 const athleteIdParam = `M${recruitIdNumber}`;
 
-                if (isMock) {
-                  const newAthlete: Athlete = {
-                    initial: formData.firstName.charAt(0).toUpperCase(),
-                    name: fullName,
-                    firstName: formData.firstName,
-                    lastName: formData.lastName,
-                    role: roleWithId,
-                    reliability: parseInt(formData.reliability) || 90,
-                    pace: formData.pace || "5:00/K",
-                    totalKm: "0 km",
-                    lastRun: "Jamais",
-                    runs: 0,
-                    img: '',
-                    streak: 0,
-                    tier: "BRONZE",
-                    tierColor: "#CD7F32",
-                    phone: formData.phone,
-                    email: formData.email,
-                    emergencyName: formData.emergencyName,
-                    emergencyPhone: formData.emergencyPhone,
-                    emergencyRelation: formData.emergencyRelation,
-                    birthDate: formData.birthDate,
-                    bloodType: formData.bloodType,
-                    allergies: formData.allergies || "Aucune",
-                    healthIssues: formData.healthIssues || "Aucun",
-                    insurance: formData.insurance || "Non spécifiée",
-                    joinDate: new Date().toLocaleDateString('fr-FR', { timeZone: 'Europe/Paris', month: 'short', year: 'numeric' }),
-                    address: formData.address || "Non spécifiée",
-                    waiverStatus: "NON SIGNÉE"
-                  };
+                const newAthlete: Athlete = {
+                  initial: formData.firstName ? formData.firstName.charAt(0).toUpperCase() : 'M',
+                  name: fullName,
+                  firstName: formData.firstName,
+                  lastName: formData.lastName,
+                  role: roleWithId,
+                  reliability: parseInt(formData.reliability) || 90,
+                  pace: formData.pace || "5:00/K",
+                  totalKm: "0 km",
+                  lastRun: "Jamais",
+                  runs: 0,
+                  img: '',
+                  streak: 0,
+                  tier: "BRONZE",
+                  tierColor: "#CD7F32",
+                  phone: formData.phone,
+                  email: formData.email,
+                  emergencyName: formData.emergencyName,
+                  emergencyPhone: formData.emergencyPhone,
+                  emergencyRelation: formData.emergencyRelation,
+                  birthDate: formData.birthDate,
+                  bloodType: formData.bloodType,
+                  allergies: formData.allergies || "Aucune",
+                  healthIssues: formData.healthIssues || "Aucun",
+                  insurance: formData.insurance || "Non spécifiée",
+                  joinDate: new Date().toLocaleDateString('fr-FR', { timeZone: 'Europe/Paris', month: 'short', year: 'numeric' }),
+                  address: formData.address || "Non spécifiée",
+                  waiverStatus: "NON SIGNÉE"
+                };
 
-                  const updatedAthletes = [newAthlete, ...athletes];
-                  setAthletes(updatedAthletes);
-                  localStorage.setItem("capten_athletes_v3", JSON.stringify(updatedAthletes));
+                let savedRemotely = false;
+                let remoteId = athleteIdParam;
 
-                  const link = `${getAppUrl()}/waiver?athleteId=${athleteIdParam}`;
-                  setNewAthleteLink(link);
-                } else {
+                if (!isMock) {
                   try {
                     const res = await fetch('/api/runners', {
                       method: 'POST',
@@ -760,18 +766,26 @@ export default function AthletesPage() {
                       })
                     });
                     if (res.ok) {
-                      const newRunner = await res.json();
-                      await loadAthletes();
-                      const link = `${getAppUrl()}/waiver?runnerId=${newRunner.id}`;
-                      setNewAthleteLink(link);
-                    } else {
-                      alert("Erreur lors de l'enregistrement du coureur.");
+                      const data = await res.json();
+                      if (data && data.id) {
+                        savedRemotely = true;
+                        remoteId = data.id;
+                        await loadAthletes();
+                      }
                     }
                   } catch (err) {
                     console.error("Error creating runner:", err);
-                    alert("Erreur lors de la création du coureur.");
                   }
                 }
+
+                if (!savedRemotely) {
+                  const updatedAthletes = [newAthlete, ...athletes];
+                  setAthletes(updatedAthletes);
+                  localStorage.setItem("capten_athletes_v3", JSON.stringify(updatedAthletes));
+                }
+
+                const link = `${getAppUrl()}/waiver?runnerId=${remoteId}`;
+                setNewAthleteLink(link);
 
                 setIsSubmitting(false);
                 setIsSuccess(true);
