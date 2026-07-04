@@ -595,7 +595,7 @@ export default function RunsPage() {
                         { name: 'Alex Rivière', img: '', status: 'present' },
                         { name: 'Sophie Lemaire', img: '', status: 'present' }
                       ])
-                        .filter((p: any) => p.name.toLowerCase().includes(participantSearch.toLowerCase()))
+                        .filter((p: any) => (p.name || '').toLowerCase().includes((participantSearch || '').toLowerCase()))
                         .map((p: any, i: number) => (
                         <div 
                           key={i} 

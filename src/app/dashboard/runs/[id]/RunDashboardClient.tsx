@@ -153,8 +153,8 @@ export default function RunDashboardClient({ run, initialRegistrations, isDemo }
     if (!searchQuery.trim()) return registrations;
     const query = searchQuery.toLowerCase();
     return registrations.filter(reg => 
-      reg.runners.name.toLowerCase().includes(query) || 
-      reg.runners.phone.includes(query)
+      (reg.runners?.name || '').toLowerCase().includes(query) || 
+      (reg.runners?.phone || '').includes(query)
     );
   }, [registrations, searchQuery]);
 
@@ -305,7 +305,7 @@ export default function RunDashboardClient({ run, initialRegistrations, isDemo }
                 <div className="flex items-center gap-3">
                   {/* Photo de profil factice */}
                   <div className="w-9 h-9 rounded-full bg-[#F4F5F7] border-[0.5px] border-black/5 flex items-center justify-center font-display italic font-black text-xs text-neutral-400 shrink-0">
-                    {reg.runners.name.substring(0, 2).toUpperCase()}
+                    {(reg.runners?.name || '??').substring(0, 2).toUpperCase()}
                   </div>
                   
                   <div className="space-y-0.5">

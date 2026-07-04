@@ -190,7 +190,7 @@ export default function AthletesPage() {
         if (stored) {
           const list = JSON.parse(stored);
           const updatedList = list.map((a: any) => {
-            if (a.name.toLowerCase() === athlete.name.toLowerCase()) {
+            if ((a.name || '').toLowerCase() === (athlete.name || '').toLowerCase()) {
               const cleanRole = a.role.replace(/\s*\(Banni\)/gi, "");
               return { ...a, role: cleanRole };
             }
@@ -227,18 +227,18 @@ export default function AthletesPage() {
         const stored = localStorage.getItem('capten_athletes_v3');
         if (stored) {
           const list = JSON.parse(stored);
-          const updatedList = list.map((a: any) => {
-            if (a.name.toLowerCase() === athlete.name.toLowerCase()) {
-              return { ...a, role: a.role.toLowerCase().includes("banni") ? a.role : a.role + " (Banni)" };
+          const updated = list.map((a: any) => {
+            if ((a.name || '').toLowerCase() === (athlete.name || '').toLowerCase()) {
+              return { ...a, role: (a.role || '').toLowerCase().includes("banni") ? a.role : a.role + " (Banni)" };
             }
             return a;
           });
-          localStorage.setItem('capten_athletes_v3', JSON.stringify(updatedList));
+          localStorage.setItem('capten_athletes_v3', JSON.stringify(updated));
         }
       }
 
       await loadAthletes();
-      setSelectedAthlete(prev => prev ? { ...prev, role: prev.role.toLowerCase().includes("banni") ? prev.role : prev.role + " (Banni)" } : null);
+      setSelectedAthlete(prev => prev ? { ...prev, role: (prev.role || '').toLowerCase().includes("banni") ? prev.role : prev.role + " (Banni)" } : null);
       alert(`Le membre ${athlete.name} a été suspendu.`);
     } catch (err) {
       console.error(err);
@@ -310,7 +310,7 @@ export default function AthletesPage() {
       {/* ATHLETES GRID */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         {athletes
-          .filter(a => a.name.toLowerCase().includes(searchQuery.toLowerCase()))
+          .filter(a => (a.name || '').toLowerCase().includes((searchQuery || '').toLowerCase()))
           .map((athlete, idx) => (
           <div key={idx} onClick={() => setSelectedAthlete(athlete)} className="bg-white border-[0.5px] border-[#E5E5E5] rounded-card-outer p-6 space-y-5 shadow-sm hover:border-black/20 transition-all group cursor-pointer">
             <div className="flex items-center justify-between">
@@ -592,7 +592,7 @@ export default function AthletesPage() {
                     <Shield size={14} /> SIGNALER
                   </Link>
                 </div>
-                {selectedAthlete.role.toLowerCase().includes("banni") ? (
+                {(selectedAthlete.role || '').toLowerCase().includes("banni") ? (
                   <button
                     onClick={() => handlePardonAthlete(selectedAthlete)}
                     className="w-full btn-lg-cta bg-emerald-600 hover:bg-black text-white border-none min-h-[44px] flex items-center justify-center"
