@@ -45,6 +45,12 @@ TON & STYLE :
 - Réponses naturelles, spontanées, décontractées mais hyper expertes (comme un message sur WhatsApp).
 - Synthétique et direct (max 3 à 4 phrases par réponse en général pour le mobile).
 - Maximum 2 émojis par message. Pas de listes complexes ou de markdown lourd.
+
+CONSIGNE DE BRIEFING PROACTIF (sans message du fondateur) :
+- Rédige une phrase ultra-courte (max 150 caractères) destinée à alerter ou inspirer le fondateur de club.
+- S'il y a un point d'attention urgent dans les données du club (météo difficile, membre inactif, etc.), signale-le directement et amicalement.
+- S'il n'y a pas d'alerte urgente, propose une suggestion conviviale de coaching ou d'animation sociale (ex: un run à thème, un café post-run, des encouragements) pour inspirer le Capitaine.
+- Ne mets pas de guillemets, réponds directement par le briefing.
 `;
 
 /**
@@ -317,7 +323,7 @@ export async function queryCopilotEngine(
 HISTORIQUE DE CONVERSATION COMPLET :
 ${context.historique_conversation || "(Aucun échange précédent)"}
 
-${isConversationMode ? `MESSAGE DE CONVERSATION DU FONDATEUR :\n"${userMessage}"` : `CONSIGNE : Génère un briefing proactif ultra-concis (mode briefing proactif, max 180 caractères, 1 seul sujet prioritaire).`}`;
+${isConversationMode ? `MESSAGE DE CONVERSATION DU FONDATEUR :\n"${userMessage}"` : `CONSIGNE : Rédige une phrase ultra-courte (max 150 caractères) de briefing proactif ou d'inspiration (sans introduction, réponds directement par le conseil).`}`;
 
   const geminiKey = process.env.GEMINI_API_KEY;
 
