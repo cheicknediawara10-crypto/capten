@@ -1,5 +1,6 @@
 import { getSupabase, getSupabaseAdmin } from './supabase';
 import { getWeatherForecast } from './weather';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 export interface CopilotContext {
   meteo_soir: string;
@@ -328,32 +329,22 @@ ${isConversationMode ? `MESSAGE DU FONDATEUR (mode conversation) :\n${userMessag
 
   const geminiKey = process.env.GEMINI_API_KEY;
 
-  if (geminiKey) {
+  if (geminiKey && geminiKey !== 'votre_cle_gemini_ici' && geminiKey.trim() !== '') {
     try {
-      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [
-            {
-              role: 'user',
-              parts: [{ text: fullPrompt }]
-            }
-          ],
-          generationConfig: {
-            temperature: 0.4,
-            maxOutputTokens: isConversationMode ? 250 : 80
-          }
-        })
+      const genAI = new GoogleGenerativeAI(geminiKey);
+      const model = genAI.getGenerativeModel({
+        model: 'gemini-1.5-flash',
+        generationConfig: {
+          temperature: 0.4,
+          maxOutputTokens: isConversationMode ? 250 : 80,
+        },
       });
 
-      if (res.ok) {
-        const json = await res.json();
-        const reply = json.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
-        if (reply) return reply;
-      }
+      const result = await model.generateContent(fullPrompt);
+      const reply = result.response.text()?.trim();
+      if (reply) return reply;
     } catch (err) {
-      console.warn('[Copilot Gemini LLM API Call Exception, using fallback]:', err);
+      console.warn('[Copilot Gemini SDK API Call Exception, using fallback]:', err);
     }
   }
 
