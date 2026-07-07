@@ -19,6 +19,9 @@ interface Incident {
   description?: string;
   involved?: string;
   anonymous: boolean;
+  run_title?: string;
+  reporter_name?: string;
+  reporter_phone?: string;
 }
 
 interface SignedAthlete {
@@ -79,6 +82,7 @@ export default function SecuritePage() {
   const [isLoadingIncidents, setIsLoadingIncidents] = useState(true);
   const [banningRunner, setBanningRunner] = useState(false);
   const [banSuccessMessage, setBanSuccessMessage] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'signalements' | 'debriefs'>('signalements');
 
   const fetchIncidents = async () => {
     setIsLoadingIncidents(true);
@@ -97,6 +101,7 @@ export default function SecuritePage() {
           anonymous: inc.anonymous,
           reporter_name: inc.reporter_name,
           reporter_phone: inc.reporter_phone,
+          run_title: inc.runs?.title || 'Général',
           raw_id: inc.id // Keep DB uuid
         }));
         setIncidents(mapped);
@@ -504,48 +509,89 @@ export default function SecuritePage() {
           </div>
         </div>
 
-        {/* BLOCK 4: INCIDENT TRACKER */}
-        <div className="bg-black text-white rounded-card-outer p-6 sm:p-8 space-y-8 shadow-sm">
-           <div className="flex justify-between items-center">
-              <h3 className="text-[18px] font-display italic font-black uppercase">Retours de l'équipe</h3>
-              <div className="bg-white/10 px-3 py-1 rounded-full">
-                 <span className="text-[10px] font-bold uppercase tracking-widest">{incidents.length} SIGNALEMENTS</span>
+        {/* BLOCK 4: INCIDENT & DEBRIEF TRACKER */}
+        <div className="bg-black text-white rounded-card-outer p-6 sm:p-8 space-y-6 shadow-sm">
+           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <h3 className="text-[18px] font-display italic font-black uppercase tracking-tight">Retours & Sécurité</h3>
+              {/* Tab Selector */}
+              <div className="flex bg-white/5 p-1 rounded-control border border-white/10 w-full sm:w-auto">
+                <button
+                  onClick={() => setActiveTab('signalements')}
+                  className={`flex-1 sm:flex-initial px-4 py-2 rounded-control text-[9px] font-black uppercase tracking-widest transition-all cursor-pointer ${
+                    activeTab === 'signalements'
+                      ? 'bg-red-600 text-white shadow-md'
+                      : 'text-white/60 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  🚨 Sécurité ({incidents.filter(inc => inc.type !== "Mood Check (Feedback)").length})
+                </button>
+                <button
+                  onClick={() => setActiveTab('debriefs')}
+                  className={`flex-1 sm:flex-initial px-4 py-2 rounded-control text-[9px] font-black uppercase tracking-widest transition-all cursor-pointer ${
+                    activeTab === 'debriefs'
+                      ? 'bg-[#FF5C00] text-white shadow-md'
+                      : 'text-white/60 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  💬 Débriefs ({incidents.filter(inc => inc.type === "Mood Check (Feedback)").length})
+                </button>
               </div>
            </div>
+           
            <div className="space-y-3">
              {isLoadingIncidents ? (
                 <div className="py-8 flex flex-col items-center justify-center space-y-2 text-white/40">
                    <RefreshCw className="w-5 h-5 animate-spin" />
-                   <p className="text-[10px] font-bold uppercase tracking-wider">Chargement des signalements...</p>
+                   <p className="text-[10px] font-bold uppercase tracking-wider">Chargement des retours...</p>
                 </div>
-              ) : incidents.length === 0 ? (
+              ) : (activeTab === 'signalements' ? incidents.filter(inc => inc.type !== "Mood Check (Feedback)") : incidents.filter(inc => inc.type === "Mood Check (Feedback)")).length === 0 ? (
                 <div className="py-8 text-center text-white/40 text-[10px] font-bold uppercase tracking-wider border border-dashed border-white/10 rounded-card-inner">
-                  Aucun incident signalé. Le club est sûr ✓
+                  {activeTab === 'signalements' 
+                    ? "Aucune alerte de sécurité signalée. Le club est sûr ✓" 
+                    : "Aucun débriefing de course reçu pour le moment."}
                 </div>
               ) : (
-                incidents.map((inc, idx) => (
+                (activeTab === 'signalements' ? incidents.filter(inc => inc.type !== "Mood Check (Feedback)") : incidents.filter(inc => inc.type === "Mood Check (Feedback)")).map((inc, idx) => (
                   <div 
                     key={idx} 
                     onClick={() => setSelectedIncident(inc)}
-                    className="flex items-center justify-between p-4 border-[0.5px] border-white/10 rounded-card-inner hover:bg-white/5 transition-colors cursor-pointer group"
+                    className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border-[0.5px] border-white/10 rounded-card-inner hover:bg-white/5 transition-colors cursor-pointer group gap-3 text-left animate-scale-up"
                   >
-                    <div className="flex items-center gap-4">
-                      <div className={`w-2 h-2 rounded-full shrink-0 ${inc.priority === 'HAUTE' ? 'bg-[#FF0000]' : 'bg-[#FF5C00]'}`} />
+                    <div className="flex items-start sm:items-center gap-4">
+                      <div className={`w-2.5 h-2.5 rounded-full shrink-0 mt-1 sm:mt-0 ${
+                        activeTab === 'signalements'
+                          ? inc.priority === 'CRITIQUE' ? 'bg-red-650 animate-pulse' : inc.priority === 'HAUTE' ? 'bg-red-500' : 'bg-orange-500'
+                          : 'bg-emerald-550'
+                      }`} />
                       <div className="space-y-0.5">
-                         <p className="text-[11px] font-black uppercase tracking-tight">{inc.type}</p>
-                         <p className="text-[9px] font-medium text-white/40 uppercase">{inc.id} • {inc.date}</p>
+                         <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                           <p className="text-[11px] font-black uppercase tracking-tight">
+                             {activeTab === 'debriefs' ? `Mood Check : ${inc.involved}` : inc.type}
+                           </p>
+                           {inc.priority === 'CRITIQUE' && activeTab === 'signalements' && (
+                             <span className="bg-red-600 text-white font-mono text-[7px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded">
+                               CRITIQUE
+                             </span>
+                           )}
+                         </div>
+                         <p className="text-[9px] font-medium text-white/40 uppercase tracking-wider font-mono">
+                           Run : <span className="text-white/75 font-bold">{inc.run_title}</span> • {inc.date}
+                         </p>
+                         <p className="text-[10px] text-white/70 font-medium line-clamp-1 mt-1 font-sans">
+                           {inc.description}
+                         </p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-4">
-                      <span className="text-[10px] font-black text-white/40 uppercase italic tracking-widest hidden sm:inline">{inc.status}</span>
-                      <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                    <div className="flex items-center justify-between sm:justify-end gap-4 border-t sm:border-t-0 border-white/5 pt-2 sm:pt-0">
+                      <span className="text-[9px] font-black text-white/40 uppercase italic tracking-widest">{inc.status}</span>
+                      <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform text-white/60" />
                     </div>
                   </div>
                 ))
               )}
            </div>
            <p className="text-[10px] font-medium text-white/40 uppercase tracking-[0.2em] text-center pt-4 border-t border-white/10 italic">
-             CANAL DE SIGNALEMENT SÉCURISÉ & PRIVÉ
+             {activeTab === 'signalements' ? "CANAL DE SIGNALEMENT SÉCURISÉ & PRIVÉ" : "RETOURS D'EXPÉRIENCE CONFIDENTIELS DES COUREURS"}
            </p>
         </div>
       </div>
@@ -853,16 +899,22 @@ export default function SecuritePage() {
 
             <div className="p-8 space-y-6 text-black">
               {/* Vibe and Priority */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-3 gap-4">
                 <div className="bg-[#F4F5F7] p-4 rounded-card-inner">
                   <span className="thin-label block mb-1.5">PRIORITÉ</span>
-                  <p className={`text-[13px] font-bold uppercase ${selectedIncident.priority === 'HAUTE' ? 'text-[#FF0000]' : 'text-[#FF5C00]'}`}>
+                  <p className={`text-[13px] font-bold uppercase ${selectedIncident.priority === 'CRITIQUE' ? 'text-red-600' : selectedIncident.priority === 'HAUTE' ? 'text-[#FF0000]' : 'text-[#FF5C00]'}`}>
                     {selectedIncident.priority}
                   </p>
                 </div>
                 <div className="bg-[#F4F5F7] p-4 rounded-card-inner">
                   <span className="thin-label block mb-1.5">STATUT ACTUEL</span>
                   <p className="text-[13px] font-bold text-black uppercase">{selectedIncident.status}</p>
+                </div>
+                <div className="bg-[#F4F5F7] p-4 rounded-card-inner">
+                  <span className="thin-label block mb-1.5">SORTIE ASSOCIÉE</span>
+                  <p className="text-[13px] font-bold text-neutral-600 uppercase truncate" title={selectedIncident.run_title}>
+                    {selectedIncident.run_title || 'Général'}
+                  </p>
                 </div>
               </div>
 

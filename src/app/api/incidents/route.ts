@@ -139,7 +139,7 @@ export async function GET(request: Request) {
     // Fetch from Supabase using supabaseAdmin filtered by club_id = captainId
     const { data: incidents, error } = await supabaseAdmin
       .from('incidents')
-      .select('*')
+      .select('*, runs(title)')
       .eq('club_id', captainId)
       .order('created_at', { ascending: false });
 
