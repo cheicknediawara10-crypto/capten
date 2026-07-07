@@ -2,28 +2,26 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Check, Zap, Shield, Users, MessageSquare, Download, Headphones, Star, X, CreditCard, ShieldCheck, AlertCircle } from 'lucide-react';
+import { Bot, Check, Lock, Sparkles, X, CreditCard, ShieldCheck, HelpCircle } from 'lucide-react';
 import { getSupabase } from '@/lib/supabase';
+import { useAuth } from '@/context/AuthContext';
 
 export default function PlanPage() {
-  const [currentPlan, setCurrentPlan] = useState("PRO");
+  const { refreshClub } = useAuth();
+  const [currentPlan, setCurrentPlan] = useState("GRATUIT");
   const [selectedPlan, setSelectedPlan] = useState<any>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [processingPlan, setProcessingPlan] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
-  const [trialExpired, setTrialExpired] = useState(false);
   const [billingInterval, setBillingInterval] = useState<'monthly' | 'yearly'>('monthly');
 
   const [profile, setProfile] = useState<any>({
-    stripe_subscription_status: 'trialing',
+    stripe_subscription_status: 'inactive',
     subscription_ends_at: null
   });
 
-  const handleCancelTrial = async () => {
-    const isActiveSub = profile?.stripe_subscription_status === 'active';
-    const confirmMessage = isActiveSub 
-      ? "Voulez-vous vraiment résilier votre abonnement CAPTEN PRO ? Vous perdrez l'accès aux fonctionnalités premium et repasserez immédiatement en formule gratuite."
-      : "Voulez-vous vraiment résilier votre essai CAPTEN PRO ? Vous perdrez l'accès aux fonctionnalités premium et repasserez immédiatement en formule gratuite.";
+  const handleCancelSubscription = async () => {
+    const confirmMessage = "Voulez-vous vraiment résilier votre abonnement CAPTEN ? Vous perdrez l'accès immédiat aux fonctionnalités avancées (Copilote, Cagnotte, Messages auto) et repasserez en formule gratuite.";
 
     if (confirm(confirmMessage)) {
       setIsProcessing(true);
@@ -46,22 +44,24 @@ export default function PlanPage() {
 
             await supabase
               .from('clubs')
-              .update({ stripe_subscription_status: 'inactive' })
+              .update({ 
+                stripe_plan: 'GRATUIT',
+                stripe_subscription_status: 'inactive' 
+              })
               .eq('id', user.id);
           }
         }
         
-        // Set mock trial expiration cookie
-        document.cookie = "capten_mock_trial_expired=true; path=/; max-age=31536000";
+        // Remove mock trial expiration
+        document.cookie = "capten_mock_trial_expired=false; path=/; max-age=31536000";
+        document.cookie = "capten_plan=GRATUIT; path=/; max-age=31536000";
 
         if (typeof window !== 'undefined') {
           window.dispatchEvent(new Event('capten_branding_change'));
         }
+        await refreshClub();
 
-        const alertMessage = isActiveSub 
-          ? "Votre abonnement PRO a été résilié. Vous êtes repassé en formule gratuite."
-          : "Votre essai PRO a été résilié. Vous êtes repassé en formule gratuite.";
-        alert(alertMessage);
+        alert("Ton abonnement a été résilié. Tu es repassé en formule gratuite.");
       } catch (err) {
         console.error(err);
         alert("Erreur lors de la résiliation.");
@@ -79,17 +79,13 @@ export default function PlanPage() {
           const { data: { user } } = await supabase.auth.getUser();
           if (user) {
             if (user.email?.toLowerCase() === 'cheicknediawara10@gmail.com') {
-              setTrialExpired(false);
-              setCurrentPlan('PRO');
-              localStorage.setItem('capten_plan', 'PRO');
-              document.cookie = "capten_mock_trial_expired=false; path=/; max-age=31536000";
+              setCurrentPlan('CAPTEN');
+              localStorage.setItem('capten_plan', 'CAPTEN');
+              document.cookie = "capten_plan=CAPTEN; path=/; max-age=31536000";
               setProfile({
                 stripe_subscription_status: 'active',
                 subscription_ends_at: '2099-12-31'
               });
-              if (typeof window !== 'undefined' && window.location.search.includes('trial_expired')) {
-                window.history.replaceState({}, '', window.location.pathname);
-              }
               return;
             }
             const { data: prof } = await supabase
@@ -99,6 +95,17 @@ export default function PlanPage() {
               .maybeSingle();
             if (prof) {
               setProfile(prof);
+            }
+            
+            const { data: club } = await supabase
+              .from('clubs')
+              .select('stripe_plan')
+              .eq('id', user.id)
+              .maybeSingle();
+            if (club?.stripe_plan) {
+              setCurrentPlan(club.stripe_plan);
+              localStorage.setItem('capten_plan', club.stripe_plan);
+              document.cookie = `capten_plan=${club.stripe_plan}; path=/; max-age=31536000`;
             }
           }
         }
@@ -121,27 +128,18 @@ export default function PlanPage() {
       }
 
       if (isVip) {
-        setTrialExpired(false);
-        setCurrentPlan('PRO');
-        localStorage.setItem('capten_plan', 'PRO');
-        document.cookie = "capten_mock_trial_expired=false; path=/; max-age=31536000";
-        if (typeof window !== 'undefined' && window.location.search.includes('trial_expired')) {
-          window.history.replaceState({}, '', window.location.pathname);
-        }
+        setCurrentPlan('CAPTEN');
+        localStorage.setItem('capten_plan', 'CAPTEN');
+        document.cookie = "capten_plan=CAPTEN; path=/; max-age=31536000";
         return;
-      }
-
-      const params = new URLSearchParams(window.location.search);
-      if (params.get('trial_expired') === 'true') {
-        setTrialExpired(true);
       }
 
       const saved = localStorage.getItem('capten_plan');
       if (saved) {
         setCurrentPlan(saved);
       } else {
-        localStorage.setItem('capten_plan', 'PRO');
-        setCurrentPlan('PRO');
+        localStorage.setItem('capten_plan', 'GRATUIT');
+        setCurrentPlan('GRATUIT');
       }
     };
 
@@ -156,7 +154,7 @@ export default function PlanPage() {
     if (success === 'true' && sessionId && planNameParam) {
       const mockPlan = {
         name: planNameParam,
-        price: planNameParam === 'PRO' ? (billingInterval === 'yearly' ? '399€' : '49,99€') : '49,99€',
+        price: planNameParam === 'CAPTEN' ? (billingInterval === 'yearly' ? '499€' : '49,99€') : '0€',
         period: billingInterval === 'yearly' ? '/an' : '/mois',
       };
       setSelectedPlan(mockPlan);
@@ -165,16 +163,18 @@ export default function PlanPage() {
       // Verify payment with Stripe backend
       fetch(`/api/stripe/verify?session_id=${sessionId}`)
         .then((res) => res.json())
-        .then((data) => {
-          if (data.verified && data.metadata?.planName === planNameParam) {
+        .then(async (data) => {
+          if (data.verified) {
             setIsProcessing(false);
             setIsSuccess(true);
-            setCurrentPlan(planNameParam);
-            localStorage.setItem('capten_plan', planNameParam);
+            setCurrentPlan('CAPTEN');
+            localStorage.setItem('capten_plan', 'CAPTEN');
+            document.cookie = "capten_plan=CAPTEN; path=/; max-age=31536000";
 
             // Clean up the URL parameters
             const cleanUrl = window.location.pathname;
             window.history.replaceState({}, document.title, cleanUrl);
+            await refreshClub();
 
             setTimeout(() => {
               setIsSuccess(false);
@@ -199,20 +199,18 @@ export default function PlanPage() {
     if (plan.name === "GRATUIT") {
       setProcessingPlan("GRATUIT");
       setIsProcessing(true);
-      setTimeout(() => {
+      setTimeout(async () => {
         setIsProcessing(false);
         setProcessingPlan(null);
         setIsSuccess(true);
         setCurrentPlan("GRATUIT");
         localStorage.setItem('capten_plan', 'GRATUIT');
-        // Disable trial expiration mock if any
-        document.cookie = "capten_mock_trial_expired=false; path=/; max-age=31536000";
+        document.cookie = "capten_plan=GRATUIT; path=/; max-age=31536000";
+        await refreshClub();
         setTimeout(() => {
           setIsSuccess(false);
-          // Redirect to settings page after successful activation
-          window.location.href = '/settings';
         }, 1500);
-      }, 1000);
+      }, 800);
     } else {
       setSelectedPlan(plan);
     }
@@ -245,26 +243,44 @@ export default function PlanPage() {
     }
   };
 
-  const plans = [
+  const displayPlans = [
     {
-      name: "PRO",
-      price: billingInterval === 'monthly' ? "49,99€" : "39,99€",
-      period: "/mois",
-      billingNote: billingInterval === 'yearly' ? "Facturé 399€/an (2 mois offerts)" : "Facturé mensuellement",
-      tag: billingInterval === 'yearly' ? "OFFRE ANNUELLE — 2 MOIS OFFERTS" : "14 JOURS D'ESSAI GRATUIT (SANS ENGAGEMENT)",
-      desc: "La solution de pilotage ultime pour votre Run Club. Zéro charge mentale logistique.",
+      name: "GRATUIT",
+      price: "0€",
+      period: "",
+      billingNote: "Pour lancer ton crew.",
+      desc: "Idéal pour les petits crews qui démarrent et veulent tester l'infrastructure.",
       features: [
-        { t: "Tes coureurs s'inscrivent seuls.", d: "Tu ne touches à rien." },
-        { t: "Si quelqu'un tombe ce soir :", d: "groupe sanguin, allergies, qui appeler.\nEn 2 secondes." },
-        { t: "Il se comporte mal.", d: "Il a signé avant d'entrer.\nTu peux l'exclure maintenant." },
-        { t: "50 check-ins. Simultanés.", d: "Toi tu cours déjà." },
-        { t: "Le message du soir.", d: "1 clic. Tu colles dans WhatsApp.\nC'est tout." },
-        { t: "La météo s'intègre automatiquement.", d: "Ton message s'adapte tout seul." },
-        { t: "Le café post-run.", d: "Tes coureurs contribuent.\nCapten prend 0%." },
-        { t: "Ton crew grandit.", d: "Le prix, lui, ne bouge pas." }
+        { t: "Page publique du crew", d: "Inscriptions rapides en 1 lien partagé.", included: true },
+        { t: "1 run actif à la fois", d: "Planification standard.", included: true },
+        { t: "Fiche d'urgence de base", d: "Sécurité et contacts d'urgence.", included: true },
+        { t: "Jusqu'à 25 membres actifs", d: "Coureurs ayant participé aux 60 derniers jours.", included: true },
+        { t: "Messages auto WhatsApp", d: "Modèles de messages intelligents verrouillés.", included: false },
+        { t: "Cagnotte de Squad", d: "Soutien et after-runs verrouillés.", included: false },
+        { t: "Le Copilote IA", d: "Assistant d'entraînement personnel verrouillé.", included: false },
+        { t: "Runs illimités", d: "Historiques et planifications multiples verrouillés.", included: false }
       ],
-      button: currentPlan === "PRO" ? "VOTRE PLAN ACTUEL" : (billingInterval === 'yearly' ? "ACTIVER LE PLAN ANNUEL" : "COMMENCER L'ESSAI GRATUIT DE 14 JOURS"),
-      type: currentPlan === "PRO" ? "current" : "upgrade"
+      button: currentPlan === "GRATUIT" ? "PLAN ACTUEL" : "COMMENCER GRATUITEMENT",
+      type: currentPlan === "GRATUIT" ? "current" : "action"
+    },
+    {
+      name: "CAPTEN",
+      price: billingInterval === 'monthly' ? "49,99€" : "41,58€",
+      period: "/mois",
+      billingNote: billingInterval === 'yearly' ? "Facturé 499€/an (2 mois offerts)" : "Facturé mensuellement",
+      desc: "Le cockpit de pilotage ultime pour structurer ton crew et le faire grandir comme un pro.",
+      tag: billingInterval === 'yearly' ? "RECOMMANDÉ — 2 MOIS OFFERTS" : "RECOMMANDÉ (SANS ENGAGEMENT)",
+      features: [
+        { t: "Page publique du crew", d: "Inscriptions rapides en 1 lien partagé.", included: true },
+        { t: "Runs illimités", d: "Planifie autant de sorties simultanées que tu veux.", included: true },
+        { t: "Fiche d'urgence de base", d: "Sécurité et contacts d'urgence.", included: true },
+        { t: "Membres actifs illimités", d: "Aucune limite de croissance pour ton club.", included: true },
+        { t: "Messages auto WhatsApp", d: "Génère des templates de diffusion parfaits en 1 clic.", included: true },
+        { t: "Cagnotte de Squad", d: "Collecte de dons sans commission (Sumeria, PayPal...).", included: true },
+        { t: "Le Copilote IA", d: "Briefing crew météo/présence quotidien + création de séances.", included: true }
+      ],
+      button: currentPlan === "CAPTEN" ? "PLAN ACTUEL" : (billingInterval === 'yearly' ? "ACTIVER LE PLAN ANNUEL" : "PASSER À CAPTEN"),
+      type: currentPlan === "CAPTEN" ? "current" : "action"
     }
   ];
 
@@ -282,7 +298,7 @@ export default function PlanPage() {
       </header>
 
       {/* BILLING TOGGLE */}
-      <div className="flex justify-center items-center gap-4 mb-4 bg-white/5 border border-black/5 rounded-[12px] p-4 max-w-[480px] mx-auto shadow-sm">
+      <div className="flex justify-center items-center gap-4 mb-4 bg-white/60 border border-black/5 rounded-[12px] p-4 max-w-[480px] mx-auto shadow-sm">
         <button 
           type="button"
           onClick={() => setBillingInterval('monthly')}
@@ -302,98 +318,118 @@ export default function PlanPage() {
         </button>
       </div>
 
-      {trialExpired && (
-        <div className="bg-[#FFF5F5] border border-[#FF5C00]/20 rounded-xl p-5 flex items-start gap-4 animate-scale-up max-w-[480px] mx-auto">
-          <AlertCircle size={20} className="text-[#FF5C00] shrink-0 mt-0.5" />
-          <div className="space-y-1 text-left">
-            <h4 className="text-xs font-mono font-black uppercase text-[#FF5C00] leading-none">PÉRIODE D'ESSAI EXPIRÉE</h4>
-            <p className="text-[11px] font-bold text-neutral-600 uppercase tracking-wide leading-relaxed pt-1">
-              Votre période d'essai gratuit de 14 jours est terminée. Veuillez souscrire à l'abonnement CAPTEN PRO ci-dessous pour continuer à utiliser toutes les fonctionnalités de CAPTEN.
-            </p>
-          </div>
-        </div>
-      )}
-
       {/* PRICING GRID */}
-      <div className="grid grid-cols-1 gap-8 max-w-[480px] mx-auto items-stretch">
-        {plans.map((plan, idx) => (
-          <div key={idx} className={`relative bg-white border-[0.5px] w-full ${plan.name === currentPlan ? 'border-black ring-1 ring-black shadow-md' : 'border-[#FF5C00]'} rounded-[16px] p-6 sm:p-10 flex flex-col justify-between shadow-lg hover:shadow-2xl transition-all h-full`}>
-            {plan.tag && (
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#FF5C00] text-white text-[9px] font-black px-5 py-1.5 rounded-full tracking-widest z-10 whitespace-nowrap">
-                {plan.tag}
-              </div>
-            )}
-            
-            <div className="space-y-8">
-              <div className="space-y-4">
-                <div className="flex justify-between items-start">
-                  <h3 className="text-[22px] sm:text-[24px] font-display italic font-black uppercase text-black tracking-tight">CAPTEN {plan.name}</h3>
-                  {plan.name === currentPlan && <span className="text-[9px] font-black text-[#56E39F] bg-[#56E39F]/10 px-2.5 py-0.5 rounded-full tracking-widest">PLAN ACTUEL</span>}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto items-stretch">
+        {displayPlans.map((plan, idx) => {
+          const isCapten = plan.name === "CAPTEN";
+          const isCurrent = plan.name === currentPlan;
+          
+          return (
+            <div 
+              key={idx} 
+              className={`relative bg-white border w-full rounded-[24px] p-6 sm:p-10 flex flex-col justify-between shadow-lg transition-all h-full ${
+                isCapten 
+                  ? 'border-[#FF5C00] ring-1 ring-[#FF5C00]/20' 
+                  : 'border-[#E5E5E5]'
+              } ${isCurrent ? 'border-black ring-2 ring-black/10' : ''}`}
+            >
+              {plan.tag && (
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#FF5C00] text-white text-[9px] font-black px-5 py-1.5 rounded-full tracking-widest z-10 whitespace-nowrap">
+                  {plan.tag}
                 </div>
-                <div className="space-y-1">
-                  <div className="flex items-baseline gap-1">
-                     <span className="text-[40px] sm:text-[48px] font-display italic font-black text-black leading-none">{plan.price}</span>
-                     {plan.period && <span className="text-[12px] sm:text-[14px] font-bold text-[#A3A3A3] uppercase">{plan.period}</span>}
-                  </div>
-                  {plan.billingNote && (
-                    <p className="text-[9px] font-black text-[#FF5C00] uppercase tracking-wider mt-0.5">
-                      {plan.billingNote}
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              <p className="text-[11px] sm:text-[12px] font-medium text-[#737373] leading-relaxed uppercase tracking-wide">
-                {plan.desc}
-              </p>
-
-              <div className="space-y-4 pt-4 border-t border-black/5">
-                {plan.features.map(({ t, d }, i) => (
-                  <div key={i} className="flex items-start gap-3 text-left">
-                    <div className="w-5 h-5 bg-[#56E39F]/10 rounded-full flex items-center justify-center text-[#56E39F] shrink-0 mt-0.5">
-                      <Check size={12} strokeWidth={4} />
-                    </div>
-                    <div>
-                      <div className="text-[12px] font-bold text-black leading-tight">{t}</div>
-                      <div className="text-[11px] text-neutral-500 font-medium leading-normal mt-1 whitespace-pre-line">{d}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="pt-8 sm:pt-12">
-              <button 
-                type="button"
-                onClick={() => plan.name !== currentPlan && handleUpgradePlan(plan)}
-                disabled={(plan.name === currentPlan) || isProcessing}
-                className={`w-full py-4 rounded-[10px] text-[10px] sm:text-[11px] font-black uppercase tracking-[0.2em] transition-all cursor-pointer active:scale-95 disabled:scale-100 disabled:cursor-default
-                  ${plan.name === currentPlan 
-                    ? 'bg-[#56E39F]/10 text-[#56E39F] border-[0.5px] border-[#56E39F]/20' 
-                    : 'bg-[#FF5C00] text-white shadow-lg shadow-orange-500/20 hover:bg-black'}
-                `}
-              >
-                {isProcessing && processingPlan === plan.name ? (
-                  <div className="flex items-center justify-center gap-2">
-                    <div className="w-3.5 h-3.5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-                    ACTIVATION...
-                  </div>
-                ) : (
-                  plan.button
-                )}
-              </button>
-              {currentPlan === 'PRO' && (
-                <button
-                  type="button"
-                  onClick={handleCancelTrial}
-                  className="w-full mt-4 text-[10px] font-black text-red-500 hover:text-red-750 hover:underline uppercase tracking-wider transition-all cursor-pointer text-center bg-transparent border-none outline-none"
-                >
-                  {profile?.stripe_subscription_status === 'active' ? "Résilier mon abonnement →" : "Résilier mon essai gratuit →"}
-                </button>
               )}
+              
+              <div className="space-y-8">
+                <div className="space-y-4">
+                  <div className="flex justify-between items-start">
+                    <h3 className="text-[24px] font-display italic font-black uppercase text-black tracking-tight">
+                      CAPTEN {plan.name}
+                    </h3>
+                    {isCurrent && (
+                      <span className="text-[8px] font-black text-emerald-600 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-full tracking-widest">
+                        PLAN ACTUEL
+                      </span>
+                    )}
+                  </div>
+                  <div className="space-y-1">
+                    <div className="flex items-baseline gap-1">
+                       <span className="text-[40px] sm:text-[48px] font-display italic font-black text-black leading-none">{plan.price}</span>
+                       {plan.period && <span className="text-[12px] sm:text-[14px] font-bold text-[#A3A3A3] uppercase">{plan.period}</span>}
+                    </div>
+                    {plan.billingNote && (
+                      <p className="text-[9px] font-black text-[#FF5C00] uppercase tracking-wider mt-0.5">
+                        {plan.billingNote}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <p className="text-[12px] font-sans text-neutral-600 leading-relaxed text-left">
+                  {plan.desc}
+                </p>
+
+                <div className="space-y-4 pt-6 border-t border-black/5">
+                  {plan.features.map(({ t, d, included }, i) => (
+                    <div key={i} className={`flex items-start gap-3 text-left ${!included ? 'opacity-40' : ''}`}>
+                      <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${
+                        included 
+                          ? 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20' 
+                          : 'bg-neutral-100 text-neutral-400 border border-neutral-200'
+                      }`}>
+                        {included ? (
+                          <Check size={11} strokeWidth={3} />
+                        ) : (
+                          <Lock size={10} strokeWidth={2.5} />
+                        )}
+                      </div>
+                      <div>
+                        <div className={`text-[12px] font-bold leading-tight ${included ? 'text-black' : 'text-neutral-400'}`}>
+                          {t}
+                        </div>
+                        <div className="text-[11px] text-neutral-500 font-medium leading-normal mt-1 whitespace-pre-line">
+                          {d}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="pt-8 sm:pt-12">
+                <button 
+                  type="button"
+                  onClick={() => !isCurrent && handleUpgradePlan(plan)}
+                  disabled={isCurrent || isProcessing}
+                  className={`w-full py-4 rounded-[10px] text-[10px] sm:text-[11px] font-black uppercase tracking-[0.2em] transition-all cursor-pointer active:scale-95 disabled:scale-100 disabled:cursor-default ${
+                    isCurrent 
+                      ? 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20' 
+                      : isCapten
+                        ? 'bg-[#FF5C00] text-white shadow-lg shadow-orange-500/20 hover:bg-black'
+                        : 'bg-black text-white hover:bg-neutral-800'
+                  }`}
+                >
+                  {isProcessing && processingPlan === plan.name ? (
+                    <div className="flex items-center justify-center gap-2">
+                      <div className="w-3.5 h-3.5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                      ACTIVATION...
+                    </div>
+                  ) : (
+                    plan.button
+                  )}
+                </button>
+                {isCurrent && isCapten && (
+                  <button
+                    type="button"
+                    onClick={handleCancelSubscription}
+                    className="w-full mt-4 text-[10px] font-black text-red-500 hover:text-red-700 hover:underline uppercase tracking-wider transition-all cursor-pointer text-center bg-transparent border-none outline-none"
+                  >
+                    Résilier mon abonnement Capten →
+                  </button>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* STRIPE UPGRADE MODAL */}
@@ -428,9 +464,9 @@ export default function PlanPage() {
                 <div className="w-16 h-16 bg-[#56E39F]/10 rounded-full flex items-center justify-center text-[#56E39F] mx-auto animate-bounce">
                   <ShieldCheck size={32} strokeWidth={3} />
                 </div>
-                <h4 className="text-[20px] font-display italic font-black uppercase text-black">PAIEMENT CONFIRMÉ !</h4>
+                <h4 className="text-[20px] font-display italic font-black uppercase text-black">ABONNEMENT ACTIVÉ !</h4>
                 <p className="text-[10px] font-bold text-[#A3A3A3] uppercase tracking-widest leading-relaxed">
-                  Votre infrastructure CAPTEN a été mise à jour en mode <span className="text-black">{selectedPlan.name}</span>.
+                  Votre infrastructure CAPTEN a été mise à jour avec succès en formule <span className="text-black">{selectedPlan.name}</span>.
                 </p>
               </div>
             ) : (
@@ -454,10 +490,8 @@ export default function PlanPage() {
                 </div>
 
                 {/* Redirect Information */}
-                <div className="space-y-4 text-center py-4">
-                  <p className="text-[12px] font-medium text-[#737373] uppercase tracking-wider">
-                    Vous allez être redirigé vers l'interface de paiement sécurisée de Stripe pour finaliser votre abonnement.
-                  </p>
+                <div className="space-y-4 text-center py-4 text-xs font-medium text-neutral-600 leading-relaxed">
+                  Tu vas être redirigé vers l'interface sécurisée de Stripe pour finaliser ton abonnement Capten.
                 </div>
 
                 {/* CTA */}
@@ -469,7 +503,7 @@ export default function PlanPage() {
                   {isProcessing ? (
                     <>
                       <div className="w-3.5 h-3.5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-                      VÉRIFICATION / REDIRECTION STRIPE...
+                      REDIRECTION STRIPE...
                     </>
                   ) : (
                     `SOUSCRIRE AU PLAN ${selectedPlan.name} VIA STRIPE`
@@ -477,7 +511,7 @@ export default function PlanPage() {
                 </button>
 
                 <p className="text-[7.5px] font-bold text-[#A3A3A3] uppercase tracking-wider text-center">
-                  Abonnement sécurisé en mode test Stripe. Aucun frais réel ne sera appliqué.
+                  Abonnement sécurisé en mode test Stripe. Aucun débit réel ne sera effectué.
                 </p>
               </div>
             )}

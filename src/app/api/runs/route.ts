@@ -60,6 +60,26 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Champs obligatoires : title, date_start, location_start' }, { status: 400 });
     }
 
+    // Gating check
+    let plan = 'GRATUIT';
+    const { data: club } = await supabase
+      .from('clubs')
+      .select('stripe_plan')
+      .eq('id', captainId)
+      .maybeSingle();
+    plan = club?.stripe_plan || 'GRATUIT';
+
+    if (plan === 'GRATUIT') {
+      const { getActiveRunsCount } = await import('@/lib/plan-access');
+      const activeRunsCount = await getActiveRunsCount(captainId);
+      if (activeRunsCount >= 1) {
+        return NextResponse.json({ 
+          error: 'LIMIT_EXCEEDED', 
+          message: 'Le plan gratuit est limité à 1 run actif à la fois. Passe à Capten pour planifier des runs en illimité !' 
+        }, { status: 403 });
+      }
+    }
+
     const { data, error } = await supabase
       .from('runs')
       .insert([{

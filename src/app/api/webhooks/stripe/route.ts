@@ -85,11 +85,12 @@ export async function POST(request: Request) {
           console.error('[Stripe Webhook Error] Failed updating profiles table:', profileUpdateError);
         }
 
-        // 2. Update public.clubs to sync status for middleware trial check
+        // 2. Update public.clubs to sync status and plan name
         const isSubscriptionActive = status === 'active' || status === 'trialing';
         const { error: clubUpdateError } = await supabase
           .from('clubs')
           .update({
+            stripe_plan: isSubscriptionActive ? 'CAPTEN' : 'GRATUIT',
             stripe_subscription_status: isSubscriptionActive ? 'active' : 'inactive'
           })
           .eq('id', clubId);

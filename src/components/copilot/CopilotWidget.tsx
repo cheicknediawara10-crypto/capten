@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Bot, MessageSquare, Send, Sparkles, X, RefreshCw, Check, ArrowRight } from 'lucide-react';
+import Link from 'next/link';
+import { Bot, MessageSquare, Send, Sparkles, X, RefreshCw, Check, ArrowRight, Lock } from 'lucide-react';
 
 interface CopilotMessage {
   role: 'user' | 'assistant';
@@ -16,6 +17,7 @@ export default function CopilotWidget() {
   const [inputMessage, setInputMessage] = useState<string>('');
   const [sending, setSending] = useState<boolean>(false);
   const [dismissed, setDismissed] = useState<boolean>(false);
+  const [isLocked, setIsLocked] = useState<boolean>(false);
 
   useEffect(() => {
     fetchBriefing();
@@ -27,7 +29,12 @@ export default function CopilotWidget() {
       const res = await fetch('/api/copilot');
       if (res.ok) {
         const data = await res.json();
-        if (data.briefing) {
+        if (data.isLocked) {
+          setIsLocked(true);
+          setBriefing(data.briefing);
+          setMessages([{ role: 'assistant', content: data.briefing }]);
+        } else if (data.briefing) {
+          setIsLocked(false);
           setBriefing(data.briefing);
           if (messages.length === 0) {
             setMessages([{ role: 'assistant', content: data.briefing }]);
@@ -43,6 +50,7 @@ export default function CopilotWidget() {
   };
 
   const handleSendMessage = async (textToSend?: string) => {
+    if (isLocked) return;
     const text = textToSend || inputMessage;
     if (!text.trim() || sending) return;
 
@@ -81,40 +89,69 @@ export default function CopilotWidget() {
   return (
     <div className="w-full">
       {/* BRIEFING CARD ON DASHBOARD */}
-      <div className="bg-[#0A0A0A] text-white rounded-card-outer p-6 sm:p-8 shadow-xl border border-white/10 relative overflow-hidden group transition-all duration-355 hover:border-[#FF5C00]/30 hover:shadow-2xl">
+      <div className={`bg-[#0A0A0A] text-white rounded-card-outer p-6 sm:p-8 shadow-xl border relative overflow-hidden group transition-all duration-355 ${
+        isLocked 
+          ? 'opacity-80 border-white/5 shadow-md' 
+          : 'border-white/10 hover:border-[#FF5C00]/30 hover:shadow-2xl'
+      }`}>
         {/* Background neon glow accent */}
-        <div className="absolute -right-20 -top-20 w-64 h-64 bg-gradient-to-br from-[#FF5C00]/20 to-transparent rounded-full blur-3xl pointer-events-none group-hover:scale-110 transition-transform duration-700" />
-        <div className="absolute -left-20 -bottom-20 w-48 h-48 bg-gradient-to-tr from-[#56E39F]/5 to-transparent rounded-full blur-2xl pointer-events-none" />
+        {!isLocked && (
+          <>
+            <div className="absolute -right-20 -top-20 w-64 h-64 bg-gradient-to-br from-[#FF5C00]/20 to-transparent rounded-full blur-3xl pointer-events-none group-hover:scale-110 transition-transform duration-700" />
+            <div className="absolute -left-20 -bottom-20 w-48 h-48 bg-gradient-to-tr from-[#56E39F]/5 to-transparent rounded-full blur-2xl pointer-events-none" />
+          </>
+        )}
 
         {/* Top Header Row */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 relative z-10 border-b border-white/5 pb-5">
           <div className="flex items-center gap-3.5">
-            <div className="w-10 h-10 rounded-card-inner bg-gradient-to-tr from-[#FF5C00] to-[#FF8C3A] text-white flex items-center justify-center font-bold shadow-lg shadow-[#FF5C00]/15 shrink-0 group-hover:rotate-6 transition-transform">
-              <Bot size={22} className="stroke-[2.2]" />
+            <div className={`w-10 h-10 rounded-card-inner flex items-center justify-center font-bold shadow-lg shrink-0 transition-transform ${
+              isLocked 
+                ? 'bg-neutral-800 text-neutral-400 shadow-none' 
+                : 'bg-gradient-to-tr from-[#FF5C00] to-[#FF8C3A] text-white shadow-[#FF5C00]/15 group-hover:rotate-6'
+            }`}>
+              {isLocked ? <Lock size={20} /> : <Bot size={22} className="stroke-[2.2]" />}
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-black text-[#FF5C00] uppercase tracking-[0.25em] font-display italic">
+                <span className="text-[10px] font-black text-neutral-400 uppercase tracking-[0.25em] font-display italic">
                   COPILOTE CAPTEN
                 </span>
-                <span className="flex items-center gap-1.5 bg-white/5 border border-white/10 text-white/80 text-[8px] font-mono font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  IA TERRAIN
-                </span>
+                {isLocked ? (
+                  <span className="bg-red-500/10 border border-red-500/20 text-red-400 text-[8px] font-mono font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1">
+                    <Lock size={8} /> BLOQUÉ
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-1.5 bg-white/5 border border-white/10 text-white/80 text-[8px] font-mono font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    IA TERRAIN
+                  </span>
+                )}
               </div>
-              <h3 className="text-[16px] sm:text-[18px] font-display italic font-black uppercase text-white tracking-tight mt-0.5">
+              <h3 className={`text-[16px] sm:text-[18px] font-display italic font-black uppercase tracking-tight mt-0.5 ${
+                isLocked ? 'text-neutral-300' : 'text-white'
+              }`}>
                 BRIEFING PROACTIF DU CREW
               </h3>
             </div>
           </div>
 
           <div className="flex items-center gap-2.5 self-end sm:self-center">
-            <button
-              onClick={() => setChatOpen(true)}
-              className="bg-gradient-to-r from-[#FF5C00] to-[#FF7A29] hover:from-white hover:to-white text-white hover:text-black px-4 py-2 rounded-control text-[10px] font-black uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all flex items-center gap-2 cursor-pointer shadow-lg shadow-[#FF5C00]/10 hover:shadow-white/5"
-            >
-              <MessageSquare size={13} className="stroke-[2.5]" /> PARLER AU COPILOTE
-            </button>
+            {isLocked ? (
+              <Link
+                href="/plan"
+                className="bg-[#FF5C00] hover:bg-[#FF5C00]/90 text-white px-4 py-2 rounded-control text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 cursor-pointer shadow-lg shadow-[#FF5C00]/15"
+              >
+                <Lock size={12} /> ACTIVER LE COPILOTE
+              </Link>
+            ) : (
+              <button
+                onClick={() => setChatOpen(true)}
+                className="bg-gradient-to-r from-[#FF5C00] to-[#FF7A29] hover:from-white hover:to-white text-white hover:text-black px-4 py-2 rounded-control text-[10px] font-black uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all flex items-center gap-2 cursor-pointer shadow-lg shadow-[#FF5C00]/10 hover:shadow-white/5"
+              >
+                <MessageSquare size={13} className="stroke-[2.5]" /> PARLER AU COPILOTE
+              </button>
+            )}
             <button
               onClick={() => setDismissed(true)}
               className="w-7 h-7 rounded-full bg-white/5 border border-white/5 hover:border-white/20 text-white/40 hover:text-white flex items-center justify-center transition-all cursor-pointer"
@@ -135,7 +172,9 @@ export default function CopilotWidget() {
           ) : (
             <div className="relative py-1">
               <span className="absolute -left-3 -top-6 text-white/5 text-[90px] font-serif select-none pointer-events-none">“</span>
-              <p className="text-[15px] sm:text-[17px] font-display italic font-medium text-white/95 leading-relaxed pl-5 border-l-2 border-[#FF5C00] relative z-10">
+              <p className={`text-[15px] sm:text-[17px] font-display italic font-medium leading-relaxed pl-5 border-l-2 relative z-10 ${
+                isLocked ? 'text-neutral-400 border-neutral-700' : 'text-white/95 border-[#FF5C00]'
+              }`}>
                 {briefing}
               </p>
             </div>
@@ -144,32 +183,41 @@ export default function CopilotWidget() {
 
         {/* QUICK SUGGESTIONS / ACTIONS */}
         <div className="flex flex-wrap items-center gap-2 pt-4 relative z-10 border-t border-white/5">
-          <button
-            onClick={() => {
-              setChatOpen(true);
-              handleSendMessage("Je gère ce sujet");
-            }}
-            className="bg-white/5 hover:bg-emerald-500/10 hover:text-[#56E39F] border border-white/10 hover:border-[#56E39F]/30 text-white/80 text-[10px] font-black uppercase tracking-wider px-3.5 py-2 rounded-full transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
-          >
-            <Check size={12} className="text-[#56E39F] stroke-[2.5]" /> Je m'en occupe
-          </button>
-          <button
-            onClick={() => {
-              setChatOpen(true);
-              handleSendMessage("Quel est le résumé complet de la météo et des arrivées ?");
-            }}
-            className="bg-white/5 hover:bg-[#FF5C00]/10 hover:text-[#FF5C00] border border-white/10 hover:border-[#FF5C00]/30 text-white/80 text-[10px] font-black uppercase tracking-wider px-3.5 py-2 rounded-full transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
-          >
-            📊 Faire le point crew
-          </button>
-          <button
-            onClick={fetchBriefing}
-            className="text-white/40 hover:text-white text-[9.5px] font-mono uppercase tracking-wider ml-auto flex items-center gap-1.5 cursor-pointer hover:underline transition-colors"
-          >
-            <RefreshCw size={11} /> Actualiser
-          </button>
+          {isLocked ? (
+            <span className="text-neutral-500 text-[10px] font-mono flex items-center gap-1.5">
+              <Lock size={12} /> Améliore ton plan de vol pour débloquer les suggestions rapides et la planification de runs automatisée.
+            </span>
+          ) : (
+            <>
+              <button
+                onClick={() => {
+                  setChatOpen(true);
+                  handleSendMessage("Je gère ce sujet");
+                }}
+                className="bg-white/5 hover:bg-emerald-500/10 hover:text-[#56E39F] border border-white/10 hover:border-[#56E39F]/30 text-white/80 text-[10px] font-black uppercase tracking-wider px-3.5 py-2 rounded-full transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
+              >
+                <Check size={12} className="text-[#56E39F] stroke-[2.5]" /> Je m'en occupe
+              </button>
+              <button
+                onClick={() => {
+                  setChatOpen(true);
+                  handleSendMessage("Quel est le résumé complet de la météo et des arrivées ?");
+                }}
+                className="bg-white/5 hover:bg-[#FF5C00]/10 hover:text-[#FF5C00] border border-white/10 hover:border-[#FF5C00]/30 text-white/80 text-[10px] font-black uppercase tracking-wider px-3.5 py-2 rounded-full transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
+              >
+                📊 Faire le point crew
+              </button>
+              <button
+                onClick={fetchBriefing}
+                className="text-white/40 hover:text-white text-[9.5px] font-mono uppercase tracking-wider ml-auto flex items-center gap-1.5 cursor-pointer hover:underline transition-colors"
+              >
+                <RefreshCw size={11} /> Actualiser
+              </button>
+            </>
+          )}
         </div>
       </div>
+
 
       {/* CHAT MODAL / DRAWER */}
       {chatOpen && (

@@ -73,13 +73,13 @@ export async function POST(request: Request) {
     };
 
     if (type === 'plan') {
-      if (!planName || planName !== 'PRO') {
+      if (!planName || planName !== 'CAPTEN') {
         return NextResponse.json({ error: 'Invalid or missing planName' }, { status: 400 });
       }
 
       const isYearly = billingInterval === 'yearly';
-      // CAPTEN PRO: 49.99€/mois ou 399€/an
-      const planAmount = isYearly ? 399.00 : 49.99;
+      // CAPTEN: 49.99€/mois ou 499€/an
+      const planAmount = isYearly ? 499.00 : 49.99;
 
       const intervalText = isYearly ? 'yearly' : 'monthly';
       const stripeInterval = isYearly ? 'year' : 'month';
@@ -90,8 +90,8 @@ export async function POST(request: Request) {
 
       if (!product) {
         product = await stripe.products.create({
-          name: `CAPTEN - Abonnement ${planName}`,
-          description: `Abonnement ${intervalText} de niveau ${planName} avec 14 jours d'essai pour votre club d'athlétisme.`,
+          name: `CAPTEN`,
+          description: `Abonnement ${intervalText} au cockpit de pilotage CAPTEN pour ton social run club.`,
           metadata: { planName },
         });
       }
@@ -117,9 +117,6 @@ export async function POST(request: Request) {
         },
       ];
       sessionParams.mode = 'subscription';
-      sessionParams.subscription_data = {
-        trial_period_days: 14,
-      };
       sessionParams.success_url = `${origin}/plan?success=true&session_id={CHECKOUT_SESSION_ID}&planName=${planName}&billingInterval=${intervalText}`;
       sessionParams.cancel_url = `${origin}/plan?cancelled=true`;
 

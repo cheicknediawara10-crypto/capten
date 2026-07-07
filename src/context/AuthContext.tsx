@@ -28,6 +28,8 @@ export interface ClubData {
     contributors: any[];
   };
   branding: ClubBranding;
+  stripe_plan?: string;
+  stripe_subscription_status?: string;
 }
 
 interface AuthContextType {
@@ -69,7 +71,9 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
           coaches: data.coaches || [],
           message_templates: data.message_templates || [],
           cagnotte_data: data.cagnotte_data || { balance: 0, transactions: [], contributors: [] },
-          branding: data.branding || {}
+          branding: data.branding || {},
+          stripe_plan: data.stripe_plan || 'GRATUIT',
+          stripe_subscription_status: data.stripe_subscription_status || 'inactive'
         });
       } else {
         // Auto-create club if missing
@@ -92,7 +96,9 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
             coaches: [],
             message_templates: [],
             cagnotte_data: { balance: 0, transactions: [], contributors: [] },
-            branding: {}
+            branding: {},
+            stripe_plan: newClub.stripe_plan || 'GRATUIT',
+            stripe_subscription_status: newClub.stripe_subscription_status || 'inactive'
           });
         }
       }
@@ -157,7 +163,9 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
             transactions: cagnotteTransactions,
             contributors: cagnotteContributors
           },
-          branding
+          branding,
+          stripe_plan: localStorage.getItem('capten_plan') || 'GRATUIT',
+          stripe_subscription_status: localStorage.getItem('capten_plan') === 'CAPTEN' ? 'active' : 'inactive'
         });
       } else {
         setUser(null);

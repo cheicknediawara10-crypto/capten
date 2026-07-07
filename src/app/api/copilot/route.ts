@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import { getSupabase, getSupabaseAdmin } from '@/lib/supabase';
+import { cookies } from 'next/headers';
+import { getSupabase } from '@/lib/supabase';
 import { getCopilotContext, queryCopilotEngine, CopilotMessage } from '@/lib/copilot';
 
 export async function GET(request: Request) {
@@ -12,6 +13,29 @@ export async function GET(request: Request) {
       if (user) {
         clubId = user.id;
       }
+    }
+
+    // Gating check
+    let plan = 'GRATUIT';
+    if (supabase && clubId !== 'demo-club') {
+      const { data } = await supabase
+        .from('clubs')
+        .select('stripe_plan')
+        .eq('id', clubId)
+        .maybeSingle();
+      plan = data?.stripe_plan || 'GRATUIT';
+    } else {
+      const cookieStore = cookies();
+      plan = cookieStore.get('capten_plan')?.value || 'GRATUIT';
+    }
+
+    if (plan === 'GRATUIT') {
+      return NextResponse.json({
+        success: false,
+        briefing: "Le Copilote IA est réservé aux membres du plan Capten. Passe au plan supérieur pour obtenir ton briefing personnalisé quotidien et planifier tes séances !",
+        isLocked: true,
+        timestamp: new Date().toISOString()
+      });
     }
 
     // Agrégation du contexte Supabase en temps réel
@@ -45,6 +69,29 @@ export async function POST(request: Request) {
       if (user) {
         clubId = user.id;
       }
+    }
+
+    // Gating check
+    let plan = 'GRATUIT';
+    if (supabase && clubId !== 'demo-club') {
+      const { data } = await supabase
+        .from('clubs')
+        .select('stripe_plan')
+        .eq('id', clubId)
+        .maybeSingle();
+      plan = data?.stripe_plan || 'GRATUIT';
+    } else {
+      const cookieStore = cookies();
+      plan = cookieStore.get('capten_plan')?.value || 'GRATUIT';
+    }
+
+    if (plan === 'GRATUIT') {
+      return NextResponse.json({
+        success: false,
+        reply: "Le Copilote IA est une fonctionnalité premium réservée au plan Capten. Passe au plan Capten pour pouvoir discuter en direct avec ton copilote IA !",
+        isLocked: true,
+        timestamp: new Date().toISOString()
+      });
     }
 
     const body = await request.json();

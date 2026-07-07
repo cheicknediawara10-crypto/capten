@@ -7,7 +7,7 @@ import { useAuth } from '@/context/AuthContext';
 import { 
   Wallet, History, Globe, Trophy, Zap, ArrowRight, Sun, Coffee, 
   X, ShieldCheck, Check, CreditCard, Building, Award,
-  Info, Eye, Copy, MessageCircle
+  Info, Eye, Copy, MessageCircle, Lock
 } from 'lucide-react';
 
 interface ContributionLog {
@@ -217,8 +217,43 @@ export default function CagnottePage() {
     { name: "Gold Sponsor", price: 3000, desc: "Silver + Bannière bento géante sur le Hub du Crew et sponsoring officiel des sorties.", color: "#FF5C00" }
   ];
 
+  const isLocked = club?.stripe_plan === 'GRATUIT';
+
   return (
-    <div className="space-y-10 pb-20">
+    <div className="space-y-10 pb-20 relative">
+      {isLocked && (
+        <div className="absolute inset-0 bg-[#F4F5F7]/30 backdrop-blur-md z-40 flex items-center justify-center p-6 select-none pointer-events-auto">
+          <div className="bg-black text-white max-w-md w-full rounded-[24px] border border-white/10 p-8 shadow-2xl text-center relative overflow-hidden">
+            {/* Ambient neon orange glow */}
+            <div className="absolute -right-20 -top-20 w-48 h-48 bg-gradient-to-br from-[#FF5C00]/20 to-transparent rounded-full blur-2xl pointer-events-none" />
+            
+            <div className="w-12 h-12 rounded-2xl bg-neutral-900 border border-white/10 text-[#FF5C00] flex items-center justify-center mx-auto mb-5 shadow-lg">
+              <Wallet className="h-6 w-6" />
+            </div>
+            
+            <span className="text-[10px] font-black text-[#FF5C00] uppercase tracking-[0.25em] font-display italic">
+              FONCTIONNALITÉ PREMIUM
+            </span>
+            
+            <h2 className="text-2xl font-display italic font-black uppercase text-white tracking-tight mt-2">
+              LA CAGNOTTE DE SQUAD
+            </h2>
+            
+            <p className="text-xs text-neutral-400 font-sans mt-3 leading-relaxed">
+              Associe ton lien de contribution, centralise les dons des coureurs de manière transparente et finance les projets et after-runs de ta communauté.
+            </p>
+            
+            <div className="mt-6 border-t border-white/5 pt-5">
+              <Link 
+                href="/plan"
+                className="w-full bg-[#FF5C00] hover:bg-[#FF5C00]/90 text-white py-3 rounded-control text-xs font-black uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-[#FF5C00]/15 active:scale-95"
+              >
+                Débloquer avec le plan Capten <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
         <header className="flex flex-col gap-1.5 pb-6 sm:pb-10 border-b-[0.5px] border-black/10 mb-8 sm:mb-10">
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 w-full">
             <div className="flex flex-wrap items-center gap-4">

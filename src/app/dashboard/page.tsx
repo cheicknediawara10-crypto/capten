@@ -7,6 +7,7 @@ import { getSupabase } from '@/lib/supabase';
 import { useAuth } from '@/context/AuthContext';
 import { getAppUrl } from '@/lib/domain';
 import CopilotWidget from '@/components/copilot/CopilotWidget';
+import UpgradeBanner from '@/components/UpgradeBanner';
 
 // === HELPERS MÉTÉO ===
 function getCoordinates(location: string): { latitude: number; longitude: number } {
@@ -817,6 +818,9 @@ export default function DashboardPage() {
           </div>
       </header>
  
+      {/* UPGRADE BANNER */}
+      <UpgradeBanner />
+
       {/* COPILOT BRIEFING IA */}
       <CopilotWidget />
 
