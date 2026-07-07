@@ -175,48 +175,98 @@ export default function DashboardPage() {
     }
 
     // Load notifications
-    const savedNotifs = localStorage.getItem('capten_inapp_notifications');
-    if (savedNotifs) {
-      try {
-        setNotifications(JSON.parse(savedNotifs));
-      } catch (e) {}
+    if (isMock) {
+      const savedNotifs = localStorage.getItem('capten_inapp_notifications');
+      if (savedNotifs) {
+        try {
+          setNotifications(JSON.parse(savedNotifs));
+        } catch (e) {}
+      } else {
+        const defaultNotifs = [
+          {
+            id: 'n1',
+            type: 'registration',
+            message: "Chloë Simonet s'est inscrite au run MORNING VIBES",
+            timestamp: "Il y a 5 min"
+          },
+          {
+            id: 'n2',
+            type: 'waiver',
+            message: "Léa Masson a signé sa décharge de responsabilité",
+            timestamp: "Il y a 12 min"
+          },
+          {
+            id: 'n3',
+            type: 'cagnotte',
+            message: "Contribution de 15,00 € reçue de Alexandre Dupont",
+            timestamp: "Il y a 45 min"
+          },
+          {
+            id: 'n4',
+            type: 'registration',
+            message: "Théo Bernard s'est inscrit au run MORNING VIBES",
+            timestamp: "Il y a 2h"
+          },
+          {
+            id: 'n5',
+            type: 'waiver',
+            message: "Marc Dupond a signé sa décharge de responsabilité",
+            timestamp: "Il y a 3h"
+          }
+        ];
+        setNotifications(defaultNotifs);
+        localStorage.setItem('capten_inapp_notifications', JSON.stringify(defaultNotifs));
+      }
     } else {
-      const defaultNotifs = [
-        {
-          id: 'n1',
-          type: 'registration',
-          message: "Chloë Simonet s'est inscrite au run MORNING VIBES",
-          timestamp: "Il y a 5 min"
-        },
-        {
-          id: 'n2',
-          type: 'waiver',
-          message: "Léa Masson a signé sa décharge de responsabilité",
-          timestamp: "Il y a 12 min"
-        },
-        {
-          id: 'n3',
-          type: 'cagnotte',
-          message: "Contribution de 15,00 € reçue de Alexandre Dupont",
-          timestamp: "Il y a 45 min"
-        },
-        {
-          id: 'n4',
-          type: 'registration',
-          message: "Théo Bernard s'est inscrit au run MORNING VIBES",
-          timestamp: "Il y a 2h"
-        },
-        {
-          id: 'n5',
-          type: 'waiver',
-          message: "Marc Dupond a signé sa décharge de responsabilité",
-          timestamp: "Il y a 3h"
-        }
-      ];
-      setNotifications(defaultNotifs);
-      localStorage.setItem('capten_inapp_notifications', JSON.stringify(defaultNotifs));
+      // Production mode: build notifications list dynamically from the real athletes list!
+      if (athletes && athletes.length > 0) {
+        const formatRelativeTime = (d: Date): string => {
+          const diffMs = new Date().getTime() - d.getTime();
+          const diffMins = Math.floor(diffMs / 60000);
+          if (diffMins < 1) return "À l'instant";
+          if (diffMins < 60) return `Il y a ${diffMins} min`;
+          const diffHours = Math.floor(diffMins / 60);
+          if (diffHours < 24) return `Il y a ${diffHours}h`;
+          const diffDays = Math.floor(diffHours / 24);
+          return `Il y a ${diffDays}j`;
+        };
+
+        const dynamicNotifs: any[] = [];
+        athletes.forEach((athlete) => {
+          const joinDate = athlete.created_at ? new Date(athlete.created_at) : new Date();
+          
+          // Join notification
+          dynamicNotifs.push({
+            id: `reg-${athlete.id}`,
+            type: 'registration',
+            message: `${athlete.name} a rejoint le crew`,
+            date: joinDate,
+            timestamp: formatRelativeTime(joinDate)
+          });
+
+          // Waiver notification
+          if (athlete.waiver_status === 'SIGNÉE') {
+            dynamicNotifs.push({
+              id: `waiver-${athlete.id}`,
+              type: 'waiver',
+              message: `${athlete.name} a signé sa décharge de responsabilité`,
+              date: joinDate,
+              timestamp: formatRelativeTime(joinDate)
+            });
+          }
+        });
+
+        // Sort by date descending (most recent first)
+        dynamicNotifs.sort((a, b) => b.date.getTime() - a.date.getTime());
+        
+        // Remove the date field before setting state
+        const cleanedNotifs = dynamicNotifs.map(({ date, ...rest }) => rest);
+        setNotifications(cleanedNotifs);
+      } else {
+        setNotifications([]);
+      }
     }
-  }, [club, isMock]);
+  }, [athletes, isMock]);
 
   const handleCopyClubLink = async () => {
     const clubUrl = `${getAppUrl()}/${generateSlug(clubName)}`;
