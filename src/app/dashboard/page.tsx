@@ -120,7 +120,7 @@ export default function DashboardPage() {
         }
       };
       fetchServerData();
-    } else {
+    } else if (isMock) {
       // Load Onboarding States from LocalStorage (Mock Fallback)
       const savedStep = localStorage.getItem('capten_onboarding_step');
       if (savedStep) setOnboardingStep(parseInt(savedStep));
@@ -174,7 +174,9 @@ export default function DashboardPage() {
         } catch (e) {}
       }
     }
+  }, [club, isMock]);
 
+  useEffect(() => {
     // Load notifications
     if (isMock) {
       const savedNotifs = localStorage.getItem('capten_inapp_notifications');
