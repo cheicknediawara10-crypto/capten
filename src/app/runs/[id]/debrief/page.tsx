@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { MapPin, Coffee, ArrowRight, CheckCircle2, Loader2, MessageSquare, ShieldCheck, Heart, Coins, ExternalLink, Clock } from 'lucide-react';
+import { MapPin, Coffee, ArrowRight, CheckCircle2, Loader2, MessageSquare, ShieldCheck, Heart, Coins, ExternalLink, Clock, ShieldAlert } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { getSupabase } from '@/lib/supabase';
 
@@ -20,6 +20,17 @@ export default function DebriefPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+
+  // Harassment report states
+  const [reportType, setReportType] = useState("Harcèlement / Comportement Inapproprié");
+  const [reportInvolved, setReportInvolved] = useState("");
+  const [reportDetails, setReportDetails] = useState("");
+  const [reportAnonymous, setReportAnonymous] = useState(true);
+  const [reportName, setReportName] = useState("");
+  const [reportPhone, setReportPhone] = useState("");
+  const [isSubmittingReport, setIsSubmittingReport] = useState(false);
+  const [isReportSubmitted, setIsReportSubmitted] = useState(false);
+  const [reportError, setReportError] = useState<string | null>(null);
 
   // Cagnotte states
   const [runner, setRunner] = useState<any>(null);
@@ -183,6 +194,43 @@ export default function DebriefPage() {
       setSubmitError("Erreur réseau. Veuillez réessayer.");
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleSubmittingReport = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!reportDetails.trim()) return;
+
+    setIsSubmittingReport(true);
+    setReportError(null);
+
+    try {
+      const response = await fetch('/api/incidents', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          run_id: runId,
+          type: reportType,
+          priority: "CRITIQUE",
+          anonymous: reportAnonymous,
+          reporter_name: reportAnonymous ? null : reportName.trim() || null,
+          reporter_phone: reportAnonymous ? null : reportPhone.trim() || null,
+          involved: reportInvolved.trim() || null,
+          details: reportDetails.trim()
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        setIsReportSubmitted(true);
+      } else {
+        setReportError(data.error || "Impossible d'envoyer le signalement.");
+      }
+    } catch (err) {
+      setReportError("Erreur réseau. Veuillez réessayer.");
+    } finally {
+      setIsSubmittingReport(false);
     }
   };
 
@@ -425,6 +473,142 @@ export default function DebriefPage() {
                   ) : (
                     <>
                       Envoyer mon feedback anonyme <ArrowRight size={14} />
+                    </>
+                  )}
+                </button>
+              </form>
+            )}
+          </div>
+        </section>
+
+        {/* HARASSMENT & SAFETY REPORTING MODULE */}
+        <section className="bg-[#FFF5F5] border border-red-205 rounded-card-outer p-6 space-y-5 shadow-md">
+          <div className="flex items-start sm:items-center gap-3">
+            <div className="w-10 h-10 bg-red-500/10 rounded-control flex items-center justify-center text-red-650 shrink-0">
+              <ShieldAlert size={20} className="text-red-600 animate-pulse" />
+            </div>
+            <div className="text-left">
+              <h2 className="text-xs font-mono font-black uppercase text-red-500 leading-none">CELLULE D'ASSISTANCE & SÉCURITÉ</h2>
+              <p className="text-[16px] font-bold text-red-950 pt-1">Signaler un comportement inapproprié</p>
+            </div>
+          </div>
+
+          <div className="border-t border-red-100/60 pt-4 text-left">
+            {isReportSubmitted ? (
+              <div className="py-6 text-center space-y-4 animate-scale-up">
+                <div className="w-14 h-14 bg-red-100/50 border border-red-200 rounded-card-inner flex items-center justify-center text-red-650 mx-auto">
+                  <CheckCircle2 size={28} className="text-red-650" />
+                </div>
+                <h3 className="text-sm font-bold uppercase text-red-700">Alerte envoyée au Captain</h3>
+                <p className="text-xs text-red-600 font-medium leading-relaxed px-4">
+                  Ton signalement a été transmis immédiatement et de manière confidentielle. Le Captain prendra les mesures nécessaires rapidement.
+                </p>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmittingReport} className="space-y-4">
+                {reportError && (
+                  <div className="bg-white border border-red-200 rounded-card-inner p-3 text-red-700 text-[10px] font-bold">
+                    {reportError}
+                  </div>
+                )}
+
+                <p className="text-xs text-red-800 leading-relaxed font-medium">
+                  Harcelé(e), victime de discrimination, de gestes ou propos déplacés, ou témoin d'une situation anormale durant ce run ? Utilise ce formulaire confidentiel pour alerter le Captain.
+                </p>
+
+                <div className="space-y-2">
+                  <label className="text-[9px] font-mono font-black text-red-450 uppercase tracking-wider block">
+                    Type de signalement
+                  </label>
+                  <select
+                    value={reportType}
+                    onChange={(e) => setReportType(e.target.value)}
+                    className="w-full px-4 py-3 bg-white border border-red-100 rounded-control text-xs font-bold text-black focus:outline-none focus:border-red-500 transition-all cursor-pointer"
+                  >
+                    <option value="Harcèlement / Comportement Inapproprié">Harcèlement ou comportement déplacé</option>
+                    <option value="Propos / Gestes Déplacés">Propos / Gestes malveillants ou discriminatoires</option>
+                    <option value="Sécurité / Incident Physique">Problème de sécurité / Incident physique</option>
+                    <option value="Autre incident grave">Autre incident grave</option>
+                  </select>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-[9px] font-mono font-black text-red-450 uppercase tracking-wider block">
+                    Personne(s) impliquée(s) (Optionnel)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Nom ou description de la personne concernée..."
+                    value={reportInvolved}
+                    onChange={(e) => setReportInvolved(e.target.value)}
+                    className="w-full px-4 py-3 bg-white border border-red-100 rounded-control text-xs font-bold text-black focus:outline-none focus:border-red-500 transition-all placeholder:text-neutral-400 font-sans"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-[9px] font-mono font-black text-red-450 uppercase tracking-wider block">
+                    Détails des faits (Obligatoire)
+                  </label>
+                  <textarea
+                    rows={4}
+                    placeholder="Décris précisément la situation pour que le Captain puisse intervenir..."
+                    value={reportDetails}
+                    onChange={(e) => setReportDetails(e.target.value)}
+                    className="w-full px-4 py-3 bg-white border border-red-100 rounded-control text-xs font-bold text-black focus:outline-none focus:border-red-500 transition-all resize-none placeholder:text-neutral-400 font-sans"
+                  />
+                </div>
+
+                <div className="flex items-center gap-2 py-1">
+                  <input
+                    type="checkbox"
+                    id="reportAnon"
+                    checked={reportAnonymous}
+                    onChange={(e) => setReportAnonymous(e.target.checked)}
+                    className="rounded text-red-650 focus:ring-red-500 h-4 w-4"
+                  />
+                  <label htmlFor="reportAnon" className="text-[11px] font-bold text-red-800 uppercase tracking-wider cursor-pointer select-none">
+                    Rester anonyme
+                  </label>
+                </div>
+
+                {!reportAnonymous && (
+                  <div className="grid grid-cols-2 gap-3 animate-fade-in">
+                    <div className="space-y-1">
+                      <label className="text-[8px] font-mono font-bold text-red-400 uppercase tracking-widest block">Ton Nom</label>
+                      <input
+                        type="text"
+                        placeholder="Ton nom..."
+                        value={reportName}
+                        onChange={(e) => setReportName(e.target.value)}
+                        className="w-full px-3 py-2 bg-white border border-red-100 rounded-control text-xs font-bold text-black focus:outline-none focus:border-red-500 transition-all font-sans"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-[8px] font-mono font-bold text-red-400 uppercase tracking-widest block">Ton Tél</label>
+                      <input
+                        type="tel"
+                        placeholder="Ton numéro..."
+                        value={reportPhone}
+                        onChange={(e) => setReportPhone(e.target.value)}
+                        className="w-full px-3 py-2 bg-white border border-red-100 rounded-control text-xs font-bold text-black focus:outline-none focus:border-red-500 transition-all font-sans"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={!reportDetails.trim() || isSubmittingReport}
+                  className="w-full py-4 rounded-control text-[11px] font-black uppercase tracking-widest transition-all text-white bg-red-600 hover:bg-black disabled:bg-neutral-200 disabled:text-neutral-400 disabled:cursor-not-allowed cursor-pointer active:scale-95 flex items-center justify-center gap-2"
+                >
+                  {isSubmittingReport ? (
+                    <>
+                      <Loader2 size={14} className="animate-spin" />
+                      ENVOI DU SIGNALEMENT EN COURS...
+                    </>
+                  ) : (
+                    <>
+                      Signaler immédiatement (Alerte Critique) <ArrowRight size={14} />
                     </>
                   )}
                 </button>
