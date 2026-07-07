@@ -11,60 +11,6 @@ import {
 export default function MobileNav() {
   const pathname = usePathname();
   const containerRef = useRef<HTMLDivElement>(null);
-  const [isTrialExpired, setIsTrialExpired] = React.useState(false);
-
-  React.useEffect(() => {
-    const checkSubscriptionStatus = async () => {
-      const savedPlan = localStorage.getItem("capten_plan");
-      const mockExpired = typeof document !== 'undefined' && document.cookie.split('; ').find(row => row.startsWith('capten_mock_trial_expired='));
-      const isMockExpired = mockExpired ? mockExpired.split('=')[1] === 'true' : false;
-
-      if (savedPlan === 'GRATUIT' || isMockExpired) {
-        setIsTrialExpired(true);
-        return;
-      }
-
-      try {
-        const { getSupabase } = await import('@/lib/supabase');
-        const supabase = getSupabase();
-        if (supabase) {
-          const { data: { user } } = await supabase.auth.getUser();
-          if (user) {
-            if (user.email?.toLowerCase() === 'cheicknediawara10@gmail.com') {
-              setIsTrialExpired(false);
-              localStorage.setItem('capten_plan', 'PRO');
-              return;
-            }
-
-            const { data: club } = await supabase
-              .from('clubs')
-              .select('trial_ends_at, stripe_subscription_status')
-              .eq('id', user.id)
-              .maybeSingle();
-            
-            if (club) {
-              const now = new Date();
-              const trialEnds = new Date(club.trial_ends_at);
-              const expired = 
-                (club.stripe_subscription_status !== 'active' && club.stripe_subscription_status !== 'trialing') ||
-                (now > trialEnds && club.stripe_subscription_status !== 'active');
-              
-              setIsTrialExpired(expired);
-              if (expired) {
-                localStorage.setItem('capten_plan', 'GRATUIT');
-              }
-            }
-          }
-        }
-      } catch (err) {
-        console.error("MobileNav subscription check error:", err);
-      }
-    };
-
-    checkSubscriptionStatus();
-    window.addEventListener("capten_branding_change", checkSubscriptionStatus);
-    return () => window.removeEventListener("capten_branding_change", checkSubscriptionStatus);
-  }, []);
 
   const items = [
     { name: "Tableau de bord", icon: <LayoutDashboard size={18} strokeWidth={1.5} />, href: "/dashboard" },
@@ -116,27 +62,7 @@ export default function MobileNav() {
       >
         {items.map((item) => {
           const isActive = pathname === item.href;
-          const isLocked = isTrialExpired && item.href !== '/plan' && item.href !== '/settings';
           
-          if (isLocked) {
-            return (
-              <button 
-                key={item.name}
-                onClick={() => {
-                  window.location.href = '/plan?trial_expired=true';
-                }}
-                className="flex flex-col items-center gap-1 shrink-0 transition-all duration-300 relative px-1 opacity-60 active:scale-95 text-[#A3A3A3] text-left bg-transparent border-none outline-none"
-              >
-                <div className="transition-all duration-300 text-neutral-300">
-                  <Lock size={18} strokeWidth={1.5} />
-                </div>
-                <span className="text-[8.5px] font-black uppercase tracking-widest text-neutral-400">
-                  {item.name}
-                </span>
-              </button>
-            );
-          }
-
           return (
             <Link 
               key={item.name}

@@ -15,56 +15,6 @@ export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const [logo, setLogo] = useState("/logo.png");
-  const [isTrialExpired, setIsTrialExpired] = useState(false);
-
-  const checkSubscriptionStatus = async () => {
-    // 1. Local/Mock check
-    const savedPlan = localStorage.getItem("capten_plan");
-    const mockExpired = typeof document !== 'undefined' && document.cookie.split('; ').find(row => row.startsWith('capten_mock_trial_expired='));
-    const isMockExpired = mockExpired ? mockExpired.split('=')[1] === 'true' : false;
-
-    if (savedPlan === 'GRATUIT' || isMockExpired) {
-      setIsTrialExpired(true);
-      return;
-    }
-
-    // 2. Supabase check
-    try {
-      const { getSupabase } = await import('@/lib/supabase');
-      const supabase = getSupabase();
-      if (supabase) {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user) {
-          if (user.email?.toLowerCase() === 'cheicknediawara10@gmail.com') {
-            setIsTrialExpired(false);
-            localStorage.setItem('capten_plan', 'PRO');
-            return;
-          }
-
-          const { data: club } = await supabase
-            .from('clubs')
-            .select('trial_ends_at, stripe_subscription_status')
-            .eq('id', user.id)
-            .maybeSingle();
-          
-          if (club) {
-            const now = new Date();
-            const trialEnds = new Date(club.trial_ends_at);
-            const expired = 
-              (club.stripe_subscription_status !== 'active' && club.stripe_subscription_status !== 'trialing') ||
-              (now > trialEnds && club.stripe_subscription_status !== 'active');
-            
-            setIsTrialExpired(expired);
-            if (expired) {
-              localStorage.setItem('capten_plan', 'GRATUIT');
-            }
-          }
-        }
-      }
-    } catch (err) {
-      console.error("Sidebar subscription check error:", err);
-    }
-  };
 
   useEffect(() => {
     const updateLogo = () => {
@@ -73,13 +23,10 @@ export default function Sidebar() {
     };
 
     updateLogo();
-    checkSubscriptionStatus();
     
     window.addEventListener("capten_branding_change", updateLogo);
-    window.addEventListener("capten_branding_change", checkSubscriptionStatus);
     return () => {
       window.removeEventListener("capten_branding_change", updateLogo);
-      window.removeEventListener("capten_branding_change", checkSubscriptionStatus);
     };
   }, []);
 
@@ -130,38 +77,18 @@ export default function Sidebar() {
               {section.items.map((item: any) => {
                 const isActive = pathname === item.href;
                 const isStaticOrExternal = item.href.endsWith(".html") || item.href.startsWith("http");
-                const isLocked = isTrialExpired && item.href !== '/plan' && item.href !== '/settings';
                 
                 const content = (
                   <>
-                    {isActive && !isLocked && <div className="absolute left-0 top-0 bottom-0 w-[4px] bg-[#FF5C00]" />}
-                    <span className={isLocked ? 'text-neutral-300' : (isActive ? 'text-[#FF5C00]' : 'text-[#A3A3A3]')}>
-                      {isLocked ? <Lock size={18} strokeWidth={1.5} /> : item.icon}
+                    {isActive && <div className="absolute left-0 top-0 bottom-0 w-[4px] bg-[#FF5C00]" />}
+                    <span className={isActive ? 'text-[#FF5C00]' : 'text-[#A3A3A3]'}>
+                      {item.icon}
                     </span>
-                    <span className={`text-[13px] tracking-tight ${isLocked ? 'text-neutral-400 font-medium' : (isActive ? 'text-[#FF5C00] font-bold' : 'text-[#555555] font-medium')}`}>
+                    <span className={`text-[13px] tracking-tight ${isActive ? 'text-[#FF5C00] font-bold' : 'text-[#555555] font-medium'}`}>
                       {item.name}
                     </span>
-                    {isLocked && (
-                      <span className="ml-auto text-[8px] font-black tracking-widest text-[#FF5C00] bg-[#FF5C00]/10 px-2 py-0.5 rounded">
-                        PRO
-                      </span>
-                    )}
                   </>
                 );
-
-                if (isLocked) {
-                  return (
-                    <button
-                      key={item.name}
-                      onClick={() => {
-                        router.push('/plan?trial_expired=true');
-                      }}
-                      className="w-full relative flex items-center gap-4 px-8 py-2.5 transition-all text-left opacity-60 hover:opacity-100 hover:bg-gray-50/50 cursor-pointer"
-                    >
-                      {content}
-                    </button>
-                  );
-                }
 
                 if (isStaticOrExternal) {
                   return (
