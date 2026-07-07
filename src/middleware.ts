@@ -87,65 +87,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  // Verification of 14-day free trial session lock
-  if (isLoggedIn && isProtectedPath && pathname !== '/plan' && pathname !== '/settings' && !pathname.startsWith('/api')) {
-    if (isSupabaseConfigured) {
-      try {
-        const supabase = createServerClient(
-          supabaseUrl!,
-          supabaseAnonKey!,
-          {
-            cookies: {
-              getAll() {
-                return request.cookies.getAll()
-              },
-              setAll(cookiesToSet) {
-                // Read-only check, cookies not modified
-              },
-            },
-          }
-        )
-        const { data: { user } } = await supabase.auth.getUser()
-        if (user) {
-          // Lifetime VIP Free Access for account owner
-          if (user.email?.toLowerCase() === 'cheicknediawara10@gmail.com') {
-            return response
-          }
 
-          const { data: club } = await supabase
-            .from('clubs')
-            .select('trial_ends_at, stripe_subscription_status')
-            .eq('id', user.id)
-            .single()
-          if (club) {
-            const now = new Date()
-            const trialEnds = new Date(club.trial_ends_at)
-            const isActiveSubscriber = club.stripe_subscription_status === 'active'
-            const isTrialValid = club.stripe_subscription_status === 'trialing' && now <= trialEnds
-            const hasAccess = isActiveSubscriber || isTrialValid
-
-            if (!hasAccess) {
-              const url = request.nextUrl.clone()
-              url.pathname = '/plan'
-              url.searchParams.set('trial_expired', 'true')
-              return NextResponse.redirect(url)
-            }
-          }
-        }
-      } catch (e) {
-        console.error('Middleware trial verification error:', e)
-      }
-    } else {
-      // Mock demonstration trial check
-      const mockTrialExpired = request.cookies.get('capten_mock_trial_expired')
-      if (mockTrialExpired && mockTrialExpired.value === 'true') {
-        const url = request.nextUrl.clone()
-        url.pathname = '/plan'
-        url.searchParams.set('trial_expired', 'true')
-        return NextResponse.redirect(url)
-      }
-    }
-  }
 
   if (isAuthPage && isLoggedIn) {
     const url = request.nextUrl.clone()
