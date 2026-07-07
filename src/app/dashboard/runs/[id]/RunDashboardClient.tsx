@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useState, useTransition, useMemo } from 'react';
+import React, { useState, useTransition, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { 
   Users, MapPin, Search, ArrowLeft, Flame, AlertCircle, 
-  CheckCircle2, Clock, ShieldCheck, MapPinCheck, HelpCircle, RotateCcw, Check
+  CheckCircle2, Clock, ShieldCheck, MapPinCheck, HelpCircle, RotateCcw, Check,
+  Sparkles, Brain, Lock
 } from 'lucide-react';
 import { manualCheckInRunner } from '@/app/actions/manual-checkin';
 import { getSupabase } from '@/lib/supabase';
@@ -49,6 +50,41 @@ export default function RunDashboardClient({ run, initialRegistrations, isDemo }
   const [searchQuery, setSearchQuery] = useState('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+
+  // AI summary states
+  const [summary, setSummary] = useState<string>('');
+  const [isLoadingSummary, setIsLoadingSummary] = useState(true);
+  const [summaryError, setSummaryError] = useState<string | null>(null);
+  const [summaryCount, setSummaryCount] = useState<number>(0);
+  const [isLocked, setIsLocked] = useState(false);
+
+  const handleGenerateSummary = async () => {
+    setIsLoadingSummary(true);
+    setSummaryError(null);
+    try {
+      const res = await fetch(`/api/copilot/debrief?run_id=${run.id}`);
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setSummary(data.summary);
+        setSummaryCount(data.count || 0);
+        setIsLocked(data.isLocked || false);
+      } else {
+        setSummaryError(data.error || "Impossible de générer la synthèse.");
+        if (data.isLocked) {
+          setIsLocked(true);
+          setSummary(data.summary);
+        }
+      }
+    } catch (e) {
+      setSummaryError("Erreur de connexion. Veuillez réessayer.");
+    } finally {
+      setIsLoadingSummary(false);
+    }
+  };
+
+  useEffect(() => {
+    handleGenerateSummary();
+  }, [run.id]);
 
   const handleVerifyCagnotte = async (runnerId: string) => {
     // 1. Sauvegarder l'état précédent pour pouvoir y revenir en cas d'erreur
@@ -392,6 +428,79 @@ export default function RunDashboardClient({ run, initialRegistrations, isDemo }
         </div>
 
       </div>
+
+      {/* SELECTION DEBRIEFING IA */}
+      <section className="bg-white border-[0.5px] border-black/10 rounded-[20px] p-6 shadow-sm space-y-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-black/5">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-[#FF5C00]/10 rounded-[12px] flex items-center justify-center text-[#FF5C00]">
+              <Sparkles size={20} className="animate-pulse text-[#FF5C00]" />
+            </div>
+            <div className="text-left">
+              <h3 className="text-[18px] font-display italic font-black uppercase text-black leading-none">Synthèse IA de fin de Run</h3>
+              <p className="text-[10px] font-bold text-[#A3A3A3] uppercase tracking-wider mt-1">Analyse intelligente de tous les débriefings reçus</p>
+            </div>
+          </div>
+          {summaryCount > 0 && !isLocked && (
+            <div className="bg-black text-white px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest font-mono">
+              {summaryCount} RETOURS ANALYSÉS
+            </div>
+          )}
+        </div>
+
+        {isLoadingSummary ? (
+          <div className="py-12 flex flex-col items-center justify-center space-y-3">
+            <div className="w-8 h-8 border-4 border-[#FF5C00] border-t-transparent rounded-full animate-spin" />
+            <p className="text-[10px] font-mono font-black text-neutral-400 uppercase tracking-widest animate-pulse">Le Copilote IA analyse les débriefings...</p>
+          </div>
+        ) : isLocked ? (
+          <div className="relative rounded-card-inner overflow-hidden bg-gradient-to-br from-neutral-900 to-black text-white p-6 sm:p-8 flex flex-col items-center text-center space-y-4 shadow-xl border border-red-500/25">
+            <div className="w-12 h-12 bg-red-500/10 rounded-full flex items-center justify-center text-[#FF5C00] mb-2 border border-red-500/20">
+              <Lock size={20} className="text-red-500" />
+            </div>
+            <h4 className="text-[20px] font-display italic font-black uppercase tracking-tight text-white leading-none">
+              SYNTHÈSE IA VERROUILLÉE
+            </h4>
+            <p className="text-neutral-400 text-xs font-medium max-w-md leading-relaxed">
+              {summary}
+            </p>
+            <Link 
+              href="/plan" 
+              className="btn-primary bg-[#FF5C00] hover:bg-white text-white hover:text-black border-none px-6 py-3 font-mono font-bold tracking-widest text-[9.5px]"
+            >
+              🚀 PASSER À CAPTEN PRO
+            </Link>
+          </div>
+        ) : summaryError ? (
+          <div className="bg-red-50 border border-red-100 rounded-card-inner p-4 text-center space-y-3">
+            <p className="text-xs text-red-700 font-bold uppercase tracking-wider">{summaryError}</p>
+            <button
+              onClick={handleGenerateSummary}
+              className="btn-secondary text-[10px] font-black uppercase tracking-widest px-4 py-2"
+            >
+              Réessayer la génération
+            </button>
+          </div>
+        ) : (
+          <div className="bg-[#FDFCF8] border border-black/5 rounded-card-inner p-5 sm:p-6 space-y-4 text-left shadow-inner">
+            <div className="prose prose-neutral max-w-none text-xs font-bold text-neutral-800 uppercase tracking-wide leading-relaxed font-sans whitespace-pre-line">
+              {summary}
+            </div>
+            
+            <div className="pt-4 border-t border-black/5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+              <p className="text-[9px] font-mono font-black text-neutral-400 uppercase tracking-wider italic">
+                Sujet aux conditions du Copilote IA Capten · Analyse en temps réel
+              </p>
+              <button 
+                onClick={handleGenerateSummary}
+                className="text-[9px] font-black uppercase text-[#FF5C00] tracking-widest hover:underline flex items-center gap-1.5 cursor-pointer"
+              >
+                🔄 ACTUALISER L'ANALYSE
+              </button>
+            </div>
+          </div>
+        )}
+      </section>
 
     </div>
   );
