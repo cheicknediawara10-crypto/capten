@@ -284,80 +284,77 @@ Réponds STRICTEMENT au format JSON suivant :
 }
 
 /**
- * Gère les conversations interactives avec le Copilote IA
+ * Gère les requêtes guidées et messages IA formulés par le fondateur (Partie Basse)
  */
-export async function queryCopilotChat(
+export async function queryCopilotGuidedAction(
   supabase: SupabaseClient,
   clubId: string,
-  userMessage: string,
-  history: any[]
+  actionType: 'rediger_message' | 'gerer_situation' | 'motiver_crew' | 'mot_coureur' | 'custom',
+  inputs: {
+    context?: string;
+    situation?: string;
+    goal?: string;
+    runnerName?: string;
+    customPrompt?: string;
+  }
 ): Promise<string> {
   const geminiKey = process.env.GEMINI_API_KEY;
   if (!geminiKey || geminiKey === 'votre_cle_gemini_ici' || geminiKey.trim() === '') {
-    return "Désolé, ma clé d'API Gemini n'est pas configurée pour l'instant. Utilise les templates de message statiques.";
+    return "Désolé, ma clé d'API Gemini n'est pas configurée pour l'instant. Veuillez contacter l'administrateur.";
   }
 
-  // Vérifier le quota quotidien d'appels de chat
-  const todayStr = new Date().toISOString().split('T')[0];
-  let dailyCalls = 0;
-  try {
-    const { count } = await supabase
-      .from('copilote_brief')
-      .select('*', { count: 'exact', head: true })
-      .gte('created_at', todayStr + 'T00:00:00Z')
-      .eq('model_used', 'gemini-3.5-flash-chat');
-    dailyCalls = count || 0;
-  } catch (err) {}
-
-  if (dailyCalls >= 1000) {
-    return "Limite quotidienne de conversations atteinte pour la sécurité du quota de l'application. Reviens demain !";
+  // 1. Construire le prompt thématique de manière claire et bornée
+  let specificPrompt = '';
+  switch (actionType) {
+    case 'rediger_message':
+      specificPrompt = `Rédige un message WhatsApp prêt à être copié-collé pour le crew. 
+Contexte et objectif du message : "${inputs.context || 'Annoncer la prochaine session'}".`;
+      break;
+    case 'gerer_situation':
+      specificPrompt = `Donne-moi 2-3 conseils ultra-pragmatiques pour gérer la situation suivante au sein de mon crew : "${inputs.situation || ''}".
+Ajoute un modèle de message WhatsApp ou SMS prêt à être envoyé si c'est pertinent.`;
+      break;
+    case 'motiver_crew':
+      specificPrompt = `Rédige un message de motivation percutant, fun et inspirant pour le crew sur le thème : "${inputs.goal || ''}".`;
+      break;
+    case 'mot_coureur':
+      const nom = inputs.runnerName || 'le coureur';
+      specificPrompt = `Rédige un message d'accueil ou de relance personnalisé, chaleureux et complice pour le coureur nommé "${nom}".
+Contexte : "${inputs.context || 'Nouveau membre à accueillir'}".`;
+      break;
+    case 'custom':
+      specificPrompt = `Traite la demande suivante : "${inputs.customPrompt || ''}"`;
+      break;
+    default:
+      specificPrompt = `Aide-moi à gérer mon crew : "${JSON.stringify(inputs)}"`;
   }
-
-  // Récupérer le contexte du crew pour la conversation
-  const { data: club } = await supabase.from('clubs').select('name, spot_name, cagnotte_url').eq('id', clubId).maybeSingle();
-  const { data: activeAlerts } = await supabase.from('copilote_alertes').select('type, payload').eq('club_id', clubId).eq('status', 'active');
-  const { data: nextRuns } = await supabase.from('runs').select('title, date_start').eq('club_id', clubId).eq('status', 'scheduled').limit(2);
-
-  const contextPrompt = `
-CONTEXTE DU CREW :
-- Nom du crew : ${club?.name || 'Capten Crew'}
-- Spot d'after-run : ${club?.spot_name || 'Non configuré'}
-- Cagnotte configurée : ${club?.cagnotte_url ? 'Oui' : 'Non'}
-
-ALERTES ACTIVES :
-${(activeAlerts || []).map(a => `- ${a.type}: ${JSON.stringify(a.payload)}`).join('\n') || 'Aucune alerte active.'}
-
-RUNS PLANIFIÉS :
-${(nextRuns || []).map(r => `- Run "${r.title}" le ${new Date(r.date_start).toLocaleString('fr-FR')}`).join('\n') || 'Aucun run planifié.'}
-`;
 
   try {
     const genAI = new GoogleGenerativeAI(geminiKey);
     const model = genAI.getGenerativeModel({
       model: 'gemini-3.5-flash',
-      systemInstruction: `Tu es le Copilote Capten, l'assistant IA ultime et complice d'un fondateur de run club (crew).
+      systemInstruction: `Tu es le Copilote Capten, l'assistant IA complice d'un fondateur de run club (crew).
 Ton ton est complice, tutoiement amical, langage de runner ("crew", "run", "after-run" - n'utilise JAMAIS les mots "club" ni "course").
-Affiche un grand dynamisme et de l'énergie. Réponds de manière synthétique et directe (max 3 à 4 phrases). Maximum 2 émojis.`,
+Affiche un grand dynamisme et de l'énergie.
+Réponds de manière extrêmement directe, pragmatique et actionnable. 
+Les messages suggérés doivent être immédiatement prêts à copier-coller dans WhatsApp. Pas d'introduction polie ou de salutations de robot (ex: ne commence pas par "Voici le message :"). Rédige directement le message ou les conseils.`,
       generationConfig: {
-        temperature: 0.6,
-        maxOutputTokens: 500
+        temperature: 0.7,
+        maxOutputTokens: 600
       }
     });
 
-    const messages = [
-      { role: 'user', parts: [{ text: `${contextPrompt}\n\nHistorique de conversation:\n${history.map(h => `${h.role === 'user' ? 'Fondateur' : 'Copilote'}: ${h.content}`).join('\n')}\n\nMessage actuel du Fondateur:\n"${userMessage}"` }] }
-    ];
-
-    const result = await model.generateContent(messages as any);
+    const result = await model.generateContent(specificPrompt);
     const reply = result.response.text()?.trim();
-    
+
     if (reply) {
-      // Enregistrer une trace pour le compteur d'appels de chat
+      // Enregistrer l'appel dans la DB sous le tag gemini-3.5-flash-chat pour le rate-limiting quotidien
+      const todayStr = new Date().toISOString().split('T')[0];
       await supabase.from('copilote_brief').insert({
         club_id: clubId,
         brief_date: todayStr,
-        headline: 'Chat interaction',
-        body: `User: ${userMessage}\nReply: ${reply}`,
+        headline: `Guided Action: ${actionType}`,
+        body: `Prompt: ${specificPrompt}\nReply: ${reply}`,
         mood: 'neutre',
         model_used: 'gemini-3.5-flash-chat',
         alert_ids: []
@@ -365,10 +362,10 @@ Affiche un grand dynamisme et de l'énergie. Réponds de manière synthétique e
       return reply;
     }
   } catch (err) {
-    console.error('[Gemini Chat Error]:', err);
+    console.error('[Gemini Guided Action Error]:', err);
   }
 
-  return "Je n'ai pas pu joindre les serveurs IA. Tout roule pour le reste ! 💪";
+  return "Je n'ai pas pu contacter mon moteur de génération IA. Tout roule pour le reste ! 💪";
 }
 
 /**

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { getSupabase, getSupabaseAdmin } from '@/lib/supabase';
-import { getOrCreateDailyBrief, queryCopilotChat } from '@/lib/ai/copilote';
+import { getOrCreateDailyBrief, queryCopilotGuidedAction } from '@/lib/ai/copilote';
 
 export const dynamic = 'force-dynamic';
 
@@ -41,7 +41,6 @@ export async function GET() {
     }
 
     if (!supabase) {
-      // Fallback Mock de briefing pour le mode démo sans Supabase
       return NextResponse.json({
         success: true,
         headline: "Tout roule pour ton crew !",
@@ -116,27 +115,49 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { message, history } = body || {};
+    const { actionType, inputs, message } = body || {};
 
-    if (!message || typeof message !== 'string') {
-      return NextResponse.json(
-        { error: 'Le paramètre message est obligatoire.' },
-        { status: 400 }
-      );
+    let actualActionType = actionType || 'custom';
+    let actualInputs = inputs || {};
+
+    if (message && !inputs?.customPrompt) {
+      actualActionType = 'custom';
+      actualInputs = { customPrompt: message };
     }
 
-    const historyMsgs = Array.isArray(history) ? history : [];
-
     if (!supabase) {
-      // Fallback démo
       return NextResponse.json({
         success: true,
-        reply: "Super ! Je prends note. Fais-moi savoir si tu as d'autres questions sur la logistique du crew.",
+        reply: "Super ! Je prends note (Mode Démo). Fais-moi savoir si tu as d'autres questions sur la logistique du crew.",
         timestamp: new Date().toISOString()
       });
     }
 
-    const reply = await queryCopilotChat(supabase, clubId, message, historyMsgs);
+    // Limiteur de quota de chat : Max 20 demandes/jour/fondateur
+    const todayStr = new Date().toISOString().split('T')[0];
+    const { count: dailyCalls } = await supabase
+      .from('copilote_brief')
+      .select('*', { count: 'exact', head: true })
+      .eq('club_id', clubId)
+      .eq('brief_date', todayStr)
+      .eq('model_used', 'gemini-3.5-flash-chat');
+
+    const callsCount = dailyCalls || 0;
+    if (callsCount >= 20) {
+      return NextResponse.json({
+        success: false,
+        reply: "Tu as beaucoup sollicité ton Copilote aujourd'hui, reviens demain ! (Limite de 20 demandes de chat par jour)",
+        limitExceeded: true,
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    const reply = await queryCopilotGuidedAction(
+      supabase,
+      clubId,
+      actualActionType,
+      actualInputs
+    );
 
     return NextResponse.json({
       success: true,
