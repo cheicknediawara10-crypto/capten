@@ -30,6 +30,7 @@ export default function CopilotDashboard() {
   const [isLocked, setIsLocked] = useState(false);
 
   // Guided Chat states
+  const [chatCallsCount, setChatCallsCount] = useState(0);
   const [activeAction, setActiveAction] = useState<ActionType>(null);
   const [inputs, setInputs] = useState({
     context: '',
@@ -62,6 +63,12 @@ export default function CopilotDashboard() {
           setMood(data.mood || 'neutre');
           setAlerts(data.alerts || []);
           setIsLocked(false);
+          
+          const calls = data.chatCallsCount || 0;
+          setChatCallsCount(calls);
+          if (calls >= 20) {
+            setLimitExceeded(true);
+          }
         }
       }
     } catch (err) {
@@ -111,6 +118,13 @@ export default function CopilotDashboard() {
       const data = await res.json();
 
       if (res.ok) {
+        if (data.chatCallsCount !== undefined) {
+          setChatCallsCount(data.chatCallsCount);
+          if (data.chatCallsCount >= 20) {
+            setLimitExceeded(true);
+          }
+        }
+        
         if (data.limitExceeded) {
           setLimitExceeded(true);
           setAiResponse(data.reply);
@@ -140,7 +154,6 @@ export default function CopilotDashboard() {
   const resetChat = () => {
     setAiResponse(null);
     setChatError(null);
-    setLimitExceeded(false);
     setInputs({
       context: '',
       situation: '',
@@ -402,6 +415,17 @@ export default function CopilotDashboard() {
               </button>
             </div>
           </div>
+        ) : limitExceeded ? (
+          // LIMIT EXCEEDED VIEW
+          <div className="bg-[#FDFCF8] border border-black/5 rounded-[16px] p-6 text-center space-y-2">
+            <span className="text-2xl">🌙</span>
+            <p className="text-xs font-black text-neutral-800 uppercase tracking-wider">
+              Tu as fait le tour pour aujourd'hui, ton Copilote revient demain !
+            </p>
+            <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest">
+              Limite maximale de 20 demandes par jour atteinte.
+            </p>
+          </div>
         ) : activeAction ? (
           // RENDER ACTIVE ACTION FORM
           <form onSubmit={handleGuidedSubmit} className="space-y-4 bg-neutral-50/50 border border-black/5 rounded-[16px] p-5 text-left">
@@ -566,6 +590,12 @@ export default function CopilotDashboard() {
               >
                 <ArrowRight size={14} />
               </button>
+            </div>
+            
+            {/* Visuel Quota counter */}
+            <div className="flex justify-between items-center px-1 mt-1 text-[9px] font-mono font-bold text-neutral-400 uppercase tracking-wider">
+              <span>Assistant Copilote</span>
+              <span>{Math.max(0, 20 - chatCallsCount)} / 20 requêtes restantes aujourd'hui</span>
             </div>
           </div>
         )}

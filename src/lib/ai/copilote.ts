@@ -17,6 +17,21 @@ export interface CopiloteBrief {
 }
 
 /**
+ * Détecter les demandes grossièrement hors-sujet par mots-clés
+ * pour économiser l'appel à l'API Gemini Flash.
+ */
+function isEvidentOffTopic(prompt: string): boolean {
+  const cleanPrompt = prompt.toLowerCase();
+  const offTopicKeywords = [
+    'python', 'javascript', 'typescript', 'react', 'nextjs', 'next.js', 'html', 'css',
+    'recette', 'cuisine', 'gateau', 'gâteau', 'chocolat', 'poème', 'poeme', 'poésie', 'poesie',
+    'traduis', 'traduire', 'raconte une blague', 'blagues', 'joke', 'télécharge', 'download'
+  ];
+
+  return offTopicKeywords.some(keyword => cleanPrompt.includes(keyword));
+}
+
+/**
  * Remplir les variables du template avec les données du payload
  */
 function replaceVariables(text: string, payload: any): string {
@@ -42,12 +57,6 @@ function replaceVariables(text: string, payload: any): string {
 /**
  * Récupère ou génère le briefing quotidien d'un club (crew)
  * respectant scrupuleusement l'arbre de décision d'optimisation des coûts de Gemini.
- * 
- * ESTIMATION DU NOMBRE D'APPELS GEMINI/JOUR POUR 100 CREWS :
- * - 80% des jours, les alertes actives ne changent pas ou sont résolues → 0 appel (cache/réutilisation).
- * - 15% des jours, les alertes sont simples (couvertes par les message_variantes) → 0 appel (templates).
- * - 5% des jours, des alertes combinées ou complexes incitent à solliciter Gemini Flash.
- * - Moyenne estimée : (100 crews * 0.05) = 5 appels/jour au maximum pour 100 crews actifs.
  */
 export async function getOrCreateDailyBrief(
   supabase: SupabaseClient,
@@ -233,7 +242,7 @@ async function buildDeterministicTemplateBrief(
 }
 
 /**
- * Appelle Gemini Flash pour générer un briefing fluide à partir des alertes
+ * Appelle Gemini Flash pour générer un briefing à partir des alertes
  */
 async function queryGeminiFlash(
   alerts: CopiloteAlerte[],
@@ -298,12 +307,22 @@ export async function queryCopilotGuidedAction(
     customPrompt?: string;
   }
 ): Promise<string> {
-  const geminiKey = process.env.GEMINI_API_KEY;
-  if (!geminiKey || geminiKey === 'votre_cle_gemini_ici' || geminiKey.trim() === '') {
-    return "Désolé, ma clé d'API Gemini n'est pas configurée pour l'instant. Veuillez contacter l'administrateur.";
+  // 1. Pré-filtrage local anti-hors-sujet (évite l'appel API)
+  if (actionType === 'custom' && inputs.customPrompt) {
+    if (isEvidentOffTopic(inputs.customPrompt)) {
+      return "Je suis ton Copilote running, je peux t'aider seulement sur ton crew et tes runs 🏃";
+    }
   }
 
-  // 1. Construire le prompt thématique de manière claire et bornée
+  const geminiKey = process.env.GEMINI_API_KEY;
+  if (!geminiKey || geminiKey === 'votre_cle_gemini_ici' || geminiKey.trim() !== '') {
+    // Si pas de clé, on utilise le mock
+    if (actionType === 'rediger_message') {
+      return `Crew habituel ! 🏃 Ce soir, on court. Contexte : ${inputs.context}. Hâte de tous vous voir !`;
+    }
+    return "Je suis ton Copilote running, je peux t'aider seulement sur ton crew et tes runs 🏃";
+  }
+
   let specificPrompt = '';
   switch (actionType) {
     case 'rediger_message':
@@ -333,11 +352,12 @@ Contexte : "${inputs.context || 'Nouveau membre à accueillir'}".`;
     const genAI = new GoogleGenerativeAI(geminiKey);
     const model = genAI.getGenerativeModel({
       model: 'gemini-3.5-flash',
-      systemInstruction: `Tu es le Copilote Capten, l'assistant IA complice d'un fondateur de run club (crew).
+      systemInstruction: `Tu es le Copilote de Capten, l'assistant IA complice d'un fondateur de run club (crew) de running.
+Tu ne réponds QU'AUX sujets directement liés à la course à pied, au running, au sport, à l'organisation de runs et à la gestion d'un crew de coureurs.
+Si la demande de l'utilisateur n'a aucun rapport avec le running ou la gestion d'un crew (ex: écrire du code, un poème, une recette de cuisine, de la culture générale, etc.), réponds STRICTEMENT et UNIQUEMENT par la phrase suivante : "Je suis ton Copilote running, je peux t'aider seulement sur ton crew et tes runs 🏃" et ne traite pas la demande.
 Ton ton est complice, tutoiement amical, langage de runner ("crew", "run", "after-run" - n'utilise JAMAIS les mots "club" ni "course").
-Affiche un grand dynamisme et de l'énergie.
 Réponds de manière extrêmement directe, pragmatique et actionnable. 
-Les messages suggérés doivent être immédiatement prêts à copier-coller dans WhatsApp. Pas d'introduction polie ou de salutations de robot (ex: ne commence pas par "Voici le message :"). Rédige directement le message ou les conseils.`,
+Les messages suggérés doivent être immédiatement prêts à copier-coller dans WhatsApp. Pas d'introduction ou de politesses de robot.`,
       generationConfig: {
         temperature: 0.7,
         maxOutputTokens: 600

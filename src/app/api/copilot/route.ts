@@ -46,6 +46,7 @@ export async function GET() {
         headline: "Tout roule pour ton crew !",
         briefing: "👋 **Bienvenue !** Tous tes runs sont programmés et le crew est en pleine forme. N'oublie pas de vérifier la météo avant de partir.",
         mood: "neutre",
+        chatCallsCount: 0,
         timestamp: new Date().toISOString()
       });
     }
@@ -61,6 +62,15 @@ export async function GET() {
       .order('priority', { ascending: false })
       .limit(3);
 
+    // Compter le nombre de requêtes IA de chat effectuées aujourd'hui
+    const todayStr = new Date().toISOString().split('T')[0];
+    const { count: dailyCalls } = await supabase
+      .from('copilote_brief')
+      .select('*', { count: 'exact', head: true })
+      .eq('club_id', clubId)
+      .eq('brief_date', todayStr)
+      .eq('model_used', 'gemini-3.5-flash-chat');
+
     return NextResponse.json({
       success: true,
       headline: brief.headline,
@@ -68,6 +78,7 @@ export async function GET() {
       mood: brief.mood,
       model_used: brief.model_used,
       alerts: alerts || [],
+      chatCallsCount: dailyCalls || 0,
       timestamp: new Date().toISOString()
     });
   } catch (error: any) {
@@ -129,6 +140,7 @@ export async function POST(request: Request) {
       return NextResponse.json({
         success: true,
         reply: "Super ! Je prends note (Mode Démo). Fais-moi savoir si tu as d'autres questions sur la logistique du crew.",
+        chatCallsCount: 1,
         timestamp: new Date().toISOString()
       });
     }
@@ -146,8 +158,9 @@ export async function POST(request: Request) {
     if (callsCount >= 20) {
       return NextResponse.json({
         success: false,
-        reply: "Tu as beaucoup sollicité ton Copilote aujourd'hui, reviens demain ! (Limite de 20 demandes de chat par jour)",
+        reply: "Tu as fait le tour pour aujourd'hui, ton Copilote revient demain 🌙 (Limite de 20 demandes de chat par jour)",
         limitExceeded: true,
+        chatCallsCount: callsCount,
         timestamp: new Date().toISOString()
       });
     }
@@ -162,6 +175,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       success: true,
       reply,
+      chatCallsCount: callsCount + 1,
       timestamp: new Date().toISOString()
     });
   } catch (error: any) {
