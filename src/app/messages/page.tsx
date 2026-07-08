@@ -41,7 +41,7 @@ function getWeatherDesc(code: number): { emoji: string; desc: string; isStorm: b
 
 
 // --- TYPES ---
-type TemplateCategory = 'avant_run' | 'pendant_run' | 'apres_run' | 'social_spot';
+type TemplateCategory = 'avant_run' | 'pendant_run' | 'apres_run' | 'social_spot' | 'accueil';
 
 interface MessageTemplate {
   id: string;
@@ -210,6 +210,27 @@ const TEMPLATES_DATABASE: MessageTemplate[] = [
     label: "Offre partenaire",
     contextHint: "Partage un code promo ou un deal exclusif avec ton crew",
     templateText: "{{club_name}} 🤝\n\n{{partner_name}} offre {{offer_description}}\nà tous les membres du crew.\n\nCode : {{promo_code}}\nValable jusqu'au {{expiry_date}}."
+  },
+  {
+    id: "6.1",
+    category: "accueil",
+    label: "Bienvenue anti-stress",
+    contextHint: "Dès l'inscription d'un nouveau membre dans le crew.",
+    templateText: "Salut {{first_name}} ! 👋\nBienvenue dans le crew {{club_name}}.\nIci, zéro pression : on court pour le plaisir et pour se rencontrer. Pas de chrono, on s'adapte à tout le monde.\nHâte de te voir sur notre prochain run ! {{prenom_capitaine}}"
+  },
+  {
+    id: "6.2",
+    category: "accueil",
+    label: "Après le premier run",
+    contextHint: "À envoyer 1-2h après son tout premier run.",
+    templateText: "Félicitations pour ton premier run avec nous {{first_name}} ! 🎉\nJ'espère que tu as passé un bon moment et que l'ambiance t'a plu. On se retrouve très vite pour le prochain run (et l'after-run au {{lieu_after}} !).\nÀ bientôt, {{prenom_capitaine}}"
+  },
+  {
+    id: "6.3",
+    category: "accueil",
+    label: "Relance en douceur",
+    contextHint: "Si un nouveau n'est pas revenu après 2 semaines.",
+    templateText: "Salut {{first_name}} ! 👋\nÇa fait déjà deux semaines qu'on ne t'a pas vu sur les runs de {{club_name}}.\nOn espère que tout va bien de ton côté. Nos prochaines sessions sont déjà ouvertes si tu veux nous rejoindre, la porte est toujours grande ouverte ! {{prenom_capitaine}}"
   }
 ];
 
@@ -246,7 +267,10 @@ function parseTemplateText(text: string, run: any, club: any): string {
     .replace(/\{\{partner_name\}\}/g, club.partner_name || "")
     .replace(/\{\{offer_description\}\}/g, club.offer_description || "")
     .replace(/\{\{promo_code\}\}/g, club.promo_code || "")
-    .replace(/\{\{expiry_date\}\}/g, club.expiry_date || "");
+    .replace(/\{\{expiry_date\}\}/g, club.expiry_date || "")
+    .replace(/\{\{prenom_capitaine\}\}/g, (club.coaches && club.coaches[0]?.name) || "Le Captain")
+    .replace(/\{\{lieu_after\}\}/g, club.spot_name || "after-run")
+    .replace(/\{\{lien_rdv\}\}/g, run.run_url || "");
 }
 
 // --- SUBCOMPONENT: LIVE WHATSAPP CHAT BUBBLE PREVIEW ---
@@ -983,6 +1007,27 @@ export default function MessagesPage() {
         setSelectedTemplate(promoTemplate);
         window.history.replaceState({}, document.title, window.location.pathname);
       }
+
+      const urlTab = params.get('tab');
+      const urlTemplateId = params.get('templateId');
+      const runnerName = params.get('runner_name');
+
+      if (urlTab) {
+        setActiveTab(urlTab as any);
+        if (urlTemplateId) {
+          const t = loadedTemplates.find((temp: any) => temp.id === urlTemplateId);
+          if (t) {
+            setSelectedTemplate(t);
+          }
+        }
+      }
+
+      if (runnerName) {
+        setSimulator(prev => ({
+          ...prev,
+          first_name: runnerName
+        }));
+      }
     }
   }, [club, isMock]);
 
@@ -1152,7 +1197,8 @@ export default function MessagesPage() {
         partner_name: simulator.partner_name,
         offer_description: simulator.offer_description,
         promo_code: simulator.promo_code,
-        expiry_date: simulator.expiry_date
+        expiry_date: simulator.expiry_date,
+        coaches: [{ name: "Alex" }]
       };
       const runData = {
         name: simulator.run_name,
@@ -1182,6 +1228,7 @@ export default function MessagesPage() {
 
   // Tab definitions
   const tabs = useMemo(() => [
+    { id: 'accueil' as TemplateCategory, label: 'Accueil' },
     { id: 'avant_run' as TemplateCategory, label: 'Avant le Run' },
     { id: 'pendant_run' as TemplateCategory, label: 'Pendant le Run' },
     { id: 'apres_run' as TemplateCategory, label: 'Après le Run' },

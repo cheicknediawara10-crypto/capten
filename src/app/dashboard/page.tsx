@@ -6,7 +6,7 @@ import { LayoutDashboard, Users, MapPin, Wallet, Zap, MessageSquare, ArrowRight,
 import { getSupabase } from '@/lib/supabase';
 import { useAuth } from '@/context/AuthContext';
 import { getAppUrl } from '@/lib/domain';
-import CopilotWidget from '@/components/copilot/CopilotWidget';
+import CopilotDashboard from '@/components/copilot/CopilotDashboard';
 import UpgradeBanner from '@/components/UpgradeBanner';
 
 // === HELPERS MÉTÉO ===
@@ -824,7 +824,7 @@ export default function DashboardPage() {
       <UpgradeBanner />
 
       {/* COPILOT BRIEFING IA */}
-      <CopilotWidget />
+      <CopilotDashboard />
 
       {/* VICTORY CHECKLIST (ONBOARDING) */}
       {isChecklistVisible && (

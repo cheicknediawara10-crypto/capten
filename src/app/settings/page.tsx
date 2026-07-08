@@ -35,6 +35,7 @@ export default function SettingsPage() {
   const [autoRound, setAutoRound] = React.useState(true);
   const [showTeamModal, setShowTeamModal] = React.useState(false);
   const [coaches, setCoaches] = React.useState<Array<{name: string, email: string, role: string}>>([]);
+  const [copilotEmailFreq, setCopilotEmailFreq] = React.useState<'quotidien' | 'hebdo' | 'jamais'>('quotidien');
 
   const showToast = (message: string) => {
     setToast(message);
@@ -95,6 +96,7 @@ export default function SettingsPage() {
       setZeroPressureMode(club.branding?.zero_pressure !== false);
       setAutoRound(club.branding?.auto_round !== false);
       setCoaches(club.coaches || []);
+      setCopilotEmailFreq(club.branding?.copilot_email_freq || 'quotidien');
     } else {
       // LocalStorage Mode Fallback
       const savedLogo = localStorage.getItem('capten_logo');
@@ -108,6 +110,9 @@ export default function SettingsPage() {
 
       const savedSafety = localStorage.getItem('capten_safety_contact');
       if (savedSafety) setSafetyContact(savedSafety);
+
+      const savedFreq = localStorage.getItem('capten_copilot_email_freq');
+      if (savedFreq) setCopilotEmailFreq(savedFreq as any);
 
       const savedSafeZone = localStorage.getItem('capten_safezone_active');
       if (savedSafeZone !== null) setIsSafeZoneActive(savedSafeZone === 'true');
@@ -196,6 +201,7 @@ export default function SettingsPage() {
       localStorage.setItem('capten_zero_pressure', zeroPressureMode.toString());
       localStorage.setItem('capten_auto_round', autoRound.toString());
       localStorage.setItem('capten_cagnotte_url', cagnotteUrl);
+      localStorage.setItem('capten_copilot_email_freq', copilotEmailFreq);
     } else {
       // Save to Supabase B2B configs
       try {
@@ -211,7 +217,8 @@ export default function SettingsPage() {
               safety_contact: safetyContact,
               safezone_active: isSafeZoneActive,
               zero_pressure: zeroPressureMode,
-              auto_round: autoRound
+              auto_round: autoRound,
+              copilot_email_freq: copilotEmailFreq
             }
           })
         });
@@ -410,6 +417,23 @@ export default function SettingsPage() {
                  <span className="text-[9px] font-black italic tracking-widest text-[#A3A3A3]">
                     BIENTÔT
                  </span>
+              </div>
+
+              {/* COPILOT EMAIL BRIEFING */}
+              <div className="p-4 bg-white border-[0.5px] border-black/10 rounded-card-inner flex flex-col justify-between space-y-3">
+                 <div className="space-y-1 text-left">
+                    <p className="text-[12px] font-display italic font-black uppercase text-black">BRIEFING COPILOTE (EMAIL)</p>
+                    <p className="text-[9px] font-medium text-[#A3A3A3] uppercase tracking-wider">Fréquence d'envoi du brief quotidien par email</p>
+                 </div>
+                 <select 
+                   value={copilotEmailFreq}
+                   onChange={(e) => setCopilotEmailFreq(e.target.value as any)}
+                   className="w-full bg-[#F4F5F7] border border-black/5 rounded-control px-2.5 py-1.5 text-[11px] font-mono font-bold text-black focus:outline-none focus:border-[#FF5C00] focus:bg-white transition-all cursor-pointer"
+                 >
+                   <option value="quotidien">QUOTIDIEN</option>
+                   <option value="hebdo">HEBDOMADAIRE</option>
+                   <option value="jamais">JAMAIS</option>
+                 </select>
               </div>
            </div>
         </div>

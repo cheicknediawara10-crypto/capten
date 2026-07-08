@@ -12,6 +12,7 @@ export interface ClubBranding {
   safezone_active?: boolean;
   zero_pressure?: boolean;
   auto_round?: boolean;
+  copilot_email_freq?: 'quotidien' | 'hebdo' | 'jamais';
 }
 
 export interface ClubData {

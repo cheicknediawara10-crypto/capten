@@ -1,11 +1,13 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { getSupabase } from '@/lib/supabase';
-import { getCopilotContext, queryCopilotEngine, CopilotMessage } from '@/lib/copilot';
+import { getSupabase, getSupabaseAdmin } from '@/lib/supabase';
+import { getOrCreateDailyBrief, queryCopilotChat } from '@/lib/ai/copilote';
 
-export async function GET(request: Request) {
+export const dynamic = 'force-dynamic';
+
+export async function GET() {
   try {
-    const supabase = getSupabase();
+    const supabase = getSupabaseAdmin() || getSupabase();
     let clubId = 'demo-club';
 
     if (supabase) {
@@ -38,16 +40,35 @@ export async function GET(request: Request) {
       });
     }
 
-    // Agrégation du contexte Supabase en temps réel
-    const context = await getCopilotContext(clubId);
+    if (!supabase) {
+      // Fallback Mock de briefing pour le mode démo sans Supabase
+      return NextResponse.json({
+        success: true,
+        headline: "Tout roule pour ton crew !",
+        briefing: "👋 **Bienvenue !** Tous tes runs sont programmés et le crew est en pleine forme. N'oublie pas de vérifier la météo avant de partir.",
+        mood: "neutre",
+        timestamp: new Date().toISOString()
+      });
+    }
 
-    // Génération du briefing proactif (priorité stricte)
-    const briefing = await queryCopilotEngine(context);
+    const brief = await getOrCreateDailyBrief(supabase, clubId);
+
+    // Récupérer également les alertes actives pour affichage direct
+    const { data: alerts } = await supabase
+      .from('copilote_alertes')
+      .select('id, type, priority, payload')
+      .eq('club_id', clubId)
+      .eq('status', 'active')
+      .order('priority', { ascending: false })
+      .limit(3);
 
     return NextResponse.json({
       success: true,
-      briefing,
-      context,
+      headline: brief.headline,
+      briefing: brief.body,
+      mood: brief.mood,
+      model_used: brief.model_used,
+      alerts: alerts || [],
       timestamp: new Date().toISOString()
     });
   } catch (error: any) {
@@ -61,7 +82,7 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const supabase = getSupabase();
+    const supabase = getSupabaseAdmin() || getSupabase();
     let clubId = 'demo-club';
 
     if (supabase) {
@@ -104,18 +125,22 @@ export async function POST(request: Request) {
       );
     }
 
-    const historyMsgs: CopilotMessage[] = Array.isArray(history) ? history : [];
+    const historyMsgs = Array.isArray(history) ? history : [];
 
-    // Agrégation du contexte Supabase en temps réel
-    const context = await getCopilotContext(clubId, historyMsgs);
+    if (!supabase) {
+      // Fallback démo
+      return NextResponse.json({
+        success: true,
+        reply: "Super ! Je prends note. Fais-moi savoir si tu as d'autres questions sur la logistique du crew.",
+        timestamp: new Date().toISOString()
+      });
+    }
 
-    // Réponse de conversation du Copilote
-    const reply = await queryCopilotEngine(context, message);
+    const reply = await queryCopilotChat(supabase, clubId, message, historyMsgs);
 
     return NextResponse.json({
       success: true,
       reply,
-      context,
       timestamp: new Date().toISOString()
     });
   } catch (error: any) {
