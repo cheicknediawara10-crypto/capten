@@ -43,11 +43,11 @@ async function handleCloseRun(request: Request) {
       });
     }
 
-    // 3. Récupérer les runs terminés à clôturer
+    // 3. Récupérer les runs terminés à clôturer (statuts 'scheduled' ou 'planned')
     const { data: runs, error: runsError } = await supabase
       .from('runs')
       .select('*')
-      .eq('status', 'scheduled')
+      .in('status', ['scheduled', 'planned'])
       .lte('scheduled_at', cutoff);
 
     if (runsError) {
@@ -127,9 +127,21 @@ async function handleCloseRun(request: Request) {
           continue;
         }
 
-        // Si blacklisté, ajouter à la liste
+        // Si blacklisté, ajouter à la liste et mettre à jour également la table public.runners
         if (isBlacklisted) {
           blacklistedMembers.push(memberId);
+
+          const { error: runnerError } = await supabase
+            .from('runners')
+            .update({
+              is_blacklisted: true,
+              blacklisted_until: new Date(Date.now() + 365 * 24 * 3600 * 1000).toISOString()
+            })
+            .eq('id', memberId);
+
+          if (runnerError) {
+            console.error(`Error blacklisting runner ${memberId} in runners table:`, runnerError);
+          }
         }
       }
 
@@ -154,6 +166,17 @@ async function handleCloseRun(request: Request) {
         .eq('id', run.id);
 
       processedRuns.push(run.id);
+    }
+
+    // Purger les anciennes confirmations de retour de plus de 30 jours (RGPD / Rétention minimale)
+    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString();
+    const { error: purgeError } = await supabase
+      .from('check_retour')
+      .delete()
+      .lt('confirmed_at', thirtyDaysAgo);
+
+    if (purgeError) {
+      console.error('Erreur lors de la purge des fiches check_retour de +30 jours :', purgeError);
     }
 
     return NextResponse.json({

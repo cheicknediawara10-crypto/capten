@@ -5,14 +5,15 @@ export const dynamic = 'force-dynamic';
 
 export async function POST(request: Request) {
   try {
+    const { getAuthenticatedCaptainId } = await import('@/lib/auth-server');
+    const captainId = await getAuthenticatedCaptainId();
+    if (!captainId) {
+      return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
+    }
+
     const supabase = getSupabaseAdmin() || getSupabase();
     if (!supabase) {
       return NextResponse.json({ error: 'Supabase non connecté' }, { status: 500 });
-    }
-
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
     }
 
     const body = await request.json();
@@ -26,7 +27,7 @@ export async function POST(request: Request) {
           dismissed_at: new Date().toISOString() 
         })
         .eq('id', alertId)
-        .eq('club_id', user.id);
+        .eq('club_id', captainId);
 
       if (error) {
         throw error;

@@ -77,7 +77,7 @@ export async function POST(request: Request) {
     let query = supabaseAdmin.from('runners').update({
       is_blacklisted: actionBan,
       blacklisted_until: actionBan ? new Date(Date.now() + 365 * 24 * 3600 * 1000).toISOString() : null // 1 year ban by default
-    });
+    }).eq('club_id', captainId); // RESTRICT to captain's own club!
 
     if (runner_id) {
       query = query.eq('id', runner_id);

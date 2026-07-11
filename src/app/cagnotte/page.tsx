@@ -211,12 +211,6 @@ export default function CagnottePage() {
     }, 2000);
   };
 
-  const B2BPlans = [
-    { name: "Bronze Partner", price: 500, desc: "Visibilité dans le club avantages membres & logo sur la page d'accueil du club.", color: "#CD7F32" },
-    { name: "Silver Partner", price: 1500, desc: "Bronze + Envoi de promotions WhatsApp personnalisées (via notre API Meta Cloud).", color: "#A3A3A3" },
-    { name: "Gold Sponsor", price: 3000, desc: "Silver + Bannière bento géante sur le Hub du Crew et sponsoring officiel des sorties.", color: "#FF5C00" }
-  ];
-
   const isLocked = club?.stripe_plan === 'GRATUIT';
 
   return (

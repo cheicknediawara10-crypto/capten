@@ -1,10 +1,13 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { ShieldAlert, Send, CheckCircle2, ShieldCheck, EyeOff, Eye, Loader2, ArrowRight } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
-export default function PublicIncidentReportPage() {
+function IncidentReportForm() {
+  const searchParams = useSearchParams();
+  const clubId = searchParams?.get('clubId') || searchParams?.get('club_id') || '';
   const [type, setType] = useState('Comportement Toxique');
   const [involved, setInvolved] = useState('');
   const [description, setDescription] = useState('');
@@ -37,6 +40,7 @@ export default function PublicIncidentReportPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          club_id: clubId,
           type,
           priority: 'MOYENNE',
           anonymous,
@@ -257,5 +261,18 @@ export default function PublicIncidentReportPage() {
         </footer>
       </div>
     </div>
+  );
+}
+
+export default function PublicIncidentReportPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#F4F5F7] flex flex-col items-center justify-center p-6 font-sans">
+        <Loader2 size={32} className="text-[#FF0000] animate-spin mb-4" />
+        <p className="text-[12px] font-bold text-neutral-400 uppercase tracking-widest font-mono">Chargement du protocole de sécurité...</p>
+      </div>
+    }>
+      <IncidentReportForm />
+    </Suspense>
   );
 }

@@ -308,6 +308,71 @@ async function handleDetection(request: Request) {
             }
           }
 
+          // --- DÉTECTION 9 : SÉCURITÉ (Coureurs non rentrés 1h après fin de run) ---
+          const oneHourAgo = new Date(now.getTime() - 1 * 60 * 60 * 1000);
+          const thirteenHoursAgo = new Date(now.getTime() - 13 * 60 * 60 * 1000);
+          
+          // Find runs that ended between 1h and 13h ago
+          const { data: runsEndedRecently } = await supabase
+            .from('runs')
+            .select('id, title, short_code, scheduled_at')
+            .eq('club_id', clubId)
+            .in('status', ['completed', 'ended'])
+            .gte('scheduled_at', thirteenHoursAgo.toISOString())
+            .lte('scheduled_at', oneHourAgo.toISOString());
+
+          if (runsEndedRecently) {
+            for (const run of runsEndedRecently) {
+              // Get all checked-in/attended participants for this run
+              const { data: checkedInParticipants } = await supabase
+                .from('registrations')
+                .select('runner_id, runners!inner(id, name, phone)')
+                .eq('run_id', run.id)
+                .eq('status', 'checked_in');
+
+              if (checkedInParticipants && checkedInParticipants.length > 0) {
+                // Get all check_retour confirmations for this run
+                const { data: confirmations } = await supabase
+                  .from('check_retour')
+                  .select('coureur_id')
+                  .eq('run_id', run.id);
+
+                const confirmedRunnerIds = new Set((confirmations || []).map(c => c.coureur_id));
+                const missingRunners = checkedInParticipants
+                  .map(p => (p as any).runners)
+                  .filter(r => r && !confirmedRunnerIds.has(r.id));
+
+                if (missingRunners.length > 0) {
+                  // Construct formatted alert names
+                  let missingNamesStr = '';
+                  if (missingRunners.length === 1) {
+                    missingNamesStr = missingRunners[0].name.split(' ')[0];
+                  } else if (missingRunners.length === 2) {
+                    missingNamesStr = `${missingRunners[0].name.split(' ')[0]} et ${missingRunners[1].name.split(' ')[0]}`;
+                  } else {
+                    missingNamesStr = `${missingRunners[0].name.split(' ')[0]}, ${missingRunners[1].name.split(' ')[0]} et ${missingRunners.length - 2} autres`;
+                  }
+
+                  activeAlertsToUpsert.push({
+                    club_id: clubId,
+                    type: 'coureurs_non_rentres',
+                    priority: 'HAUTE',
+                    payload: { 
+                      run_id: run.id, 
+                      run_title: run.title, 
+                      short_code: run.short_code, 
+                      missing_names: missingNamesStr,
+                      missing_count: missingRunners.length,
+                      missing_runners: missingRunners.map(r => ({ id: r.id, name: r.name, phone: r.phone }))
+                    },
+                    dedup_key: `coureurs_non_rentres:${run.id}`,
+                    status: 'active'
+                  });
+                }
+              }
+            }
+          }
+
           // 3. Écrire les alertes détectées dans la DB
           let addedCount = 0;
           for (const alert of activeAlertsToUpsert) {

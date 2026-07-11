@@ -182,6 +182,13 @@ const TEMPLATES_DATABASE: MessageTemplate[] = [
     contextHint: "Boisson offerte par la cagnotte du club.",
     templateText: "{{club_name}} ☕\nCe soir, le run se termine au social spot.\nLes boissons des nouveaux sont offertes par la cagnotte du club !\n{{run_url}}"
   },
+  {
+    id: "3.8",
+    category: "apres_run",
+    label: "BIEN RENTRÉ ?",
+    contextHint: "Vérifier que tout le monde est bien rentré après le run.",
+    templateText: "Run fini ! J'espère que vous avez kiffé 🔥\nConfirme que t'es bien rentré(e) 👇\n{{lien_check_retour}}"
+  },
   // --- CATÉGORIE 4 : SOCIAL SPOT ---
   {
     id: "5.1",
@@ -270,7 +277,8 @@ function parseTemplateText(text: string, run: any, club: any): string {
     .replace(/\{\{expiry_date\}\}/g, club.expiry_date || "")
     .replace(/\{\{prenom_capitaine\}\}/g, (club.coaches && club.coaches[0]?.name) || "Le Captain")
     .replace(/\{\{lieu_after\}\}/g, club.spot_name || "after-run")
-    .replace(/\{\{lien_rdv\}\}/g, run.run_url || "");
+    .replace(/\{\{lien_rdv\}\}/g, run.run_url || "")
+    .replace(/\{\{lien_check_retour\}\}/g, run.short_code ? `capten.app/r/${run.short_code}` : "capten.app/r/xxxxxx");
 }
 
 // --- SUBCOMPONENT: LIVE WHATSAPP CHAT BUBBLE PREVIEW ---
@@ -355,16 +363,26 @@ interface TemplateCardProps {
   parsedPreview: string;
   categoryLabel: string;
   onSelect: (template: MessageTemplate) => void;
+  isDisabled?: boolean;
+  tooltip?: string;
 }
 
-const TemplateCard = React.memo(({ template, parsedPreview, categoryLabel, onSelect }: TemplateCardProps) => {
+const TemplateCard = React.memo(({ template, parsedPreview, categoryLabel, onSelect, isDisabled, tooltip }: TemplateCardProps) => {
   return (
     <div 
-      onClick={() => onSelect(template)}
-      className="relative overflow-hidden rounded-[20px] border border-black/10 bg-white p-5 hover:border-[#FF5C00] transition-all duration-300 group shadow-sm hover:shadow-md flex flex-col justify-between cursor-pointer hover:-translate-y-1 active:translate-y-0 select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF5C00] focus-visible:ring-offset-2 focus-visible:ring-offset-white"
-      tabIndex={0}
+      onClick={() => {
+        if (isDisabled) return;
+        onSelect(template);
+      }}
+      title={tooltip}
+      className={`relative overflow-hidden rounded-[20px] border p-5 transition-all duration-300 group shadow-sm flex flex-col justify-between select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF5C00] focus-visible:ring-offset-2 focus-visible:ring-offset-white ${
+        isDisabled 
+          ? 'border-black/5 bg-neutral-50/50 opacity-45 cursor-not-allowed' 
+          : 'border-black/10 bg-white hover:border-[#FF5C00] hover:shadow-md hover:-translate-y-1 active:translate-y-0 cursor-pointer'
+      }`}
+      tabIndex={isDisabled ? -1 : 0}
       role="button"
-      aria-label={`Sélectionner le modèle : ${template.label}`}
+      aria-label={isDisabled ? `${template.label} - ${tooltip}` : `Sélectionner le modèle : ${template.label}`}
     >
       <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-[#FF5C00]/0 to-transparent transition-all duration-500 group-hover:via-[#FF5C00]/50"></div>
       
@@ -393,9 +411,9 @@ const TemplateCard = React.memo(({ template, parsedPreview, categoryLabel, onSel
 
       <div className="mt-5 pt-3 border-t border-black/5 flex items-center justify-between">
         <span className="text-[10px] font-mono text-neutral-600 group-hover:text-black transition-colors flex items-center gap-1.5 font-bold">
-          🎯 SÉLECTIONNER <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+          {isDisabled ? '🔒 INDISPONIBLE' : '🎯 SÉLECTIONNER'} <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
         </span>
-        <span className="text-[9px] font-mono text-neutral-500 font-medium">Copie & Partage</span>
+        <span className="text-[9px] font-mono text-neutral-500 font-medium">{isDisabled ? tooltip : 'Copie & Partage'}</span>
       </div>
     </div>
   );
@@ -802,9 +820,9 @@ const MessageEditorModal = React.memo(({
                       { l: "Distance", t: "{{run_distance}}" },
                       { l: "Météo", t: "{{weather}}" },
                       { l: "Lien Check-In", t: "{{run_url}}" },
+                      { l: "Lien Retour", t: "{{lien_check_retour}}" },
                       { l: "Lien Stats", t: "{{stats_url}}" },
                       { l: "Lien Don", t: "{{donation_url}}" },
-                      { l: "Lien Sponsor", t: "{{sponsor_url}}" },
                       { l: "Lien Sécurité", t: "{{report_url}}" },
                       { l: "Capacité", t: "{{capacity}}" },
                       { l: "Inscrits", t: "{{registered_count}}" },
@@ -913,7 +931,6 @@ export default function MessagesPage() {
     run_url: "capten.app/the-crew-trail/run/xyz",
     stats_url: "capten.app/the-crew-trail/stats",
     donation_url: "capten.app/cagnotte/contribuer",
-    sponsor_url: "capten.app/cagnotte/sponsor",
     report_url: "capten.app/securite/signaler",
     capacity: "50",
     registered_count: "42",
@@ -1146,6 +1163,13 @@ export default function MessagesPage() {
       : (club?.whatsapp_display_name || club?.name || 'The Crew Trail');
     
     if (selectedRun) {
+      const clubSlug = clubName
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)+/g, '');
+
       setSimulator(prev => ({
         ...prev,
         club_name: clubName,
@@ -1153,10 +1177,9 @@ export default function MessagesPage() {
         run_time: selectedRun.time || prev.run_time,
         run_location: selectedRun.location || prev.run_location,
         run_distance: selectedRun.distance ? selectedRun.distance.replace(/\s*KM/gi, "") : prev.run_distance,
-        run_url: `${origin}/waiver?runId=${selectedRun.id}`,
-        stats_url: `${origin}/dashboard/runs/${selectedRun.id}`,
+        run_url: `${origin}/${clubSlug}/run/${selectedRun.id}`,
+        stats_url: `${origin}/${clubSlug}/stats`,
         donation_url: `${origin}/cagnotte/contribuer`,
-        sponsor_url: `${origin}/cagnotte/sponsor`,
         report_url: `${origin}/securite/signaler`,
         capacity: String(selectedRun.max_slots || selectedRun.capacity || "50"),
         registered_count: String(selectedRun.slots_taken || selectedRun.registered || "0"),
@@ -1169,7 +1192,6 @@ export default function MessagesPage() {
         ...prev,
         club_name: clubName,
         donation_url: `${origin}/cagnotte/contribuer`,
-        sponsor_url: `${origin}/cagnotte/sponsor`,
         report_url: `${origin}/securite/signaler`,
       }));
     }
@@ -1590,10 +1612,16 @@ export default function MessagesPage() {
                     first_name: simulator.first_name,
                     absence_count: simulator.absence_count,
                     run_location: simulator.run_location,
-                    weather_condition: simulator.weather_condition
+                    weather_condition: simulator.weather_condition,
+                    short_code: selectedRun?.short_code || ""
                   };
                   const parsedPreview = parseTemplateText(template.templateText, runData, clubData);
                   const catLabel = tabs.find(t => t.id === template.category)?.label || "Run";
+
+                  const isBienRentreTemplate = template.label === "BIEN RENTRÉ ?";
+                  const runNotEnded = !selectedRun || (selectedRun.status !== 'completed' && selectedRun.status !== 'ended');
+                  const isDisabled = isBienRentreTemplate && runNotEnded;
+                  const tooltip = isDisabled ? "Disponible dès que le run sera terminé" : undefined;
 
                   return (
                     <TemplateCard 
@@ -1602,6 +1630,8 @@ export default function MessagesPage() {
                       parsedPreview={parsedPreview}
                       categoryLabel={catLabel}
                       onSelect={handleSelectTemplate}
+                      isDisabled={isDisabled}
+                      tooltip={tooltip}
                     />
                   );
                 })}

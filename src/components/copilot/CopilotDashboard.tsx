@@ -166,6 +166,8 @@ export default function CopilotDashboard() {
 
   const getAlertIcon = (type: string) => {
     switch (type) {
+      case 'coureurs_non_rentres':
+        return <AlertCircle size={16} className="text-red-500 animate-bounce" />;
       case 'nouveau_runner':
         return <UserPlus size={16} className="text-[#FF5C00]" />;
       case 'regulier_decroche':
@@ -331,12 +333,26 @@ export default function CopilotDashboard() {
                     </div>
 
                     <div className="flex items-center justify-end gap-2">
-                      <Link 
-                        href={action.href}
-                        className="bg-black hover:bg-[#FF5C00] text-white text-[9px] font-black uppercase tracking-widest px-3.5 py-2 rounded-control flex items-center gap-1 transition-all"
-                      >
-                        {action.label} <ArrowRight size={10} />
-                      </Link>
+                      {alert.type === 'coureurs_non_rentres' ? (
+                        <button
+                          onClick={() => {
+                            const missing = alert.payload?.missing_runners || [];
+                            const relanceText = missing.map((r: any) => `Salut ${r.name.split(' ')[0]}, t'es bien rentré(e) ce soir ? On s'inquiète 🖤`).join('\n\n');
+                            setAiResponse(relanceText);
+                            setActiveAction('custom');
+                          }}
+                          className="bg-red-500 hover:bg-black text-white text-[9px] font-black uppercase tracking-widest px-3.5 py-2 rounded-control flex items-center gap-1 transition-all cursor-pointer"
+                        >
+                          Contacter <ArrowRight size={10} />
+                        </button>
+                      ) : (
+                        <Link 
+                          href={action.href}
+                          className="bg-black hover:bg-[#FF5C00] text-white text-[9px] font-black uppercase tracking-widest px-3.5 py-2 rounded-control flex items-center gap-1 transition-all"
+                        >
+                          {action.label} <ArrowRight size={10} />
+                        </Link>
+                      )}
                       <button
                         onClick={() => handleDismissAlert(alert.id)}
                         className="w-8 h-8 rounded-control border border-black/5 hover:border-red-500 hover:text-red-500 text-neutral-400 flex items-center justify-center transition-all cursor-pointer"

@@ -85,6 +85,7 @@ export default function RunnersGdprPage() {
           runner_id: runner.id,
           accept_health: acceptHealth,
           accept_photo: acceptPhoto,
+          token: runner.waiver_token, // Pass authorization token
         }),
       });
 
@@ -112,7 +113,7 @@ export default function RunnersGdprPage() {
     setSuccess(null);
 
     try {
-      const res = await fetch(`/api/runners/gdpr?id=${encodeURIComponent(runner.id)}`, {
+      const res = await fetch(`/api/runners/gdpr?id=${encodeURIComponent(runner.id)}&token=${encodeURIComponent(runner.waiver_token)}`, { // Pass authorization token
         method: "DELETE",
       });
 

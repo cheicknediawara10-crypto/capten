@@ -80,6 +80,8 @@ export async function POST(request: Request) {
       }
     }
 
+    const short_code = Math.random().toString(36).substring(2, 10).substring(0, 7); // 7-char short code
+
     const { data, error } = await supabase
       .from('runs')
       .insert([{
@@ -93,13 +95,14 @@ export async function POST(request: Request) {
         stripe_product_id: null,
         max_slots: max_slots || null,
         slots_taken: 0,
-        status: 'scheduled',
+        status: 'planned',
         scheduled_at: date_start,
         reminder_offset_minutes: reminder_offset_minutes !== undefined ? parseInt(String(reminder_offset_minutes)) : 30,
         club_id: captainId,
         captain_id: captainId,
         vibe: vibe || 'Social & Chill',
-        coach: coach || 'Alex Rivière'
+        coach: coach || 'Alex Rivière',
+        short_code
       }])
       .select()
       .single();

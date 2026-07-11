@@ -1,6 +1,7 @@
 "use server"
 
 import { getSupabaseAdmin } from '@/lib/supabase';
+import { getAuthenticatedCaptainId } from '@/lib/auth-server';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
@@ -30,9 +31,30 @@ export async function manualCheckInRunner(registrationId: string) {
       };
     }
 
+    const captainId = await getAuthenticatedCaptainId();
+    if (!captainId) {
+      return { error: "Non autorisé. Session expirée." };
+    }
+
     const supabaseAdmin = getSupabaseAdmin();
     if (!supabaseAdmin) {
       return { error: "Client d'administration Supabase indisponible." };
+    }
+
+    // Security Check: Verify that the registration exists and belongs to a run owned by this captain
+    const { data: registration, error: fetchError } = await supabaseAdmin
+      .from('registrations')
+      .select('*, runs!inner(club_id)')
+      .eq('id', registrationId)
+      .maybeSingle();
+
+    if (fetchError || !registration) {
+      return { error: "Inscription introuvable." };
+    }
+
+    // Check if the captain owns the club that scheduled this run
+    if ((registration as any).runs?.club_id !== captainId) {
+      return { error: "Accès refusé. Vous n'êtes pas le Captain fondateur de ce club." };
     }
 
     const { data, error } = await supabaseAdmin
@@ -62,3 +84,4 @@ export async function manualCheckInRunner(registrationId: string) {
     return { error: error.message || "Erreur interne lors de la validation manuelle." };
   }
 }
+

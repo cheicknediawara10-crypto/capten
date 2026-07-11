@@ -19,6 +19,7 @@ export async function POST(request: Request) {
           name: name,
           phone: phone,
           signed_waiver: true,
+          waiver_token: "mock-token-123",
           accept_health: true,
           accept_photo: true
         }
@@ -58,6 +59,7 @@ export async function POST(request: Request) {
         name: runner.name,
         phone: runner.phone,
         signed_waiver: runner.signed_waiver,
+        waiver_token: runner.waiver_token || "unknown", // Return token for authorization
         accept_health: !!healthData,
         accept_photo: photoConsent ? photoConsent.accorde : false
       }
@@ -71,7 +73,7 @@ export async function POST(request: Request) {
 // 2. Update/Withdraw Consent
 export async function PATCH(request: Request) {
   try {
-    const { runner_id, accept_health, accept_photo } = await request.json();
+    const { runner_id, accept_health, accept_photo, token } = await request.json();
 
     if (!runner_id) {
       return NextResponse.json({ error: "ID de runner requis." }, { status: 400 });
@@ -82,12 +84,17 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ success: true, message: "Mise à jour simulée (Mode Démo)." });
     }
 
-    // Fetch club_id from runner profile to associate the log with the correct club
+    // Fetch club_id & token from runner profile
     const { data: runnerDetails } = await supabaseAdmin
       .from('runners')
-      .select('club_id')
+      .select('club_id, waiver_token')
       .eq('id', runner_id)
       .maybeSingle();
+
+    // Verify token
+    if (!runnerDetails || runnerDetails.waiver_token !== token) {
+      return NextResponse.json({ error: "Accès refusé. Session invalide." }, { status: 401 });
+    }
 
     // Log the consent update action in audit logs
     await supabaseAdmin.from('audit_logs').insert({
@@ -143,6 +150,7 @@ export async function DELETE(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const runner_id = searchParams.get('id');
+    const token = searchParams.get('token');
 
     if (!runner_id) {
       return NextResponse.json({ error: "ID de runner requis." }, { status: 400 });
@@ -153,12 +161,17 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ success: true, message: "Suppression totale simulée (Mode Démo)." });
     }
 
-    // Fetch details before deleting
+    // Fetch details & token before deleting
     const { data: runnerDetails } = await supabaseAdmin
       .from('runners')
-      .select('name, phone, club_id')
+      .select('name, phone, club_id, waiver_token')
       .eq('id', runner_id)
       .maybeSingle();
+
+    // Verify token
+    if (!runnerDetails || runnerDetails.waiver_token !== token) {
+      return NextResponse.json({ error: "Accès refusé. Session invalide." }, { status: 401 });
+    }
 
     // Log the profile deletion action in audit logs
     await supabaseAdmin.from('audit_logs').insert({

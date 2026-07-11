@@ -222,7 +222,7 @@ function WaiverForm() {
             emergency_name: acceptHealth ? emergencyName : null,
             emergency_phone: acceptHealth ? emergencyPhone : null,
             emergency_relation: acceptHealth ? emergencyRelation : null,
-            birth_date: acceptHealth ? dob : null,
+            birth_date: dob || null,
             blood_type: acceptHealth ? bloodType : null,
             allergies: acceptHealth ? allergies : null,
             health_issues: acceptHealth ? healthIssues : null,
@@ -425,6 +425,17 @@ function WaiverForm() {
                 />
               </div>
             </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-neutral-500 uppercase tracking-wider block">Date de naissance *</label>
+              <input
+                type="date"
+                required
+                value={dob}
+                onChange={e => setDob(e.target.value)}
+                className="brutalist-input bg-[#F4F5F7]"
+              />
+            </div>
           </div>
 
           {/* Emergency Card Box */}
@@ -474,15 +485,6 @@ function WaiverForm() {
           <div className="bg-[#F4F5F7] border border-black/5 rounded-card-inner p-5 space-y-4">
             <p className="text-[10px] font-black text-neutral-500 uppercase tracking-wider flex items-center gap-1.5"><ShieldCheck size={14} /> INFORMATIONS DE SANTÉ & LOGISTIQUE (OPTIONNEL)</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-1.5 text-left">
-                <label className="text-[9px] font-black text-black uppercase tracking-widest block">Date de naissance</label>
-                <input 
-                  type="date" 
-                  value={dob} 
-                  onChange={e => setDob(e.target.value)} 
-                  className="w-full px-3 py-2 bg-white border border-black/10 rounded-control text-xs font-bold text-black focus:outline-none focus:border-black" 
-                />
-              </div>
               <div className="space-y-1.5 text-left">
                 <label className="text-[9px] font-black text-black uppercase tracking-widest block">Groupe Sanguin</label>
                 <select 

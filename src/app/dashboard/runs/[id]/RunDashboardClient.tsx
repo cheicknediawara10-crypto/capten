@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { 
   Users, MapPin, Search, ArrowLeft, Flame, AlertCircle, 
   CheckCircle2, Clock, ShieldCheck, MapPinCheck, HelpCircle, RotateCcw, Check,
-  Sparkles, Brain, Lock
+  Sparkles, Brain, Lock, Copy
 } from 'lucide-react';
 import { manualCheckInRunner } from '@/app/actions/manual-checkin';
 import { getSupabase } from '@/lib/supabase';
@@ -50,6 +50,31 @@ export default function RunDashboardClient({ run, initialRegistrations, isDemo }
   const [searchQuery, setSearchQuery] = useState('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [runStatus, setRunStatus] = useState<string>(run.status);
+
+  const handleEndRun = async () => {
+    try {
+      const supabase = getSupabase();
+      if (!isDemo && supabase) {
+        const { error } = await supabase
+          .from('runs')
+          .update({ status: 'completed' })
+          .eq('id', run.id);
+        if (error) throw error;
+      }
+      setRunStatus('completed');
+    } catch (err) {
+      alert("Erreur lors de la clôture du run.");
+    }
+  };
+
+  const isCheckRetourActive = useMemo(() => {
+    if (runStatus !== 'completed' && runStatus !== 'ended') return false;
+    const startTime = new Date(run.date_start).getTime();
+    const estimatedEndTime = startTime + 2 * 60 * 60 * 1000;
+    const validityEndTime = estimatedEndTime + 12 * 60 * 60 * 1000;
+    return Date.now() < validityEndTime;
+  }, [runStatus, run.date_start]);
 
   // AI summary states
   const [summary, setSummary] = useState<string>('');
@@ -220,6 +245,14 @@ export default function RunDashboardClient({ run, initialRegistrations, isDemo }
               MODE DÉMONSTRATION
             </span>
           )}
+          {runStatus !== 'completed' && runStatus !== 'ended' && (
+            <button
+              onClick={handleEndRun}
+              className="bg-black hover:bg-[#FF5C00] text-white transition-colors border border-black/5 px-3 py-1.5 rounded-[4px] text-[8.5px] font-black uppercase tracking-widest cursor-pointer"
+            >
+              🏁 Marquer comme terminé
+            </button>
+          )}
           <div className="bg-[#FF5C00] text-white px-2.5 py-1 rounded-[4px] text-[8.5px] font-black uppercase tracking-widest italic animate-pulse">
             LIVE TRACKING
           </div>
@@ -242,6 +275,16 @@ export default function RunDashboardClient({ run, initialRegistrations, isDemo }
           </div>
         </div>
       </header>
+
+      {/* CARD CHECK RETOUR */}
+      {isCheckRetourActive && (
+        <CheckRetourSection
+          runId={run.id}
+          shortCode={run.short_code || ''}
+          registrations={registrations}
+          isDemo={isDemo}
+        />
+      )}
 
       {/* TOAST D'ERREUR DISCRET */}
       {errorMessage && (
@@ -502,6 +545,200 @@ export default function RunDashboardClient({ run, initialRegistrations, isDemo }
         )}
       </section>
 
+    </div>
+  );
+}
+
+// --- SUBCOMPONENT: CHECK RETOUR PANEL ---
+function CheckRetourSection({
+  runId,
+  shortCode,
+  registrations,
+  isDemo
+}: {
+  runId: string;
+  shortCode: string;
+  registrations: Registration[];
+  isDemo: boolean;
+}) {
+  const [confirmations, setConfirmations] = useState<{ coureur_id: string }[]>([]);
+  const [copyFeedback, setCopyFeedback] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+
+  useEffect(() => {
+    async function load() {
+      if (isDemo) {
+        const present = registrations.filter(r => r.status === 'checked_in');
+        if (present.length > 2) {
+          setConfirmations(present.slice(0, Math.floor(present.length / 2)).map(p => ({ coureur_id: p.runners.id })));
+        }
+        return;
+      }
+      const supabase = getSupabase();
+      if (supabase) {
+        const { data } = await supabase
+          .from('check_retour')
+          .select('coureur_id')
+          .eq('run_id', runId);
+        if (data) setConfirmations(data);
+      }
+    }
+    load();
+  }, [runId, registrations, isDemo]);
+
+  const presentRunners = useMemo(() => {
+    return registrations.filter(r => r.status === 'checked_in');
+  }, [registrations]);
+
+  const confirmedIds = useMemo(() => new Set(confirmations.map(c => c.coureur_id)), [confirmations]);
+  const confirmedCount = useMemo(() => presentRunners.filter(r => confirmedIds.has(r.runners.id)).length, [presentRunners, confirmedIds]);
+  const nonConfirmedRunners = useMemo(() => presentRunners.filter(r => !confirmedIds.has(r.runners.id)), [presentRunners, confirmedIds]);
+
+  const copyMessage = async () => {
+    const link = `capten.app/r/${shortCode}`;
+    const text = `Run fini ! J'espère que vous avez kiffé 🔥\nConfirme que t'es bien rentré(e) 👇\n${link}`;
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopyFeedback(true);
+      setTimeout(() => setCopyFeedback(false), 2000);
+    } catch (err) {
+      alert("Erreur lors de la copie. Copie manuellement : " + link);
+    }
+  };
+
+  const handleManualConfirm = async (runnerId: string) => {
+    if (isDemo) {
+      setConfirmations(prev => [...prev, { coureur_id: runnerId }]);
+      return;
+    }
+    try {
+      const supabase = getSupabase();
+      if (supabase) {
+        const { data: { user } } = await supabase.auth.getUser();
+        const { error } = await supabase
+          .from('check_retour')
+          .insert({
+            run_id: runId,
+            coureur_id: runnerId,
+            crew_id: user?.id,
+            manual: true,
+            confirmed_by: user?.id
+          });
+        if (!error) {
+          setConfirmations(prev => [...prev, { coureur_id: runnerId }]);
+        } else {
+          alert("Erreur lors de la confirmation manuelle : " + error.message);
+        }
+      }
+    } catch (err: any) {
+      alert("Erreur réseau.");
+    }
+  };
+
+  const pct = presentRunners.length > 0 ? Math.round((confirmedCount / presentRunners.length) * 100) : 0;
+  const nonConfirmedNames = nonConfirmedRunners.map(r => r.runners.name.split(' ')[0]).join(', ');
+
+  return (
+    <div className="bg-[#FDFCF8] border-[1.5px] border-[#FF5C00]/25 rounded-[20px] p-6 shadow-sm space-y-4">
+      <div className="flex justify-between items-start">
+        <div className="space-y-1">
+          <h3 className="font-display italic font-black text-xl uppercase tracking-tight flex items-center gap-2 text-black">
+            🏠 CHECK RETOUR ACTIF
+          </h3>
+          <p className="text-[10px] text-neutral-500 font-bold uppercase tracking-wider">
+            Vérifie que tout le monde est bien rentré après la séance
+          </p>
+        </div>
+        <span className="font-mono text-xs font-black text-[#FF5C00] bg-[#FF5C00]/10 px-3 py-1 rounded-full">
+          {pct}% confirmés
+        </span>
+      </div>
+
+      {/* Progress Bar */}
+      <div className="space-y-2">
+        <div className="flex justify-between text-xs font-bold font-mono">
+          <span className="text-[#FF5C00]">{confirmedCount} confirmés</span>
+          <span className="text-neutral-400">{presentRunners.length} au départ</span>
+        </div>
+        <div className="w-full bg-black/5 h-3 rounded-full overflow-hidden">
+          <div 
+            className="bg-[#FF5C00] h-full rounded-full transition-all duration-500 ease-out"
+            style={{ width: `${pct}%` }}
+          />
+        </div>
+      </div>
+
+      {/* Awaiting List */}
+      {nonConfirmedRunners.length > 0 ? (
+        <div className="bg-rose-50 border border-rose-500/10 rounded-[14px] p-3.5 text-[11px] font-bold text-neutral-700">
+          <span className="text-rose-500 uppercase tracking-wider font-extrabold mr-1">⚠️ EN ATTENTE :</span>
+          {nonConfirmedNames}
+        </div>
+      ) : (
+        <div className="bg-emerald-50 border border-emerald-500/10 rounded-[14px] p-3.5 text-[11px] font-bold text-emerald-700">
+          🎉 Tout le monde est bien rentré ! Beau travail Captain.
+        </div>
+      )}
+
+      {/* Action Buttons */}
+      <div className="flex gap-3 pt-1">
+        <button
+          onClick={copyMessage}
+          className={`flex-1 py-3.5 rounded-xl text-xs font-mono font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-all active:scale-95 duration-200 min-h-[44px] cursor-pointer ${
+            copyFeedback 
+              ? 'bg-[#00FF66] text-black shadow-lg shadow-[#00FF66]/20 ring-2 ring-[#00FF66]' 
+              : 'bg-black text-white hover:bg-black/90'
+          }`}
+        >
+          {copyFeedback ? 'COPIÉ ! ✅' : 'Copier le message'}
+        </button>
+
+        {nonConfirmedRunners.length > 0 && (
+          <button
+            onClick={() => setShowModal(true)}
+            className="flex-1 py-3.5 bg-white border border-black/10 hover:border-[#FF5C00] text-black hover:text-[#FF5C00] rounded-xl text-xs font-mono font-black uppercase tracking-wider transition-all active:scale-95 duration-200 min-h-[44px] cursor-pointer"
+          >
+            Confirmer manuellement
+          </button>
+        )}
+      </div>
+
+      {/* Manual Confirmation Modal */}
+      {showModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white border border-black/10 rounded-[24px] p-6 max-w-md w-full shadow-2xl space-y-4">
+            <div className="flex justify-between items-center border-b border-black/5 pb-3">
+              <h4 className="font-display italic font-black uppercase text-lg text-black">
+                Pointage manuel retour
+              </h4>
+              <button 
+                onClick={() => setShowModal(false)}
+                className="text-[10px] font-black text-neutral-400 hover:text-black uppercase tracking-wider"
+              >
+                Fermer
+              </button>
+            </div>
+
+            <p className="text-neutral-500 text-[11px] leading-relaxed font-bold uppercase tracking-wider">
+              Cochez les coureurs qui vous ont confirmé leur retour (par message direct, etc.) :
+            </p>
+
+            <div className="max-h-60 overflow-y-auto space-y-2 pr-1">
+              {nonConfirmedRunners.map(reg => (
+                <div key={reg.runners.id} className="flex justify-between items-center p-2.5 hover:bg-neutral-50 rounded-xl border border-black/5">
+                  <span className="text-[12px] font-black uppercase text-black">{reg.runners.name}</span>
+                  <button
+                    onClick={() => handleManualConfirm(reg.runners.id)}
+                    className="bg-emerald-50 border border-emerald-200 hover:bg-[#56E39F] hover:text-white text-emerald-800 px-3 py-1.5 rounded-[8px] text-[9px] font-black uppercase tracking-wider transition-all cursor-pointer"
+                  >
+                    Valider retour
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

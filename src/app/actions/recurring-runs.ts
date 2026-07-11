@@ -161,9 +161,10 @@ export async function generateMonthlyRunsForSeries(
           slots_taken: 0,
           vibe: 'Social & Chill',
           coach: 'Alex Rivière',
-          status: 'scheduled',
+          status: 'planned',          // Nouveau statut par défaut
           sms_sent: false,
-          reminder_offset_minutes: series.reminder_offset_minutes || 30
+          reminder_offset_minutes: series.reminder_offset_minutes || 30,
+          short_code: Math.random().toString(36).substring(2, 10).substring(0, 7) // Unique short code
         });
       }
       current.setDate(current.getDate() + 1);

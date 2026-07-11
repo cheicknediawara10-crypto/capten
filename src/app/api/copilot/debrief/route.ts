@@ -24,15 +24,10 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: "L'identifiant du run est requis." }, { status: 400 });
     }
 
+    const { getAuthenticatedCaptainId } = await import('@/lib/auth-server');
+    const captainId = await getAuthenticatedCaptainId();
+    const clubId = captainId || 'demo-club';
     const supabase = getSupabaseAdmin() || getSupabase();
-    let clubId = 'demo-club';
-
-    if (supabase) {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        clubId = user.id;
-      }
-    }
 
     // 1. Gating check
     let plan = 'GRATUIT';

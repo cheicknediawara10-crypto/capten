@@ -161,6 +161,9 @@ export default async function RunDashboardPage({ params }: PageProps) {
 
   // Requête Base de Données réelle
   try {
+    const { getAuthenticatedCaptainId } = await import('@/lib/auth-server');
+    const captainId = await getAuthenticatedCaptainId();
+
     const { data: run, error: runError } = await supabaseAdmin
       .from('runs')
       .select('*')
@@ -176,6 +179,25 @@ export default async function RunDashboardPage({ params }: PageProps) {
             </h1>
             <p className="text-[12px] font-medium text-neutral-500 uppercase tracking-wider mb-6">
               Le run demandé n'existe pas ou a été supprimé de la base de données.
+            </p>
+            <a href="/runs" className="inline-block bg-black text-white text-[10px] font-black uppercase tracking-widest px-5 py-3 rounded-[8px] hover:bg-[#FF5C00] transition-colors">
+              RETOURNER AUX SORTIES
+            </a>
+          </div>
+        </div>
+      );
+    }
+
+    // Verify multi-tenant authorization
+    if (!captainId || (run.club_id !== captainId && run.captain_id !== captainId)) {
+      return (
+        <div className="min-h-screen bg-[#FDFCF8] flex items-center justify-center p-6 text-center">
+          <div className="bg-white border border-black/10 rounded-[20px] p-8 max-w-[400px] shadow-sm">
+            <h1 className="text-[20px] font-display italic font-black uppercase text-rose-500 mb-2">
+              ACCÈS REFUSÉ
+            </h1>
+            <p className="text-[12px] font-medium text-neutral-500 uppercase tracking-wider mb-6">
+              Vous n'êtes pas autorisé à accéder aux données de ce run.
             </p>
             <a href="/runs" className="inline-block bg-black text-white text-[10px] font-black uppercase tracking-widest px-5 py-3 rounded-[8px] hover:bg-[#FF5C00] transition-colors">
               RETOURNER AUX SORTIES

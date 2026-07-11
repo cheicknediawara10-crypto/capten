@@ -7,15 +7,10 @@ export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
+    const { getAuthenticatedCaptainId } = await import('@/lib/auth-server');
+    const captainId = await getAuthenticatedCaptainId();
+    const clubId = captainId || 'demo-club';
     const supabase = getSupabaseAdmin() || getSupabase();
-    let clubId = 'demo-club';
-
-    if (supabase) {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        clubId = user.id;
-      }
-    }
 
     // Gating check
     let plan = 'GRATUIT';
@@ -92,15 +87,10 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    const { getAuthenticatedCaptainId } = await import('@/lib/auth-server');
+    const captainId = await getAuthenticatedCaptainId();
+    const clubId = captainId || 'demo-club';
     const supabase = getSupabaseAdmin() || getSupabase();
-    let clubId = 'demo-club';
-
-    if (supabase) {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        clubId = user.id;
-      }
-    }
 
     // Gating check
     let plan = 'GRATUIT';
