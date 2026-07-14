@@ -931,6 +931,7 @@ export default function MessagesPage() {
     run_url: "capten.app/the-crew-trail/run/xyz",
     stats_url: "capten.app/the-crew-trail/stats",
     donation_url: "capten.app/cagnotte/contribuer",
+    sponsor_url: "capten.app/cagnotte/sponsor",
     report_url: "capten.app/securite/signaler",
     capacity: "50",
     registered_count: "42",
