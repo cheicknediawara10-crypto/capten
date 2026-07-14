@@ -90,13 +90,13 @@ export async function POST(
     }
 
     // Incrémenter le checkin_count de l'événement
-    await supabase.rpc('increment_event_checkin', { event_id: id }).catch(() => {
+    const { error: rpcError } = await supabase.rpc('increment_event_checkin', { event_id: id });
+    if (rpcError) {
       // Fallback simple si la fonction RPC n'est pas encore créée
-      supabase.from('spot_events')
+      await supabase.from('spot_events')
         .update({ checkin_count: (ticket.spot_events?.checkin_count || 0) + 1 })
-        .eq('id', id)
-        .then();
-    });
+        .eq('id', id);
+    }
 
     return NextResponse.json({
       success: true,
