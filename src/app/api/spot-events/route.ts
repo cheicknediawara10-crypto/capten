@@ -3,6 +3,7 @@ import { getSupabaseAdmin } from '@/lib/supabase';
 import { getAuthenticatedCaptainId } from '@/lib/auth-server';
 import { SpotEvent, generatePublicSlug, generateSignedLink } from '@/lib/spots';
 import { resend } from '@/lib/resend';
+import { MOCK_SPOTS } from '../spots/route';
 
 export const dynamic = 'force-dynamic';
 
