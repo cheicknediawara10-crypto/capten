@@ -31,6 +31,7 @@ export interface ClubData {
   branding: ClubBranding;
   stripe_plan?: string;
   stripe_subscription_status?: string;
+  spots_balance_cents?: number;
 }
 
 interface AuthContextType {
@@ -74,7 +75,8 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
           cagnotte_data: data.cagnotte_data || { balance: 0, transactions: [], contributors: [] },
           branding: data.branding || {},
           stripe_plan: data.stripe_plan || 'GRATUIT',
-          stripe_subscription_status: data.stripe_subscription_status || 'inactive'
+          stripe_subscription_status: data.stripe_subscription_status || 'inactive',
+          spots_balance_cents: data.spots_balance_cents || 0
         });
       } else {
         // Auto-create club if missing
@@ -99,7 +101,8 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
             cagnotte_data: { balance: 0, transactions: [], contributors: [] },
             branding: {},
             stripe_plan: newClub.stripe_plan || 'GRATUIT',
-            stripe_subscription_status: newClub.stripe_subscription_status || 'inactive'
+            stripe_subscription_status: newClub.stripe_subscription_status || 'inactive',
+            spots_balance_cents: 0
           });
         }
       }
@@ -166,7 +169,8 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
           },
           branding,
           stripe_plan: localStorage.getItem('capten_plan') || 'GRATUIT',
-          stripe_subscription_status: localStorage.getItem('capten_plan') === 'CAPTEN' ? 'active' : 'inactive'
+          stripe_subscription_status: localStorage.getItem('capten_plan') === 'CAPTEN' ? 'active' : 'inactive',
+          spots_balance_cents: parseInt(localStorage.getItem('capten_spots_balance_cents') || '21850', 10)
         });
       } else {
         setUser(null);
