@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { LayoutDashboard, Users, MapPin, Wallet, Zap, MessageSquare, ArrowRight, Plus, Trophy, Activity, Globe, Heart, Flame, CheckCircle2, RefreshCw, Store } from 'lucide-react';
-import { getSupabase } from '@/lib/supabase';
+import { getSupabase, formatPrice } from '@/lib/supabase';
 import { useAuth } from '@/context/AuthContext';
 import { getAppUrl } from '@/lib/domain';
 import CopilotDashboard from '@/components/copilot/CopilotDashboard';
