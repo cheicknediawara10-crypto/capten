@@ -266,7 +266,7 @@ export default function SpotSalePage() {
               <div className="flex items-center gap-3">
                 <MapPin size={15} className="text-neutral-400" />
                 <a
-                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(spot?.name + ' ' + spot?.address)}`}
+                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((spot?.name || '') + ' ' + (spot?.address || ''))}`}
                   target="_blank"
                   rel="noreferrer"
                   className="text-[#FF5C00] hover:underline"

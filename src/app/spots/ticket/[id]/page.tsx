@@ -157,7 +157,7 @@ export default function RunnerTicketPage() {
               </div>
               <div className="space-y-1 flex flex-col">
                 <span className="text-[9px] font-mono font-bold uppercase tracking-wider text-neutral-400">⏰ Heure</span>
-                <span>{event?.event_time.slice(0, 5)}</span>
+                <span>{event?.event_time?.slice(0, 5)}</span>
               </div>
             </div>
 
