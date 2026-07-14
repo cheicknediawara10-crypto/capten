@@ -37,6 +37,7 @@ interface RunInfo {
   vibe: string;
   coach: string;
   status: 'scheduled' | 'completed' | 'cancelled';
+  short_code?: string;
 }
 
 interface ClientProps {
