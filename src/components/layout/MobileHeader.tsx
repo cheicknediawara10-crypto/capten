@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { 
   Menu, X, LayoutDashboard, Users, Map, Sparkles, 
-  MessageSquare, Ticket, Wallet, ShieldCheck, CreditCard, Settings, LogOut, Globe, PlayCircle
+  MessageSquare, Ticket, Wallet, Store, ShieldCheck, CreditCard, Settings, LogOut, Globe, PlayCircle
 } from "lucide-react";
 import { logout } from "@/app/login/actions";
 
@@ -46,6 +46,7 @@ export default function MobileHeader() {
       title: "Terrain",
       items: [
         { name: "Cagnotte", icon: <Wallet size={18} strokeWidth={1.5} />, href: "/cagnotte" },
+        { name: "Spots", icon: <Store size={18} strokeWidth={1.5} />, href: "/spots/explorer" },
         { name: "Protection", icon: <ShieldCheck size={18} strokeWidth={1.5} />, href: "/securite" },
       ]
     },

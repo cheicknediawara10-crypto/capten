@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { LayoutDashboard, Users, MapPin, Wallet, Zap, MessageSquare, ArrowRight, Plus, Trophy, Activity, Globe, Heart, Flame, CheckCircle2, RefreshCw } from 'lucide-react';
+import { LayoutDashboard, Users, MapPin, Wallet, Zap, MessageSquare, ArrowRight, Plus, Trophy, Activity, Globe, Heart, Flame, CheckCircle2, RefreshCw, Store } from 'lucide-react';
 import { getSupabase } from '@/lib/supabase';
 import { useAuth } from '@/context/AuthContext';
 import { getAppUrl } from '@/lib/domain';
@@ -72,6 +72,7 @@ export default function DashboardPage() {
   const [spotName, setSpotName] = useState<string | null>(null);
   const [athletes, setAthletes] = useState<any[]>([]);
   const [runs, setRuns] = useState<any[]>([]);
+  const [latestSpotEvent, setLatestSpotEvent] = useState<any | null>(null);
   const [firstName, setFirstName] = useState('');
   const [notifications, setNotifications] = useState<any[]>([]);
   const [weatherInfo, setWeatherInfo] = useState<{ emoji: string; temp: number; desc: string; windspeed: number; isStorm: boolean; isExtreme: boolean } | null>(null);
@@ -95,12 +96,13 @@ export default function DashboardPage() {
       setCagnotteUrl(club.cagnotte_url || null);
       setSpotName(club.spot_name || null);
 
-      // Fetch runs and athletes from Supabase B2B endpoints
+      // Fetch runs, athletes and spot events from Supabase B2B endpoints
       const fetchServerData = async () => {
         try {
-          const [runsRes, runnersRes] = await Promise.all([
+          const [runsRes, runnersRes, spotEventsRes] = await Promise.all([
             fetch('/api/runs'),
-            fetch('/api/runners')
+            fetch('/api/runners'),
+            fetch('/api/spot-events')
           ]);
           if (runsRes.ok) {
             const runsData = await runsRes.json();
@@ -115,6 +117,13 @@ export default function DashboardPage() {
               setAthletes(runnersData);
             }
           }
+          if (spotEventsRes.ok) {
+            const eventsData = await spotEventsRes.json();
+            if (Array.isArray(eventsData) && eventsData.length > 0) {
+              const latest = eventsData.find(e => ['completed', 'on_sale'].includes(e.status));
+              if (latest) setLatestSpotEvent(latest);
+            }
+          }
         } catch (e) {
           console.error("Error fetching dashboard server data:", e);
         }
@@ -127,6 +136,22 @@ export default function DashboardPage() {
 
       const skipped = localStorage.getItem('capten_onboarding_skipped') === 'true';
       setSkipOnboarding(skipped);
+
+      // Simulation mock spots
+      setLatestSpotEvent({
+        id: 'event-1-mock',
+        event_date: '2026-07-18',
+        quota: 40,
+        offer_price_cents: 600,
+        merchant_rate: 0.75,
+        club_rate: 0.125,
+        platform_rate: 0.125,
+        checkin_count: 24,
+        spot: {
+          name: 'Blondy Coffee',
+          offer_description: 'Café filtre + Part de banana bread maison'
+        }
+      });
 
       // Load Brand Setup Status
       const savedName = localStorage.getItem('capten_club_name') || localStorage.getItem('capten_onboarding_s2_name') || '';
@@ -1319,6 +1344,82 @@ export default function DashboardPage() {
                 </div>
              </div>
            )}
+
+            {/* SPOTS CONTADOR WIDGET */}
+            <div className="bg-white border-[0.5px] border-[#E5E5E5] rounded-card-outer p-6 sm:p-8 flex flex-col justify-between shadow-sm relative group overflow-hidden hover:border-[#FF5C00] transition-all">
+               <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                     <span 
+                       style={{
+                         fontFamily: 'var(--font-dm-mono), DM Mono, monospace',
+                         fontSize: '11px',
+                         color: '#9B9B93',
+                         textTransform: 'uppercase'
+                       }}
+                     >
+                       Le Compteur Spots
+                     </span>
+                     <Store size={16} className="text-[#FF5C00]" />
+                  </div>
+
+                  {latestSpotEvent ? (
+                    <div className="space-y-3">
+                      <div>
+                        <h4 className="text-xs font-mono font-bold uppercase text-neutral-400">Dernier run chez</h4>
+                        <h3 className="text-[20px] font-display italic font-black text-black uppercase leading-tight">
+                          {latestSpotEvent.spot?.name || 'Partner Spot'}
+                        </h3>
+                        <p className="text-[9px] font-mono text-neutral-400 mt-0.5">
+                          {new Date(latestSpotEvent.event_date).toLocaleDateString('fr-FR')}
+                        </p>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4 border-t border-black/5 pt-3 text-[10px] font-mono font-bold text-neutral-500 uppercase">
+                        <div>
+                          <span className="text-[8px] text-neutral-400 block">Coureurs</span>
+                          <span className="text-black text-xs">{latestSpotEvent.checkin_count || 0}</span>
+                        </div>
+                        <div>
+                          <span className="text-[8px] text-neutral-400 block">Ta Part Club</span>
+                          <span className="text-[#FF5C00] text-xs">
+                            +{((latestSpotEvent.checkin_count || 0) * latestSpotEvent.offer_price_cents * latestSpotEvent.club_rate / 100).toFixed(2)}€
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="border-t border-black/5 pt-3">
+                        <span className="text-[8px] text-neutral-400 font-mono font-bold uppercase block">Cagnotte Spots totale</span>
+                        <span className="text-black text-base font-mono font-black">
+                          {formatPrice(club?.spots_balance_cents || 0)}
+                        </span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <p className="text-xs font-sans text-neutral-600 leading-relaxed">
+                        Boostez votre trésorerie club en terminant vos runs dans un commerce partenaire. Les coureurs prépaient en ligne, le club gagne 12.5% !
+                      </p>
+                      <Link 
+                        href="/spots/explorer"
+                        className="text-xs font-mono font-bold text-[#FF5C00] hover:underline"
+                      >
+                        → Explorer les spots
+                      </Link>
+                    </div>
+                  )}
+               </div>
+
+               {latestSpotEvent && (
+                 <div className="border-t border-black/5 pt-4 mt-5 flex justify-end">
+                   <Link
+                     href="/spots/events"
+                     className="text-[10px] font-mono font-black uppercase text-black hover:text-[#FF5C00]"
+                   >
+                     Gérer mes Spots →
+                   </Link>
+                 </div>
+               )}
+            </div>
  
         </div>
       </div>

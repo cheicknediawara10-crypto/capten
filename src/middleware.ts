@@ -70,7 +70,10 @@ export async function middleware(request: NextRequest) {
     '/settings',
     '/cagnotte',
     '/avantages',
-    '/social-wall'
+    '/social-wall',
+    '/spots/explorer',
+    '/spots/events',
+    '/spots/scan'
   ]
 
   const isProtectedPath = protectedPaths.some((path) =>

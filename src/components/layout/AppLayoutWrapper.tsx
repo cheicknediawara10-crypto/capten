@@ -29,7 +29,11 @@ export default function AppLayoutWrapper({ children }: AppLayoutWrapperProps) {
     cleanPath.startsWith("/runners/manage") ||
     cleanPath.startsWith("/securite/signaler") ||
     cleanPath.startsWith("/cagnotte/contribuer") ||
-    cleanPath.startsWith("/cagnotte/sponsor");
+    cleanPath.startsWith("/cagnotte/sponsor") ||
+    (cleanPath.startsWith("/spots") && 
+     !cleanPath.startsWith("/spots/explorer") && 
+     !cleanPath.startsWith("/spots/events") && 
+     !cleanPath.startsWith("/spots/scan"));
 
   if (isPublicPage) {
     return (

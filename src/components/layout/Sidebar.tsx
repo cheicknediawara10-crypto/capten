@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { 
-  Map, Users, Globe, Wallet, 
+  Map, Users, Globe, Wallet, Store,
   BarChart3, Sparkles, Ticket, ShieldCheck, 
   LogOut, Zap, LayoutDashboard, Settings,
   MessageSquare, CreditCard, Shield, Plus, History, CloudRain, Wind, Droplets, Activity, Lock, PlayCircle
@@ -49,6 +49,7 @@ export default function Sidebar() {
       title: "TERRAIN",
       items: [
         { name: "Cagnotte", icon: <Wallet size={18} strokeWidth={1.5} />, href: "/cagnotte" },
+        { name: "Spots", icon: <Store size={18} strokeWidth={1.5} />, href: "/spots/explorer" },
         { name: "Protection", icon: <ShieldCheck size={18} strokeWidth={1.5} />, href: "/securite" },
       ]
     },
