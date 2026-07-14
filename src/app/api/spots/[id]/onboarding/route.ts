@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { stripe } from '@/lib/stripe';
-import { MOCK_SPOTS } from '../../route';
+import { MOCK_SPOTS } from '@/lib/spots';
 
 export const dynamic = 'force-dynamic';
 

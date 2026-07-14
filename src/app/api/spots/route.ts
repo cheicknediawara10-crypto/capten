@@ -1,58 +1,9 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { getAuthenticatedCaptainId } from '@/lib/auth-server';
-import { Spot } from '@/lib/spots';
+import { Spot, MOCK_SPOTS } from '@/lib/spots';
 
 export const dynamic = 'force-dynamic';
-
-// Données de simulation pour le développement local ou en mode mock
-export const MOCK_SPOTS: Spot[] = [
-  {
-    id: 'spot-1-mock',
-    name: 'Blondy Coffee',
-    address: '12 Rue de la Lune, 75002 Paris',
-    neighborhood: 'Sentier / 2ème',
-    contact_email: 'hello@blondy.cafe',
-    contact_phone: '0142345678',
-    capacity: 40,
-    offer_description: 'Café filtre + Part de banana bread maison',
-    offer_price_cents: 600,
-    availability: { sat: ['morning'], sun: ['morning'], wed: ['afternoon'] },
-    stripe_account_id: 'acct_1mock123',
-    status: 'active',
-    created_at: new Date().toISOString()
-  },
-  {
-    id: 'spot-2-mock',
-    name: 'The French Bastards',
-    address: '181 Rue Saint-Denis, 75002 Paris',
-    neighborhood: 'Saint-Denis / 2ème',
-    contact_email: 'contact@tfb.com',
-    contact_phone: '0142348899',
-    capacity: 30,
-    offer_description: 'Double Espresso + Croissant au beurre AOP',
-    offer_price_cents: 500,
-    availability: { sat: ['morning'], sun: ['morning'] },
-    stripe_account_id: null,
-    status: 'active',
-    created_at: new Date().toISOString()
-  },
-  {
-    id: 'spot-3-mock',
-    name: 'Café de Flore',
-    address: '172 Boulevard Saint-Germain, 75006 Paris',
-    neighborhood: 'Saint-Germain / 6ème',
-    contact_email: 'flore@cafe.fr',
-    contact_phone: '0145485526',
-    capacity: 50,
-    offer_description: 'Chocolat chaud spécial + Viennoiserie au choix',
-    offer_price_cents: 1200,
-    availability: { tue: ['morning'], thu: ['morning'] },
-    stripe_account_id: 'acct_2mock123',
-    status: 'pending',
-    created_at: new Date().toISOString()
-  }
-];
 
 // GET /api/spots — Lister les commerces (filtrés par quartier)
 export async function GET(request: Request) {

@@ -138,3 +138,72 @@ export function verifySignedToken(eventId: string, action: 'accept' | 'decline',
     return false;
   }
 }
+
+// Données de simulation pour le développement local ou en mode mock
+export const MOCK_SPOTS: Spot[] = [
+  {
+    id: 'spot-1-mock',
+    name: 'Blondy Coffee',
+    address: '12 Rue de la Lune, 75002 Paris',
+    neighborhood: 'Sentier / 2ème',
+    contact_email: 'hello@blondy.cafe',
+    contact_phone: '0142345678',
+    capacity: 40,
+    offer_description: 'Café filtre + Part de banana bread maison',
+    offer_price_cents: 600,
+    availability: { sat: ['morning'], sun: ['morning'], wed: ['afternoon'] },
+    stripe_account_id: 'acct_1mock123',
+    status: 'active',
+    created_at: new Date().toISOString()
+  },
+  {
+    id: 'spot-2-mock',
+    name: 'The French Bastards',
+    address: '181 Rue Saint-Denis, 75002 Paris',
+    neighborhood: 'Saint-Denis / 2ème',
+    contact_email: 'contact@tfb.com',
+    contact_phone: '0142348899',
+    capacity: 30,
+    offer_description: 'Double Espresso + Croissant au beurre AOP',
+    offer_price_cents: 500,
+    availability: { sat: ['morning'], sun: ['morning'] },
+    stripe_account_id: null,
+    status: 'active',
+    created_at: new Date().toISOString()
+  },
+  {
+    id: 'spot-3-mock',
+    name: 'Café de Flore',
+    address: '172 Boulevard Saint-Germain, 75006 Paris',
+    neighborhood: 'Saint-Germain / 6ème',
+    contact_email: 'flore@cafe.fr',
+    contact_phone: '0145485526',
+    capacity: 50,
+    offer_description: 'Chocolat chaud spécial + Viennoiserie au choix',
+    offer_price_cents: 1200,
+    availability: { tue: ['morning'], thu: ['morning'] },
+    stripe_account_id: 'acct_2mock123',
+    status: 'pending',
+    created_at: new Date().toISOString()
+  }
+];
+
+export const MOCK_SPOT_EVENTS: SpotEvent[] = [
+  {
+    id: 'event-1-mock',
+    spot_id: 'spot-1-mock',
+    club_id: 'mock-captain-uuid',
+    event_date: '2026-07-18',
+    event_time: '10:00:00',
+    estimated_runners: 35,
+    quota: 40,
+    offer_price_cents: 600,
+    merchant_rate: 0.75,
+    club_rate: 0.125,
+    platform_rate: 0.125,
+    public_slug: 'paris-run-club-chez-blondy-coffee-20260718-abcd',
+    status: 'on_sale',
+    checkin_count: 0,
+    created_at: new Date().toISOString()
+  }
+];

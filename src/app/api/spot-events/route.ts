@@ -1,31 +1,10 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { getAuthenticatedCaptainId } from '@/lib/auth-server';
-import { SpotEvent, generatePublicSlug, generateSignedLink } from '@/lib/spots';
+import { SpotEvent, generatePublicSlug, generateSignedLink, MOCK_SPOTS, MOCK_SPOT_EVENTS } from '@/lib/spots';
 import { resend } from '@/lib/resend';
-import { MOCK_SPOTS } from '../spots/route';
 
 export const dynamic = 'force-dynamic';
-
-export const MOCK_SPOT_EVENTS: SpotEvent[] = [
-  {
-    id: 'event-1-mock',
-    spot_id: 'spot-1-mock',
-    club_id: 'mock-captain-uuid',
-    event_date: '2026-07-18',
-    event_time: '10:00:00',
-    estimated_runners: 35,
-    quota: 40,
-    offer_price_cents: 600,
-    merchant_rate: 0.75,
-    club_rate: 0.125,
-    platform_rate: 0.125,
-    public_slug: 'paris-run-club-chez-blondy-coffee-20260718-abcd',
-    status: 'on_sale',
-    checkin_count: 0,
-    created_at: new Date().toISOString()
-  }
-];
 
 // GET /api/spot-events — Liste des événements d'un club
 export async function GET(request: Request) {
