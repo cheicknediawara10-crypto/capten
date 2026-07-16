@@ -253,7 +253,7 @@ export default function VictoryChecklist({
               🎉 FÉLICITATIONS, TON RUN CLUB EST PRÊT !
             </p>
             <p className="text-[9px] font-bold text-[#71717A] uppercase tracking-widest leading-relaxed mt-1">
-              Les fondations sont posées. Tu peux maintenant fermer cette checklist pour libérer de l'espace.
+              {"Les fondations sont posées. Tu peux maintenant fermer cette checklist pour libérer de l'espace."}
             </p>
           </div>
           <button

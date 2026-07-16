@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { Bot, MessageSquare, Send, Sparkles, X, RefreshCw, Check, ArrowRight, Lock, Copy, RotateCcw, Info } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
@@ -43,25 +43,41 @@ export default function CopilotDrawer() {
   }, [messages, sending]);
 
   // Load chat limits and alerts status on mount
-  const fetchQuota = async () => {
-    if (isFreePlan) return;
-    try {
-      const res = await fetch('/api/copilot');
-      if (res.ok) {
-        const data = await res.json();
-        setChatCallsCount(data.chatCallsCount || 0);
-        if (data.chatCallsCount >= 20) {
-          setLimitExceeded(true);
-        }
-      }
-    } catch (e) {
-      console.error('Error fetching quota:', e);
-    }
-  };
-
   useEffect(() => {
+    if (isFreePlan) return;
+    async function fetchQuota() {
+      try {
+        const res = await fetch('/api/copilot');
+        if (res.ok) {
+          const data = await res.json();
+          setChatCallsCount(data.chatCallsCount || 0);
+          if (data.chatCallsCount >= 20) {
+            setLimitExceeded(true);
+          }
+        }
+      } catch (e) {
+        console.error('Error fetching quota:', e);
+      }
+    }
     fetchQuota();
-  }, [club?.stripe_plan]);
+  }, [club?.stripe_plan, isFreePlan]);
+
+  const dismissAlert = useCallback(async (alertId: string) => {
+    if (isMock) {
+      window.dispatchEvent(new CustomEvent('refresh-copilot-alerts'));
+      return;
+    }
+    try {
+      await fetch('/api/copilot/alerts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'dismiss', alertId })
+      });
+      window.dispatchEvent(new CustomEvent('refresh-copilot-alerts'));
+    } catch (err) {
+      console.error('Failed to dismiss alert:', err);
+    }
+  }, [isMock]);
 
   // Event Listeners for drawer control
   useEffect(() => {
@@ -140,24 +156,7 @@ export default function CopilotDrawer() {
       window.removeEventListener('toggle-copilot-drawer', handleToggle);
       window.removeEventListener('open-copilot', handleOpen);
     };
-  }, [club?.stripe_plan]);
-
-  const dismissAlert = async (alertId: string) => {
-    if (isMock) {
-      window.dispatchEvent(new CustomEvent('refresh-copilot-alerts'));
-      return;
-    }
-    try {
-      await fetch('/api/copilot/alerts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'dismiss', alertId })
-      });
-      window.dispatchEvent(new CustomEvent('refresh-copilot-alerts'));
-    } catch (err) {
-      console.error('Failed to dismiss alert:', err);
-    }
-  };
+  }, [dismissAlert, isFreePlan]);
 
   const handleSendMessage = async (textToSend?: string) => {
     const text = textToSend || inputMessage;
@@ -347,7 +346,7 @@ export default function CopilotDrawer() {
               <div className="flex-1 space-y-4">
                 {messages.length === 0 && !activeAction && (
                   <div className="text-center py-8 text-neutral-500 text-xs font-semibold max-w-xs mx-auto">
-                    👋 Salut Capten ! Besoin d'aide pour rédiger un message, motiver le crew ou gérer un imprévu ? Choisis une action rapide ci-dessous ou pose-moi une question en texte libre.
+                    {"👋 Salut Capten ! Besoin d'aide pour rédiger un message, motiver le crew ou gérer un imprévu ? Choisis une action rapide ci-dessous ou pose-moi une question en texte libre."}
                   </div>
                 )}
 
@@ -414,7 +413,7 @@ export default function CopilotDrawer() {
 
                   {activeAction === 'rediger_message' && (
                     <div className="space-y-1">
-                      <label className="text-[9px] font-mono font-black uppercase text-neutral-400">Objet de l'annonce</label>
+                      <label className="text-[9px] font-mono font-black uppercase text-neutral-400">{"Objet de l'annonce"}</label>
                       <textarea
                         value={inputs.context}
                         onChange={(e) => setInputs(prev => ({ ...prev, context: e.target.value }))}
