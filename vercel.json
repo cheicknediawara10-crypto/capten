@@ -39,7 +39,7 @@
   "crons": [
     {
       "path": "/api/cron/close-run",
-      "schedule": "0 * * * *"
+      "schedule": "0 1 * * *"
     },
     {
       "path": "/api/cron/copilot-detection",
@@ -47,7 +47,7 @@
     },
     {
       "path": "/api/cron/spots",
-      "schedule": "0 * * * *"
+      "schedule": "0 3 * * *"
     }
   ]
 }
