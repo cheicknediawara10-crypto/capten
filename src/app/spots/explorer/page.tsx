@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { Store, MapPin, Coffee, Users, ChevronRight, Filter } from 'lucide-react';
 import { formatPrice } from '@/lib/supabase';
@@ -21,10 +22,65 @@ const NEIGHBORHOODS = [
 ];
 
 export default function SpotsExplorerPage() {
-  const { club } = useAuth();
+  const { club, refreshClub } = useAuth();
+  const router = useRouter();
   const [spots, setSpots] = useState<Spot[]>([]);
   const [selectedNeighborhood, setSelectedNeighborhood] = useState('Tous');
   const [loading, setLoading] = useState(true);
+
+  // Suggestion form states
+  const [suggestedName, setSuggestedName] = useState('');
+  const [suggestedContact, setSuggestedContact] = useState('');
+  const [suggestedAddress, setSuggestedAddress] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [successMsg, setSuccessMsg] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
+
+  const handleSuggestSpot = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!suggestedName) return;
+
+    try {
+      setSubmitting(true);
+      setSuccessMsg('');
+      setErrorMsg('');
+
+      const res = await fetch('/api/spot-suggestions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: suggestedName,
+          contact: suggestedContact,
+          address: suggestedAddress
+        })
+      });
+
+      if (res.ok) {
+        setSuccessMsg('Merci pour ta suggestion !');
+        setSuggestedName('');
+        setSuggestedContact('');
+        setSuggestedAddress('');
+      } else {
+        const data = await res.json();
+        setErrorMsg(data.error || 'Erreur lors de l\'envoi.');
+      }
+    } catch (err) {
+      setErrorMsg('Erreur réseau.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('onboarding_success') === 'true') {
+      if (urlParams.get('mock_connect') === 'true') {
+        localStorage.setItem('capten_stripe_connect_id', 'acct_mock_connect_123');
+      }
+      refreshClub();
+      router.replace('/spots/explorer');
+    }
+  }, [router, refreshClub]);
 
   useEffect(() => {
     async function loadSpots() {
@@ -77,7 +133,7 @@ export default function SpotsExplorerPage() {
           💡 Comment ça marche ?
         </h3>
         <p className="text-xs font-sans text-neutral-600 leading-relaxed">
-          Sélectionnez un café ou coffee shop partenaire dans la liste ci-dessous, proposez une date de fin de run, et partagez le lien de vente à vos coureurs. Le commerce prépare l'offre, et vous touchez <strong>12.5% de commission</strong> reversée directement dans votre cagnotte !
+          Sélectionnez un café ou coffee shop partenaire dans la liste ci-dessous, proposez une date de fin de run, et partagez le lien de vente à vos coureurs. Le commerce prépare l'offre, et vous touchez <strong>10% de commission</strong> (sur la première visite de chaque coureur) reversée directement dans votre cagnotte !
         </p>
       </div>
 
@@ -108,9 +164,65 @@ export default function SpotsExplorerPage() {
           <p className="text-[10px] font-mono font-bold uppercase tracking-wider text-neutral-400 mt-4">Chargement des commerces...</p>
         </div>
       ) : spots.length === 0 ? (
-        <div className="linear-card text-center py-16 space-y-3">
-          <Store size={36} className="text-neutral-300 mx-auto" />
-          <p className="text-xs font-mono font-bold text-neutral-500 uppercase">Aucun spot disponible pour ce quartier.</p>
+        <div className="linear-card bg-[#FDFCF8] border border-black/10 rounded-[12px] p-8 text-center max-w-xl mx-auto space-y-6">
+          <Store size={44} className="text-[#FF5C00] mx-auto animate-pulse" />
+          <div className="space-y-2">
+            <h2 className="text-lg font-display italic font-black uppercase text-black leading-tight tracking-tight">
+              Aucun spot dans ton quartier pour l'instant.
+            </h2>
+            <p className="text-xs font-sans text-neutral-500 max-w-md mx-auto">
+              Tu connais un café ou coffee shop sympa où ton crew finit ses runs ? Suggère-le nous et on s'occupe de le contacter !
+            </p>
+          </div>
+
+          <div className="bg-white border border-black/5 p-4 rounded-xl text-center space-y-1">
+            <p className="text-[10px] font-mono font-bold uppercase tracking-wider text-neutral-400">Projection estimée</p>
+            <p className="text-sm font-sans font-bold text-[#FF5C00]">
+              Un run de 40 coureurs ≈ 24 € accumulés pour ton crew !
+            </p>
+          </div>
+
+          <form onSubmit={handleSuggestSpot} className="space-y-4 pt-4 border-t border-black/5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <input
+                type="text"
+                placeholder="Nom du commerce"
+                required
+                value={suggestedName}
+                onChange={e => setSuggestedName(e.target.value)}
+                className="w-full bg-white border border-black/10 rounded-lg px-3 py-2 text-xs font-sans placeholder-neutral-400 focus:outline-none focus:border-[#FF5C00]"
+              />
+              <input
+                type="text"
+                placeholder="Contact ou Lien Instagram"
+                value={suggestedContact}
+                onChange={e => setSuggestedContact(e.target.value)}
+                className="w-full bg-white border border-black/10 rounded-lg px-3 py-2 text-xs font-sans placeholder-neutral-400 focus:outline-none focus:border-[#FF5C00]"
+              />
+            </div>
+            <input
+              type="text"
+              placeholder="Adresse ou Ville"
+              value={suggestedAddress}
+              onChange={e => setSuggestedAddress(e.target.value)}
+              className="w-full bg-white border border-black/10 rounded-lg px-3 py-2 text-xs font-sans placeholder-neutral-400 focus:outline-none focus:border-[#FF5C00]"
+            />
+            
+            <button
+              type="submit"
+              disabled={submitting}
+              className="w-full bg-[#FF5C00] text-white py-2.5 rounded-lg text-[10px] font-mono font-black uppercase tracking-widest hover:bg-black transition-all active:scale-95 disabled:opacity-50"
+            >
+              {submitting ? 'Envoi...' : 'Suggérer un commerce'}
+            </button>
+            
+            {successMsg && (
+              <p className="text-[10px] font-mono font-bold text-green-600 uppercase tracking-wider">{successMsg}</p>
+            )}
+            {errorMsg && (
+              <p className="text-[10px] font-mono font-bold text-red-600 uppercase tracking-wider">{errorMsg}</p>
+            )}
+          </form>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

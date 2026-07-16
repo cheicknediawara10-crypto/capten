@@ -32,6 +32,7 @@ export interface ClubData {
   stripe_plan?: string;
   stripe_subscription_status?: string;
   spots_balance_cents?: number;
+  stripe_connect_id?: string | null;
 }
 
 interface AuthContextType {
@@ -76,7 +77,8 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
           branding: data.branding || {},
           stripe_plan: data.stripe_plan || 'GRATUIT',
           stripe_subscription_status: data.stripe_subscription_status || 'inactive',
-          spots_balance_cents: data.spots_balance_cents || 0
+          spots_balance_cents: data.spots_balance_cents || 0,
+          stripe_connect_id: data.stripe_connect_id || null
         });
       } else {
         // Auto-create club if missing
@@ -102,7 +104,8 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
             branding: {},
             stripe_plan: newClub.stripe_plan || 'GRATUIT',
             stripe_subscription_status: newClub.stripe_subscription_status || 'inactive',
-            spots_balance_cents: 0
+            spots_balance_cents: 0,
+            stripe_connect_id: null
           });
         }
       }
@@ -170,7 +173,8 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
           branding,
           stripe_plan: localStorage.getItem('capten_plan') || 'GRATUIT',
           stripe_subscription_status: localStorage.getItem('capten_plan') === 'CAPTEN' ? 'active' : 'inactive',
-          spots_balance_cents: parseInt(localStorage.getItem('capten_spots_balance_cents') || '21850', 10)
+          spots_balance_cents: parseInt(localStorage.getItem('capten_spots_balance_cents') || '21850', 10),
+          stripe_connect_id: localStorage.getItem('capten_stripe_connect_id') || 'acct_mock_connect_123'
         });
       } else {
         setUser(null);

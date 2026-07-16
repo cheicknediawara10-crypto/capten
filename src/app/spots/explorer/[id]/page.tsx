@@ -30,6 +30,7 @@ export default function SpotDetailPage() {
   const [estimatedRunners, setEstimatedRunners] = useState(25);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [proposalSuccess, setProposalSuccess] = useState(false);
+  const [showIbanModal, setShowIbanModal] = useState(false);
 
   useEffect(() => {
     async function loadSpot() {
@@ -53,6 +54,12 @@ export default function SpotDetailPage() {
   const handlePropose = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!eventDate || !eventTime) return;
+
+    if (!club?.stripe_connect_id) {
+      setShowIbanModal(true);
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -258,6 +265,56 @@ export default function SpotDetailPage() {
           )}
         </div>
       </div>
+      
+      {/* Modal Filtre IBAN */}
+      {showIbanModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="bg-[#FDFCF8] border-2 border-black max-w-md w-full mx-4 p-8 rounded-none relative space-y-6">
+            <button
+              onClick={() => setShowIbanModal(false)}
+              className="absolute top-4 right-4 text-xs font-mono font-bold uppercase tracking-wider text-neutral-400 hover:text-black"
+            >
+              Fermer ×
+            </button>
+
+            <div className="space-y-2 text-center">
+              <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#FF5C00] block">
+                Stripe Connect requis
+              </span>
+              <h2 className="text-2xl font-display italic font-black uppercase text-black leading-tight tracking-tight">
+                Avant de réserver ton premier spot
+              </h2>
+            </div>
+
+            <p className="text-xs font-sans text-neutral-600 leading-relaxed text-center">
+              Ton club touche <strong>10 % de commission</strong> sur chaque coureur présent.<br />
+              Pour recevoir cette cagnotte, configure ton compte d'encaissement.
+            </p>
+
+            <div className="bg-white border border-black/5 p-4 text-center">
+              <p className="text-[10px] font-mono font-bold uppercase tracking-wider text-neutral-400">
+                ⚡️ Stripe Connect — 2 min, IBAN requis
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              <a
+                href="/api/club/onboarding"
+                className="w-full bg-[#FF5C00] text-white py-3.5 text-[11px] font-mono font-black uppercase tracking-widest hover:bg-black transition-all active:scale-95 text-center block"
+              >
+                Configurer mon compte
+              </a>
+              
+              <button
+                onClick={() => setShowIbanModal(false)}
+                className="w-full bg-transparent text-neutral-400 py-2 text-[9px] font-mono font-bold uppercase tracking-widest hover:text-black transition-all text-center block"
+              >
+                Plus tard
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

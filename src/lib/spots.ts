@@ -28,7 +28,7 @@ export interface SpotEvent {
   estimated_runners: number;
   quota: number;
   offer_price_cents: number;
-  merchant_rate: number;
+  merchant_rate?: number;
   club_rate: number;
   platform_rate: number;
   public_slug: string;
@@ -44,9 +44,27 @@ export interface SpotTicket {
   runner_name: string | null;
   qr_token: string;
   amount_cents: number;
+  is_first_visit: boolean;
+  commission_applied: boolean;
   stripe_payment_intent_id: string;
   status: 'paid' | 'redeemed' | 'refunded';
   redeemed_at: string | null;
+  created_at: string;
+}
+
+export interface RunnerVisit {
+  runner_email: string;
+  spot_id: string;
+  first_visit_at: string;
+}
+
+export interface SpotSuggestion {
+  id: string;
+  club_id: string;
+  suggested_name: string;
+  suggested_contact: string | null;
+  suggested_address: string | null;
+  notes: string | null;
   created_at: string;
 }
 
@@ -79,13 +97,20 @@ export function generateQrToken(): string {
  */
 export function calculateSplit(
   amountCents: number,
-  merchantRate: number = 0.75,
-  clubRate: number = 0.125,
-  platformRate: number = 0.125
+  clubRate: number = 0.10,
+  platformRate: number = 0.05,
+  commissionApplied: boolean = true
 ) {
-  const merchantAmount = Math.round(amountCents * merchantRate);
+  if (!commissionApplied) {
+    return {
+      merchantAmount: amountCents,
+      clubAmount: 0,
+      platformAmount: 0
+    };
+  }
   const clubAmount = Math.round(amountCents * clubRate);
-  const platformAmount = amountCents - merchantAmount - clubAmount;
+  const platformAmount = Math.round(amountCents * platformRate);
+  const merchantAmount = amountCents - clubAmount - platformAmount;
   return {
     merchantAmount,
     clubAmount,
@@ -198,9 +223,8 @@ export const MOCK_SPOT_EVENTS: SpotEvent[] = [
     estimated_runners: 35,
     quota: 40,
     offer_price_cents: 600,
-    merchant_rate: 0.75,
-    club_rate: 0.125,
-    platform_rate: 0.125,
+    club_rate: 0.10,
+    platform_rate: 0.05,
     public_slug: 'paris-run-club-chez-blondy-coffee-20260718-abcd',
     status: 'on_sale',
     checkin_count: 0,

@@ -117,6 +117,8 @@ export async function POST(request: Request) {
         const runnerName = paymentIntent.metadata.runner_name;
         const amountCents = paymentIntent.amount;
         const paymentIntentId = paymentIntent.id;
+        const isFirstVisit = paymentIntent.metadata?.is_first_visit !== 'false';
+        const commissionApplied = paymentIntent.metadata?.commission_applied !== 'false';
 
         const supabase = getSupabaseAdmin();
         if (supabase) {
@@ -131,7 +133,9 @@ export async function POST(request: Request) {
               qr_token: qrToken,
               amount_cents: amountCents,
               stripe_payment_intent_id: paymentIntentId,
-              status: 'paid'
+              status: 'paid',
+              is_first_visit: isFirstVisit,
+              commission_applied: commissionApplied
             }])
             .select('*, spot_events(*, spot:spots(*), club:clubs(*))')
             .maybeSingle();
@@ -140,6 +144,24 @@ export async function POST(request: Request) {
             console.error('[Webhook Error] Failed to create spot ticket:', ticketError);
           } else if (ticket) {
             console.log(`[Webhook Success] Ticket created: ${ticket.id} for runner: ${runnerEmail}`);
+            
+            // Si c'est une première visite, on l'enregistre dans l'historique
+            if (isFirstVisit) {
+              const spotId = ticket.spot_events?.spot_id;
+              if (spotId) {
+                const { error: visitError } = await supabase
+                  .from('runner_visits')
+                  .insert([{
+                    runner_email: runnerEmail,
+                    spot_id: spotId
+                  }]);
+                if (visitError) {
+                  console.error('[Webhook Error] Failed to register runner visit:', visitError);
+                } else {
+                  console.log(`[Webhook Success] Registered first visit of ${runnerEmail} at spot ${spotId}`);
+                }
+              }
+            }
             
             // Envoyer l'email avec le QR Code
             const spotName = ticket.spot_events?.spot?.name || 'Commerce';

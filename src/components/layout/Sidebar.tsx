@@ -7,7 +7,8 @@ import {
   Map, Users, Globe, Wallet, Store,
   BarChart3, Sparkles, Ticket, ShieldCheck, 
   LogOut, Zap, LayoutDashboard, Settings,
-  MessageSquare, CreditCard, Shield, Plus, History, CloudRain, Wind, Droplets, Activity, Lock, PlayCircle
+  MessageSquare, CreditCard, Shield, Plus, History, CloudRain, Wind, Droplets, Activity, Lock, PlayCircle,
+  Calendar, TrendingUp
 } from "lucide-react";
 import { logout } from "@/app/login/actions";
 
@@ -49,7 +50,9 @@ export default function Sidebar() {
       title: "TERRAIN",
       items: [
         { name: "Cagnotte", icon: <Wallet size={18} strokeWidth={1.5} />, href: "/cagnotte" },
-        { name: "Spots", icon: <Store size={18} strokeWidth={1.5} />, href: "/spots/explorer" },
+        { name: "Spots (Explorer)", icon: <Store size={18} strokeWidth={1.5} />, href: "/spots/explorer" },
+        { name: "Spots (Événements)", icon: <Calendar size={18} strokeWidth={1.5} />, href: "/spots/events" },
+        { name: "Le Compteur", icon: <TrendingUp size={18} strokeWidth={1.5} />, href: "/spots/compteur" },
         { name: "Protection", icon: <ShieldCheck size={18} strokeWidth={1.5} />, href: "/securite" },
       ]
     },

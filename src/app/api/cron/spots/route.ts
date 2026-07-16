@@ -87,20 +87,36 @@ async function handleCron(request: Request) {
           // 2. Récupérer tous les billets vendus payés ('paid' ou 'redeemed')
           const { data: tickets } = await supabase
             .from('spot_tickets')
-            .select('amount_cents')
+            .select('amount_cents, is_first_visit, commission_applied')
             .eq('spot_event_id', event.id)
             .in('status', ['paid', 'redeemed']);
 
           const totalSalesCents = (tickets || []).reduce((acc, t) => acc + t.amount_cents, 0);
 
           if (totalSalesCents > 0) {
-            const splits = calculateSplit(totalSalesCents, event.merchant_rate, event.club_rate, event.platform_rate);
+            let merchantTotal = 0;
+            let clubTotal = 0;
+            let platformTotal = 0;
+
+            if (tickets) {
+              for (const ticket of tickets) {
+                const ticketSplits = calculateSplit(
+                  ticket.amount_cents,
+                  event.club_rate,
+                  event.platform_rate,
+                  ticket.commission_applied
+                );
+                merchantTotal += ticketSplits.merchantAmount;
+                clubTotal += ticketSplits.clubAmount;
+                platformTotal += ticketSplits.platformAmount;
+              }
+            }
 
             // 3. Créditer la cagnotte du club
             const currentBalance = event.club?.spots_balance_cents || 0;
             await supabase
               .from('clubs')
-              .update({ spots_balance_cents: currentBalance + splits.clubAmount })
+              .update({ spots_balance_cents: currentBalance + clubTotal })
               .eq('id', event.club_id);
 
             // 4. Récupérer l'email du fondateur pour le récap
@@ -131,7 +147,7 @@ async function handleCron(request: Request) {
                       <div style="background-color: #F4F5F7; padding: 15px; border-radius: 6px; margin: 20px 0;">
                         <p style="margin: 5px 0;">🎫 <strong>Formules prépayées :</strong> ${(tickets || []).length} vendues</p>
                         <p style="margin: 5px 0;">💰 <strong>Volume total généré :</strong> ${(totalSalesCents / 100).toFixed(2)}€</p>
-                        <p style="margin: 5px 0; font-size: 16px; color: #FF5C00;">💸 <strong>Votre reversement net (75%) :</strong> <strong>${(splits.merchantAmount / 100).toFixed(2)}€</strong></p>
+                        <p style="margin: 5px 0; font-size: 16px; color: #FF5C00;">💸 <strong>Votre reversement net :</strong> <strong>${(merchantTotal / 100).toFixed(2)}€</strong></p>
                       </div>
                       
                       <p>Ce virement automatique sera crédité directement sur le compte bancaire configuré sur votre dashboard Stripe Connect sous 2 à 3 jours ouvrés.</p>
@@ -158,9 +174,9 @@ async function handleCron(request: Request) {
                       <p>Votre événement de running chez <strong>${spotName}</strong> est terminé.</p>
                       
                       <div style="background-color: #FDFCF8; border: 1px solid #E5E5E5; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center;">
-                        <span style="font-size: 12px; color: #888; text-transform: uppercase; font-weight: bold;">Ta part Club (12.5%)</span>
-                        <h1 style="color: #111; font-size: 36px; margin: 10px 0;">+${(splits.clubAmount / 100).toFixed(2)}€</h1>
-                        <p style="margin: 0; font-size: 13px; color: #666;">Cagnotte Spots totale : <strong>${((currentBalance + splits.clubAmount) / 100).toFixed(2)}€</strong></p>
+                        <span style="font-size: 12px; color: #888; text-transform: uppercase; font-weight: bold;">Ta part Club</span>
+                        <h1 style="color: #111; font-size: 36px; margin: 10px 0;">+${(clubTotal / 100).toFixed(2)}€</h1>
+                        <p style="margin: 0; font-size: 13px; color: #666;">Cagnotte Spots totale : <strong>${((currentBalance + clubTotal) / 100).toFixed(2)}€</strong></p>
                       </div>
 
                       <div style="font-size: 14px; color: #333; line-height: 1.5;">

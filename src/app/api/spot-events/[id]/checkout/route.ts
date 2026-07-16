@@ -75,9 +75,23 @@ export async function POST(
       }, { status: 400 });
     }
 
+    // Vérifier s'il s'agit de la première visite du coureur chez ce commerce
+    const { data: existingVisit, error: visitError } = await supabase
+      .from('runner_visits')
+      .select('*')
+      .eq('runner_email', runner_email)
+      .eq('spot_id', event.spot_id)
+      .maybeSingle();
+
+    if (visitError) {
+      console.error("[Checkout] Error checking runner visits:", visitError);
+    }
+
+    const isFirstVisit = !existingVisit;
     const amountCents = event.offer_price_cents;
-    // La commission totale prélevée (Part Club 12.5% + Part Capten 12.5% = 25% au total)
-    const platformRate = Number(event.club_rate) + Number(event.platform_rate);
+    
+    // Commission sur la PREMIÈRE visite uniquement (10% Club + 5% Capten = 15%). 0% sinon.
+    const platformRate = isFirstVisit ? (Number(event.club_rate || 0.10) + Number(event.platform_rate || 0.05)) : 0;
     const applicationFeeAmount = Math.round(amountCents * platformRate);
 
     // Créer le PaymentIntent Stripe avec transfert Direct Connect
@@ -94,6 +108,8 @@ export async function POST(
         spot_event_id: id,
         runner_email,
         runner_name,
+        is_first_visit: isFirstVisit ? 'true' : 'false',
+        commission_applied: (isFirstVisit && applicationFeeAmount > 0) ? 'true' : 'false',
       },
     });
 
