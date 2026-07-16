@@ -8,23 +8,12 @@ import { Store, MapPin, Coffee, Users, ChevronRight, Filter } from 'lucide-react
 import { formatPrice } from '@/lib/supabase';
 import { Spot } from '@/lib/spots';
 
-const NEIGHBORHOODS = [
-  'Tous',
-  'Sentier / 2ème',
-  'Saint-Denis / 2ème',
-  'Le Marais / 3ème',
-  'Châtelet / 1er',
-  'Montmartre / 18ème',
-  'Saint-Germain / 6ème',
-  'Bastille / 11ème',
-  'Canal Saint-Martin / 10ème',
-  'Pigalle / 9ème'
-];
-
 export default function SpotsExplorerPage() {
   const { club, refreshClub } = useAuth();
   const router = useRouter();
   const [spots, setSpots] = useState<Spot[]>([]);
+  const [allSpots, setAllSpots] = useState<Spot[]>([]);
+  const [neighborhoods, setNeighborhoods] = useState<string[]>(['Tous']);
   const [selectedNeighborhood, setSelectedNeighborhood] = useState('Tous');
   const [loading, setLoading] = useState(true);
 
@@ -83,17 +72,19 @@ export default function SpotsExplorerPage() {
   }, [router, refreshClub]);
 
   useEffect(() => {
-    async function loadSpots() {
+    async function loadAllSpots() {
       try {
         setLoading(true);
-        const url = selectedNeighborhood === 'Tous'
-          ? '/api/spots'
-          : `/api/spots?neighborhood=${encodeURIComponent(selectedNeighborhood)}`;
-        
-        const res = await fetch(url);
+        const res = await fetch('/api/spots');
         if (res.ok) {
           const data = await res.json();
-          setSpots(data.filter((s: Spot) => s.status === 'active'));
+          const activeSpots = data.filter((s: Spot) => s.status === 'active');
+          setAllSpots(activeSpots);
+          setSpots(activeSpots);
+
+          // Extraire dynamiquement les quartiers/villes uniques
+          const uniqueNeighborhoods = ['Tous', ...Array.from(new Set(activeSpots.map((s: Spot) => s.neighborhood).filter(Boolean)))];
+          setNeighborhoods(uniqueNeighborhoods as string[]);
         }
       } catch (err) {
         console.error('Failed to fetch spots:', err);
@@ -101,8 +92,17 @@ export default function SpotsExplorerPage() {
         setLoading(false);
       }
     }
-    loadSpots();
-  }, [selectedNeighborhood]);
+    loadAllSpots();
+  }, []);
+
+  // Filtrer localement sur changement de sélection
+  useEffect(() => {
+    if (selectedNeighborhood === 'Tous') {
+      setSpots(allSpots);
+    } else {
+      setSpots(allSpots.filter(s => s.neighborhood === selectedNeighborhood));
+    }
+  }, [selectedNeighborhood, allSpots]);
 
   return (
     <div className="space-y-8 pb-20 page-transition">
@@ -142,7 +142,7 @@ export default function SpotsExplorerPage() {
         <div className="text-[#A3A3A3] p-1.5 shrink-0">
           <Filter size={16} />
         </div>
-        {NEIGHBORHOODS.map(n => (
+        {neighborhoods.map(n => (
           <button
             key={n}
             onClick={() => setSelectedNeighborhood(n)}

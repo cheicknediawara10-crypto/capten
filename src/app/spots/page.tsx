@@ -3,18 +3,6 @@
 import React, { useState } from 'react';
 import { Store, Clock, Users, CheckCircle2, ArrowRight, Sparkles, MapPin } from 'lucide-react';
 
-const NEIGHBORHOODS = [
-  'Sentier / 2ème',
-  'Saint-Denis / 2ème',
-  'Le Marais / 3ème',
-  'Châtelet / 1er',
-  'Montmartre / 18ème',
-  'Saint-Germain / 6ème',
-  'Bastille / 11ème',
-  'Canal Saint-Martin / 10ème',
-  'Pigalle / 9ème'
-];
-
 const DAYS_OF_WEEK = [
   { id: 'mon', label: 'Lundi' },
   { id: 'tue', label: 'Mardi' },
@@ -36,7 +24,7 @@ export default function SpotsLandingPage() {
   const [formData, setFormData] = useState({
     name: '',
     address: '',
-    neighborhood: NEIGHBORHOODS[0],
+    neighborhood: '',
     contact_email: '',
     contact_phone: '',
     capacity: 30,
@@ -221,15 +209,16 @@ export default function SpotsLandingPage() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-neutral-500">Quartier / Arrondissement</label>
-                <select
+                <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-neutral-500">Ville / Quartier</label>
+                <input
+                  type="text"
                   name="neighborhood"
+                  required
                   value={formData.neighborhood}
                   onChange={handleInputChange}
+                  placeholder="ex: Lyon, Bordeaux, Marais / 3ème..."
                   className="w-full bg-[#F4F5F7] border border-black/10 rounded-md px-3.5 py-2.5 text-xs font-sans font-semibold focus:outline-none focus:border-[#FF5C00] focus:bg-white transition-all"
-                >
-                  {NEIGHBORHOODS.map(n => <option key={n} value={n}>{n}</option>)}
-                </select>
+                />
               </div>
             </div>
 
