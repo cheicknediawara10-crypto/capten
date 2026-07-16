@@ -315,7 +315,7 @@ export async function queryCopilotGuidedAction(
   }
 
   const geminiKey = process.env.GEMINI_API_KEY;
-  if (!geminiKey || geminiKey === 'votre_cle_gemini_ici' || geminiKey.trim() !== '') {
+  if (!geminiKey || geminiKey === 'votre_cle_gemini_ici' || geminiKey.trim() === '') {
     // Si pas de clé, on utilise le mock
     if (actionType === 'rediger_message') {
       return `Crew habituel ! 🏃 Ce soir, on court. Contexte : ${inputs.context}. Hâte de tous vous voir !`;

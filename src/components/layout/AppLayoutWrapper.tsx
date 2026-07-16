@@ -5,6 +5,8 @@ import { usePathname } from "next/navigation";
 import Sidebar from "@/components/layout/Sidebar";
 import MobileHeader from "@/components/layout/MobileHeader";
 import MobileNav from "@/components/layout/MobileNav";
+import CopilotBubble from "@/components/copilot/CopilotBubble";
+import CopilotDrawer from "@/components/copilot/CopilotDrawer";
 
 interface AppLayoutWrapperProps {
   children: React.ReactNode;
@@ -63,6 +65,10 @@ export default function AppLayoutWrapper({ children }: AppLayoutWrapperProps) {
         {/* Mobile Navigation Bar (Bottom) */}
         <MobileNav />
       </main>
+
+      {/* Copilote Persistant */}
+      <CopilotBubble />
+      <CopilotDrawer />
     </div>
   );
 }
