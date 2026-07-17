@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import NextLink from 'next/link';
 import { Calendar, Clock, MapPin, Coffee, Link, Share2, Clipboard, ChevronRight, Loader2, Sparkles, CheckCircle2, XCircle } from 'lucide-react';
 import { formatPrice } from '@/lib/supabase';
 import { SpotEvent } from '@/lib/spots';
@@ -71,14 +72,14 @@ export default function MySpotEventsPage() {
   return (
     <div className="space-y-8 pb-20 page-transition">
       {/* Header */}
-      <header className="flex flex-col gap-1.5 pb-6 border-b-[0.5px] border-black/10 mb-8">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 w-full">
+      <header className="flex flex-col gap-1.5 pb-0 border-b-[0.5px] border-black/10 mb-8">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 w-full pb-4">
           <div>
             <h1 className="text-[28px] sm:text-[42px] font-display italic font-black uppercase text-black leading-none tracking-tighter">
-              MES ÉVÉNEMENTS SPOTS
+              SPOTS PARTENAIRES
             </h1>
             <p className="text-[10px] font-bold text-[#A3A3A3] uppercase tracking-wider mt-1">
-              Suivi des réservations et des ventes
+              {"Marketplace commerces · Réservations · Suivi d'économie locale"}
             </p>
           </div>
           
@@ -88,6 +89,21 @@ export default function MySpotEventsPage() {
           >
             Rafraîchir
           </button>
+        </div>
+
+        {/* Tab Navigation */}
+        <div className="flex items-center gap-0 -mb-[1px]">
+          <NextLink
+            href="/spots/explorer"
+            className="px-5 py-2.5 text-[10px] font-mono font-black uppercase tracking-wider border-b-2 border-transparent text-[#A3A3A3] hover:text-black transition-all"
+          >
+            Explorer
+          </NextLink>
+          <span
+            className="px-5 py-2.5 text-[10px] font-mono font-black uppercase tracking-wider border-b-2 border-[#FF5C00] text-[#FF5C00] cursor-default"
+          >
+            {"Mes événements"}
+          </span>
         </div>
       </header>
 

@@ -851,7 +851,76 @@ export default function DashboardPage() {
 
       {/* COPILOT BRIEFING IA */}
       <CopilotBanner />
- 
+
+      {/* LE COMPTEUR — BLOC FLUX EN HAUT DU DASHBOARD */}
+      <div className="bg-white border-[0.5px] border-[#E5E5E5] rounded-card-outer p-6 sm:p-8 shadow-sm relative overflow-hidden">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 bg-[#FF5C00]/10 border border-[#FF5C00]/20 rounded-lg flex items-center justify-center">
+              <Store size={18} className="text-[#FF5C00]" />
+            </div>
+            <div>
+              <p className="text-[9px] font-black text-[#D1D1D1] uppercase tracking-[0.2em] italic">{"LE COMPTEUR"}</p>
+              <p className="text-[9px] font-mono text-[#A3A3A3] uppercase tracking-wider">{"Impact économique de ton crew"}</p>
+            </div>
+          </div>
+          <Link
+            href="/cagnotte"
+            className="text-[10px] font-mono font-black uppercase tracking-wider text-[#FF5C00] hover:text-black transition-all flex items-center gap-1.5"
+          >
+            Voir la cagnotte →
+          </Link>
+        </div>
+
+        {latestSpotEvent ? (
+          <div className="mt-5 border-t border-black/5 pt-5">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <div>
+                <p className="text-[20px] sm:text-[24px] font-display italic font-black uppercase text-black leading-none tracking-tight">
+                  {new Date(latestSpotEvent.event_date).toLocaleDateString('fr-FR', { weekday: 'long', day: '2-digit', month: '2-digit' }).toUpperCase()} — {latestSpotEvent.spot?.name || 'SPOT PARTENAIRE'}
+                </p>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 mt-4">
+              <div className="space-y-0.5">
+                <span className="text-[8px] font-mono font-bold uppercase tracking-wider text-[#A3A3A3] block">Coureurs présents</span>
+                <span className="text-xl font-mono font-black text-black">{latestSpotEvent.checkin_count || 0}</span>
+              </div>
+              <div className="space-y-0.5">
+                <span className="text-[8px] font-mono font-bold uppercase tracking-wider text-[#A3A3A3] block">{"€ Générés"}</span>
+                <span className="text-xl font-mono font-black text-black">
+                  {((latestSpotEvent.checkin_count || 0) * latestSpotEvent.offer_price_cents / 100).toFixed(2)} €
+                </span>
+              </div>
+              <div className="space-y-0.5">
+                <span className="text-[8px] font-mono font-bold uppercase tracking-wider text-[#FF5C00] block">Part Club</span>
+                <span className="text-xl font-mono font-black text-[#FF5C00]">
+                  +{((latestSpotEvent.checkin_count || 0) * latestSpotEvent.offer_price_cents * latestSpotEvent.club_rate / 100).toFixed(2)} €
+                </span>
+              </div>
+              <div className="space-y-0.5">
+                <span className="text-[8px] font-mono font-bold uppercase tracking-wider text-[#A3A3A3] block">Cagnotte Club</span>
+                <span className="text-xl font-mono font-black text-black">
+                  {formatPrice(club?.spots_balance_cents || 0)}
+                </span>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="mt-5 border-t border-black/5 pt-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <p className="text-[13px] font-sans text-neutral-500 leading-relaxed">
+              {"Ton premier run rapportera à ton crew. Lance-toi, et les chiffres suivront."}
+            </p>
+            <Link
+              href="/spots/explorer"
+              className="shrink-0 bg-black hover:bg-[#FF5C00] text-white px-5 py-2.5 rounded-control text-[10px] font-black uppercase tracking-wider transition-all"
+            >
+              Explorer les spots
+            </Link>
+          </div>
+        )}
+      </div>
+
       {/* TOP ROW: 4 MINIMALIST KPI CARDS */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         {/* Card 1: LE CREW */}
@@ -1092,81 +1161,7 @@ export default function DashboardPage() {
              </div>
            )}
 
-            {/* SPOTS CONTADOR WIDGET */}
-            <div className="bg-white border-[0.5px] border-[#E5E5E5] rounded-card-outer p-6 sm:p-8 flex flex-col justify-between shadow-sm relative group overflow-hidden hover:border-[#FF5C00] transition-all">
-               <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                     <span 
-                       style={{
-                         fontFamily: 'var(--font-dm-mono), DM Mono, monospace',
-                         fontSize: '11px',
-                         color: '#9B9B93',
-                         textTransform: 'uppercase'
-                       }}
-                     >
-                       Le Compteur Spots
-                     </span>
-                     <Store size={16} className="text-[#FF5C00]" />
-                  </div>
-
-                  {latestSpotEvent ? (
-                    <div className="space-y-3">
-                      <div>
-                        <h4 className="text-xs font-mono font-bold uppercase text-neutral-400">Dernier run chez</h4>
-                        <h3 className="text-[20px] font-display italic font-black text-black uppercase leading-tight">
-                          {latestSpotEvent.spot?.name || 'Partner Spot'}
-                        </h3>
-                        <p className="text-[9px] font-mono text-neutral-400 mt-0.5">
-                          {new Date(latestSpotEvent.event_date).toLocaleDateString('fr-FR')}
-                        </p>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-4 border-t border-black/5 pt-3 text-[10px] font-mono font-bold text-neutral-500 uppercase">
-                        <div>
-                          <span className="text-[8px] text-neutral-400 block">Coureurs</span>
-                          <span className="text-black text-xs">{latestSpotEvent.checkin_count || 0}</span>
-                        </div>
-                        <div>
-                          <span className="text-[8px] text-neutral-400 block">Ta Part Club</span>
-                          <span className="text-[#FF5C00] text-xs">
-                            +{((latestSpotEvent.checkin_count || 0) * latestSpotEvent.offer_price_cents * latestSpotEvent.club_rate / 100).toFixed(2)}€
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="border-t border-black/5 pt-3">
-                        <span className="text-[8px] text-neutral-400 font-mono font-bold uppercase block">Cagnotte Spots totale</span>
-                        <span className="text-black text-base font-mono font-black">
-                          {formatPrice(club?.spots_balance_cents || 0)}
-                        </span>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="space-y-2">
-                      <p className="text-xs font-sans text-neutral-600 leading-relaxed">
-                        Boostez votre trésorerie club en terminant vos runs dans un commerce partenaire. Les coureurs prépaient en ligne, le club gagne 12.5% !
-                      </p>
-                      <Link 
-                        href="/spots/explorer"
-                        className="text-xs font-mono font-bold text-[#FF5C00] hover:underline"
-                      >
-                        → Explorer les spots
-                      </Link>
-                    </div>
-                  )}
-               </div>
-
-               {latestSpotEvent && (
-                 <div className="border-t border-black/5 pt-4 mt-5 flex justify-end">
-                   <Link
-                     href="/spots/events"
-                     className="text-[10px] font-mono font-black uppercase text-black hover:text-[#FF5C00]"
-                   >
-                     Gérer mes Spots →
-                   </Link>
-                 </div>
-               )}
-            </div>
+            {/* LE COMPTEUR WIDGET — Supprimé, remonté en haut du dashboard */}
  
         </div>
       </div>

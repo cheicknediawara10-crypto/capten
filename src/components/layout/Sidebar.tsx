@@ -7,8 +7,7 @@ import {
   Map, Users, Globe, Wallet, Store,
   BarChart3, Sparkles, Ticket, ShieldCheck, 
   LogOut, Zap, LayoutDashboard, Settings,
-  MessageSquare, CreditCard, Shield, Plus, History, CloudRain, Wind, Droplets, Activity, Lock, PlayCircle,
-  Calendar, TrendingUp
+  MessageSquare, CreditCard, Shield, Plus, History, CloudRain, Wind, Droplets, Activity, Lock, PlayCircle
 } from "lucide-react";
 import { logout } from "@/app/login/actions";
 
@@ -49,10 +48,8 @@ export default function Sidebar() {
     {
       title: "TERRAIN",
       items: [
+        { name: "Spots", icon: <Store size={18} strokeWidth={1.5} />, href: "/spots/explorer" },
         { name: "Cagnotte", icon: <Wallet size={18} strokeWidth={1.5} />, href: "/cagnotte" },
-        { name: "Spots (Explorer)", icon: <Store size={18} strokeWidth={1.5} />, href: "/spots/explorer" },
-        { name: "Spots (Événements)", icon: <Calendar size={18} strokeWidth={1.5} />, href: "/spots/events" },
-        { name: "Le Compteur", icon: <TrendingUp size={18} strokeWidth={1.5} />, href: "/spots/compteur" },
         { name: "Protection", icon: <ShieldCheck size={18} strokeWidth={1.5} />, href: "/securite" },
       ]
     },
@@ -79,7 +76,7 @@ export default function Sidebar() {
             <p className="text-[10px] text-[#D1D1D1] font-black uppercase tracking-[0.3em] mb-4 px-8 italic">{section.title}</p>
             <div className="space-y-0.5">
               {section.items.map((item: any) => {
-                const isActive = pathname === item.href;
+                const isActive = pathname === item.href || (item.href === '/spots/explorer' && pathname.startsWith('/spots'));
                 const isStaticOrExternal = item.href.endsWith(".html") || item.href.startsWith("http");
                 
                 const content = (

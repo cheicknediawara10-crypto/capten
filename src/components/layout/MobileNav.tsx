@@ -62,7 +62,7 @@ export default function MobileNav() {
         className="flex items-center gap-6 overflow-x-auto scroll-smooth py-3 px-8 no-scrollbar w-full"
       >
         {items.map((item) => {
-          const isActive = pathname === item.href;
+          const isActive = pathname === item.href || (item.href === '/spots/explorer' && pathname.startsWith('/spots'));
           
           return (
             <Link 
