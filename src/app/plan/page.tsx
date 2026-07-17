@@ -19,6 +19,39 @@ export default function PlanPage() {
     stripe_subscription_status: 'inactive',
     subscription_ends_at: null
   });
+  const [variant, setVariant] = useState<'A' | 'B'>('A');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    // Check login status
+    const checkLogin = async () => {
+      try {
+        const supabase = getSupabase();
+        if (supabase) {
+          const { data: { user } } = await supabase.auth.getUser();
+          setIsLoggedIn(!!user);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    checkLogin();
+
+    // Assign A/B test variant
+    let assigned = localStorage.getItem('capten_signup_variant') as 'A' | 'B';
+    if (!assigned || !['A', 'B'].includes(assigned)) {
+      assigned = Math.random() < 0.5 ? 'A' : 'B';
+      localStorage.setItem('capten_signup_variant', assigned);
+    }
+    setVariant(assigned);
+
+    // Track pricing view
+    fetch('/api/ab-test/track', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ variant: assigned, page: 'pricing' }),
+    }).catch(err => console.error('Error tracking view:', err));
+  }, []);
 
   const handleCancelSubscription = async () => {
     const confirmMessage = "Voulez-vous vraiment résilier votre abonnement CAPTEN ? Vous perdrez l'accès immédiat aux fonctionnalités avancées (Copilote, Cagnotte, Messages auto) et repasserez en formule gratuite.";
@@ -267,9 +300,13 @@ export default function PlanPage() {
       name: "CAPTEN",
       price: billingInterval === 'monthly' ? "49,99€" : "41,58€",
       period: "/mois",
-      billingNote: billingInterval === 'yearly' ? "Facturé 499€/an (2 mois offerts)" : "Facturé mensuellement",
+      billingNote: !isLoggedIn && variant === 'B' 
+        ? "Rien ne t'est prélevé aujourd'hui."
+        : (billingInterval === 'yearly' ? "Facturé 499€/an (2 mois offerts)" : "Facturé mensuellement"),
       desc: "Le cockpit de pilotage ultime pour structurer ton crew et le faire grandir comme un pro.",
-      tag: billingInterval === 'yearly' ? "RECOMMANDÉ — 2 MOIS OFFERTS" : "RECOMMANDÉ (SANS ENGAGEMENT)",
+      tag: !isLoggedIn && variant === 'B'
+        ? "ESSAI 21 JOURS GRATUITS"
+        : (billingInterval === 'yearly' ? "RECOMMANDÉ — 2 MOIS OFFERTS" : "RECOMMANDÉ (SANS ENGAGEMENT)"),
       features: [
         { t: "Page publique du crew", d: "Inscriptions rapides en 1 lien partagé.", included: true },
         { t: "Runs illimités", d: "Planifie autant de sorties simultanées que tu veux.", included: true },
@@ -279,7 +316,11 @@ export default function PlanPage() {
         { t: "Cagnotte de Squad", d: "Collecte de dons sans commission (Sumeria, PayPal...).", included: true },
         { t: "Le Copilote IA", d: "Briefing crew météo/présence quotidien + création de séances.", included: true }
       ],
-      button: currentPlan === "CAPTEN" ? "PLAN ACTUEL" : (billingInterval === 'yearly' ? "ACTIVER LE PLAN ANNUEL" : "PASSER À CAPTEN"),
+      button: currentPlan === "CAPTEN" ? "PLAN ACTUEL" : (
+        !isLoggedIn && variant === 'B' 
+          ? "ESSAI 21 JOURS — SANS ENGAGEMENT" 
+          : (billingInterval === 'yearly' ? "ACTIVER LE PLAN ANNUEL" : "PASSER À CAPTEN")
+      ),
       type: currentPlan === "CAPTEN" ? "current" : "action"
     }
   ];
@@ -343,7 +384,7 @@ export default function PlanPage() {
                 <div className="space-y-4">
                   <div className="flex justify-between items-start">
                     <h3 className="text-[24px] font-display italic font-black uppercase text-black tracking-tight">
-                      CAPTEN {plan.name}
+                      {plan.name === 'CAPTEN' ? 'CAPTEN PRO' : 'CAPTEN GRATUIT'}
                     </h3>
                     {isCurrent && (
                       <span className="text-[8px] font-black text-emerald-600 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-full tracking-widest">
@@ -396,35 +437,78 @@ export default function PlanPage() {
               </div>
 
               <div className="pt-8 sm:pt-12">
-                <button 
-                  type="button"
-                  onClick={() => !isCurrent && handleUpgradePlan(plan)}
-                  disabled={isCurrent || isProcessing}
-                  className={`w-full py-4 rounded-[10px] text-[10px] sm:text-[11px] font-black uppercase tracking-[0.2em] transition-all cursor-pointer active:scale-95 disabled:scale-100 disabled:cursor-default ${
-                    isCurrent 
-                      ? 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20' 
-                      : isCapten
-                        ? 'bg-[#FF5C00] text-white shadow-lg shadow-orange-500/20 hover:bg-black'
-                        : 'bg-black text-white hover:bg-neutral-800'
-                  }`}
-                >
-                  {isProcessing && processingPlan === plan.name ? (
-                    <div className="flex items-center justify-center gap-2">
-                      <div className="w-3.5 h-3.5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-                      ACTIVATION...
-                    </div>
-                  ) : (
-                    plan.button
-                  )}
-                </button>
-                {isCurrent && isCapten && (
-                  <button
-                    type="button"
-                    onClick={handleCancelSubscription}
-                    className="w-full mt-4 text-[10px] font-black text-red-500 hover:text-red-700 hover:underline uppercase tracking-wider transition-all cursor-pointer text-center bg-transparent border-none outline-none"
-                  >
-                    Résilier mon abonnement Capten →
-                  </button>
+                {isLoggedIn ? (
+                  <>
+                    <button 
+                      type="button"
+                      onClick={() => !isCurrent && handleUpgradePlan(plan)}
+                      disabled={isCurrent || isProcessing}
+                      className={`w-full py-4 rounded-[10px] text-[10px] sm:text-[11px] font-black uppercase tracking-[0.2em] transition-all cursor-pointer active:scale-95 disabled:scale-100 disabled:cursor-default ${
+                        isCurrent 
+                          ? 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20' 
+                          : isCapten
+                            ? 'bg-[#FF5C00] text-white shadow-lg shadow-orange-500/20 hover:bg-black'
+                            : 'bg-black text-white hover:bg-neutral-800'
+                      }`}
+                    >
+                      {isProcessing && processingPlan === plan.name ? (
+                        <div className="flex items-center justify-center gap-2">
+                          <div className="w-3.5 h-3.5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                          ACTIVATION...
+                        </div>
+                      ) : (
+                        plan.button
+                      )}
+                    </button>
+                    {isCurrent && isCapten && (
+                      <button
+                        type="button"
+                        onClick={handleCancelSubscription}
+                        className="w-full mt-4 text-[10px] font-black text-red-500 hover:text-red-700 hover:underline uppercase tracking-wider transition-all cursor-pointer text-center bg-transparent border-none outline-none"
+                      >
+                        Résilier mon abonnement Capten →
+                      </button>
+                    )}
+                  </>
+                ) : (
+                  /* Guest Visitor / Signup funnel */
+                  <>
+                    {plan.name === 'GRATUIT' ? (
+                      variant === 'A' ? (
+                        <Link 
+                          href="/login?mode=signup&variant=A"
+                          className="w-full text-center py-4 rounded-[10px] text-[10px] sm:text-[11px] font-black uppercase tracking-[0.2em] transition-all bg-black text-white hover:bg-neutral-800 block cursor-pointer"
+                        >
+                          COMMENCER GRATUITEMENT
+                        </Link>
+                      ) : (
+                        <div className="text-center py-4">
+                          <Link 
+                            href="/login?mode=signup&variant=B&free=true"
+                            className="text-[11px] font-black text-neutral-400 hover:text-black transition-all uppercase tracking-wider underline cursor-pointer"
+                          >
+                            ou continuer avec le plan gratuit
+                          </Link>
+                        </div>
+                      )
+                    ) : (
+                      variant === 'A' ? (
+                        <Link 
+                          href="/login?mode=signup&variant=A&upgrade=true"
+                          className="w-full text-center py-4 rounded-[10px] text-[10px] sm:text-[11px] font-black uppercase tracking-[0.2em] transition-all bg-[#FF5C00] text-white hover:bg-black block cursor-pointer"
+                        >
+                          SOUSCRIRE À CAPTEN
+                        </Link>
+                      ) : (
+                        <Link 
+                          href="/login?mode=signup&variant=B"
+                          className="w-full text-center py-4 rounded-[10px] text-[10px] sm:text-[11px] font-black uppercase tracking-[0.2em] transition-all bg-[#FF5C00] text-white hover:bg-black block cursor-pointer"
+                        >
+                          ESSAI 21 JOURS — SANS ENGAGEMENT
+                        </Link>
+                      )
+                    )}
+                  </>
                 )}
               </div>
             </div>

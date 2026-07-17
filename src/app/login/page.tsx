@@ -7,7 +7,7 @@ import Link from "next/link";
 import {
   Mail, Lock, ArrowRight, Loader2,
   MessageSquare, MapPin, Wallet, ShieldCheck, AlertCircle, CheckCircle2,
-  Eye, EyeOff, ArrowLeft, Zap, Users, BarChart3, UserPlus
+  Eye, EyeOff, ArrowLeft, Zap, Users, BarChart3, UserPlus, CreditCard, Calendar, Hash
 } from "lucide-react";
 import { loginWithPassword, loginWithOtp, resetPassword, signUp } from "./actions";
 
@@ -227,32 +227,72 @@ function LoginForm() {
   const searchParams = useSearchParams();
   const redirectedFrom = searchParams.get("redirectedFrom") || "/dashboard";
 
+  // URL Query Parameters
+  const paramVariant = searchParams.get("variant") as 'A' | 'B' | null;
+  const isFreePlanUrl = searchParams.get("free") === "true";
+  const isUpgradeUrl = searchParams.get("upgrade") === "true";
+
+  // Form states
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [clubName, setClubName] = useState("");
+  const [ville, setVille] = useState("");
+  const [membersCount, setMembersCount] = useState("");
+  const [instagramLink, setInstagramLink] = useState("");
+
+  // Step 2 Card states
+  const [signupStep, setSignupStep] = useState<1 | 2>(1);
+  const [cardNumber, setCardNumber] = useState("");
+  const [cardExpiry, setCardExpiry] = useState("");
+  const [cardCvc, setCardCvc] = useState("");
+  const [cardName, setCardName] = useState("");
+
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [mode, setMode] = useState<"password" | "signup" | "forgot">("password");
 
+  // Persistent variant resolving
+  const [assignedVariant, setAssignedVariant] = useState<'A' | 'B'>('A');
+
+  useEffect(() => {
+    // Read from params or storage or roll
+    let currentVariant = paramVariant;
+    if (!currentVariant || !['A', 'B'].includes(currentVariant)) {
+      currentVariant = localStorage.getItem('capten_signup_variant') as 'A' | 'B';
+    }
+    if (!currentVariant || !['A', 'B'].includes(currentVariant)) {
+      currentVariant = Math.random() < 0.5 ? 'A' : 'B';
+    }
+    localStorage.setItem('capten_signup_variant', currentVariant);
+    setAssignedVariant(currentVariant);
+
+    // Track signup page view
+    fetch('/api/ab-test/track', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ variant: currentVariant, page: 'signup' }),
+    }).catch(err => console.error('Error tracking view:', err));
+  }, [paramVariant]);
+
   const switchMode = (newMode: "password" | "signup" | "forgot") => {
     setMode(newMode);
+    setSignupStep(1);
     setErrorMessage(null);
     setSuccessMessage(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
     setErrorMessage(null);
     setSuccessMessage(null);
 
-    const formData = new FormData();
-    formData.append("email", email);
-
     if (mode === "password") {
+      setIsLoading(true);
+      const formData = new FormData();
+      formData.append("email", email);
       formData.append("password", password);
       const result = await loginWithPassword(formData);
 
@@ -264,32 +304,75 @@ function LoginForm() {
         router.refresh();
       }
     } else if (mode === "signup") {
-      // Validate confirm password
+      // Step 1 validation
       if (password !== confirmPassword) {
         setErrorMessage("Les mots de passe ne correspondent pas.");
-        setIsLoading(false);
         return;
       }
 
+      // If Variant B and not free plan URL, we need Step 2 (Card) before submitting to server
+      if (assignedVariant === 'B' && !isFreePlanUrl && signupStep === 1) {
+        setSignupStep(2);
+        return;
+      }
+
+      // Submission
+      setIsLoading(true);
+      const formData = new FormData();
+      formData.append("email", email);
       formData.append("password", password);
       formData.append("clubName", clubName);
+      formData.append("ville", ville);
+      formData.append("membersCount", membersCount);
+      formData.append("instagramLink", instagramLink);
+      formData.append("variant", assignedVariant);
+
+      const targetPlan = (assignedVariant === 'B' && !isFreePlanUrl) ? 'trial' : 'free';
+      formData.append("plan", targetPlan);
+
       const result = await signUp(formData);
 
       if (result.error) {
         setErrorMessage(result.error);
         setIsLoading(false);
-      } else if ((result as any).needsConfirmation) {
-        setSuccessMessage(
-          result.message || "Compte créé ! Vérifiez vos e-mails pour confirmer votre inscription."
-        );
-        setIsLoading(false);
-      } else {
-        // Auto-logged in (demo mode)
-        router.push(redirectedFrom);
-        router.refresh();
+      } else if (result.success) {
+        if (result.isMock) {
+          // Demo Mode - set mock states
+          localStorage.setItem('capten_club_name', clubName.trim());
+          localStorage.setItem('capten_plan', targetPlan === 'trial' ? 'CAPTEN' : 'GRATUIT');
+          document.cookie = `capten_plan=${targetPlan === 'trial' ? 'CAPTEN' : 'GRATUIT'}; path=/; max-age=31536000`;
+          
+          if (targetPlan === 'trial') {
+            const ends = new Date();
+            ends.setDate(ends.getDate() + 21);
+            localStorage.setItem('capten_trial_ends_at', ends.toISOString());
+          }
+          
+          router.push('/dashboard');
+          router.refresh();
+        } else {
+          // Supabase real mode
+          if ((result as any).needsConfirmation) {
+            setSuccessMessage(
+              result.message || "Compte créé ! Vérifiez vos e-mails pour confirmer votre inscription."
+            );
+            setIsLoading(false);
+          } else {
+            // Check if we need to redirect to payment intent / subscription flow
+            if (isUpgradeUrl && targetPlan === 'free') {
+              router.push('/plan');
+            } else {
+              router.push('/dashboard');
+              router.refresh();
+            }
+          }
+        }
       }
     } else {
       // Forgot Password request
+      setIsLoading(true);
+      const formData = new FormData();
+      formData.append("email", email);
       const result = await resetPassword(formData);
 
       if (result.error) {
@@ -338,9 +421,21 @@ function LoginForm() {
           display: "inline-flex",
           alignItems: "center",
           gap: 8,
-          background: mode === "signup" ? "rgba(22,163,74,0.05)" : C.orangeDim,
-          border: `1px solid ${mode === "signup" ? "rgba(22,163,74,0.18)" : C.orangeBorder}`,
-          color: mode === "signup" ? C.green : C.orange,
+          background: mode === "signup" 
+            ? (assignedVariant === 'B' && !isFreePlanUrl 
+                ? (signupStep === 1 ? "rgba(22,163,74,0.05)" : "rgba(255,92,0,0.05)")
+                : "rgba(22,163,74,0.05)") 
+            : C.orangeDim,
+          border: `1px solid ${mode === "signup" 
+            ? (assignedVariant === 'B' && !isFreePlanUrl
+                ? (signupStep === 1 ? "rgba(22,163,74,0.18)" : "rgba(255,92,0,0.18)")
+                : "rgba(22,163,74,0.18)")
+            : C.orangeBorder}`,
+          color: mode === "signup" 
+            ? (assignedVariant === 'B' && !isFreePlanUrl
+                ? (signupStep === 1 ? C.green : C.orange)
+                : C.green)
+            : C.orange,
           padding: "5px 14px",
           borderRadius: 100,
           fontFamily: "var(--font-dm-mono), monospace",
@@ -350,8 +445,18 @@ function LoginForm() {
           textTransform: "uppercase",
           marginBottom: 20,
         }}>
-          {mode === "signup" ? <UserPlus size={10} /> : <Lock size={10} />}
-          {mode === "password" ? "Espace Sécurisé" : mode === "signup" ? "Nouveau Capitaine" : "Réinitialisation"}
+          {mode === "signup" 
+            ? (assignedVariant === 'B' && !isFreePlanUrl 
+                ? (signupStep === 1 ? <UserPlus size={10} /> : <CreditCard size={10} />)
+                : <UserPlus size={10} />)
+            : <Lock size={10} />}
+          {mode === "password" 
+            ? "Espace Sécurisé" 
+            : mode === "signup" 
+              ? (assignedVariant === 'B' && !isFreePlanUrl
+                  ? (signupStep === 1 ? "Étape 1 sur 2" : "Étape 2 sur 2")
+                  : "Nouveau Capitaine")
+              : "Réinitialisation"}
         </div>
 
         <h1 style={{
@@ -365,7 +470,13 @@ function LoginForm() {
           letterSpacing: -1,
           marginBottom: 12,
         }}>
-          {mode === "password" ? "CONNEXION" : mode === "signup" ? "INSCRIPTION" : "RÉINITIALISATION"}
+          {mode === "password" 
+            ? "CONNEXION" 
+            : mode === "signup" 
+              ? (assignedVariant === 'B' && !isFreePlanUrl
+                  ? (signupStep === 1 ? "INSCRIPTION" : "CARTE BANCAIRE")
+                  : "INSCRIPTION")
+              : "RÉINITIALISATION"}
         </h1>
 
         <p style={{
@@ -377,8 +488,12 @@ function LoginForm() {
           {mode === "password"
             ? "Accédez à votre tableau de bord et pilotez votre run club."
             : mode === "signup"
-            ? "Créez votre compte capitaine et lancez votre run club en 2 minutes."
-            : "Saisissez votre e-mail pour recevoir un lien de réinitialisation."}
+              ? (assignedVariant === 'B' && !isFreePlanUrl
+                  ? (signupStep === 1 
+                      ? "Saisissez vos informations de compte capitaine pour commencer votre essai."
+                      : "Enregistrez votre carte pour activer l'essai de 21 jours. Aucun prélèvement aujourd'hui.")
+                  : "Créez votre compte capitaine et lancez votre run club en 2 minutes.")
+              : "Saisissez votre e-mail pour recevoir un lien de réinitialisation."}
         </p>
       </div>
 
@@ -432,83 +547,10 @@ function LoginForm() {
 
       {/* Form */}
       <form onSubmit={handleSubmit}>
-        {/* Club Name Field (Signup only) */}
-        {mode === "signup" && (
-          <div className="login-fade-up-1" style={{ marginBottom: 16 }}>
-            <label style={{
-              display: "block",
-              fontSize: 11,
-              fontWeight: 700,
-              color: C.textSecondary,
-              textTransform: "uppercase",
-              letterSpacing: 1,
-              marginBottom: 8,
-              fontFamily: "var(--font-dm-sans), sans-serif",
-            }}>
-              Nom du Run Club
-            </label>
-            <div style={{ position: "relative" }}>
-              <Users size={16} style={{
-                position: "absolute",
-                left: 16,
-                top: "50%",
-                transform: "translateY(-50%)",
-                color: C.textLight,
-              }} />
-              <input
-                type="text"
-                required
-                placeholder="Ex: Paris Running Crew"
-                value={clubName}
-                onChange={(e) => setClubName(e.target.value)}
-                disabled={isLoading}
-                className="login-input"
-                id="signup-club-name"
-              />
-            </div>
-          </div>
-        )}
-
-        {/* Email Field */}
-        <div className="login-fade-up-1" style={{ marginBottom: 16 }}>
-          <label style={{
-            display: "block",
-            fontSize: 11,
-            fontWeight: 700,
-            color: C.textSecondary,
-            textTransform: "uppercase",
-            letterSpacing: 1,
-            marginBottom: 8,
-            fontFamily: "var(--font-dm-sans), sans-serif",
-          }}>
-            Adresse e-mail
-          </label>
-          <div style={{ position: "relative" }}>
-            <Mail size={16} style={{
-              position: "absolute",
-              left: 16,
-              top: "50%",
-              transform: "translateY(-50%)",
-              color: C.textLight,
-            }} />
-            <input
-              type="email"
-              required
-              placeholder="votre@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              disabled={isLoading}
-              className="login-input"
-              id="login-email"
-            />
-          </div>
-        </div>
-
-        {/* Password Field (Only shown in password mode) */}
-        {/* Password Field (Login & Signup modes) */}
-        {(mode === "password" || mode === "signup") && (
+        {mode === "signup" && signupStep === 1 && (
           <>
-            <div className="login-fade-up-2" style={{ marginBottom: mode === "signup" ? 16 : 8 }}>
+            {/* Club Name Field */}
+            <div className="login-fade-up-1" style={{ marginBottom: 16 }}>
               <label style={{
                 display: "block",
                 fontSize: 11,
@@ -519,10 +561,10 @@ function LoginForm() {
                 marginBottom: 8,
                 fontFamily: "var(--font-dm-sans), sans-serif",
               }}>
-                Mot de passe
+                Nom du Run Club
               </label>
               <div style={{ position: "relative" }}>
-                <Lock size={16} style={{
+                <Users size={16} style={{
                   position: "absolute",
                   left: 16,
                   top: "50%",
@@ -530,30 +572,406 @@ function LoginForm() {
                   color: C.textLight,
                 }} />
                 <input
-                  type={showPassword ? "text" : "password"}
+                  type="text"
                   required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Ex: Paris Running Crew"
+                  value={clubName}
+                  onChange={(e) => setClubName(e.target.value)}
                   disabled={isLoading}
                   className="login-input"
-                  id="login-password"
-                  placeholder={mode === "signup" ? "6 caractères minimum" : "••••••••"}
-                  minLength={mode === "signup" ? 6 : undefined}
+                  id="signup-club-name"
                 />
-                <button
-                  type="button"
-                  className="eye-toggle"
-                  onClick={() => setShowPassword(!showPassword)}
-                  aria-label={showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
-                >
-                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                </button>
               </div>
             </div>
 
-            {/* Confirm Password (Signup only) */}
-            {mode === "signup" && (
-              <div className="login-fade-up-2" style={{ marginBottom: 8 }}>
+            {/* Extra fields for Variant B */}
+            {assignedVariant === 'B' && (
+              <>
+                {/* Ville */}
+                <div className="login-fade-up-1" style={{ marginBottom: 16 }}>
+                  <label style={{
+                    display: "block",
+                    fontSize: 11,
+                    fontWeight: 700,
+                    color: C.textSecondary,
+                    textTransform: "uppercase",
+                    letterSpacing: 1,
+                    marginBottom: 8,
+                    fontFamily: "var(--font-dm-sans), sans-serif",
+                  }}>
+                    Ville d'activité
+                  </label>
+                  <div style={{ position: "relative" }}>
+                    <MapPin size={16} style={{
+                      position: "absolute",
+                      left: 16,
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      color: C.textLight,
+                    }} />
+                    <input
+                      type="text"
+                      required
+                      placeholder="Ex: Paris"
+                      value={ville}
+                      onChange={(e) => setVille(e.target.value)}
+                      disabled={isLoading}
+                      className="login-input"
+                    />
+                  </div>
+                </div>
+
+                {/* Membres count */}
+                <div className="login-fade-up-1" style={{ marginBottom: 16 }}>
+                  <label style={{
+                    display: "block",
+                    fontSize: 11,
+                    fontWeight: 700,
+                    color: C.textSecondary,
+                    textTransform: "uppercase",
+                    letterSpacing: 1,
+                    marginBottom: 8,
+                    fontFamily: "var(--font-dm-sans), sans-serif",
+                  }}>
+                    Nombre de membres actifs (estimation)
+                  </label>
+                  <div style={{ position: "relative" }}>
+                    <Users size={16} style={{
+                      position: "absolute",
+                      left: 16,
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      color: C.textLight,
+                    }} />
+                    <input
+                      type="number"
+                      required
+                      placeholder="Ex: 40"
+                      value={membersCount}
+                      onChange={(e) => setMembersCount(e.target.value)}
+                      disabled={isLoading}
+                      className="login-input"
+                    />
+                  </div>
+                </div>
+
+                {/* Instagram link */}
+                <div className="login-fade-up-1" style={{ marginBottom: 16 }}>
+                  <label style={{
+                    display: "block",
+                    fontSize: 11,
+                    fontWeight: 700,
+                    color: C.textSecondary,
+                    textTransform: "uppercase",
+                    letterSpacing: 1,
+                    marginBottom: 8,
+                    fontFamily: "var(--font-dm-sans), sans-serif",
+                  }}>
+                    Lien Instagram (Optionnel)
+                  </label>
+                  <div style={{ position: "relative" }}>
+                    <Zap size={16} style={{
+                      position: "absolute",
+                      left: 16,
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      color: C.textLight,
+                    }} />
+                    <input
+                      type="url"
+                      placeholder="Ex: https://instagram.com/monclub"
+                      value={instagramLink}
+                      onChange={(e) => setInstagramLink(e.target.value)}
+                      disabled={isLoading}
+                      className="login-input"
+                    />
+                  </div>
+                </div>
+              </>
+            )}
+          </>
+        )}
+
+        {/* Step 1 Fields: Email & Password (Login, Forgot, and Signup Step 1) */}
+        {signupStep === 1 && (
+          <>
+            {/* Email Field */}
+            <div className="login-fade-up-1" style={{ marginBottom: 16 }}>
+              <label style={{
+                display: "block",
+                fontSize: 11,
+                fontWeight: 700,
+                color: C.textSecondary,
+                textTransform: "uppercase",
+                letterSpacing: 1,
+                marginBottom: 8,
+                fontFamily: "var(--font-dm-sans), sans-serif",
+              }}>
+                Adresse e-mail
+              </label>
+              <div style={{ position: "relative" }}>
+                <Mail size={16} style={{
+                  position: "absolute",
+                  left: 16,
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  color: C.textLight,
+                }} />
+                <input
+                  type="email"
+                  required
+                  placeholder="votre@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={isLoading}
+                  className="login-input"
+                  id="login-email"
+                />
+              </div>
+            </div>
+
+            {/* Password Field (Login & Signup modes) */}
+            {(mode === "password" || mode === "signup") && (
+              <>
+                <div className="login-fade-up-2" style={{ marginBottom: mode === "signup" ? 16 : 8 }}>
+                  <label style={{
+                    display: "block",
+                    fontSize: 11,
+                    fontWeight: 700,
+                    color: C.textSecondary,
+                    textTransform: "uppercase",
+                    letterSpacing: 1,
+                    marginBottom: 8,
+                    fontFamily: "var(--font-dm-sans), sans-serif",
+                  }}>
+                    Mot de passe
+                  </label>
+                  <div style={{ position: "relative" }}>
+                    <Lock size={16} style={{
+                      position: "absolute",
+                      left: 16,
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      color: C.textLight,
+                    }} />
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      required
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      disabled={isLoading}
+                      className="login-input"
+                      id="login-password"
+                      placeholder={mode === "signup" ? "6 caractères minimum" : "••••••••"}
+                      minLength={mode === "signup" ? 6 : undefined}
+                    />
+                    <button
+                      type="button"
+                      className="eye-toggle"
+                      onClick={() => setShowPassword(!showPassword)}
+                      aria-label={showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
+                    >
+                      {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Confirm Password (Signup only) */}
+                {mode === "signup" && (
+                  <div className="login-fade-up-2" style={{ marginBottom: 8 }}>
+                    <label style={{
+                      display: "block",
+                      fontSize: 11,
+                      fontWeight: 700,
+                      color: C.textSecondary,
+                      textTransform: "uppercase",
+                      letterSpacing: 1,
+                      marginBottom: 8,
+                      fontFamily: "var(--font-dm-sans), sans-serif",
+                    }}>
+                      Confirmer le mot de passe
+                    </label>
+                    <div style={{ position: "relative" }}>
+                      <Lock size={16} style={{
+                        position: "absolute",
+                        left: 16,
+                        top: "50%",
+                        transform: "translateY(-50%)",
+                        color: C.textLight,
+                      }} />
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        required
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        disabled={isLoading}
+                        className="login-input"
+                        id="signup-confirm-password"
+                        placeholder="••••••••"
+                        minLength={6}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Forgot Password Link (Login mode only) */}
+                {mode === "password" && (
+                  <div className="login-fade-up-2" style={{
+                    textAlign: "right",
+                    marginBottom: 28,
+                  }}>
+                    <button
+                      type="button"
+                      onClick={() => switchMode("forgot")}
+                      style={{
+                        background: "none",
+                        border: "none",
+                        color: C.orange,
+                        fontSize: 12,
+                        fontWeight: 600,
+                        cursor: "pointer",
+                        fontFamily: "var(--font-dm-sans), sans-serif",
+                        padding: 0,
+                        transition: "color 0.15s",
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.color = C.orangeHover)}
+                      onMouseLeave={(e) => (e.currentTarget.style.color = C.orange)}
+                    >
+                      Mot de passe oublié ?
+                    </button>
+                  </div>
+                )}
+
+                {/* Signup spacing */}
+                {mode === "signup" && <div style={{ marginBottom: 28 }} />}
+              </>
+            )}
+          </>
+        )}
+
+        {/* Step 2 Fields: Card Details (Variant B Trial signup only) */}
+        {mode === "signup" && signupStep === 2 && (
+          <div className="login-fade-up" style={{ spaceY: 16 }}>
+            {/* Trial Recap Panel */}
+            <div style={{
+              background: "#FDFCF8",
+              border: "1px dashed #FF5C00",
+              borderRadius: 14,
+              padding: 18,
+              marginBottom: 20,
+            }}>
+              <h4 style={{
+                fontFamily: "var(--font-barlow), sans-serif",
+                fontStyle: "italic",
+                fontWeight: 900,
+                fontSize: 15,
+                color: "#000",
+                textTransform: "uppercase",
+                letterSpacing: 0.5,
+                marginBottom: 10,
+              }}>
+                ESSAI CAPTEN — 21 JOURS
+              </h4>
+              <ul style={{
+                fontSize: 12,
+                color: C.textSecondary,
+                paddingLeft: 16,
+                listStyleType: "disc",
+                lineHeight: 1.6,
+                margin: 0,
+              }}>
+                <li>Accès complet premium immédiat sans restriction.</li>
+                <li style={{ fontWeight: 800, color: C.text }}>Rien ne t'est prélevé aujourd'hui.</li>
+                <li>Débit de 49,99 €/mois à partir du <span style={{ fontWeight: 700 }}>{new Date(Date.now() + 21 * 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR')}</span>.</li>
+                <li>Annulation en 1 clic sans justification depuis tes réglages.</li>
+              </ul>
+            </div>
+
+            {/* Card Name */}
+            <div style={{ marginBottom: 14 }}>
+              <label style={{
+                display: "block",
+                fontSize: 11,
+                fontWeight: 700,
+                color: C.textSecondary,
+                textTransform: "uppercase",
+                letterSpacing: 1,
+                marginBottom: 8,
+                fontFamily: "var(--font-dm-sans), sans-serif",
+              }}>
+                Titulaire de la carte
+              </label>
+              <div style={{ position: "relative" }}>
+                <Users size={16} style={{
+                  position: "absolute",
+                  left: 16,
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  color: C.textLight,
+                }} />
+                <input
+                  type="text"
+                  required
+                  placeholder="Jean Dupont"
+                  value={cardName}
+                  onChange={(e) => setCardName(e.target.value)}
+                  disabled={isLoading}
+                  className="login-input"
+                />
+              </div>
+            </div>
+
+            {/* Card Number */}
+            <div style={{ marginBottom: 14 }}>
+              <label style={{
+                display: "block",
+                fontSize: 11,
+                fontWeight: 700,
+                color: C.textSecondary,
+                textTransform: "uppercase",
+                letterSpacing: 1,
+                marginBottom: 8,
+                fontFamily: "var(--font-dm-sans), sans-serif",
+              }}>
+                Numéro de carte bancaire
+              </label>
+              <div style={{ position: "relative" }}>
+                <CreditCard size={16} style={{
+                  position: "absolute",
+                  left: 16,
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  color: C.textLight,
+                }} />
+                <input
+                  type="text"
+                  required
+                  maxLength={19}
+                  placeholder="4242 4242 4242 4242"
+                  value={cardNumber}
+                  onChange={(e) => {
+                    let v = e.target.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+                    let matches = v.match(/\d{4,16}/g);
+                    let match = matches && matches[0] || '';
+                    let parts = [];
+                    for (let i=0, len=match.length; i<len; i+=4) {
+                      parts.push(match.substring(i, i+4));
+                    }
+                    if (parts.length > 0) {
+                      setCardNumber(parts.join(' '));
+                    } else {
+                      setCardNumber(v);
+                    }
+                  }}
+                  disabled={isLoading}
+                  className="login-input"
+                />
+              </div>
+            </div>
+
+            {/* Expiry & CVC Grid */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 24 }}>
+              <div>
                 <label style={{
                   display: "block",
                   fontSize: 11,
@@ -564,10 +982,10 @@ function LoginForm() {
                   marginBottom: 8,
                   fontFamily: "var(--font-dm-sans), sans-serif",
                 }}>
-                  Confirmer le mot de passe
+                  Date d'expiration
                 </label>
                 <div style={{ position: "relative" }}>
-                  <Lock size={16} style={{
+                  <Calendar size={16} style={{
                     position: "absolute",
                     left: 16,
                     top: "50%",
@@ -575,51 +993,59 @@ function LoginForm() {
                     color: C.textLight,
                   }} />
                   <input
-                    type={showPassword ? "text" : "password"}
+                    type="text"
                     required
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    maxLength={5}
+                    placeholder="MM/AA"
+                    value={cardExpiry}
+                    onChange={(e) => {
+                      let v = e.target.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+                      if (v.length >= 2) {
+                        setCardExpiry(v.substring(0, 2) + '/' + v.substring(2, 4));
+                      } else {
+                        setCardExpiry(v);
+                      }
+                    }}
                     disabled={isLoading}
                     className="login-input"
-                    id="signup-confirm-password"
-                    placeholder="••••••••"
-                    minLength={6}
                   />
                 </div>
               </div>
-            )}
-
-            {/* Forgot Password Link (Login mode only) */}
-            {mode === "password" && (
-              <div className="login-fade-up-2" style={{
-                textAlign: "right",
-                marginBottom: 28,
-              }}>
-                <button
-                  type="button"
-                  onClick={() => switchMode("forgot")}
-                  style={{
-                    background: "none",
-                    border: "none",
-                    color: C.orange,
-                    fontSize: 12,
-                    fontWeight: 600,
-                    cursor: "pointer",
-                    fontFamily: "var(--font-dm-sans), sans-serif",
-                    padding: 0,
-                    transition: "color 0.15s",
-                  }}
-                  onMouseEnter={(e) => (e.currentTarget.style.color = C.orangeHover)}
-                  onMouseLeave={(e) => (e.currentTarget.style.color = C.orange)}
-                >
-                  Mot de passe oublié ?
-                </button>
+              <div>
+                <label style={{
+                  display: "block",
+                  fontSize: 11,
+                  fontWeight: 700,
+                  color: C.textSecondary,
+                  textTransform: "uppercase",
+                  letterSpacing: 1,
+                  marginBottom: 8,
+                  fontFamily: "var(--font-dm-sans), sans-serif",
+                }}>
+                  CVC / CVV
+                </label>
+                <div style={{ position: "relative" }}>
+                  <Hash size={16} style={{
+                    position: "absolute",
+                    left: 16,
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    color: C.textLight,
+                  }} />
+                  <input
+                    type="text"
+                    required
+                    maxLength={3}
+                    placeholder="123"
+                    value={cardCvc}
+                    onChange={(e) => setCardCvc(e.target.value.replace(/[^0-9]/g, ''))}
+                    disabled={isLoading}
+                    className="login-input"
+                  />
+                </div>
               </div>
-            )}
-
-            {/* Signup spacing */}
-            {mode === "signup" && <div style={{ marginBottom: 28 }} />}
-          </>
+            </div>
+          </div>
         )}
 
         {/* Submit Button */}
@@ -629,9 +1055,19 @@ function LoginForm() {
             disabled={isLoading}
             className="login-btn"
             id="login-submit"
-            style={mode === "signup" ? { background: C.green } : undefined}
-            onMouseEnter={mode === "signup" ? (e) => { e.currentTarget.style.background = "#15803d"; e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 8px 24px rgba(22,163,74,0.25)"; } : undefined}
-            onMouseLeave={mode === "signup" ? (e) => { e.currentTarget.style.background = C.green; e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "none"; } : undefined}
+            style={mode === "signup" 
+              ? { background: signupStep === 1 && assignedVariant === 'B' && !isFreePlanUrl ? C.orange : C.green } 
+              : undefined}
+            onMouseEnter={mode === "signup" ? (e) => { 
+              e.currentTarget.style.background = signupStep === 1 && assignedVariant === 'B' && !isFreePlanUrl ? C.orangeHover : "#15803d"; 
+              e.currentTarget.style.transform = "translateY(-1px)"; 
+              e.currentTarget.style.boxShadow = signupStep === 1 && assignedVariant === 'B' && !isFreePlanUrl ? "0 8px 24px rgba(255,92,0,0.25)" : "0 8px 24px rgba(22,163,74,0.25)"; 
+            } : undefined}
+            onMouseLeave={mode === "signup" ? (e) => { 
+              e.currentTarget.style.background = signupStep === 1 && assignedVariant === 'B' && !isFreePlanUrl ? C.orange : C.green; 
+              e.currentTarget.style.transform = "none"; 
+              e.currentTarget.style.boxShadow = "none"; 
+            } : undefined}
           >
             {isLoading ? (
               <>
@@ -643,13 +1079,39 @@ function LoginForm() {
                 {mode === "password" 
                   ? "Se connecter" 
                   : mode === "signup"
-                  ? "Créer mon compte"
-                  : "Réinitialiser le mot de passe"}
+                    ? (assignedVariant === 'B' && !isFreePlanUrl
+                        ? (signupStep === 1 ? "Continuer vers l'étape 2" : "Démarrer l'essai")
+                        : "Créer mon compte")
+                    : "Réinitialiser le mot de passe"}
                 <ArrowRight size={16} />
               </>
             )}
           </button>
         </div>
+
+        {/* Back Link to Step 1 (Step 2 signup only) */}
+        {mode === "signup" && signupStep === 2 && (
+          <div className="login-fade-up-3" style={{ textAlign: "center", marginTop: 16 }}>
+            <button
+              type="button"
+              disabled={isLoading}
+              onClick={() => setSignupStep(1)}
+              style={{
+                background: "none",
+                border: "none",
+                color: C.textSecondary,
+                fontSize: 12,
+                fontWeight: 600,
+                cursor: isLoading ? "not-allowed" : "pointer",
+                fontFamily: "var(--font-dm-sans), sans-serif",
+                textDecoration: "underline",
+                opacity: isLoading ? 0.5 : 1,
+              }}
+            >
+              ← Modifier les informations de compte
+            </button>
+          </div>
+        )}
 
         {/* Back Link (Only shown in forgot mode) */}
         {mode === "forgot" && (
@@ -694,7 +1156,9 @@ function LoginForm() {
               textTransform: "uppercase",
               letterSpacing: 1,
             }}>
-              {mode === "password" ? "Essai gratuit de 14 jours" : "Déjà un compte ?"}
+              {mode === "password" 
+                ? (assignedVariant === 'B' ? "Essai complet de 21 jours" : "Essai gratuit de 14 jours")
+                : "Déjà un compte ?"}
             </span>
             <div style={{ flex: 1, height: 1, background: C.border }} />
           </div>

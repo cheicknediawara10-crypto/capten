@@ -170,6 +170,9 @@ export default function DashboardPage() {
           if (Array.isArray(parsed)) {
             setRuns(parsed);
             setHasRuns(parsed.length > 0);
+            if (parsed.length > 0 && !localStorage.getItem('capten_first_run_created_at')) {
+              localStorage.setItem('capten_first_run_created_at', new Date().toISOString());
+            }
           }
         } catch (e) {
           setHasRuns(false);
@@ -849,6 +852,63 @@ export default function DashboardPage() {
       {/* UPGRADE BANNER */}
       <UpgradeBanner />
 
+      {/* TRIAL PROGRESS BANNER */}
+      {club?.plan === 'trial' && (
+        <div className="bg-[#FFFDF9] border border-[#FF5C00] rounded-card-outer p-6 sm:p-8 space-y-4 shadow-sm relative overflow-hidden mb-6">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="bg-[#FF5C00] text-white text-[8px] font-black px-2 py-0.5 rounded-full tracking-widest uppercase">
+                  Période d'essai Capten
+                </span>
+                <span className="text-[10px] font-bold text-neutral-500 uppercase tracking-wider">
+                  {Math.max(0, 21 - Math.floor((Date.now() - new Date(club.created_at || Date.now()).getTime()) / (1000 * 60 * 60 * 24)))} jours restants (Fin le {new Date(new Date(club.created_at || Date.now()).getTime() + 21 * 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR')})
+                </span>
+              </div>
+              <h3 className="text-[20px] font-display italic font-black uppercase text-black leading-tight">
+                Objectif d'intégration : planifier et clôturer 3 runs
+              </h3>
+              <p className="text-[12px] text-neutral-600 font-sans leading-relaxed">
+                Pour valider ton essai et te familiariser avec le cockpit, nous t'invitons à compléter tes 3 premiers runs.
+              </p>
+            </div>
+            <div className="flex flex-col items-end shrink-0 gap-1.5 w-full md:w-auto">
+              <span className="text-[11px] font-mono font-black uppercase tracking-wider text-[#FF5C00]">
+                Run {Math.min(3, runs.length)} sur 3
+              </span>
+              <div className="w-full md:w-[180px] h-2 bg-neutral-100 rounded-full overflow-hidden border border-black/5">
+                <div 
+                  className="h-full bg-[#FF5C00] transition-all duration-500" 
+                  style={{ width: `${(Math.min(3, runs.length) / 3) * 100}%` }}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pt-4 border-t border-black/5">
+            <p className="text-[11px] text-neutral-500 font-mono">
+              Prochain prélèvement de 49,99€/mois à J+21. Résiliable en 1 clic dans les réglages.
+            </p>
+            <div className="flex items-center gap-3">
+              {runs.length < 3 && (
+                <Link 
+                  href="/runs?openPlanifier=true" 
+                  className="bg-[#FF5C00] hover:bg-black text-white px-4 py-2 rounded-control text-[9px] font-black uppercase tracking-wider transition-all"
+                >
+                  Planifier un run +
+                </Link>
+              )}
+              <Link 
+                href="/settings" 
+                className="text-[9px] font-mono font-bold uppercase tracking-wider text-neutral-400 hover:text-black transition-all underline"
+              >
+                Gérer / Résilier mon essai
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* COPILOT BRIEFING IA */}
       <CopilotBanner />
 
@@ -1303,7 +1363,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {isChecklistVisible && (
+      {isChecklistVisible && !(club?.plan === 'trial' && ((Date.now() - new Date(club.created_at || Date.now()).getTime()) / (1000 * 60 * 60)) < 48) && (
         <div className="mt-8">
           <VictoryChecklist
             completedMissionsCount={completedMissionsCount}

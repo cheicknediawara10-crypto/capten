@@ -286,17 +286,24 @@ export default function SettingsPage() {
 
             await supabase
               .from('clubs')
-              .update({ stripe_subscription_status: 'inactive' })
+              .update({ 
+                plan: 'free',
+                stripe_plan: 'GRATUIT',
+                stripe_subscription_status: 'inactive' 
+              })
               .eq('id', user.id);
           }
         }
         
         // Set mock trial expiration cookie
         document.cookie = "capten_mock_trial_expired=true; path=/; max-age=31536000";
+        document.cookie = "capten_plan=GRATUIT; path=/; max-age=31536000";
 
         if (typeof window !== 'undefined') {
           window.dispatchEvent(new Event('capten_branding_change'));
         }
+
+        await refreshClub();
 
         const successMessage = isActiveSub ? "ABONNEMENT PRO RÉSILIÉ AVEC SUCCÈS !" : "ESSAI PRO RÉSILIÉ AVEC SUCCÈS !";
         showToast(successMessage);
@@ -553,14 +560,14 @@ export default function SettingsPage() {
               </div>
               <div className="space-y-1">
                  <h4 className="text-[15px] sm:text-[16px] font-black uppercase text-black">
-                   Mon Abonnement CAPTEN : <span className="text-[#FF5C00]">{currentPlan === 'PRO' ? (profile?.stripe_subscription_status === 'active' ? 'ACTIF PRO' : 'ESSAI EN COURS') : 'GRATUIT'}</span>
+                   Mon Abonnement CAPTEN : <span className="text-[#FF5C00]">{club?.plan === 'trial' ? 'ESSAI EN COURS' : currentPlan === 'CAPTEN' ? 'ACTIF PRO' : 'GRATUIT'}</span>
                  </h4>
                  <p className="text-[9px] sm:text-[10px] font-medium text-[#A3A3A3] uppercase tracking-widest leading-relaxed">
-                   {currentPlan === 'PRO' 
-                     ? (profile?.stripe_subscription_status === 'active' 
+                   {club?.plan === 'trial' 
+                     ? `Période d'essai gratuite active • ${Math.max(0, 21 - Math.floor((Date.now() - new Date(club.created_at || Date.now()).getTime()) / (1000 * 60 * 60 * 24)))} jours restants`
+                     : currentPlan === 'CAPTEN'
                        ? `Formule pro active • Facturation automatique active` 
-                       : `Période d'essai gratuite active • 14 jours restants`)
-                     : `Formule gratuite active • Fonctionnalités limitées`}
+                       : `Formule gratuite active • Fonctionnalités limitées`}
                  </p>
               </div>
            </div>
@@ -571,12 +578,12 @@ export default function SettingsPage() {
               >
                 GÉRER L'ÉQUIPE
               </button>
-              {currentPlan === 'PRO' && (
+              {(club?.plan === 'trial' || currentPlan === 'CAPTEN') && (
                 <button 
                   onClick={handleCancelTrial}
                   className="w-full sm:w-auto px-6 py-3.5 bg-red-50 text-red-650 hover:bg-red-500 hover:text-white text-[10px] font-black uppercase tracking-widest rounded-control transition-all cursor-pointer text-center"
                 >
-                  {profile?.stripe_subscription_status === 'active' ? "RÉSILIER L'ABONNEMENT" : "RÉSILIER L'ESSAI"}
+                  {currentPlan === 'CAPTEN' ? "RÉSILIER L'ABONNEMENT" : "RÉSILIER L'ESSAI"}
                 </button>
               )}
               <button 

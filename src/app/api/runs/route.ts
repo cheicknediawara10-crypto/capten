@@ -110,6 +110,21 @@ export async function POST(request: Request) {
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
+
+    // Record first_run_created_at if not set
+    const { data: clubData } = await supabase
+      .from('clubs')
+      .select('first_run_created_at')
+      .eq('id', captainId)
+      .maybeSingle();
+
+    if (clubData && !clubData.first_run_created_at) {
+      await supabase
+        .from('clubs')
+        .update({ first_run_created_at: new Date().toISOString() })
+        .eq('id', captainId);
+    }
+
     return NextResponse.json(data, { status: 201 });
   } catch (err) {
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });

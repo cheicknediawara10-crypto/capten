@@ -33,6 +33,10 @@ export interface ClubData {
   stripe_subscription_status?: string;
   spots_balance_cents?: number;
   stripe_connect_id?: string | null;
+  plan?: string;
+  first_run_created_at?: string | null;
+  created_at?: string;
+  signup_variant?: string;
 }
 
 interface AuthContextType {
@@ -78,7 +82,11 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
           stripe_plan: data.stripe_plan || 'GRATUIT',
           stripe_subscription_status: data.stripe_subscription_status || 'inactive',
           spots_balance_cents: data.spots_balance_cents || 0,
-          stripe_connect_id: data.stripe_connect_id || null
+          stripe_connect_id: data.stripe_connect_id || null,
+          plan: data.plan || 'free',
+          first_run_created_at: data.first_run_created_at || null,
+          created_at: data.created_at || data.created_time || null,
+          signup_variant: data.signup_variant || 'A',
         });
       } else {
         // Auto-create club if missing
@@ -105,7 +113,11 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
             stripe_plan: newClub.stripe_plan || 'GRATUIT',
             stripe_subscription_status: newClub.stripe_subscription_status || 'inactive',
             spots_balance_cents: 0,
-            stripe_connect_id: null
+            stripe_connect_id: null,
+            plan: newClub.plan || 'free',
+            first_run_created_at: newClub.first_run_created_at || null,
+            created_at: newClub.created_at || newClub.created_time || null,
+            signup_variant: newClub.signup_variant || 'A',
           });
         }
       }
@@ -157,6 +169,7 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
           auto_round: localStorage.getItem('capten_auto_round') === 'true'
         };
 
+        const planVal = localStorage.getItem('capten_plan') === 'CAPTEN' ? 'trial' : 'free';
         setClub({
           id: 'mock-captain-uuid',
           name: savedClubName,
@@ -174,7 +187,11 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
           stripe_plan: localStorage.getItem('capten_plan') || 'GRATUIT',
           stripe_subscription_status: localStorage.getItem('capten_plan') === 'CAPTEN' ? 'active' : 'inactive',
           spots_balance_cents: parseInt(localStorage.getItem('capten_spots_balance_cents') || '21850', 10),
-          stripe_connect_id: localStorage.getItem('capten_stripe_connect_id') || 'acct_mock_connect_123'
+          stripe_connect_id: localStorage.getItem('capten_stripe_connect_id') || 'acct_mock_connect_123',
+          plan: planVal,
+          first_run_created_at: localStorage.getItem('capten_first_run_created_at') || null,
+          created_at: localStorage.getItem('capten_club_created_at') || new Date().toISOString(),
+          signup_variant: localStorage.getItem('capten_signup_variant') || 'A',
         });
       } else {
         setUser(null);

@@ -195,6 +195,11 @@ export async function signUp(formData: FormData) {
   const email = formData.get('email') as string
   const password = formData.get('password') as string
   const clubName = formData.get('clubName') as string
+  const ville = formData.get('ville') as string
+  const membersCount = formData.get('membersCount') as string
+  const instagramLink = formData.get('instagramLink') as string
+  const variant = formData.get('variant') as string
+  const plan = formData.get('plan') as string
 
   if (!email || !password) {
     return { error: 'Veuillez saisir votre e-mail et votre mot de passe.' }
@@ -218,7 +223,20 @@ export async function signUp(formData: FormData) {
       sameSite: 'lax',
       maxAge: 60 * 60 * 24 * 7
     })
-    return { success: true, message: 'Compte créé avec succès (mode démo) ! Redirection...' }
+    return { 
+      success: true, 
+      isMock: true, 
+      message: 'Compte créé avec succès (mode démo) ! Redirection...',
+      mockUser: {
+        email,
+        clubName: clubName.trim(),
+        ville: ville ? ville.trim() : '',
+        membersCount: membersCount ? Number(membersCount) : 0,
+        instagramLink: instagramLink ? instagramLink.trim() : '',
+        variant: variant || 'A',
+        plan: plan || 'free'
+      }
+    }
   }
 
   // Inscription réelle via Supabase Auth
@@ -248,6 +266,11 @@ export async function signUp(formData: FormData) {
     options: {
       data: {
         club_name: clubName.trim(),
+        ville: ville ? ville.trim() : '',
+        members_count: membersCount ? Number(membersCount) : 0,
+        instagram_link: instagramLink ? instagramLink.trim() : '',
+        signup_variant: variant || 'A',
+        plan: plan || 'free',
       },
       emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/auth/callback`,
     },
