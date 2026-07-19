@@ -122,6 +122,18 @@ export async function POST(request: Request) {
 
         const supabase = getSupabaseAdmin();
         if (supabase) {
+          // Check if ticket already exists (Idempotency)
+          const { data: existingTicket } = await supabase
+            .from('spot_tickets')
+            .select('id, status')
+            .eq('stripe_payment_intent_id', paymentIntentId)
+            .maybeSingle();
+
+          if (existingTicket) {
+            console.log(`[Stripe Webhook] PaymentIntent ${paymentIntentId} déjà traité — billet existant.`);
+            return NextResponse.json({ received: true });
+          }
+
           const qrToken = generateQrToken();
 
           const { data: ticket, error: ticketError } = await supabase

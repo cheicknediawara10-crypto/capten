@@ -94,6 +94,8 @@ export async function POST(
     const platformRate = isFirstVisit ? (Number(event.club_rate || 0.10) + Number(event.platform_rate || 0.05)) : 0;
     const applicationFeeAmount = Math.round(amountCents * platformRate);
 
+    const idempotencyKey = request.headers.get('idempotency-key') || request.headers.get('x-idempotency-key') || undefined;
+
     // Créer le PaymentIntent Stripe avec transfert Direct Connect
     const paymentIntent = await stripe.paymentIntents.create({
       amount: amountCents,
@@ -111,6 +113,8 @@ export async function POST(
         is_first_visit: isFirstVisit ? 'true' : 'false',
         commission_applied: (isFirstVisit && applicationFeeAmount > 0) ? 'true' : 'false',
       },
+    }, {
+      idempotencyKey
     });
 
     return NextResponse.json({

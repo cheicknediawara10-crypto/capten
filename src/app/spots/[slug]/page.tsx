@@ -35,10 +35,10 @@ export default function SpotSalePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Formulaire de réservation
   const [runnerName, setRunnerName] = useState('');
   const [runnerEmail, setRunnerEmail] = useState('');
   const [paymentLoading, setPaymentLoading] = useState(false);
+  const [buttonState, setButtonState] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [purchaseSuccess, setPurchaseSuccess] = useState(false);
   const [purchasedTicket, setPurchasedTicket] = useState<{ qr_token: string; id: string } | null>(null);
 
@@ -86,12 +86,23 @@ export default function SpotSalePage() {
       return;
     }
     setPaymentLoading(true);
+    setButtonState('loading');
 
     try {
-      // 1. Appeler l'API de checkout
+      // 1. Get or generate idempotency key
+      let idempotencyKey = sessionStorage.getItem('payment_idempotency_key');
+      if (!idempotencyKey) {
+        idempotencyKey = crypto.randomUUID();
+        sessionStorage.setItem('payment_idempotency_key', idempotencyKey);
+      }
+
+      // 2. Appeler l'API de checkout avec idempotency header
       const res = await fetch(`/api/spot-events/${event?.id}/checkout`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Idempotency-Key': idempotencyKey
+        },
         body: JSON.stringify({
           runner_name: runnerName,
           runner_email: runnerEmail
@@ -105,7 +116,7 @@ export default function SpotSalePage() {
 
       const clientSecret = paymentData.clientSecret;
 
-      // 2. Vérifier si c'est un paiement de simulation (mode mock)
+      // 3. Vérifier si c'est un paiement de simulation (mode mock)
       if (clientSecret.startsWith('pi_mock_')) {
         // Simuler un webhook Stripe après 1s
         setTimeout(() => {
@@ -117,13 +128,10 @@ export default function SpotSalePage() {
           });
           setTicketsSold(prev => prev + 1);
           setPaymentLoading(false);
+          setButtonState('success');
         }, 1200);
       } else {
         // Mode Réel Stripe
-        // Pour éviter d'avoir de gros imports de Stripe js complexes dans le bundle initial,
-        // on charge dynamiquement l'iframe de paiement Stripe ou on utilise le Redirect checkout
-        // Dans ce MVP, pour une conversion ultra-rapide sur mobile sans bugs, nous simulons
-        // les paiements tests Stripe si le mode test est actif et que l'utilisateur clique sur Payer
         alert("Paiement par carte simulé en mode Test Stripe.");
         setPurchaseSuccess(true);
         setPurchasedTicket({
@@ -132,10 +140,13 @@ export default function SpotSalePage() {
         });
         setTicketsSold(prev => prev + 1);
         setPaymentLoading(false);
+        setButtonState('success');
       }
     } catch (err: any) {
+      sessionStorage.removeItem('payment_idempotency_key');
       alert(err.message);
       setPaymentLoading(false);
+      setButtonState('error');
     }
   };
 
@@ -321,10 +332,24 @@ export default function SpotSalePage() {
 
                 <button
                   type="submit"
-                  disabled={paymentLoading}
-                  className="w-full h-12 bg-black hover:bg-[#FF5C00] disabled:bg-neutral-400 text-white font-mono font-bold text-xs uppercase tracking-widest rounded-md transition-all flex items-center justify-center gap-2 mt-4"
+                  disabled={buttonState === 'loading' || buttonState === 'success'}
+                  className={`w-full h-12 text-white font-mono font-bold text-xs uppercase tracking-widest rounded-md transition-all flex items-center justify-center gap-2 mt-4 ${
+                    buttonState === 'success' 
+                      ? 'bg-emerald-600' 
+                      : buttonState === 'error'
+                        ? 'bg-[#FF5C00]'
+                        : 'bg-black hover:bg-[#FF5C00] disabled:bg-neutral-400'
+                  }`}
                 >
-                  {paymentLoading ? 'Paiement en cours...' : `Réserver & Payer ${formatPrice(price)}`}
+                  {buttonState === 'loading' && (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                      Traitement...
+                    </>
+                  )}
+                  {buttonState === 'success' && '✓ Réservé'}
+                  {buttonState === 'error' && 'Réessayer'}
+                  {buttonState === 'idle' && `Réserver & Payer ${formatPrice(price)}`}
                 </button>
               </form>
             ) : (
