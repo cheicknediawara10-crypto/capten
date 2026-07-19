@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { getSupabase, getSupabaseAdmin } from '@/lib/supabase';
-import { getOrCreateDailyBrief, queryCopilotGuidedAction } from '@/lib/ai/copilote';
+import { getOrCreateDailyBrief, queryCopilotGuidedAction, queryCopilotAccroche } from '@/lib/ai/copilote';
 
 export const dynamic = 'force-dynamic';
 
@@ -46,6 +46,25 @@ export async function GET() {
       });
     }
 
+    // Compter le nombre de requêtes IA de chat effectuées aujourd'hui (briefs + chats)
+    const todayStr = new Date().toISOString().split('T')[0];
+    const { count: dailyCalls } = await supabase
+      .from('copilote_brief')
+      .select('*', { count: 'exact', head: true })
+      .eq('club_id', clubId)
+      .eq('brief_date', todayStr);
+
+    const callsCount = dailyCalls || 0;
+    if (callsCount >= 20) {
+      return NextResponse.json({
+        success: false,
+        briefing: "Tu as fait le tour pour aujourd'hui, ton Copilote revient demain 🌙 (Limite de 20 demandes par jour)",
+        limitExceeded: true,
+        chatCallsCount: callsCount,
+        timestamp: new Date().toISOString()
+      });
+    }
+
     const brief = await getOrCreateDailyBrief(supabase, clubId);
 
     // Récupérer également les alertes actives pour affichage direct
@@ -57,14 +76,8 @@ export async function GET() {
       .order('priority', { ascending: false })
       .limit(3);
 
-    // Compter le nombre de requêtes IA de chat effectuées aujourd'hui
-    const todayStr = new Date().toISOString().split('T')[0];
-    const { count: dailyCalls } = await supabase
-      .from('copilote_brief')
-      .select('*', { count: 'exact', head: true })
-      .eq('club_id', clubId)
-      .eq('brief_date', todayStr)
-      .eq('model_used', 'gemini-3.5-flash-chat');
+    // Générer l'accroche contextuelle dynamique
+    const hookAlert = await queryCopilotAccroche(supabase, clubId);
 
     return NextResponse.json({
       success: true,
@@ -73,7 +86,8 @@ export async function GET() {
       mood: brief.mood,
       model_used: brief.model_used,
       alerts: alerts || [],
-      chatCallsCount: dailyCalls || 0,
+      hookAlert: hookAlert,
+      chatCallsCount: callsCount,
       timestamp: new Date().toISOString()
     });
   } catch (error: any) {
@@ -135,20 +149,19 @@ export async function POST(request: Request) {
       });
     }
 
-    // Limiteur de quota de chat : Max 20 demandes/jour/fondateur
+    // Limiteur de quota de chat : Max 20 demandes/jour/fondateur (briefs + chats)
     const todayStr = new Date().toISOString().split('T')[0];
     const { count: dailyCalls } = await supabase
       .from('copilote_brief')
       .select('*', { count: 'exact', head: true })
       .eq('club_id', clubId)
-      .eq('brief_date', todayStr)
-      .eq('model_used', 'gemini-3.5-flash-chat');
+      .eq('brief_date', todayStr);
 
     const callsCount = dailyCalls || 0;
     if (callsCount >= 20) {
       return NextResponse.json({
         success: false,
-        reply: "Tu as fait le tour pour aujourd'hui, ton Copilote revient demain 🌙 (Limite de 20 demandes de chat par jour)",
+        reply: "Tu as fait le tour pour aujourd'hui, ton Copilote revient demain 🌙 (Limite de 20 demandes par jour)",
         limitExceeded: true,
         chatCallsCount: callsCount,
         timestamp: new Date().toISOString()
