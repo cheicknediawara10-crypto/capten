@@ -310,8 +310,8 @@ function LoginForm() {
         return;
       }
 
-      // If Variant B and not free plan URL, we need Step 2 (Card) before submitting to server
-      if (assignedVariant === 'B' && !isFreePlanUrl && signupStep === 1) {
+      // Unless free plan URL (free=true), trial signup requires Step 2 (Card) for 21-day trial
+      if (!isFreePlanUrl && signupStep === 1) {
         setSignupStep(2);
         return;
       }
@@ -327,7 +327,7 @@ function LoginForm() {
       formData.append("instagramLink", instagramLink);
       formData.append("variant", assignedVariant);
 
-      const targetPlan = (assignedVariant === 'B' && !isFreePlanUrl) ? 'trial' : 'free';
+      const targetPlan = !isFreePlanUrl ? 'trial' : 'free';
       formData.append("plan", targetPlan);
 
       const result = await signUp(formData);
@@ -453,7 +453,7 @@ function LoginForm() {
           {mode === "password" 
             ? "Espace Sécurisé" 
             : mode === "signup" 
-              ? (assignedVariant === 'B' && !isFreePlanUrl
+              ? (!isFreePlanUrl
                   ? (signupStep === 1 ? "Étape 1 sur 2" : "Étape 2 sur 2")
                   : "Nouveau Capitaine")
               : "Réinitialisation"}
@@ -473,7 +473,7 @@ function LoginForm() {
           {mode === "password" 
             ? "CONNEXION" 
             : mode === "signup" 
-              ? (assignedVariant === 'B' && !isFreePlanUrl
+              ? (!isFreePlanUrl
                   ? (signupStep === 1 ? "INSCRIPTION" : "CARTE BANCAIRE")
                   : "INSCRIPTION")
               : "RÉINITIALISATION"}
@@ -488,7 +488,7 @@ function LoginForm() {
           {mode === "password"
             ? "Accédez à votre tableau de bord et pilotez votre run club."
             : mode === "signup"
-              ? (assignedVariant === 'B' && !isFreePlanUrl
+              ? (!isFreePlanUrl
                   ? (signupStep === 1 
                       ? "Saisissez vos informations de compte capitaine pour commencer votre essai."
                       : "Enregistrez votre carte pour activer l'essai de 21 jours. Aucun prélèvement aujourd'hui.")
