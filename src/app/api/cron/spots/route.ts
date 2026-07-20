@@ -227,6 +227,7 @@ async function handleCron(request: Request) {
         if (tickets) {
           for (const ticket of tickets) {
             const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${ticket.qr_token}`;
+            const ticketUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://capten.app'}/spots/ticket/${ticket.id}`;
             const spotObj = Array.isArray(event.spot) ? event.spot[0] : event.spot;
             const spotName = (spotObj as any)?.name || 'Commerce';
             const spotAddress = (spotObj as any)?.address || '';
