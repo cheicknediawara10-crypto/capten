@@ -117,6 +117,11 @@ export async function POST(request: Request) {
         },
       ];
       sessionParams.mode = 'subscription';
+      if (!isYearly) {
+        sessionParams.subscription_data = {
+          trial_period_days: 21,
+        };
+      }
       sessionParams.success_url = `${origin}/plan?success=true&session_id={CHECKOUT_SESSION_ID}&planName=${planName}&billingInterval=${intervalText}`;
       sessionParams.cancel_url = `${origin}/plan?cancelled=true`;
 

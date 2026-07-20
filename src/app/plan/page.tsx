@@ -300,13 +300,13 @@ export default function PlanPage() {
       name: "CAPTEN",
       price: billingInterval === 'monthly' ? "49,99€" : "41,58€",
       period: "/mois",
-      billingNote: !isLoggedIn && variant === 'B' 
-        ? "Rien ne t'est prélevé aujourd'hui."
-        : (billingInterval === 'yearly' ? "Facturé 499€/an (2 mois offerts)" : "Facturé mensuellement"),
+      billingNote: billingInterval === 'yearly' 
+        ? "Facturé 499€/an (2 mois offerts)" 
+        : "Essai 21 jours gratuit — Rien ne t'est prélevé aujourd'hui",
       desc: "Le cockpit de pilotage ultime pour structurer ton crew et le faire grandir comme un pro.",
-      tag: !isLoggedIn && variant === 'B'
-        ? "ESSAI 21 JOURS GRATUITS"
-        : (billingInterval === 'yearly' ? "RECOMMANDÉ — 2 MOIS OFFERTS" : "RECOMMANDÉ (SANS ENGAGEMENT)"),
+      tag: billingInterval === 'yearly'
+        ? "RECOMMANDÉ — 2 MOIS OFFERTS"
+        : "ESSAI 21 JOURS GRATUITS",
       features: [
         { t: "Page publique du crew", d: "Inscriptions rapides en 1 lien partagé.", included: true },
         { t: "Runs illimités", d: "Planifie autant de sorties simultanées que tu veux.", included: true },
@@ -317,9 +317,9 @@ export default function PlanPage() {
         { t: "Le Copilote IA", d: "Briefing crew météo/présence quotidien + création de séances.", included: true }
       ],
       button: currentPlan === "CAPTEN" ? "PLAN ACTUEL" : (
-        !isLoggedIn && variant === 'B' 
-          ? "ESSAI 21 JOURS — SANS ENGAGEMENT" 
-          : (billingInterval === 'yearly' ? "ACTIVER LE PLAN ANNUEL" : "PASSER À CAPTEN")
+        billingInterval === 'yearly' 
+          ? "ACTIVER LE PLAN ANNUEL" 
+          : "ESSAI 21 JOURS GRATUIT"
       ),
       type: currentPlan === "CAPTEN" ? "current" : "action"
     }
@@ -492,21 +492,12 @@ export default function PlanPage() {
                         </div>
                       )
                     ) : (
-                      variant === 'A' ? (
-                        <Link 
-                          href="/login?mode=signup&variant=A&upgrade=true"
-                          className="w-full text-center py-4 rounded-[10px] text-[10px] sm:text-[11px] font-black uppercase tracking-[0.2em] transition-all bg-[#FF5C00] text-white hover:bg-black block cursor-pointer"
-                        >
-                          SOUSCRIRE À CAPTEN
-                        </Link>
-                      ) : (
-                        <Link 
-                          href="/login?mode=signup&variant=B"
-                          className="w-full text-center py-4 rounded-[10px] text-[10px] sm:text-[11px] font-black uppercase tracking-[0.2em] transition-all bg-[#FF5C00] text-white hover:bg-black block cursor-pointer"
-                        >
-                          ESSAI 21 JOURS — SANS ENGAGEMENT
-                        </Link>
-                      )
+                      <Link 
+                        href="/login?mode=signup&upgrade=true"
+                        className="w-full text-center py-4 rounded-[10px] text-[10px] sm:text-[11px] font-black uppercase tracking-[0.2em] transition-all bg-[#FF5C00] text-white hover:bg-black block cursor-pointer"
+                      >
+                        {billingInterval === 'yearly' ? "ACTIVER LE PLAN ANNUEL" : "ESSAI 21 JOURS GRATUIT"}
+                      </Link>
                     )}
                   </>
                 )}
