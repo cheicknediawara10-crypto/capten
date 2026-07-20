@@ -127,9 +127,11 @@ async function handleCron(request: Request) {
               .maybeSingle();
 
             // 5. Envoyer les récapitulatifs par email
-            const merchantEmail = event.spot?.contact_email;
-            const spotName = event.spot?.name || 'Commerce';
-            const clubName = event.club?.whatsapp_display_name || 'Club';
+            const spotObj = Array.isArray(event.spot) ? event.spot[0] : event.spot;
+            const clubObj = Array.isArray(event.club) ? event.club[0] : event.club;
+            const merchantEmail = (spotObj as any)?.contact_email;
+            const spotName = (spotObj as any)?.name || 'Commerce';
+            const clubName = (clubObj as any)?.whatsapp_display_name || 'Club';
             
             // Email au commerce
             if (merchantEmail) {
@@ -225,8 +227,10 @@ async function handleCron(request: Request) {
         if (tickets) {
           for (const ticket of tickets) {
             const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${ticket.qr_token}`;
-            const ticketUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://capten.app'}/spots/ticket/${ticket.id}`;
-            const spotName = event.spot?.name || 'Commerce';
+            const spotObj = Array.isArray(event.spot) ? event.spot[0] : event.spot;
+            const spotName = (spotObj as any)?.name || 'Commerce';
+            const spotAddress = (spotObj as any)?.address || '';
+            const offerDesc = (spotObj as any)?.offer_description || '';
 
             try {
               await resend.emails.send({
@@ -247,9 +251,9 @@ async function handleCron(request: Request) {
                     </div>
                     
                     <div style="background-color: #F4F5F7; padding: 15px; border-radius: 8px; font-size: 14px; line-height: 1.6; color: #333;">
-                      <p style="margin: 5px 0;">📍 <strong>Lieu :</strong> ${spotName} (${event.spot?.address || ''})</p>
+                      <p style="margin: 5px 0;">📍 <strong>Lieu :</strong> ${spotName} (${spotAddress})</p>
                       <p style="margin: 5px 0;">📅 <strong>Date :</strong> Demain (${new Date(event.event_date).toLocaleDateString('fr-FR')}) à ${event.event_time}</p>
-                      <p style="margin: 5px 0;">☕️ <strong>Offre incluse :</strong> ${event.spot?.offer_description || ''}</p>
+                      <p style="margin: 5px 0;">☕️ <strong>Offre incluse :</strong> ${offerDesc}</p>
                     </div>
                     
                     <p style="text-align: center; margin-top: 25px; font-size: 12px; color: #888;">

@@ -67,7 +67,8 @@ export async function POST(
       return NextResponse.json({ error: 'SOLD_OUT', message: 'Cet événement est complet !' }, { status: 400 });
     }
 
-    const stripeAccountId = event.spot?.stripe_account_id;
+    const spotObj = Array.isArray(event.spot) ? event.spot[0] : event.spot;
+    const stripeAccountId = (spotObj as any)?.stripe_account_id;
     if (!stripeAccountId) {
       return NextResponse.json({ 
         error: 'PAYMENT_UNCONFIGURED', 

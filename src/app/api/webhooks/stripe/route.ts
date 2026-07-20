@@ -175,11 +175,12 @@ export async function POST(request: Request) {
               }
             }
             
-            // Envoyer l'email avec le QR Code
-            const spotName = ticket.spot_events?.spot?.name || 'Commerce';
-            const spotAddress = ticket.spot_events?.spot?.address || '';
-            const offerDesc = ticket.spot_events?.spot?.offer_description || '';
-            const clubName = ticket.spot_events?.club?.whatsapp_display_name || 'Capten';
+            const spotObj = Array.isArray(ticket.spot_events?.spot) ? ticket.spot_events.spot[0] : ticket.spot_events?.spot;
+            const clubObj = Array.isArray(ticket.spot_events?.club) ? ticket.spot_events.club[0] : ticket.spot_events?.club;
+            const spotName = (spotObj as any)?.name || 'Commerce';
+            const spotAddress = (spotObj as any)?.address || '';
+            const offerDesc = (spotObj as any)?.offer_description || '';
+            const clubName = (clubObj as any)?.whatsapp_display_name || 'Capten';
             
             const eventDateStr = ticket.spot_events?.event_date 
               ? new Date(ticket.spot_events.event_date).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })
