@@ -937,7 +937,7 @@ export default function DashboardPage() {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div>
                 <p className="text-[20px] sm:text-[24px] font-display italic font-black uppercase text-black leading-none tracking-tight">
-                  {new Date(latestSpotEvent.event_date).toLocaleDateString('fr-FR', { weekday: 'long', day: '2-digit', month: '2-digit' }).toUpperCase()} — {latestSpotEvent.spot?.name || 'SPOT PARTENAIRE'}
+                  {new Date(latestSpotEvent.event_date).toLocaleDateString('fr-FR', { weekday: 'long', day: '2-digit', month: '2-digit' }).toUpperCase()} — {(Array.isArray(latestSpotEvent.spot) ? (latestSpotEvent.spot[0] as any)?.name : (latestSpotEvent.spot as any)?.name) || 'SPOT PARTENAIRE'}
                 </p>
               </div>
             </div>
