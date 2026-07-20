@@ -138,21 +138,8 @@ export default function DashboardPage() {
       const skipped = localStorage.getItem('capten_onboarding_skipped') === 'true';
       setSkipOnboarding(skipped);
 
-      // Simulation mock spots
-      setLatestSpotEvent({
-        id: 'event-1-mock',
-        event_date: '2026-07-18',
-        quota: 40,
-        offer_price_cents: 600,
-        merchant_rate: 0.75,
-        club_rate: 0.125,
-        platform_rate: 0.125,
-        checkin_count: 24,
-        spot: {
-          name: 'Blondy Coffee',
-          offer_description: 'Café filtre + Part de banana bread maison'
-        }
-      });
+      // No hardcoded mock spot event
+      setLatestSpotEvent(null);
 
       // Load Brand Setup Status
       const savedName = localStorage.getItem('capten_club_name') || localStorage.getItem('capten_onboarding_s2_name') || '';
