@@ -228,7 +228,7 @@ export default function PlanPage() {
     }
   }, [billingInterval]);
 
-  const handleUpgradePlan = (plan: any) => {
+  const handleUpgradePlan = async (plan: any) => {
     if (plan.name === "GRATUIT") {
       setProcessingPlan("GRATUIT");
       setIsProcessing(true);
@@ -246,33 +246,39 @@ export default function PlanPage() {
       }, 800);
     } else {
       setSelectedPlan(plan);
+      setProcessingPlan(plan.name);
+      setIsProcessing(true);
+      try {
+        const res = await fetch('/api/stripe/checkout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: 'plan',
+            planName: plan.name,
+            billingInterval: billingInterval,
+          }),
+        });
+
+        const data = await res.json();
+        if (data.url) {
+          window.location.href = data.url;
+        } else {
+          alert(data.error || 'Erreur de redirection vers Stripe.');
+          setIsProcessing(false);
+          setProcessingPlan(null);
+        }
+      } catch (err) {
+        console.error(err);
+        alert('Erreur serveur lors de la connexion à Stripe.');
+        setIsProcessing(false);
+        setProcessingPlan(null);
+      }
     }
   };
 
   const handleConfirmUpgrade = async () => {
-    setIsProcessing(true);
-    try {
-      const res = await fetch('/api/stripe/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          type: 'plan',
-          planName: selectedPlan.name,
-          billingInterval: billingInterval,
-        }),
-      });
-
-      const data = await res.json();
-      if (data.url) {
-        window.location.href = data.url;
-      } else {
-        alert(data.error || 'Erreur de redirection vers Stripe.');
-        setIsProcessing(false);
-      }
-    } catch (err) {
-      console.error(err);
-      alert('Erreur serveur lors de la connexion à Stripe.');
-      setIsProcessing(false);
+    if (selectedPlan) {
+      await handleUpgradePlan(selectedPlan);
     }
   };
 
