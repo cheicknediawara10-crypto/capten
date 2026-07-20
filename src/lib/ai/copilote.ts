@@ -535,6 +535,9 @@ async function buildSystemPrompt(supabase: SupabaseClient, clubId: string): Prom
         .eq('spot_event_id', lastSpotEvent.id)
         .eq('status', 'paid');
 
+      const totalGenerated = (((ticketCount || 0) * (lastSpotEvent.offer_price_cents || 0)) / 100).toFixed(2);
+      const dateObj = new Date(lastSpotEvent.event_date);
+      const dateStr = dateObj.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
       const spotObj = Array.isArray(lastSpotEvent.spot) ? lastSpotEvent.spot[0] : lastSpotEvent.spot;
       const spotName = (spotObj as any)?.name;
       lastSpotStr = `${spotName || 'Commerce'} le ${dateStr} — ${ticketCount || 0} présents — ${totalGenerated} € générés`;
