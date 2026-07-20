@@ -851,7 +851,7 @@ function LoginForm() {
 
         {/* Step 2 Fields: Card Details (Variant B Trial signup only) */}
         {mode === "signup" && signupStep === 2 && (
-          <div className="login-fade-up" style={{ spaceY: 16 }}>
+          <div className="login-fade-up space-y-4">
             {/* Trial Recap Panel */}
             <div style={{
               background: "#FDFCF8",
