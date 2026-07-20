@@ -498,12 +498,20 @@ export default function PlanPage() {
                         </div>
                       )
                     ) : (
-                      <Link 
-                        href="/login?mode=signup&upgrade=true"
-                        className="w-full text-center py-4 rounded-[10px] text-[10px] sm:text-[11px] font-black uppercase tracking-[0.2em] transition-all bg-[#FF5C00] text-white hover:bg-black block cursor-pointer"
-                      >
-                        {billingInterval === 'yearly' ? "ACTIVER LE PLAN ANNUEL" : "ESSAI 21 JOURS GRATUIT"}
-                      </Link>
+                      <div className="space-y-3 text-center">
+                        <Link 
+                          href="/login?mode=signup&upgrade=true"
+                          className="w-full text-center py-4 rounded-[10px] text-[10px] sm:text-[11px] font-black uppercase tracking-[0.2em] transition-all bg-[#FF5C00] text-white hover:bg-black block cursor-pointer shadow-lg shadow-orange-500/20"
+                        >
+                          {billingInterval === 'yearly' ? "ACTIVER LE PLAN ANNUEL" : "ESSAI 21 JOURS GRATUIT — ACCÈS COMPLET"}
+                        </Link>
+                        <Link 
+                          href="/login?mode=signup&free=true"
+                          className="text-[10px] font-bold text-neutral-400 hover:text-black transition-all uppercase tracking-wider underline block pt-1 cursor-pointer"
+                        >
+                          ou continuer avec le plan gratuit
+                        </Link>
+                      </div>
                     )}
                   </>
                 )}
