@@ -50,8 +50,8 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // Fallback au cookie de session de simulation si Supabase n'est pas configuré
-  if (!isLoggedIn && !isSupabaseConfigured) {
+  // Fallback au cookie de session de simulation UNIQUEMENT en développement local
+  if (!isLoggedIn && !isSupabaseConfigured && process.env.NODE_ENV === 'development') {
     const mockSession = request.cookies.get('capten_mock_session')
     if (mockSession && mockSession.value === 'active') {
       isLoggedIn = true

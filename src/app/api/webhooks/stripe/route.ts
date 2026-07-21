@@ -191,7 +191,8 @@ export async function POST(request: Request) {
             const ticketUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://capten.app'}/spots/ticket/${ticket.id}`;
             
             try {
-              await resend.emails.send({
+              if (resend) {
+                await resend.emails.send({
                 from: 'Capten Spots <spots@capten.app>',
                 to: runnerEmail,
                 subject: `🎟️ Votre billet Capten Spots chez ${spotName}`,
@@ -223,6 +224,7 @@ export async function POST(request: Request) {
                   </div>
                 `
               });
+              }
             } catch (emailErr) {
               console.error('[Webhook Error] Failed to send ticket email:', emailErr);
             }

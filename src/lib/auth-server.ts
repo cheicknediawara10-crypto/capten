@@ -5,9 +5,12 @@ export async function getAuthenticatedCaptainId(): Promise<string | null> {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
-  // Mock Fallback
+  // Mock Fallback — uniquement en développement local
   if (!supabaseUrl || !supabaseAnonKey || supabaseUrl.includes('votre-projet')) {
-    return 'mock-captain-uuid';
+    if (process.env.NODE_ENV === 'development') {
+      return 'mock-captain-uuid';
+    }
+    return null;
   }
 
   try {

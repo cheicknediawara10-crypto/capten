@@ -203,10 +203,10 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
 
     setIsMock(false);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
-        setUser(session.user);
-        await fetchClub(session.user.id, supabase);
+      const { data: { user: authenticatedUser } } = await supabase.auth.getUser();
+      if (authenticatedUser) {
+        setUser(authenticatedUser);
+        await fetchClub(authenticatedUser.id, supabase);
       } else {
         setUser(null);
         setClub(null);

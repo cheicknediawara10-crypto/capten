@@ -1,0 +1,12 @@
+# Capten — Social Run Club Management Platform
+# https://capten.app
+
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /settings/
+Disallow: /login/
+Disallow: /plan/
+
+Sitemap: https://capten.app/sitemap.xml

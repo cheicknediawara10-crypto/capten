@@ -172,7 +172,8 @@ export async function POST(request: Request) {
     const declineLink = generateSignedLink(newEvent.id, 'decline');
 
     try {
-      await resend.emails.send({
+      if (resend) {
+        await resend.emails.send({
         from: 'Capten Spots <spots@capten.app>',
         to: contactEmail,
         subject: `Proposition de Run Club : ${clubName} souhaite venir chez ${spotName} !`,
@@ -200,6 +201,7 @@ export async function POST(request: Request) {
           </div>
         `
       });
+      }
     } catch (emailErr) {
       console.error("Failed to send proposal email via Resend:", emailErr);
     }

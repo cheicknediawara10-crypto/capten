@@ -136,7 +136,7 @@ async function handleCron(request: Request) {
             // Email au commerce
             if (merchantEmail) {
               try {
-                await resend.emails.send({
+                if (resend) await resend.emails.send({
                   from: 'Capten Spots <spots@capten.app>',
                   to: merchantEmail,
                   subject: `📈 Rapport financier Capten Spots — Sortie ${clubName}`,
@@ -165,7 +165,7 @@ async function handleCron(request: Request) {
             // Email au fondateur
             if (founderProfile?.email) {
               try {
-                await resend.emails.send({
+                if (resend) await resend.emails.send({
                   from: 'Capten Spots <spots@capten.app>',
                   to: founderProfile.email,
                   subject: `🔥 Le Compteur Spots — Cagnotte Club créditée !`,
@@ -234,7 +234,8 @@ async function handleCron(request: Request) {
             const offerDesc = (spotObj as any)?.offer_description || '';
 
             try {
-              await resend.emails.send({
+              if (resend) {
+                await resend.emails.send({
                 from: 'Capten Spots <spots@capten.app>',
                 to: ticket.runner_email,
                 subject: `⏰ Rappel J-1 : Votre billet Capten Spots pour demain chez ${spotName}`,
@@ -264,6 +265,7 @@ async function handleCron(request: Request) {
                   </div>
                 `
               });
+              }
               remindersSent++;
             } catch (e) {
               console.error('Failed sending runner reminder email:', e);

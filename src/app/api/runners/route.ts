@@ -111,9 +111,28 @@ export async function PATCH(request: Request) {
 
     const body = await request.json().catch(() => ({}));
 
+    // Whitelist des champs autorisés pour éviter l'injection (ex: changement de club_id)
+    const ALLOWED_FIELDS = [
+      'name', 'phone', 'email', 'role', 'reliability', 'pace',
+      'emergency_name', 'emergency_phone', 'emergency_relation',
+      'birth_date', 'blood_type', 'allergies', 'health_issues',
+      'insurance', 'address', 'signed_waiver', 'is_blacklisted'
+    ];
+
+    const sanitizedUpdate: Record<string, any> = {};
+    for (const key of ALLOWED_FIELDS) {
+      if (key in body) {
+        sanitizedUpdate[key] = body[key];
+      }
+    }
+
+    if (Object.keys(sanitizedUpdate).length === 0) {
+      return NextResponse.json({ error: 'Aucun champ valide à mettre à jour' }, { status: 400 });
+    }
+
     const { data: updatedRunner, error } = await supabaseAdmin
       .from('runners')
-      .update(body)
+      .update(sanitizedUpdate)
       .eq('id', id)
       .eq('club_id', captainId)
       .select()

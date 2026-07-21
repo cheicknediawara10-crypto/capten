@@ -92,7 +92,8 @@ export async function GET(
         const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://capten.app';
         const eventUrl = `${siteUrl}/spots/${event.public_slug}`;
         
-        await resend.emails.send({
+        if (resend) {
+          await resend.emails.send({
           from: 'Capten Spots <spots@capten.app>',
           to: contactFounderEmail,
           subject: action === 'accept' 
@@ -118,6 +119,7 @@ export async function GET(
               </div>
             `
         });
+        }
       }
     } catch (dbErr: any) {
       console.error("Database update error on respond:", dbErr);

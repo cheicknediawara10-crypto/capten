@@ -71,7 +71,7 @@ async function handleOnboardingCron(request: Request) {
 
           const recipient = profile?.email;
           if (recipient) {
-            await resend.emails.send({
+            if (resend) await resend.emails.send({
               from: 'Capten Onboarding <onboarding@capten.app>',
               to: recipient,
               subject: '⚡ Planifie ton premier run sur Capten !',
@@ -103,7 +103,7 @@ async function handleOnboardingCron(request: Request) {
 
           const recipient = profile?.email;
           if (recipient) {
-            await resend.emails.send({
+            if (resend) await resend.emails.send({
               from: 'Capten Onboarding <onboarding@capten.app>',
               to: recipient,
               subject: '🏃‍♂️ Déjà une semaine d\'essai Capten !',
@@ -135,7 +135,7 @@ async function handleOnboardingCron(request: Request) {
 
           const recipient = profile?.email;
           if (recipient) {
-            await resend.emails.send({
+            if (resend) await resend.emails.send({
               from: 'Capten Onboarding <onboarding@capten.app>',
               to: recipient,
               subject: '🔥 Déjà 14 jours d\'essai ! Faisons le point',
@@ -167,7 +167,7 @@ async function handleOnboardingCron(request: Request) {
 
           const recipient = profile?.email;
           if (recipient) {
-            await resend.emails.send({
+            if (resend) await resend.emails.send({
               from: 'Capten Billing <billing@capten.app>',
               to: recipient,
               subject: '⚠️ Rappel : Fin de votre essai Capten dans 3 jours',
