@@ -46,7 +46,6 @@ export interface ClubDetails {
   id: string;
   name: string;
   whatsapp_display_name: string;
-  twilio_messaging_service_sid?: string | null;
   credit_balance_euros: number;
   whatsapp_messages_sent_this_month: number;
   trial_ends_at: string;
