@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { 
@@ -26,7 +26,7 @@ import {
 import { SpotOffer } from '@/lib/spots';
 import { formatPrice } from '@/lib/supabase';
 
-export default function MerchantSpacePage() {
+function MerchantSpaceContent() {
   const searchParams = useSearchParams();
   const token = searchParams.get('token') || '';
 
@@ -882,5 +882,22 @@ export default function MerchantSpacePage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function MerchantSpacePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#FDFCF8] flex items-center justify-center p-6">
+        <div className="flex flex-col items-center gap-3">
+          <RefreshCw className="animate-spin text-[#FF5C00]" size={32} />
+          <p className="text-xs font-mono font-bold uppercase tracking-wider text-neutral-400">
+            Chargement de l'Espace Commerce...
+          </p>
+        </div>
+      </div>
+    }>
+      <MerchantSpaceContent />
+    </Suspense>
   );
 }
