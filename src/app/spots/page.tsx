@@ -357,6 +357,52 @@ export default function SpotsLandingPage() {
             </button>
           </form>
         </section>
+        {/* Section 6 — Accéder à mon espace commerce */}
+        <section className="bg-white border-2 border-black p-8 rounded-2xl max-w-2xl mx-auto space-y-4 text-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+          <span className="text-[9px] font-mono font-black uppercase tracking-[0.2em] text-[#FF5C00]">
+            Déjà Partenaire ?
+          </span>
+          <h2 className="text-xl font-display font-black uppercase italic tracking-tight">
+            Accéder à mon espace commerce
+          </h2>
+          <p className="text-xs font-mono text-neutral-500 max-w-md mx-auto">
+            Accédez à vos offres exclusives, validez les propositions de sorties et suivez vos encaissements sans mot de passe.
+          </p>
+
+          <form
+            onSubmit={async (e) => {
+              e.preventDefault();
+              const emailInput = (e.currentTarget.elements.namedItem('merchant_email') as HTMLInputElement)?.value;
+              if (!emailInput) return;
+              try {
+                const res = await fetch('/api/spots/merchant/magic-link', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ email: emailInput })
+                });
+                const data = await res.json();
+                alert(data.message || 'Lien d\'accès envoyé par email !');
+              } catch {
+                alert('Erreur lors de l\'envoi du lien.');
+              }
+            }}
+            className="flex flex-col sm:flex-row gap-2 max-w-md mx-auto pt-2"
+          >
+            <input
+              type="email"
+              name="merchant_email"
+              required
+              placeholder="contact@votre-commerce.com"
+              className="flex-1 bg-[#F4F5F7] border border-black/20 rounded-xl px-4 py-2.5 text-xs font-mono focus:outline-none focus:border-[#FF5C00]"
+            />
+            <button
+              type="submit"
+              className="bg-black hover:bg-[#FF5C00] text-white px-5 py-2.5 rounded-xl text-xs font-mono font-black uppercase tracking-wider transition-colors shrink-0"
+            >
+              Recevoir mon lien
+            </button>
+          </form>
+        </section>
       </main>
 
       {/* Footer */}

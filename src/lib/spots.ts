@@ -3,6 +3,17 @@ import crypto from 'crypto';
 const SECRET = process.env.CRON_SECRET || 'capten-spots-secret-2026';
 
 // Interfaces TypeScript pour le module Spots
+export interface SpotOffer {
+  id: string;
+  name: string;
+  description: string;
+  price_cents: number;
+  quota: number;
+  availability: string[];
+  status: 'active' | 'paused';
+  created_at: string;
+}
+
 export interface Spot {
   id: string;
   name: string;
@@ -13,9 +24,16 @@ export interface Spot {
   capacity: number;
   offer_description: string;
   offer_price_cents: number;
+  offer_name?: string;
+  offers?: SpotOffer[];
   availability: Record<string, string[]>;
   stripe_account_id: string | null;
   status: 'pending' | 'active' | 'paused' | 'rejected';
+  merchant_access_token?: string | null;
+  merchant_token_expires_at?: string | null;
+  total_earned_cents?: number;
+  total_events?: number;
+  total_runners?: number;
   created_at: string;
 }
 
@@ -164,6 +182,57 @@ export function verifySignedToken(eventId: string, action: 'accept' | 'decline',
   }
 }
 
+/**
+ * Génère un lien magique sécurisé pour l'Espace Commerce (durée de validité 30 jours).
+ */
+export function generateMerchantMagicLink(spotId: string, email: string): { link: string; token: string; expiresAt: string } {
+  const timestamp = Date.now();
+  const expiresInMs = 30 * 24 * 60 * 60 * 1000; // 30 jours
+  const expiresAtMs = timestamp + expiresInMs;
+  const data = `merchant:${spotId}:${email.toLowerCase()}:${expiresAtMs}`;
+  const signature = crypto.createHmac('sha256', SECRET).update(data).digest('hex');
+  const token = `${spotId}.${expiresAtMs}.${signature}`;
+  
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://capten.app';
+  const link = `${siteUrl}/spots/espace?token=${token}`;
+  return {
+    link,
+    token,
+    expiresAt: new Date(expiresAtMs).toISOString()
+  };
+}
+
+/**
+ * Vérifie la validité d'un token d'accès Espace Commerce (durée de validité 30 jours).
+ */
+export function verifyMerchantToken(token: string, email?: string): { valid: boolean; spotId?: string; expired?: boolean } {
+  try {
+    const parts = token.split('.');
+    if (parts.length !== 3) return { valid: false };
+    const [spotId, expiresAtStr, signature] = parts;
+    const expiresAtMs = parseInt(expiresAtStr, 10);
+    if (isNaN(expiresAtMs)) return { valid: false };
+
+    if (Date.now() > expiresAtMs) {
+      return { valid: false, spotId, expired: true };
+    }
+
+    if (email) {
+      const expectedData = `merchant:${spotId}:${email.toLowerCase()}:${expiresAtMs}`;
+      const expectedSignature = crypto.createHmac('sha256', SECRET).update(expectedData).digest('hex');
+      const sigBuffer = Buffer.from(signature, 'hex');
+      const expectedBuffer = Buffer.from(expectedSignature, 'hex');
+      if (sigBuffer.length !== expectedBuffer.length || !crypto.timingSafeEqual(sigBuffer, expectedBuffer)) {
+        return { valid: false };
+      }
+    }
+
+    return { valid: true, spotId };
+  } catch (e) {
+    return { valid: false };
+  }
+}
+
 // Données de simulation pour le développement local ou en mode mock
 export const MOCK_SPOTS: Spot[] = [
   {
@@ -174,11 +243,37 @@ export const MOCK_SPOTS: Spot[] = [
     contact_email: 'hello@blondy.cafe',
     contact_phone: '0142345678',
     capacity: 40,
+    offer_name: 'Le Pack Récup',
     offer_description: 'Café filtre + Part de banana bread maison',
     offer_price_cents: 600,
+    offers: [
+      {
+        id: 'offer-1',
+        name: 'Le Pack Récup',
+        description: 'Café filtre + Part de banana bread maison',
+        price_cents: 600,
+        quota: 40,
+        availability: ['sat_morning', 'sun_morning'],
+        status: 'active',
+        created_at: new Date().toISOString()
+      },
+      {
+        id: 'offer-2',
+        name: 'Le Brunch Runner',
+        description: 'Matcha Latte + Avocado toast + Granola bowl',
+        price_cents: 1400,
+        quota: 20,
+        availability: ['sun_morning'],
+        status: 'active',
+        created_at: new Date().toISOString()
+      }
+    ],
     availability: { sat: ['morning'], sun: ['morning'], wed: ['afternoon'] },
     stripe_account_id: 'acct_1mock123',
     status: 'active',
+    total_earned_cents: 62035,
+    total_events: 4,
+    total_runners: 143,
     created_at: new Date().toISOString()
   },
   {
@@ -189,11 +284,27 @@ export const MOCK_SPOTS: Spot[] = [
     contact_email: 'contact@tfb.com',
     contact_phone: '0142348899',
     capacity: 30,
+    offer_name: 'Le Pack Petit-Dej',
     offer_description: 'Double Espresso + Croissant au beurre AOP',
     offer_price_cents: 500,
+    offers: [
+      {
+        id: 'offer-tfb-1',
+        name: 'Le Pack Petit-Dej',
+        description: 'Double Espresso + Croissant au beurre AOP',
+        price_cents: 500,
+        quota: 30,
+        availability: ['sat_morning', 'sun_morning'],
+        status: 'active',
+        created_at: new Date().toISOString()
+      }
+    ],
     availability: { sat: ['morning'], sun: ['morning'] },
     stripe_account_id: null,
     status: 'active',
+    total_earned_cents: 35000,
+    total_events: 2,
+    total_runners: 70,
     created_at: new Date().toISOString()
   },
   {
@@ -204,11 +315,27 @@ export const MOCK_SPOTS: Spot[] = [
     contact_email: 'flore@cafe.fr',
     contact_phone: '0145485526',
     capacity: 50,
+    offer_name: 'Formule Gourmande',
     offer_description: 'Chocolat chaud spécial + Viennoiserie au choix',
     offer_price_cents: 1200,
+    offers: [
+      {
+        id: 'offer-flore-1',
+        name: 'Formule Gourmande',
+        description: 'Chocolat chaud spécial + Viennoiserie au choix',
+        price_cents: 1200,
+        quota: 50,
+        availability: ['tue_morning', 'thu_morning'],
+        status: 'active',
+        created_at: new Date().toISOString()
+      }
+    ],
     availability: { tue: ['morning'], thu: ['morning'] },
     stripe_account_id: 'acct_2mock123',
     status: 'pending',
+    total_earned_cents: 0,
+    total_events: 0,
+    total_runners: 0,
     created_at: new Date().toISOString()
   }
 ];
