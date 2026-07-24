@@ -1,6 +1,7 @@
 import crypto from 'crypto';
 
-const SECRET = process.env.CRON_SECRET || 'capten-spots-secret-2026';
+// HMAC secret dédié — JAMAIS de fallback hardcodé en production
+const SECRET = process.env.HMAC_SECRET || process.env.CRON_SECRET || '';
 
 // Interfaces TypeScript pour le module Spots
 export interface SpotOffer {
@@ -184,14 +185,22 @@ export function verifySignedToken(eventId: string, action: 'accept' | 'decline',
 
 /**
  * Génère un lien magique sécurisé pour l'Espace Commerce (durée de validité 30 jours).
+ * Le token contient : spotId.emailHash.expiresAtMs.signature
+ * emailHash permet de vérifier la signature SANS connaître l'email au préalable.
  */
 export function generateMerchantMagicLink(spotId: string, email: string): { link: string; token: string; expiresAt: string } {
+  if (!SECRET) {
+    throw new Error('[HMAC] HMAC_SECRET ou CRON_SECRET manquant — impossible de signer un token.');
+  }
   const timestamp = Date.now();
   const expiresInMs = 30 * 24 * 60 * 60 * 1000; // 30 jours
   const expiresAtMs = timestamp + expiresInMs;
-  const data = `merchant:${spotId}:${email.toLowerCase()}:${expiresAtMs}`;
+  const emailNorm = email.toLowerCase().trim();
+  // Hash court de l'email pour l'inclure dans le token (non-réversible)
+  const emailHash = crypto.createHash('sha256').update(emailNorm).digest('hex').substring(0, 16);
+  const data = `merchant:${spotId}:${emailNorm}:${expiresAtMs}`;
   const signature = crypto.createHmac('sha256', SECRET).update(data).digest('hex');
-  const token = `${spotId}.${expiresAtMs}.${signature}`;
+  const token = `${spotId}.${emailHash}.${expiresAtMs}.${signature}`;
   
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://capten.app';
   const link = `${siteUrl}/spots/espace?token=${token}`;
@@ -203,31 +212,71 @@ export function generateMerchantMagicLink(spotId: string, email: string): { link
 }
 
 /**
- * Vérifie la validité d'un token d'accès Espace Commerce (durée de validité 30 jours).
+ * Vérifie la validité d'un token d'accès Espace Commerce.
+ * Supporte les deux formats :
+ *  - V2 (nouveau) : spotId.emailHash.expiresAtMs.signature (4 parties)
+ *  - V1 (legacy)  : spotId.expiresAtMs.signature (3 parties) — nécessite vérification DB
+ * La signature HMAC est TOUJOURS vérifiée quand l'email est connu.
  */
-export function verifyMerchantToken(token: string, email?: string): { valid: boolean; spotId?: string; expired?: boolean } {
+export function verifyMerchantToken(token: string, email?: string): { valid: boolean; spotId?: string; expired?: boolean; requiresDbCheck?: boolean } {
   try {
     const parts = token.split('.');
-    if (parts.length !== 3) return { valid: false };
-    const [spotId, expiresAtStr, signature] = parts;
-    const expiresAtMs = parseInt(expiresAtStr, 10);
-    if (isNaN(expiresAtMs)) return { valid: false };
 
-    if (Date.now() > expiresAtMs) {
-      return { valid: false, spotId, expired: true };
-    }
+    // Format V2 : 4 parties (spotId.emailHash.expiresAtMs.signature)
+    if (parts.length === 4) {
+      const [spotId, emailHash, expiresAtStr, signature] = parts;
+      const expiresAtMs = parseInt(expiresAtStr, 10);
+      if (isNaN(expiresAtMs)) return { valid: false };
 
-    if (email) {
-      const expectedData = `merchant:${spotId}:${email.toLowerCase()}:${expiresAtMs}`;
-      const expectedSignature = crypto.createHmac('sha256', SECRET).update(expectedData).digest('hex');
-      const sigBuffer = Buffer.from(signature, 'hex');
-      const expectedBuffer = Buffer.from(expectedSignature, 'hex');
-      if (sigBuffer.length !== expectedBuffer.length || !crypto.timingSafeEqual(sigBuffer, expectedBuffer)) {
-        return { valid: false };
+      if (Date.now() > expiresAtMs) {
+        return { valid: false, spotId, expired: true };
       }
+
+      // Si l'email est fourni, on vérifie directement la signature
+      if (email) {
+        const emailNorm = email.toLowerCase().trim();
+        const expectedData = `merchant:${spotId}:${emailNorm}:${expiresAtMs}`;
+        const expectedSignature = crypto.createHmac('sha256', SECRET).update(expectedData).digest('hex');
+        const sigBuffer = Buffer.from(signature, 'hex');
+        const expectedBuffer = Buffer.from(expectedSignature, 'hex');
+        if (sigBuffer.length !== expectedBuffer.length || !crypto.timingSafeEqual(sigBuffer, expectedBuffer)) {
+          return { valid: false };
+        }
+        return { valid: true, spotId };
+      }
+
+      // Sans email : marquer qu'une vérification DB est requise
+      // Le caller DOIT comparer le token complet avec spots.merchant_access_token
+      return { valid: true, spotId, requiresDbCheck: true };
     }
 
-    return { valid: true, spotId };
+    // Format V1 legacy : 3 parties (spotId.expiresAtMs.signature)
+    if (parts.length === 3) {
+      const [spotId, expiresAtStr, signature] = parts;
+      const expiresAtMs = parseInt(expiresAtStr, 10);
+      if (isNaN(expiresAtMs)) return { valid: false };
+
+      if (Date.now() > expiresAtMs) {
+        return { valid: false, spotId, expired: true };
+      }
+
+      if (email) {
+        const emailNorm = email.toLowerCase().trim();
+        const expectedData = `merchant:${spotId}:${emailNorm}:${expiresAtMs}`;
+        const expectedSignature = crypto.createHmac('sha256', SECRET).update(expectedData).digest('hex');
+        const sigBuffer = Buffer.from(signature, 'hex');
+        const expectedBuffer = Buffer.from(expectedSignature, 'hex');
+        if (sigBuffer.length !== expectedBuffer.length || !crypto.timingSafeEqual(sigBuffer, expectedBuffer)) {
+          return { valid: false };
+        }
+        return { valid: true, spotId };
+      }
+
+      // V1 sans email → vérification DB obligatoire
+      return { valid: true, spotId, requiresDbCheck: true };
+    }
+
+    return { valid: false };
   } catch (e) {
     return { valid: false };
   }

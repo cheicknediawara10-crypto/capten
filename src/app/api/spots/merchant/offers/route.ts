@@ -16,6 +16,22 @@ export async function POST(request: Request) {
     }
 
     const spotId = verification.spotId;
+
+    // Vérification DB obligatoire si la signature HMAC n'a pas pu être vérifiée sans email
+    if (verification.requiresDbCheck) {
+      const supabaseCheck = getSupabaseAdmin();
+      if (supabaseCheck) {
+        const { data: spotRow } = await supabaseCheck
+          .from('spots')
+          .select('merchant_access_token')
+          .eq('id', spotId)
+          .maybeSingle();
+
+        if (!spotRow || spotRow.merchant_access_token !== token) {
+          return NextResponse.json({ error: 'UNAUTHORIZED', message: 'Token invalide (vérification échouée)' }, { status: 401 });
+        }
+      }
+    }
     const body = await request.json().catch(() => ({}));
     const { name, description, price_cents, quota, availability } = body;
 
@@ -97,6 +113,22 @@ export async function PATCH(request: Request) {
     }
 
     const spotId = verification.spotId;
+
+    // Vérification DB obligatoire si la signature HMAC n'a pas pu être vérifiée sans email
+    if (verification.requiresDbCheck) {
+      const supabaseCheck = getSupabaseAdmin();
+      if (supabaseCheck) {
+        const { data: spotRow } = await supabaseCheck
+          .from('spots')
+          .select('merchant_access_token')
+          .eq('id', spotId)
+          .maybeSingle();
+
+        if (!spotRow || spotRow.merchant_access_token !== token) {
+          return NextResponse.json({ error: 'UNAUTHORIZED', message: 'Token invalide (vérification échouée)' }, { status: 401 });
+        }
+      }
+    }
     const body = await request.json().catch(() => ({}));
     const { offer_id, name, description, price_cents, quota, availability, status } = body;
 

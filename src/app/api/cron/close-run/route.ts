@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getSupabase } from '@/lib/supabase';
+import { getSupabaseAdmin } from '@/lib/supabase';
 import { mockMembers } from '@/lib/broadcast';
 
 export const dynamic = 'force-dynamic';
@@ -22,7 +22,7 @@ async function handleCloseRun(request: Request) {
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
     }
 
-    const supabase = getSupabase();
+    const supabase = getSupabaseAdmin();
     const now = new Date();
     // Seuil : runs commencés il y a plus de 3 heures (durée moyenne run 2h + 1h d'attente après clôture)
     const cutoff = new Date(now.getTime() - 3 * 60 * 60 * 1000).toISOString();

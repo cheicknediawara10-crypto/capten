@@ -3,6 +3,8 @@ import { getSupabaseAdmin } from '@/lib/supabase';
 import { generateMerchantMagicLink, MOCK_SPOTS } from '@/lib/spots';
 import { resend } from '@/lib/resend';
 
+import { rateLimit } from '@/lib/rate-limit';
+
 export const dynamic = 'force-dynamic';
 
 export async function POST(request: Request) {
@@ -12,6 +14,12 @@ export async function POST(request: Request) {
 
     if (!email) {
       return NextResponse.json({ error: 'Email obligatoire' }, { status: 400 });
+    }
+
+    const ip = request.headers.get('x-forwarded-for') || '127.0.0.1';
+    const rateLimitResult = await rateLimit(`magic-link:${ip}:${email}`, 5, 600);
+    if (!rateLimitResult.success) {
+      return NextResponse.json({ error: 'Trop de demandes de liens d\'accès. Veuillez patienter 10 minutes.' }, { status: 429 });
     }
 
     const supabase = getSupabaseAdmin();

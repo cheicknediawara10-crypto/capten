@@ -206,7 +206,7 @@ export async function POST(request: Request) {
                     <div style="text-align: center; margin: 30px 0; background: white; padding: 20px; border-radius: 8px; border: 1px dashed #FF5C00;">
                       <p style="margin: 0 0 10px 0; font-size: 12px; color: #888; text-transform: uppercase; font-weight: bold; letter-spacing: 0.05em;">Présentez ce QR Code au comptoir</p>
                       <img src="${qrCodeUrl}" width="200" height="200" style="display: block; margin: 0 auto;" alt="QR Code" />
-                      <p style="margin: 15px 0 0 0; font-family: monospace; font-size: 14px; font-weight: bold; color: #111;">${runnerName}</p>
+                      <p style="margin: 15px 0 0 0; font-family: monospace; font-size: 14px; font-weight: bold; color: #111;">${String(runnerName || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>
                     </div>
                     
                     <div style="background-color: #F4F5F7; padding: 15px; border-radius: 8px; font-size: 14px; line-height: 1.6; color: #333;">

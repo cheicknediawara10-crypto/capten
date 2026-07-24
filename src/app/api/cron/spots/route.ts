@@ -112,8 +112,13 @@ async function handleCron(request: Request) {
               }
             }
 
-            // 3. Créditer la cagnotte du club
-            const currentBalance = event.club?.spots_balance_cents || 0;
+            // 3. Créditer la cagnotte du club (Re-fetch balance actualisée pour réduire la fenêtre de race condition)
+            const { data: latestClub } = await supabase
+              .from('clubs')
+              .select('spots_balance_cents')
+              .eq('id', event.club_id)
+              .maybeSingle();
+            const currentBalance = latestClub?.spots_balance_cents || event.club?.spots_balance_cents || 0;
             await supabase
               .from('clubs')
               .update({ spots_balance_cents: currentBalance + clubTotal })

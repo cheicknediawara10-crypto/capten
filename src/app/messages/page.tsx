@@ -291,10 +291,12 @@ const WhatsAppBubblePreview = React.memo(({ text, clubName }: WhatsAppBubblePrev
   // Parses WhatsApp markdown syntax into HTML safely
   const formatWhatsAppText = (rawText: string) => {
     if (!rawText) return "";
-    let escaped = rawText
+    let escaped = String(rawText)
       .replace(/&/g, "&amp;")
       .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;");
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
     
     // Bold (*text*)
     escaped = escaped.replace(/\*(.*?)\*/g, '<strong class="font-black">$1</strong>');

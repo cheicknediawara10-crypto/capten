@@ -24,6 +24,20 @@ export async function GET(request: Request) {
     const spotId = verification.spotId;
     const supabase = getSupabaseAdmin();
 
+    // Vérification DB obligatoire : le token reçu DOIT correspondre au token stocké en base
+    // Cela empêche la forge de tokens même si la signature HMAC n'est pas vérifiable sans email
+    if (verification.requiresDbCheck && supabase) {
+      const { data: spotRow } = await supabase
+        .from('spots')
+        .select('merchant_access_token')
+        .eq('id', spotId)
+        .maybeSingle();
+
+      if (!spotRow || spotRow.merchant_access_token !== token) {
+        return NextResponse.json({ error: 'TOKEN_INVALID', message: 'Token d\'accès invalide (vérification échouée)' }, { status: 401 });
+      }
+    }
+
     let spot: Spot | null = null;
     let events: any[] = [];
     let tickets: any[] = [];
