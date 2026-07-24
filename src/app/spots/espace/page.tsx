@@ -23,7 +23,8 @@ import {
   Sparkles,
   RefreshCw
 } from 'lucide-react';
-import { formatPrice, SpotOffer } from '@/lib/spots';
+import { SpotOffer } from '@/lib/spots';
+import { formatPrice } from '@/lib/supabase';
 
 export default function MerchantSpacePage() {
   const searchParams = useSearchParams();

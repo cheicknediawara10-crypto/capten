@@ -68,7 +68,7 @@ export async function GET(request: Request) {
     if (!spot) {
       const mockSpot = MOCK_SPOTS.find(s => s.id === spotId) || MOCK_SPOTS[0];
       spot = mockSpot;
-      events = MOCK_SPOT_EVENTS.filter(e => e.spot_id === spot.id).map(e => ({
+      events = MOCK_SPOT_EVENTS.filter(e => e.spot_id === mockSpot.id).map(e => ({
         ...e,
         club: { whatsapp_display_name: 'Paris Run Club' }
       }));
