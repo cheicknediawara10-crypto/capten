@@ -205,7 +205,7 @@ const FEATURES = [
   {
     icon: Wallet,
     title: "Paiements Intégrés",
-    desc: "Monétisez vos sessions via Stripe Connect.",
+    desc: "Monétise tes sessions via Stripe Connect.",
   },
   {
     icon: ShieldCheck,
@@ -216,8 +216,8 @@ const FEATURES = [
 
 /* ── Stats ─────────────────────────────────────────────── */
 const STATS = [
-  { value: "500+", label: "Clubs Actifs" },
-  { value: "15K", label: "Runners" },
+  { value: "500+", label: "Crews Actifs" },
+  { value: "15K+", label: "Membres" },
   { value: "99.9%", label: "Uptime" },
 ];
 
@@ -486,14 +486,14 @@ function LoginForm() {
           lineHeight: 1.6,
         }}>
           {mode === "password"
-            ? "Accédez à votre tableau de bord et pilotez votre run club."
+            ? "Accède à ton tableau de bord et pilote ton crew."
             : mode === "signup"
               ? (!isFreePlanUrl
                   ? (signupStep === 1 
-                      ? "Saisissez vos informations de compte capitaine pour commencer votre essai."
-                      : "Enregistrez votre carte pour activer l'essai de 21 jours. Aucun prélèvement aujourd'hui.")
-                  : "Créez votre compte capitaine et lancez votre run club en 2 minutes.")
-              : "Saisissez votre e-mail pour recevoir un lien de réinitialisation."}
+                      ? "Saisis tes informations de compte pour commencer ton essai."
+                      : "Enregistre ta carte pour activer l'essai de 21 jours. Aucun prélèvement aujourd'hui.")
+                  : "Crée ton compte et lance ton crew en 2 minutes.")
+              : "Saisis ton e-mail pour recevoir un lien de réinitialisation."}
         </p>
       </div>
 
@@ -561,7 +561,7 @@ function LoginForm() {
                 marginBottom: 8,
                 fontFamily: "var(--font-dm-sans), sans-serif",
               }}>
-                Nom du Run Club
+                Nom du Crew / Club
               </label>
               <div style={{ position: "relative" }}>
                 <Users size={16} style={{
@@ -574,7 +574,7 @@ function LoginForm() {
                 <input
                   type="text"
                   required
-                  placeholder="Ex: Paris Running Crew"
+                  placeholder="Ex: Paris Running Crew, Walkers Paris..."
                   value={clubName}
                   onChange={(e) => setClubName(e.target.value)}
                   disabled={isLoading}
@@ -1436,7 +1436,7 @@ export default function LoginPage() {
               marginBottom: 16,
               maxWidth: 500,
             }}>
-              VOTRE RUN CLUB
+              TON CREW
               <br />
               <span style={{ color: C.orange }}>MÉRITE MIEUX.</span>
             </h2>
