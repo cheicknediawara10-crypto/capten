@@ -6,6 +6,7 @@ import { Plus, MapPin, Zap, ArrowRight, Sun, Cloud, History, Users, Clock, Check
 import { useBroadcast } from '@/context/BroadcastContext';
 import { useAuth } from '@/context/AuthContext';
 import { getAppUrl } from '@/lib/domain';
+import { getCommunityLabels } from '@/lib/community-labels';
 
 type TabFilter = 'upcoming' | 'past';
 
@@ -342,12 +343,14 @@ export default function RunsPage() {
     : 0;
   const totalParticipants = runs.filter(r => r.status === 'past').reduce((s, r) => s + r.checkedIn, 0);
 
+  const L = getCommunityLabels(club?.community_type, club?.community_type_custom);
+
   // Dynamic next run time & description
   const upcomingRuns = runs.filter(r => r.status === 'live' || r.status === 'upcoming');
   const nextRunTime = upcomingRuns.length > 0 ? (upcomingRuns[0].time || '—') : '—';
   const nextRunSub = upcomingRuns.length > 0 
     ? `${upcomingRuns[0].date} — ${upcomingRuns[0].name}`.toUpperCase()
-    : 'AUCUN RUN PLANIFIÉ';
+    : L.no_session_planned;
 
   return (
     <div className="space-y-10 pb-20">
@@ -355,13 +358,13 @@ export default function RunsPage() {
       <header className="flex flex-col gap-1.5 pb-6 sm:pb-10 border-b-[0.5px] border-black/10 mb-8 sm:mb-10">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 w-full">
           <div className="flex flex-wrap items-center gap-4">
-            <h1 className="text-[28px] sm:text-[42px] font-display italic font-black uppercase text-black leading-none tracking-tight">GESTION DES RUNS</h1>
+            <h1 className="text-[28px] sm:text-[42px] font-display italic font-black uppercase text-black leading-none tracking-tight">GESTION DES {L.session_plural_cap.toUpperCase()}</h1>
           </div>
           <button 
             onClick={() => setIsCreateModalOpen(true)}
-            className="w-full sm:w-auto btn-primary"
+            className="w-full sm:w-auto btn-primary uppercase"
           >
-            <Plus size={13} strokeWidth={4} /> LANCER UN RUN
+            <Plus size={13} strokeWidth={4} /> {L.launch_session_cap}
           </button>
         </div>
       </header>
@@ -369,10 +372,10 @@ export default function RunsPage() {
       {/* KPI ROW */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         {[
-          { label: 'RUNS CE MOIS', value: `${totalRuns}`, sub: '+2 CETTE SEMAINE', color: 'text-black' },
+          { label: `${L.session_plural_cap.toUpperCase()} CE MOIS`, value: `${totalRuns}`, sub: '+2 CETTE SEMAINE', color: 'text-black' },
           { label: 'TAUX DE PRÉSENCE', value: `${avgAttendance}%`, sub: 'MOYENNE SUR 30J', color: 'text-[#56E39F]' },
           { label: 'PARTICIPANTS CUMULÉS', value: `${totalParticipants}`, sub: 'CE MOIS', color: 'text-[#FF5C00]' },
-          { label: 'PROCHAIN RUN', value: nextRunTime, sub: nextRunSub, color: 'text-black' },
+          { label: L.next_session, value: nextRunTime, sub: nextRunSub, color: 'text-black' },
         ].map((kpi, i) => (
           <div key={i} className="bg-white border-[0.5px] border-[#E5E5E5] rounded-card-outer p-6 space-y-2 shadow-sm">
             <p className="text-[9px] font-black text-[#D1D1D1] uppercase tracking-[0.2em] italic">{kpi.label}</p>

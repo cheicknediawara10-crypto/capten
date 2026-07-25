@@ -291,13 +291,13 @@ export default function PlanPage() {
       desc: "Idéal pour les petits crews qui démarrent et veulent tester l'infrastructure.",
       features: [
         { t: "Page publique du crew", d: "Inscriptions rapides en 1 lien partagé.", included: true },
-        { t: "1 run actif à la fois", d: "Planification standard.", included: true },
+        { t: "1 sortie active à la fois", d: "Planification standard.", included: true },
         { t: "Fiche d'urgence de base", d: "Sécurité et contacts d'urgence.", included: true },
-        { t: "Jusqu'à 25 membres actifs", d: "Coureurs ayant participé aux 60 derniers jours.", included: true },
+        { t: "Jusqu'à 25 membres actifs", d: "Membres ayant participé aux 60 derniers jours.", included: true },
         { t: "Messages auto WhatsApp", d: "Modèles de messages intelligents verrouillés.", included: false },
         { t: "Cagnotte de Squad", d: "Soutien et after-runs verrouillés.", included: false },
         { t: "Le Copilote IA", d: "Assistant d'entraînement personnel verrouillé.", included: false },
-        { t: "Runs illimités", d: "Historiques et planifications multiples verrouillés.", included: false }
+        { t: "Sorties illimitées", d: "Historiques et planifications multiples verrouillés.", included: false }
       ],
       button: currentPlan === "GRATUIT" ? "PLAN ACTUEL" : "COMMENCER GRATUITEMENT",
       type: currentPlan === "GRATUIT" ? "current" : "action"
@@ -315,7 +315,7 @@ export default function PlanPage() {
         : "ESSAI 21 JOURS GRATUITS",
       features: [
         { t: "Page publique du crew", d: "Inscriptions rapides en 1 lien partagé.", included: true },
-        { t: "Runs illimités", d: "Planifie autant de sorties simultanées que tu veux.", included: true },
+        { t: "Sorties illimitées", d: "Planifie autant de sorties simultanées que tu veux.", included: true },
         { t: "Fiche d'urgence de base", d: "Sécurité et contacts d'urgence.", included: true },
         { t: "Membres actifs illimités", d: "Aucune limite de croissance pour ton club.", included: true },
         { t: "Messages auto WhatsApp", d: "Génère des templates de diffusion parfaits en 1 clic.", included: true },

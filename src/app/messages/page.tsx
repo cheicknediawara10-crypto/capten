@@ -1467,7 +1467,7 @@ export default function MessagesPage() {
               Zéro frais d'envoi. <span className="text-[#FF5C00]">Copy-Paste Direct.</span>
             </h1>
             <p className="text-sm font-sans text-neutral-600 mt-2 max-w-3xl leading-relaxed">
-              Propulse l'engagement de ton crew sans payer un centime. Génère les messages parfaits, intègre les données du run et partage-les directement dans ton groupe WhatsApp.
+              Propulse l'engagement de ton crew sans payer un centime. Génère les messages parfaits, intègre les données de ta sortie et partage-les directement dans ton groupe WhatsApp.
             </p>
           </div>
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0">
@@ -1501,13 +1501,13 @@ export default function MessagesPage() {
         ) : (
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <p className="text-xs font-medium text-neutral-500 uppercase tracking-tight">
-              Lance d&apos;abord un run pour générer tes messages →
+              Planifie d&apos;abord une sortie pour générer tes messages →
             </p>
             <Link 
               href="/runs" 
               className="px-4 py-2.5 bg-[#FF5C00] text-white rounded-control text-[10px] font-black uppercase tracking-widest hover:bg-black transition-all text-center block active:scale-95 shadow-sm"
             >
-              + LANCER MON PREMIER RUN
+              + PLANIFIER UNE SORTIE
             </Link>
           </div>
         )}

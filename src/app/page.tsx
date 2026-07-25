@@ -278,6 +278,46 @@ function Hero() {
 }
 
 function DashboardMockup() {
+  const [activeTab, setActiveTab] = useState(0);
+
+  const mockups = [
+    {
+      type: "Run Club",
+      name: "PARIS RUN CLUB",
+      sub: "Paris · 47 coureurs protégés",
+      tag: "RUN CE SOIR",
+      title: "AFTERWORK CANAL",
+      detail: "19h30 · 7km · République · 🌤️ 17°C",
+      groups: [["Hard","#DC2626"],["Tempo","#D97706"],["Easy","#16A34A"]],
+      sweeper: "✓ Voiture balai assignée",
+      membersText: "47/47 coureurs protégés",
+    },
+    {
+      type: "Walk Club",
+      name: "GIRLS WHO WALK PARIS",
+      sub: "Paris · 64 marcheuses protégées",
+      tag: "MARCHE DU SAMEDI",
+      title: "SUNSET TUILERIES",
+      detail: "18h00 · 5km · Palais Royal · 🌤️ 21°C",
+      groups: [["Pace Doux","#16A34A"],["Pace Rythmé","#D97706"]],
+      sweeper: "✓ Serre-file désignée",
+      membersText: "64/64 marcheuses protégées",
+    },
+    {
+      type: "Trail & Rando",
+      name: "ALPINE TRAIL CREW",
+      sub: "Grenoble · 32 traileurs protégés",
+      tag: "SORTIE SAMEDI",
+      title: "RIDGE TRAIL CHARTREUSE",
+      detail: "08h30 · 14km / +850m D+ · ⛅ 14°C",
+      groups: [["D+ Intense","#DC2626"],["Rando-Run","#16A34A"]],
+      sweeper: "✓ Serre-file équipé radio",
+      membersText: "32/32 traileurs protégés",
+    },
+  ];
+
+  const m = mockups[activeTab];
+
   return (
     <div style={{
       background: C.bgCard, border: `1px solid ${C.border}`,
@@ -285,17 +325,38 @@ function DashboardMockup() {
       boxShadow: "0 24px 64px rgba(0,0,0,0.10)",
     }}>
       {/* Chrome */}
-      <div style={{ background: "#F0EEE8", padding: "10px 16px", borderBottom: `1px solid ${C.border}`, display: "flex", alignItems: "center", gap: 6 }}>
-        {["#FF5F57","#FFBD2E","#28C840"].map(c => <div key={c} style={{ width: 10, height: 10, borderRadius: "50%", background: c }} />)}
-        <div style={{ marginLeft: 8, background: C.bgCard, borderRadius: 5, padding: "3px 12px", fontSize: 11, color: C.grayLight, fontFamily: "monospace" }}>capten.app/dashboard</div>
+      <div style={{ background: "#F0EEE8", padding: "10px 16px", borderBottom: `1px solid ${C.border}`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          {["#FF5F57","#FFBD2E","#28C840"].map(c => <div key={c} style={{ width: 10, height: 10, borderRadius: "50%", background: c }} />)}
+          <div style={{ marginLeft: 8, background: C.bgCard, borderRadius: 5, padding: "3px 12px", fontSize: 11, color: C.grayLight, fontFamily: "monospace" }}>capten.app/dashboard</div>
+        </div>
+
+        {/* Community switcher pills */}
+        <div style={{ display: "flex", gap: 4 }}>
+          {mockups.map((item, idx) => (
+            <button
+              key={item.type}
+              onClick={() => setActiveTab(idx)}
+              style={{
+                fontSize: 10, fontFamily: "'DM Mono',monospace",
+                padding: "2px 8px", borderRadius: 4, cursor: "pointer",
+                background: activeTab === idx ? C.orange : "transparent",
+                color: activeTab === idx ? "#fff" : C.gray,
+                border: "none", transition: "all 0.15s ease",
+              }}
+            >
+              {item.type}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div style={{ padding: 20 }}>
         {/* Header */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
           <div>
-            <div style={{ fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 700, fontSize: 14, letterSpacing: 2, color: C.orange, textTransform: "uppercase" }}>PARIS RUN CLUB</div>
-            <div style={{ fontSize: 11, color: C.grayLight, fontFamily: "'DM Mono',monospace" }}>Paris · 47 coureurs</div>
+            <div style={{ fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 700, fontSize: 14, letterSpacing: 2, color: C.orange, textTransform: "uppercase" }}>{m.name}</div>
+            <div style={{ fontSize: 11, color: C.grayLight, fontFamily: "'DM Mono',monospace" }}>{m.sub}</div>
           </div>
           <div style={{ background: C.greenBg, border: "1px solid rgba(22,163,74,0.3)", color: C.green, padding: "3px 10px", borderRadius: 100, fontSize: 10, fontFamily: "'DM Mono',monospace" }}>● ACTIF</div>
         </div>
@@ -306,7 +367,7 @@ function DashboardMockup() {
           <div style={{ background: "#FFF7F5", border: "1px solid rgba(220,38,38,0.15)", borderRadius: 10, padding: "10px 14px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <div>
               <div style={{ fontSize: 10, color: C.red, fontFamily: "'DM Mono',monospace", letterSpacing: 1, marginBottom: 2 }}>EN CAS D'URGENCE</div>
-              <div style={{ fontSize: 13, fontWeight: 600 }}>47/47 coureurs protégés</div>
+              <div style={{ fontSize: 13, fontWeight: 600 }}>{m.membersText}</div>
               <div style={{ fontSize: 11, color: C.gray }}>Groupe sanguin · Qui appeler · Allergies</div>
             </div>
             <span style={{ fontSize: 22 }}>🚨</span>
@@ -316,28 +377,28 @@ function DashboardMockup() {
           <div style={{ background: "#F5F0FF", border: "1px solid rgba(124,58,237,0.15)", borderRadius: 10, padding: "10px 14px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <div>
               <div style={{ fontSize: 10, color: "#7C3AED", fontFamily: "'DM Mono',monospace", letterSpacing: 1, marginBottom: 2 }}>CHARTE SIGNÉE</div>
-              <div style={{ fontSize: 13, fontWeight: 600 }}>47/47 engagements signés</div>
+              <div style={{ fontSize: 13, fontWeight: 600 }}>100% des membres ont signé</div>
               <div style={{ fontSize: 11, color: C.gray }}>Comportement déplacé → exclusion immédiate</div>
             </div>
             <span style={{ fontSize: 22 }}>🛡️</span>
           </div>
 
-          {/* Run ce soir */}
+          {/* Session ce soir */}
           <div style={{ background: C.orangeBg, border: `1px solid ${C.orangeBorder}`, borderRadius: 10, padding: "10px 14px" }}>
-            <div style={{ fontSize: 10, color: C.orange, fontFamily: "'DM Mono',monospace", letterSpacing: 1, marginBottom: 4 }}>RUN CE SOIR</div>
-            <div style={{ fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 700, fontSize: 15 }}>AFTERWORK CANAL</div>
-            <div style={{ fontSize: 11, color: C.gray, marginBottom: 8 }}>19h30 · 7km · République · 🌤️ 17°C</div>
-            <div style={{ display: "flex", gap: 6 }}>
-              {[["Hard","#DC2626"],["Tempo","#D97706"],["Easy","#16A34A"]].map(([g,c]) => (
+            <div style={{ fontSize: 10, color: C.orange, fontFamily: "'DM Mono',monospace", letterSpacing: 1, marginBottom: 4 }}>{m.tag}</div>
+            <div style={{ fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 700, fontSize: 15 }}>{m.title}</div>
+            <div style={{ fontSize: 11, color: C.gray, marginBottom: 8 }}>{m.detail}</div>
+            <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center" }}>
+              {m.groups.map(([g,c]) => (
                 <span key={g} style={{ fontSize: 9, padding: "2px 7px", borderRadius: 4, border: `1px solid ${c}40`, color: c, fontFamily: "'DM Mono',monospace" }}>{g}</span>
               ))}
-              <span style={{ marginLeft: "auto", fontSize: 11, color: C.green }}>✓ Voiture balai assignée</span>
+              <span style={{ marginLeft: "auto", fontSize: 11, color: C.green }}>{m.sweeper}</span>
             </div>
           </div>
 
           {/* Message kit */}
           <div style={{ background: C.bgSection, borderRadius: 10, padding: "10px 14px" }}>
-            <div style={{ fontSize: 10, color: C.grayLight, fontFamily: "'DM Mono',monospace", marginBottom: 8 }}>MESSAGE DU SOIR — PRÊT</div>
+            <div style={{ fontSize: 10, color: C.grayLight, fontFamily: "'DM Mono',monospace", marginBottom: 8 }}>MESSAGE AUTOMATIQUE — PRÊT</div>
             <button style={{ width: "100%", background: C.orangeBg, border: `1px solid ${C.orangeBorder}`, color: C.orange, padding: "8px", borderRadius: 7, fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
               📋 Copier le rappel → WhatsApp
             </button>

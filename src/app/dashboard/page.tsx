@@ -52,6 +52,7 @@ const getInitials = (name: string) => {
 
 export default function DashboardPage() {
   const { user, club, isMock, refreshClub } = useAuth();
+  const L = getCommunityLabels(club?.community_type, club?.community_type_custom);
   const [quotaExceeded, setQuotaExceeded] = useState(false);
   const [time, setTime] = useState<Date | null>(null);
 
@@ -933,7 +934,7 @@ export default function DashboardPage() {
                   href="/runs?openPlanifier=true" 
                   className="bg-[#FF5C00] hover:bg-black text-white px-4 py-2 rounded-control text-[9px] font-black uppercase tracking-wider transition-all"
                 >
-                  Planifier un run +
+                  {L.plan_session} +
                 </Link>
               )}
               <Link 
@@ -974,14 +975,14 @@ export default function DashboardPage() {
            <p className="text-[9px] font-black text-[#D1D1D1] uppercase tracking-[0.2em] italic">FIDÉLITÉ DU CREW</p>
            <h3 className="text-[32px] font-display italic font-black text-[#56E39F]">{activeMembersCount > 0 ? `${avgReliability}%` : "—"}</h3>
            <p className="text-[9px] font-medium text-[#A3A3A3] uppercase tracking-widest">
-             {activeMembersCount > 0 ? "MOYENNE D'ASSIDUITÉ" : "Visible après le 1er run"}
+             {activeMembersCount > 0 ? "MOYENNE D'ASSIDUITÉ" : "Visible après la 1ère sortie"}
            </p>
         </Link>
 
         {/* Card 3: PROTECTION */}
         <Link 
           href="/securite" 
-          title="Coureurs ayant signé la charte de bienveillance et rempli leur fiche d'urgence."
+          title="Membres ayant signé la charte de bienveillance et rempli leur fiche d'urgence."
           className="bg-white border-[0.5px] border-[#E5E5E5] rounded-card-outer p-6 space-y-2 shadow-sm group hover:border-[#FF5C00]/40 hover:shadow-md transition-all duration-300 cursor-pointer"
         >
            <p className="text-[9px] font-black text-[#D1D1D1] uppercase tracking-[0.2em] italic">PROTECTION</p>
@@ -995,7 +996,7 @@ export default function DashboardPage() {
              </h3>
            )}
            <p className="text-[9px] font-medium text-[#A3A3A3] uppercase tracking-widest">
-             {totalRunners === 0 ? "Visible après les 1ères inscriptions" : "coureurs protégés"}
+             {totalRunners === 0 ? "Visible après les 1ères inscriptions" : "membres protégés"}
            </p>
         </Link>
 
@@ -1019,7 +1020,7 @@ export default function DashboardPage() {
              <div className="space-y-4 relative z-10">
                 {/* 1. Badge "PROCHAIN RUN PLANIFIÉ" */}
                 <div className="flex items-center gap-3">
-                   <div className="bg-[#FF5C00]/10 border border-[#FF5C00]/20 text-[#FF5C00] px-3 py-1 rounded-control text-[10px] font-black uppercase tracking-widest italic animate-pulse">PROCHAIN RUN PLANIFIÉ</div>
+                   <div className="bg-[#FF5C00]/10 border border-[#FF5C00]/20 text-[#FF5C00] px-3 py-1 rounded-control text-[10px] font-black uppercase tracking-widest italic animate-pulse">{L.next_session} PLANIFIÉ(E)</div>
                 </div>
                 
                 {/* 2. Nom du run */}
@@ -1042,7 +1043,7 @@ export default function DashboardPage() {
                 {weatherInfo && weatherInfo.isExtreme && (
                   <div className="text-[12px] text-red-600 flex items-center gap-2">
                     <span>⚠️ Conditions difficiles — tu veux</span>
-                    <button onClick={(e) => { e.preventDefault(); handleCancelRun(latestRun.id); }} className="font-black underline cursor-pointer hover:text-red-800">annuler ce run ?</button>
+                    <button onClick={(e) => { e.preventDefault(); handleCancelRun(latestRun.id); }} className="font-black underline cursor-pointer hover:text-red-800">annuler cette sortie ?</button>
                   </div>
                 )}
 
