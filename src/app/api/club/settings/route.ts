@@ -74,6 +74,8 @@ export async function PATCH(request: Request) {
     if (body.message_templates !== undefined) updates.message_templates = body.message_templates;
     if (body.cagnotte_data !== undefined) updates.cagnotte_data = body.cagnotte_data;
     if (body.branding !== undefined) updates.branding = body.branding;
+    if (body.community_type !== undefined) updates.community_type = body.community_type;
+    if (body.community_type_custom !== undefined) updates.community_type_custom = body.community_type_custom;
 
     const { data: updatedClub, error } = await supabaseAdmin
       .from('clubs')

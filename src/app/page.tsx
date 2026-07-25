@@ -206,20 +206,19 @@ function Hero() {
           <h1 className="fade-up d1 hero-title" style={{
             fontFamily: "'Barlow Condensed',sans-serif",
             fontWeight: 900, fontStyle: "italic",
-            fontSize: 96, lineHeight: 0.88,
+            fontSize: 88, lineHeight: 0.88,
             textTransform: "uppercase", letterSpacing: -1,
             marginBottom: 28,
           }}>
-            TU AS LANCÉ CE CREW<br />
-            <span style={{ color: C.orange }}>POUR COURIR.</span><br />
-            PAS POUR FAIRE<br />
-            <span style={{ color: C.orange }}>L&apos;ADMIN.</span>
+            LA PLATEFORME DES<br />
+            <span style={{ color: C.orange }}>COMMUNAUTÉS SPORTIVES</span><br />
+            LOCALES.
           </h1>
 
           {/* Subheadline */}
-          <p className="fade-up d2" style={{ fontSize: 17, color: C.gray, lineHeight: 1.75, marginBottom: 32, maxWidth: 440 }}>
-            Pendant que tu cours, Capten gère les inscriptions, protège tes coureurs si quelque chose tourne mal, et te donne les outils pour agir si quelqu'un se comporte mal.
-            <strong style={{ color: C.black }}> Toi tu cours. Capten fait le reste.</strong>
+          <p className="fade-up d2" style={{ fontSize: 17, color: C.gray, lineHeight: 1.75, marginBottom: 32, maxWidth: 460 }}>
+            Run clubs, walk clubs, groupes de trail — gérez votre crew, protégez vos membres, générez des revenus.
+            <strong style={{ color: C.black }}> Vous bougez ensemble. Capten fait le reste.</strong>
           </p>
 
           {/* CTAs */}

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Settings, Share2, Shield, Wallet, Users, Monitor, Globe, Bell, CheckCircle2, AlertTriangle, Plus, ArrowRight, Smartphone, Sliders, Sparkles, CreditCard, ExternalLink, Check, DollarSign } from 'lucide-react';
 import { getSupabase } from '@/lib/supabase';
 import { useAuth } from '@/context/AuthContext';
+import { COMMUNITY_OPTIONS, CommunityType } from '@/lib/community-labels';
 
 export default function SettingsPage() {
   const { user, club, isMock, refreshClub } = useAuth();
@@ -16,6 +17,10 @@ export default function SettingsPage() {
   const [showWhatsappModal, setShowWhatsappModal] = React.useState(false);
   const [isDemoMode, setIsDemoMode] = React.useState(false);
   const [currentPlan, setCurrentPlan] = React.useState("PRO");
+
+  // Community Type State
+  const [communityType, setCommunityType] = React.useState<CommunityType>('run_club');
+  const [communityTypeCustom, setCommunityTypeCustom] = React.useState('');
 
   // Agnostic payments & Profiles states
   const [profile, setProfile] = React.useState<any>({
@@ -97,8 +102,15 @@ export default function SettingsPage() {
       setAutoRound(club.branding?.auto_round !== false);
       setCoaches(club.coaches || []);
       setCopilotEmailFreq(club.branding?.copilot_email_freq || 'quotidien');
+      setCommunityType((club.community_type as any) || 'run_club');
+      setCommunityTypeCustom(club.community_type_custom || '');
     } else {
       // LocalStorage Mode Fallback
+      const savedType = localStorage.getItem('capten_community_type');
+      if (savedType) setCommunityType(savedType as any);
+
+      const savedCustom = localStorage.getItem('capten_community_type_custom');
+      if (savedCustom) setCommunityTypeCustom(savedCustom);
       const savedLogo = localStorage.getItem('capten_logo');
       if (savedLogo) setLogoUrl(savedLogo);
 
@@ -202,6 +214,10 @@ export default function SettingsPage() {
       localStorage.setItem('capten_auto_round', autoRound.toString());
       localStorage.setItem('capten_cagnotte_url', cagnotteUrl);
       localStorage.setItem('capten_copilot_email_freq', copilotEmailFreq);
+      localStorage.setItem('capten_community_type', communityType);
+      if (communityTypeCustom) {
+        localStorage.setItem('capten_community_type_custom', communityTypeCustom);
+      }
     } else {
       // Save to Supabase B2B configs
       try {
@@ -210,6 +226,8 @@ export default function SettingsPage() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             cagnotte_url: cagnotteUrl,
+            community_type: communityType,
+            community_type_custom: communityTypeCustom || null,
             branding: {
               logo: logoUrl || '',
               primary_color: primaryColor,
@@ -404,6 +422,31 @@ export default function SettingsPage() {
                     <p className="text-[10px] font-black uppercase text-black">LOGO DU CLUB</p>
                     <p className="text-[9px] font-medium text-[#A3A3A3] uppercase">Format PNG ou SVG (400px)</p>
                  </div>
+              </div>
+
+              {/* TYPE DE COMMUNAUTÉ */}
+              <div className="pt-4 border-t border-[#F4F5F7] space-y-2">
+                 <p className="text-[10px] font-black uppercase text-black">TYPE DE COMMUNAUTÉ</p>
+                 <select
+                   value={communityType}
+                   onChange={(e) => setCommunityType(e.target.value as any)}
+                   className="w-full bg-[#F4F5F7] border border-black/5 rounded-control px-3 py-2 text-[11px] font-mono font-bold text-black focus:outline-none focus:border-[#FF5C00] focus:bg-white transition-all cursor-pointer"
+                 >
+                   {COMMUNITY_OPTIONS.map((opt) => (
+                     <option key={opt.id} value={opt.id}>
+                       {opt.icon} {opt.label.toUpperCase()}
+                     </option>
+                   ))}
+                 </select>
+                 {communityType === 'other' && (
+                   <input
+                     type="text"
+                     placeholder="Préciser le type (ex: Roller Club)"
+                     value={communityTypeCustom}
+                     onChange={(e) => setCommunityTypeCustom(e.target.value)}
+                     className="w-full mt-2 bg-[#F4F5F7] border border-black/5 rounded-control px-3 py-2 text-[11px] font-mono text-black focus:outline-none focus:border-[#FF5C00]"
+                   />
+                 )}
               </div>
            </div>
         </div>

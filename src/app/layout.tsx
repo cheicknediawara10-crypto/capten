@@ -21,17 +21,17 @@ const dmMono = DM_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Capten — Gestion de social run clubs",
-  description: "Capten — L'outil de gestion pour fondateurs de social run clubs. Portail d'inscription, décharges RGPD, check-in GPS simultané. Essai gratuit 14 jours.",
+  title: "Capten — La plateforme des communautés sportives locales",
+  description: "Capten — Run clubs, walk clubs, groupes de trail. Gérez votre crew, protégez vos membres et générez des revenus.",
   openGraph: {
-    title: "Capten — Gestion de social run clubs",
-    description: "Capten — L'outil de gestion pour fondateurs de social run clubs. Portail d'inscription, décharges RGPD, check-in GPS simultané. Essai gratuit 14 jours.",
+    title: "Capten — La plateforme des communautés sportives locales",
+    description: "Capten — Run clubs, walk clubs, groupes de trail. Gérez votre crew, protégez vos membres et générez des revenus.",
     images: [
       {
         url: "/dashboard-preview.png",
         width: 1200,
         height: 630,
-        alt: "Capten — Gestion de social run clubs",
+        alt: "Capten — La plateforme des communautés sportives locales",
       }
     ]
   }

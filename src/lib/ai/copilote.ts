@@ -1,5 +1,6 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { SupabaseClient } from '@supabase/supabase-js';
+import { getCommunityLabels } from '@/lib/community-labels';
 
 export interface CopiloteAlerte {
   id: string;
@@ -419,7 +420,7 @@ async function buildSystemPrompt(supabase: SupabaseClient, clubId: string): Prom
     // 1. Charger les données du club
     const { data: club } = await supabase
       .from('clubs')
-      .select('name, whatsapp_display_name, stripe_plan, spots_balance_cents')
+      .select('name, whatsapp_display_name, stripe_plan, spots_balance_cents, community_type, community_type_custom')
       .eq('id', clubId)
       .maybeSingle();
 
@@ -427,6 +428,7 @@ async function buildSystemPrompt(supabase: SupabaseClient, clubId: string): Prom
     const planActive = club?.stripe_plan === 'CAPTEN' ? 'payant' : 'gratuit';
     const spotsBalanceCents = club?.spots_balance_cents || 0;
     const cagnotteAmount = (spotsBalanceCents / 100).toFixed(2);
+    const labels = getCommunityLabels(club?.community_type, club?.community_type_custom);
 
     // 2. Charger le fondateur
     const { data: founder } = await supabase
@@ -544,19 +546,20 @@ async function buildSystemPrompt(supabase: SupabaseClient, clubId: string): Prom
       lastSpotStr = `${spotName || 'Commerce'} le ${dateStr} — ${ticketCount || 0} présents — ${totalGenerated} € générés`;
     }
 
-    return `Tu es le Copilote de ${clubName}, l'assistant IA intégré à Capten.
+    return `Tu es le Copilote de ${clubName}, ${labels.community_label}.
 
-Tu n'es pas un assistant généraliste. Tu es le bras droit du fondateur de ce run club. Tu connais ses coureurs, ses runs, sa cagnotte, et surtout : tu connais intimement le monde des social run clubs. Pas depuis un manuel — depuis le terrain.
+Tu n'es pas un assistant généraliste. Tu es le bras droit du fondateur de cette communauté sportive (${labels.community_label}). Tu connais ${labels.members_plural}, ses sorties, sa cagnotte, et surtout : tu connais intimement le monde des communautés sportives locales. Pas depuis un manuel — depuis le terrain.
 
 ---
 
 ## DONNÉES RÉELLES DU CLUB (injectées en temps réel)
 
-Nom du club : ${clubName}
+Nom du club / de la communauté : ${clubName}
+Type de communauté : ${labels.community_label} (${labels.community_type})
 Fondateur : ${founderName}
-Membres actifs (60 derniers jours) : ${activeMembersCount} coureurs
-Prochain run : ${nextRunStr}
-Membres non confirmés pour ce run : ${unconfirmedRunnersStr}
+Membres actifs (60 derniers jours) : ${activeMembersCount} ${labels.member_singular}s
+Prochain événement / sortie : ${nextRunStr}
+Membres non confirmés pour cette sortie : ${unconfirmedRunnersStr}
 Dernière sortie : ${lastRunStr}
 Nouveau(x) membre(s) sans message de bienvenue : ${newRunnerName}
 Cagnotte du club : ${cagnotteAmount} €

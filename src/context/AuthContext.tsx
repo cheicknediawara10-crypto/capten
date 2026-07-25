@@ -37,6 +37,8 @@ export interface ClubData {
   first_run_created_at?: string | null;
   created_at?: string;
   signup_variant?: string;
+  community_type?: string;
+  community_type_custom?: string | null;
 }
 
 interface AuthContextType {
@@ -87,6 +89,8 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
           first_run_created_at: data.first_run_created_at || null,
           created_at: data.created_at || data.created_time || null,
           signup_variant: data.signup_variant || 'A',
+          community_type: data.community_type || 'run_club',
+          community_type_custom: data.community_type_custom || null,
         });
       } else {
         // Auto-create club if missing
@@ -94,7 +98,8 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
           .from('clubs')
           .insert({
             id: userId,
-            whatsapp_display_name: 'MON RUN CLUB'
+            whatsapp_display_name: 'MON RUN CLUB',
+            community_type: 'run_club'
           })
           .select()
           .single();
@@ -118,6 +123,8 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
             first_run_created_at: newClub.first_run_created_at || null,
             created_at: newClub.created_at || newClub.created_time || null,
             signup_variant: newClub.signup_variant || 'A',
+            community_type: newClub.community_type || 'run_club',
+            community_type_custom: newClub.community_type_custom || null,
           });
         }
       }
@@ -192,6 +199,8 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
           first_run_created_at: localStorage.getItem('capten_first_run_created_at') || null,
           created_at: localStorage.getItem('capten_club_created_at') || new Date().toISOString(),
           signup_variant: localStorage.getItem('capten_signup_variant') || 'A',
+          community_type: localStorage.getItem('capten_community_type') || 'run_club',
+          community_type_custom: localStorage.getItem('capten_community_type_custom') || null,
         });
       } else {
         setUser(null);

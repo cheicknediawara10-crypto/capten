@@ -9,6 +9,7 @@ import { getAppUrl } from '@/lib/domain';
 import CopilotBanner from '@/components/copilot/CopilotBanner';
 import VictoryChecklist from '@/components/VictoryChecklist';
 import UpgradeBanner from '@/components/UpgradeBanner';
+import { COMMUNITY_OPTIONS, CommunityType, getCommunityLabels } from '@/lib/community-labels';
 
 // === HELPERS MÉTÉO ===
 function getCoordinates(location: string): { latitude: number; longitude: number } {
@@ -81,6 +82,8 @@ export default function DashboardPage() {
   // Onboarding States
   const [onboardingStep, setOnboardingStep] = useState(1);
   const [onboardingClubName, setOnboardingClubName] = useState('');
+  const [onboardingCommunityType, setOnboardingCommunityType] = useState<CommunityType>('run_club');
+  const [onboardingCommunityCustom, setOnboardingCommunityCustom] = useState('');
   const [skipOnboarding, setSkipOnboarding] = useState(false);
 
   useEffect(() => {
@@ -493,6 +496,10 @@ export default function DashboardPage() {
     if (isMock) {
       localStorage.setItem('capten_club_name', finalClubName);
       localStorage.setItem('capten_onboarding_s2_name', finalClubName);
+      localStorage.setItem('capten_community_type', onboardingCommunityType);
+      if (onboardingCommunityCustom) {
+        localStorage.setItem('capten_community_type_custom', onboardingCommunityCustom);
+      }
     } else {
       try {
         await fetch('/api/club/settings', {
@@ -500,6 +507,8 @@ export default function DashboardPage() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             whatsapp_display_name: finalClubName,
+            community_type: onboardingCommunityType,
+            community_type_custom: onboardingCommunityCustom || null,
             branding: {
               ...club?.branding,
               onboarding_step: 2
@@ -654,9 +663,12 @@ export default function DashboardPage() {
 
             <div className="bg-white border border-[#E5E5E5] rounded-card-outer p-8 sm:p-10 space-y-6 shadow-sm text-left">
               <div className="space-y-2">
+                <label className="text-[12px] font-mono font-bold uppercase tracking-wider text-black block">
+                  Nom de ta communauté / crew
+                </label>
                 <input
                   type="text"
-                  placeholder="Ex : Paris Run Club, Paname Run Club..."
+                  placeholder="Ex : Paris Run Club, Girls Who Walk Paris, Trail Crew..."
                   value={onboardingClubName}
                   onChange={(e) => setOnboardingClubName(e.target.value)}
                   className="w-full px-4 py-4 border border-[#E5E5E5] rounded-control text-[18px] font-sans focus:outline-none focus:border-[#FF5C00] focus:ring-1 focus:ring-[#FF5C00] bg-white shadow-sm transition-all"
@@ -664,6 +676,45 @@ export default function DashboardPage() {
                 <p className="text-[13px] text-[#9B9B93] font-mono mt-2">
                   Ton portail sera : capten.app/{generateSlug(onboardingClubName) || "[slug-auto-généré]"}
                 </p>
+              </div>
+
+              {/* SÉLECTEUR DE TYPE DE COMMUNAUTÉ */}
+              <div className="space-y-3 pt-3 border-t border-black/5">
+                <label className="text-[12px] font-mono font-bold uppercase tracking-wider text-black block">
+                  Quel type de communauté organises-tu ?
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {COMMUNITY_OPTIONS.map((opt) => (
+                    <button
+                      key={opt.id}
+                      type="button"
+                      onClick={() => setOnboardingCommunityType(opt.id)}
+                      className={`p-3.5 rounded-control border text-left flex items-start gap-3 transition-all cursor-pointer ${
+                        onboardingCommunityType === opt.id
+                          ? 'border-[#FF5C00] bg-[#FF5C00]/5 text-black ring-1 ring-[#FF5C00]'
+                          : 'border-[#E5E5E5] bg-white text-neutral-600 hover:border-black/20'
+                      }`}
+                    >
+                      <span className="text-2xl shrink-0">{opt.icon}</span>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[13px] font-black uppercase font-mono tracking-wide">{opt.label}</p>
+                        <p className="text-[10px] text-neutral-500 font-sans leading-tight mt-0.5">{opt.description}</p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+
+                {onboardingCommunityType === 'other' && (
+                  <div className="pt-2">
+                    <input
+                      type="text"
+                      placeholder="Précise ton type (ex : Roller Club, SwimRun, Vélo...)"
+                      value={onboardingCommunityCustom}
+                      onChange={(e) => setOnboardingCommunityCustom(e.target.value)}
+                      className="w-full px-4 py-3 border border-[#E5E5E5] rounded-control text-sm font-sans focus:outline-none focus:border-[#FF5C00]"
+                    />
+                  </div>
+                )}
               </div>
 
               <button
