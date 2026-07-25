@@ -108,7 +108,7 @@ export async function GET(
                 <div style="background-color: #F4F5F7; padding: 15px; border-radius: 6px; text-align: center; margin: 20px 0;">
                   <a href="${eventUrl}" style="color: #FF5C00; font-weight: bold; text-decoration: none; font-size: 16px;">${eventUrl}</a>
                 </div>
-                <p>Vos coureurs pourront réserver leur formule en 1 clic (sans création de compte) et recevront leur QR Code par email.</p>
+                <p>Tes membres pourront réserver leur formule en 1 clic (sans création de compte) et recevront leur QR Code par email.</p>
               </div>
             `
             : `
@@ -190,7 +190,7 @@ export async function GET(
           <h1>${action === 'accept' ? 'Proposition Acceptée !' : 'Proposition Déclinée'}</h1>
           <p>
             ${action === 'accept' 
-              ? `Merci ! Vous avez accepté la venue de <strong>${clubName}</strong>. L'événement est désormais disponible à la vente pour les coureurs.<br><br>Vous recevrez un récapitulatif des commandes par email avant leur arrivée.`
+              ? `Merci ! Vous avez accepté la venue de <strong>${clubName}</strong>. L'événement est désormais disponible à la vente pour les membres.<br><br>Vous recevrez un récapitulatif des commandes par email avant leur arrivée.`
               : `Vous avez refusé la venue de <strong>${clubName}</strong>. Le club a été informé de votre décision.<br><br>À bientôt !`
             }
           </p>

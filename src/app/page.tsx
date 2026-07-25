@@ -858,7 +858,7 @@ function PricingSection() {
           Si tu organises 2 runs par mois,<br />Capten coûte moins qu'un café par run.
         </p>
         <p style={{ color: C.grayLight, fontSize: 13, marginBottom: 40, fontFamily: "'DM Mono',monospace", opacity: v ? 1 : 0, transition: "opacity 0.7s 0.3s ease" }}>
-          Pas de limites de coureurs · Pas d'options cachées
+          Pas de limites de membres · Pas d'options cachées
         </p>
 
         {/* Toggle */}
@@ -880,7 +880,7 @@ function PricingSection() {
           opacity: v ? 1 : 0, transition: "opacity 0.7s 0.4s ease",
         }}>
           <div style={{ position: "absolute", top: 16, right: 16, background: C.orange, color: "#fff", padding: "4px 12px", borderRadius: 100, fontSize: 11, fontWeight: 700, fontFamily: "'DM Mono',monospace" }}>
-            14 JOURS GRATUITS
+            21 JOURS GRATUITS
           </div>
 
           {/* Price */}
@@ -900,13 +900,13 @@ function PricingSection() {
           {/* Features */}
           <div className="pricing-feats" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px 24px", marginBottom: 32, textAlign: "left" }}>
             {[
-              { t: "Tes coureurs s'inscrivent seuls.", d: "Tu ne touches à rien." },
+              { t: "Tes membres s'inscrivent seuls.", d: "Tu ne touches à rien." },
               { t: "Si quelqu'un tombe ce soir :", d: "groupe sanguin, allergies, qui appeler.\nEn 2 secondes." },
               { t: "Il se comporte mal.", d: "Il a signé avant d'entrer.\nTu peux l'exclure maintenant." },
               { t: "50 check-ins. Simultanés.", d: "Toi tu cours déjà." },
               { t: "Le message du soir.", d: "1 clic. Tu colles dans WhatsApp.\nC'est tout." },
               { t: "La météo s'intègre automatiquement.", d: "Ton message s'adapte tout seul." },
-              { t: "Le café post-run.", d: "Tes coureurs contribuent.\nCapten prend 0%." },
+              { t: "Le café post-run.", d: "Tes membres contribuent.\nCapten prend 0%." },
               { t: "Ton crew grandit.", d: "Le prix, lui, ne bouge pas." }
             ].map(({ t, d }) => (
               <div key={t} style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
@@ -938,11 +938,11 @@ function FAQ() {
 
   const faqs = [
     {
-      q: "Est-ce que mes coureurs doivent télécharger une app ?",
-      a: "Non. Jamais. Ton coureur reçoit un lien dans le groupe WhatsApp. Il clique. Il s'inscrit, remplit ses infos, signe la charte. Tout dans son navigateur. Aucune app à installer.",
+      q: "Est-ce que mes membres doivent télécharger une app ?",
+      a: "Non. Jamais. Ton membre reçoit un lien dans le groupe WhatsApp. Il clique. Il s'inscrit, remplit ses infos, signe la charte. Tout dans son navigateur. Aucune app à installer.",
     },
     {
-      q: "Qui voit les informations médicales de mes coureurs ?",
+      q: "Qui voit les informations médicales de mes membres ?",
       a: "Toi uniquement. Personne d'autre dans le crew n'y a accès. Ces informations ne sont là que pour toi, si quelque chose tourne mal pendant un run.",
     },
     {

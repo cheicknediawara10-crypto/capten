@@ -186,11 +186,11 @@ export async function POST(request: Request) {
             <div style="background-color: #F4F5F7; padding: 15px; border-radius: 6px; margin: 20px 0;">
               <p style="margin: 5px 0;">📅 <strong>Date :</strong> ${new Date(event_date).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</p>
               <p style="margin: 5px 0;">⏰ <strong>Heure d'arrivée :</strong> ${event_time}</p>
-              <p style="margin: 5px 0;">🏃‍♂️ <strong>Estimation :</strong> ~${estimated_runners} coureurs</p>
+              <p style="margin: 5px 0;">👥 <strong>Estimation :</strong> ~${estimated_runners} membres</p>
               <p style="margin: 5px 0;">☕️ <strong>Votre offre proposée :</strong> ${newEvent.quota} places max de "${newEvent.offer_price_cents / 100}€ : Café/Boisson + En-cas"</p>
             </div>
 
-            <p>Pour chaque coureur qui prépaie son offre, vous encaissez immédiatement <strong>75% du prix (soit ${(priceCents * 0.75 / 100).toFixed(2)}€ net)</strong>. Aucun frais d'installation, aucune démarche de facturation.</p>
+            <p>Pour chaque membre qui prépaie son offre, vous encaissez immédiatement <strong>75% du prix (soit ${(priceCents * 0.75 / 100).toFixed(2)}€ net)</strong>. Aucun frais d'installation, aucune démarche de facturation.</p>
             
             <div style="margin: 30px 0; text-align: center;">
               <a href="${acceptLink}" style="background-color: #FF5C00; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; margin-right: 15px; display: inline-block;">ACCEPTER LA DATE</a>

@@ -5,13 +5,13 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 
 export const dynamic = 'force-dynamic';
 
-const DEBRIEF_SYSTEM_PROMPT = `Tu es le Copilote IA Capten. Ton rôle est d'analyser l'ensemble des débriefings, retours anonymes des coureurs et signalements de sécurité suite à une course (run) spécifique, et d'en faire une synthèse claire, concise et extrêmement exploitable pour le Capitaine du club.
+const DEBRIEF_SYSTEM_PROMPT = `Tu es le Copilote IA Capten. Ton rôle est d'analyser l'ensemble des débriefings, retours anonymes des membres et signalements de sécurité suite à une session spécifique, et d'en faire une synthèse claire, concise et extrêmement exploitable pour le Capitaine du club.
 
 Ta synthèse doit comporter obligatoirement :
 1. **Satisfaction & Humeur Globale** : Résume la satisfaction (ex: taux de sensations positives 🔥 vs fatigue/allure trop rapide 🥵 ou sentiment de solitude 😔).
-2. **Analyse du Rythme et de l'Allure** : Analyse si l'allure globale était adaptée.
+2. **Analyse du Rythme et de l'Allure** : Analyse si le rythme global était adapté.
 3. **Sécurité & Alertes** : Identifie les incidents ou alertes critiques (problèmes physiques, harcèlement, discrimination, chutes).
-4. **Conseils & Actions Concrètes** : Donne 2 à 3 recommandations concrètes pour la prochaine session (ex: nommer un serre-file, ralentir l'allure sur la fin, modifier le parcours).
+4. **Conseils & Actions Concrètes** : Donne 2 à 3 recommandations concrètes pour la prochaine session (ex: nommer un serre-file, ralentir le rythme sur la fin, modifier le parcours).
 
 Reste professionnel, amical et synthétique. Rédige en français sous forme de blocs structurés avec des émojis. Ne cite aucun nom pour préserver l'anonymat des signalements.`;
 
@@ -21,7 +21,7 @@ export async function GET(request: Request) {
     const runId = searchParams.get('run_id');
 
     if (!runId) {
-      return NextResponse.json({ error: "L'identifiant du run est requis." }, { status: 400 });
+      return NextResponse.json({ error: "L'identifiant de la session est requis." }, { status: 400 });
     }
 
     const { getAuthenticatedCaptainId } = await import('@/lib/auth-server');
@@ -46,13 +46,13 @@ export async function GET(request: Request) {
     if (plan === 'GRATUIT') {
       return NextResponse.json({
         success: false,
-        summary: "L'analyse IA de fin de run est réservée aux membres du plan Capten. Passe au plan supérieur pour synthétiser instantanément les retours de tes coureurs !",
+        summary: "L'analyse IA de fin de session est réservée aux membres du plan Capten. Passe au plan supérieur pour synthétiser instantanément les retours de tes membres !",
         isLocked: true
       });
     }
 
     // 2. Fetch run info
-    let runTitle = 'Run';
+    let runTitle = 'Session';
     if (supabase) {
       const { data: runData } = await supabase
         .from('runs')
@@ -62,7 +62,7 @@ export async function GET(request: Request) {
       if (runData) runTitle = runData.title;
     } else {
       // Mock Fallback
-      runTitle = 'TEMPO THURSDAY';
+      runTitle = 'SESSION DE SQUAD';
     }
 
     // 3. Fetch all feedback/incidents for this run
@@ -76,20 +76,20 @@ export async function GET(request: Request) {
     } else {
       // Mock feedbacks
       feedbacks = [
-        { type: 'Mood Check (Feedback)', priority: 'BASSE', anonymous: true, involved: '🧘 Rythme parfait', details: "Super ambiance ce soir, allure nickel." },
-        { type: 'Mood Check (Feedback)', priority: 'BASSE', anonymous: true, involved: '🔥 Super', details: "Merci au Captain ! Café d'après-run au top." },
+        { type: 'Mood Check (Feedback)', priority: 'BASSE', anonymous: true, involved: '🧘 Rythme parfait', details: "Super ambiance ce soir, rythme nickel." },
+        { type: 'Mood Check (Feedback)', priority: 'BASSE', anonymous: true, involved: '🔥 Super', details: "Merci au Captain ! Café d'après-session au top." },
         { type: 'Mood Check (Feedback)', priority: 'BASSE', anonymous: true, involved: '🧘 Rythme parfait', details: "" },
         { type: 'Mood Check (Feedback)', priority: 'HAUTE', anonymous: true, involved: '🥵 Trop rapide', details: "Les 2 derniers kilomètres étaient trop rapides pour moi, j'ai fini à la traîne." },
-        { type: 'Mood Check (Feedback)', priority: 'HAUTE', anonymous: true, involved: '🥵 Trop rapide', details: "Allure difficile à suivre sur la côte." },
+        { type: 'Mood Check (Feedback)', priority: 'HAUTE', anonymous: true, involved: '🥵 Trop rapide', details: "Rythme difficile à suivre sur la côte." },
         { type: 'Mood Check (Feedback)', priority: 'BASSE', anonymous: true, involved: '🧘 Rythme parfait', details: "" },
-        { type: 'Mood Check (Feedback)', priority: 'HAUTE', anonymous: true, involved: '😔 Je me suis senti seul', details: "Personne ne m'a parlé pendant le run d'après-café, c'était ma première fois et je me suis senti un peu exclu." }
+        { type: 'Mood Check (Feedback)', priority: 'HAUTE', anonymous: true, involved: '😔 Je me suis senti seul', details: "Personne ne m'a parlé pendant l'after-session, c'était ma première fois et je me suis senti un peu exclu." }
       ];
     }
 
     if (feedbacks.length === 0) {
       return NextResponse.json({
         success: true,
-        summary: "Aucun débriefing ou signalement n'a été reçu pour cette course. Pour analyser les retours, partage le lien de débriefing de fin de run à tes coureurs !",
+        summary: "Aucun débriefing ou signalement n'a été reçu pour cette session. Pour analyser les retours, partage le lien de débriefing de fin de session à tes membres !",
         count: 0
       });
     }
@@ -104,7 +104,7 @@ export async function GET(request: Request) {
 - Anonyme : ${f.anonymous ? 'Oui' : 'Non'}`;
     }).join('\n\n');
 
-    const contentPrompt = `Voici la liste des débriefings et retours anonymes reçus pour le run "${runTitle}" (Total : ${feedbacks.length} retours) :\n\n${listFeedbacksStr}\n\nFais une synthèse structurée et exploitable pour le Captain du club.`;
+    const contentPrompt = `Voici la liste des débriefings et retours anonymes reçus pour la session "${runTitle}" (Total : ${feedbacks.length} retours) :\n\n${listFeedbacksStr}\n\nFais une synthèse structurée et exploitable pour le Captain du club.`;
 
     const geminiKey = process.env.GEMINI_API_KEY;
 
@@ -152,13 +152,13 @@ export async function GET(request: Request) {
 * **😔 Sentiment d'exclusion** : ${moodCounts['😔'] || 0}
 
 ### ⚠️ Points d'Attention
-${slowDownCount > 0 ? `* **Allure trop rapide** : ${slowDownCount} coureurs ont signalé un rythme trop élevé.` : ''}
-${leftOutCount > 0 ? `* **Inclusivité** : ${leftOutCount} coureur(s) se sont senti(s) mis de côté lors de cette session.` : ''}
+${slowDownCount > 0 ? `* **Rythme trop rapide** : ${slowDownCount} membres ont signalé un rythme trop élevé.` : ''}
+${leftOutCount > 0 ? `* **Inclusivité** : ${leftOutCount} membre(s) se sont senti(s) mis de côté lors de cette session.` : ''}
 ${slowDownCount === 0 && leftOutCount === 0 ? `* Aucun point d'attention particulier à signaler. Ambiance au top !` : ''}
 
 ### 💡 Recommandations
-1. ${slowDownCount > 0 ? "Ralentir l'allure sur la fin de course ou proposer un groupe de niveau plus tranquille." : "Maintenir cette allure et ce format qui conviennent très bien."}
-2. ${leftOutCount > 0 ? "Nommer des parrains/co-captains pour accueillir et accompagner les nouveaux coureurs au café." : "Continuer d'encourager les rituels d'après-run pour souder la communauté."}
+1. ${slowDownCount > 0 ? "Ralentir le rythme sur la fin de session ou proposer un groupe de niveau plus tranquille." : "Maintenir ce rythme et ce format qui conviennent très bien."}
+2. ${leftOutCount > 0 ? "Nommer des parrains/co-captains pour accueillir et accompagner les nouveaux membres lors de l'after-session." : "Continuer d'encourager les rituels d'après-session pour souder la communauté."}
 `;
 
     return NextResponse.json({

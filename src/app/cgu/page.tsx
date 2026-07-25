@@ -78,7 +78,7 @@ export default function CGUPage() {
               Le Captain est seul responsable du contenu publié, des parcours planifiés et de la gestion des membres de son club. CAPTEN agit exclusivement en tant que prestataire technique d'hébergement et d'automatisation.
             </p>
             <p>
-              CAPTEN ne saurait être tenu pour responsable en cas d'accident survenu lors d'un run, de non-respect du code de la route par les coureurs, ou d'indisponibilité technique momentanée des services.
+              CAPTEN ne saurait être tenu pour responsable en cas d'accident survenu lors d'une session, de non-respect du code de la route par les membres, ou d'indisponibilité technique momentanée des services.
             </p>
           </section>
 

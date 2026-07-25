@@ -234,7 +234,7 @@ export default function CagnottePage() {
             </h2>
             
             <p className="text-xs text-neutral-400 font-sans mt-3 leading-relaxed">
-              Associe ton lien de contribution, centralise les dons des coureurs de manière transparente et finance les projets et after-runs de ta communauté.
+              Associe ton lien de contribution, centralise les dons des membres de manière transparente et finance les projets et after-sessions de ta communauté.
             </p>
             
             <div className="mt-6 border-t border-white/5 pt-5">
@@ -359,7 +359,7 @@ export default function CagnottePage() {
                    Liens de Cagnotte Direct
                  </h3>
                  <p className="text-[10px] text-white/95 leading-relaxed font-medium">
-                   CAPTEN ne gère aucun flux financier. Vos coureurs cliquent sur votre bouton en debrief et sont redirigés directement sur votre Sumeria, Revolut, PayPal ou Wero.
+                   CAPTEN ne gère aucun flux financier. Tes membres cliquent sur ton bouton en débrief et sont redirigés directement sur ton Sumeria, Revolut, PayPal ou Wero.
                  </p>
               </div>
               
@@ -524,7 +524,7 @@ export default function CagnottePage() {
               <div className="space-y-4">
                 <h4 className="text-[16px] font-display italic font-black uppercase text-[#FF5C00]">Capten ne touche pas ton argent.</h4>
                 <p className="text-[13px] font-sans font-medium text-neutral-600 leading-relaxed">
-                  Tes coureurs cliquent sur ton lien Sumeria (ex Lydia), Revolut ou Wero. L&apos;argent arrive directement sur ton téléphone.
+                  Tes membres cliquent sur ton lien Sumeria (ex Lydia), Revolut ou Wero. L&apos;argent arrive directement sur ton téléphone.
                 </p>
               </div>
               <div className="bg-[#F4F5F7] rounded-card-inner p-4 border border-black/5 space-y-3 font-medium text-[11px] text-neutral-650">
