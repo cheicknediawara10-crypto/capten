@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { getSupabase } from '@/lib/supabase';
 import { useAuth } from '@/context/AuthContext';
+import { getCommunityLabels } from '@/lib/community-labels';
 
 // === HELPERS MÉTÉO ===
 function getCoordinates(location: string): { latitude: number; longitude: number } {
@@ -59,56 +60,56 @@ const TEMPLATES_DATABASE: MessageTemplate[] = [
     category: "avant_run",
     label: "Rappel session J-0",
     contextHint: "À envoyer 30-60 min avant une session habituelle.",
-    templateText: "{{club_name}} 📍\nCe soir, on se retrouve à {{run_time}} pour notre session habituelle.\n{{run_distance}}, {{weather}}.\n{{run_url}}"
+    templateText: "{{club_name}} 📍\nCe soir, on se retrouve à {{run_time}} pour notre {{session_single}} habituelle.\n{{run_distance}}, {{weather}}.\n{{run_url}}"
   },
   {
     id: "1.2",
     category: "avant_run",
     label: "Rappel motivation J-0",
     contextHint: "À envoyer quand l'engagement est faible.",
-    templateText: "{{club_name}} ⚡\nCe soir {{run_time}}. La journée a été longue, c'est exactement pour ça qu'on se retrouve ensemble.\n{{run_url}}"
+    templateText: "{{club_name}} ⚡\nCe soir {{run_time}}. La journée a été longue, c'est exactement pour ça qu'on se retrouve pour {{session_named}}.\n{{run_url}}"
   },
   {
     id: "1.3",
     category: "avant_run",
     label: "Rappel météo difficile J-0",
     contextHint: "Pluie, froid, vent. La session a lieu quand même.",
-    templateText: "{{club_name}} 🌧️\nCe soir la session a lieu quand même. {{weather}}.\nPrends une veste adaptée, on y va tranquille.\n{{run_url}}"
+    templateText: "{{club_name}} 🌧️\nCe soir {{session_named}} a lieu quand même. {{weather}}.\nPrends une tenue adaptée, on y va ensemble.\n{{run_url}}"
   },
   {
     id: "1.4",
     category: "avant_run",
     label: "Rappel canicule J-0",
     contextHint: "Forte chaleur, consignes de sécurité.",
-    templateText: "{{club_name}} ☀️\nForte chaleur ce soir. On se retrouve à {{run_time}}.\nPense à prendre de l'eau, on adapte le rythme.\n{{run_url}}"
+    templateText: "{{club_name}} ☀️\nForte chaleur ce soir. On se retrouve à {{run_time}}.\nPense à prendre de l'eau, on adapte {{pace}}.\n{{run_url}}"
   },
   {
     id: "1.5",
     category: "avant_run",
     label: "Rappel veille J-1",
     contextHint: "À envoyer la veille pour bloquer l'agenda.",
-    templateText: "{{club_name}} 📅\nSession demain soir {{run_time}}. {{run_name}}.\nInscriptions ouvertes (places limitées) :\n{{run_url}}"
+    templateText: "{{club_name}} 📅\n{{session_single_cap}} demain soir {{run_time}}. {{run_name}}.\nInscriptions ouvertes (places limitées) :\n{{run_url}}"
   },
   {
     id: "1.6",
     category: "avant_run",
     label: "Session complète",
     contextHint: "Session complète, pousser les gens à libérer leur place.",
-    templateText: "{{club_name}} 🔒\nLa session de ce soir est complète.\nSi tu as un contretemps, libère ta place pour les copains :\n{{run_url}}"
+    templateText: "{{club_name}} 🔒\n{{session_single_cap}} de ce soir est complète.\nSi tu as un contretemps, libère ta place pour les membres du crew :\n{{run_url}}"
   },
   {
     id: "1.7",
     category: "avant_run",
     label: "Place libérée (Liste d'attente)",
     contextHint: "En DM au premier de la liste d'attente.",
-    templateText: "{{club_name}} ⚡\nUne place s'est libérée pour la session de ce soir !\nDis-moi vite si tu es toujours chaud(e) pour venir :\n{{run_url}}"
+    templateText: "{{club_name}} ⚡\nUne place s'est libérée pour {{session_named}} de ce soir !\nDis-moi vite si tu es toujours disponible pour venir :\n{{run_url}}"
   },
   {
     id: "1.8",
     category: "avant_run",
     label: "Première session d'un nouveau",
     contextHint: "En DM de bienvenue à un nouveau membre.",
-    templateText: "{{club_name}} 👋\nBienvenue dans le crew ! On se retrouve ce soir à {{run_time}}.\nSigne juste ta décharge en ligne avant de venir :\n{{run_url}}"
+    templateText: "{{club_name}} 👋\nBienvenue dans le crew ! On se retrouve ce soir à {{run_time}} pour {{session_named}}.\nSigne juste ta décharge en ligne avant de venir :\n{{run_url}}"
   },
   // --- CATÉGORIE 2 : PENDANT LA SESSION ---
   {
@@ -123,14 +124,14 @@ const TEMPLATES_DATABASE: MessageTemplate[] = [
     category: "pendant_run",
     label: "Annulation météo extrême",
     contextHint: "Orage, tempête, neige. Sécurité d'abord.",
-    templateText: "{{club_name}} ❌\nPas de session ce soir, la météo s'annonce trop mauvaise.\nPrenez soin de vous, on se retrouve le {{next_run_date}} !"
+    templateText: "{{club_name}} ❌\nPas de {{session_single}} ce soir, la météo s'annonce trop mauvaise.\nPrenez soin de vous, on se retrouve pour {{session_named}} du {{next_run_date}} !"
   },
   {
     id: "2.3",
     category: "pendant_run",
     label: "Annulation / Report",
     contextHint: "Problème de dernière minute du Captain.",
-    templateText: "{{club_name}} ❌\nPetit imprévu ce soir, je dois annuler la session.\nOn se rattrape le {{next_run_date}} même heure, même endroit !"
+    templateText: "{{club_name}} ❌\nPetit imprévu ce soir, je dois annuler {{session_named}}.\nOn se rattrape le {{next_run_date}} même heure, même endroit !"
   },
   // --- CATÉGORIE 3 : APRÈS LA SESSION ---
   {
@@ -138,21 +139,21 @@ const TEMPLATES_DATABASE: MessageTemplate[] = [
     category: "apres_run",
     label: "Débrief standard",
     contextHint: "Le lendemain matin. Simple, sobre.",
-    templateText: "{{club_name}} ✅\nMerci d'être venus hier, on était {{checkin_count}} !\nLes présences et stats du crew sont à jour :\n{{stats_url}}"
+    templateText: "{{club_name}} ✅\nMerci d'être venus hier, on était {{checkin_count}} {{members_plural_short}} !\nLes présences et stats du crew sont à jour :\n{{stats_url}}"
   },
   {
     id: "3.2",
     category: "apres_run",
     label: "Record de présence",
     contextHint: "Quand le taux de présence est historique.",
-    templateText: "{{club_name}} 🏆\nRecord battu hier soir, on était {{checkin_count}} sur place !\nTout le monde était présent, merci pour l'énergie :\n{{stats_url}}"
+    templateText: "{{club_name}} 🏆\nRecord battu hier soir, on était {{checkin_count}} {{members_plural_short}} sur place !\nTout le monde était présent, merci pour l'énergie :\n{{stats_url}}"
   },
   {
     id: "3.3",
     category: "apres_run",
     label: "Débrief avec cagnotte",
     contextHint: "Si une cagnotte était active.",
-    templateText: "{{club_name}} ☕\nSuper session hier, on était {{checkin_count}}.\nMerci pour vos dons : {{pot_amount}}€ récoltés pour le café !\nProchaine session le {{next_run_date}}."
+    templateText: "{{club_name}} ☕\nSuper {{session_single}} hier, on était {{checkin_count}} {{members_plural_short}}.\nMerci pour vos dons : {{pot_amount}}€ récoltés pour le café !\nProchaine {{session_single}} le {{next_run_date}}."
   },
   {
     id: "3.4",
@@ -166,7 +167,7 @@ const TEMPLATES_DATABASE: MessageTemplate[] = [
     category: "apres_run",
     label: "Rappel no-show",
     contextHint: "En DM privé uniquement. Jamais en groupe.",
-    templateText: "{{club_name}} 👋\nHey {{first_name}}, ça fait un petit moment qu'on t'a pas vu !\nTout va bien ? N'hésite pas à passer à la session du {{next_run_date}} :\n{{run_url}}"
+    templateText: "{{club_name}} 👋\nHey {{first_name}}, ça fait un petit moment qu'on t'a pas vu !\nTout va bien ? N'hésite pas à passer à {{session_named}} du {{next_run_date}} :\n{{run_url}}"
   },
   {
     id: "3.6",
@@ -180,14 +181,14 @@ const TEMPLATES_DATABASE: MessageTemplate[] = [
     category: "apres_run",
     label: "After-session cagnotte",
     contextHint: "Boisson offerte par la cagnotte du club.",
-    templateText: "{{club_name}} ☕\nCe soir, la session se termine au social spot.\nLes boissons des nouveaux sont offertes par la cagnotte du club !\n{{run_url}}"
+    templateText: "{{club_name}} ☕\nCe soir, {{session_named}} se termine au social spot.\nLes boissons des nouveaux {{members_plural_short}} sont offertes par la cagnotte du club !\n{{run_url}}"
   },
   {
     id: "3.8",
     category: "apres_run",
     label: "BIEN RENTRÉ ?",
     contextHint: "Vérifier que tout le monde est bien rentré après la session.",
-    templateText: "Session finie ! J'espère que vous avez kiffé 🔥\nConfirme que t'es bien rentré(e) 👇\n{{lien_check_retour}}"
+    templateText: "{{session_single_cap}} finie ! J'espère que vous avez kiffé 🔥\nConfirme que t'es bien rentré(e) 👇\n{{lien_check_retour}}"
   },
   // --- CATÉGORIE 4 : SOCIAL SPOT ---
   {
@@ -195,56 +196,59 @@ const TEMPLATES_DATABASE: MessageTemplate[] = [
     category: "social_spot",
     label: "Annonce du spot",
     contextHint: "À envoyer après la session",
-    templateText: "{{club_name}} ☕\nAprès la session ce soir, on se retrouve au {{spot_name}} !\nAdresse : {{spot_address}}\n{{spot_message}}"
+    templateText: "{{club_name}} ☕\nAprès {{session_named}} ce soir, on se retrouve au {{spot_name}} !\nAdresse : {{spot_address}}\n{{spot_message}}"
   },
   {
     id: "5.2",
     category: "social_spot",
     label: "Débrief + spot",
     contextHint: "Le lendemain matin",
-    templateText: "{{club_name}} ✅\nOn était {{checkin_count}} membres hier soir, merci pour l'énergie.\nOn se retrouve à la prochaine session le {{next_run_date}} !"
+    templateText: "{{club_name}} ✅\nOn était {{checkin_count}} {{members_plural_short}} hier soir, merci pour l'énergie.\nOn se retrouve à la prochaine {{session_single}} le {{next_run_date}} !"
   },
   {
     id: "5.3",
     category: "social_spot",
     label: "Cagnotte au spot",
     contextHint: "Si une cagnotte était active",
-    templateText: "{{club_name}} 🎉\n{{pot_amount}}€ collectés dans la cagnotte ce soir.\nCafé offert pour tout le monde au {{spot_name}} !"
+    templateText: "{{club_name}} 🎉\n{{pot_amount}}€ collectés dans la cagnotte ce soir.\nCafé offert pour tous les {{members_plural_short}} au {{spot_name}} !"
   },
   {
     id: "5.4",
     category: "social_spot",
     label: "Offre partenaire",
     contextHint: "Partage un code promo ou un deal exclusif avec ton crew",
-    templateText: "{{club_name}} 🤝\n\n{{partner_name}} offre {{offer_description}}\nà tous les membres du crew.\n\nCode : {{promo_code}}\nValable jusqu'au {{expiry_date}}."
+    templateText: "{{club_name}} 🤝\n\n{{partner_name}} offre {{offer_description}}\nà tous les {{members_plural_short}} du crew.\n\nCode : {{promo_code}}\nValable jusqu'au {{expiry_date}}."
   },
   {
     id: "6.1",
     category: "accueil",
     label: "Bienvenue anti-stress",
     contextHint: "Dès l'inscription d'un nouveau membre dans le crew.",
-    templateText: "Salut {{first_name}} ! 👋\nBienvenue dans le crew {{club_name}}.\nIci, zéro pression : on se retrouve pour le plaisir de bouger ensemble. Pas d'esprit de compétition, on s'adapte à tout le monde.\nHâte de te voir sur notre prochaine session ! {{prenom_capitaine}}"
+    templateText: "Salut {{first_name}} ! 👋\nBienvenue dans le crew {{club_name}}.\nIci, zéro pression : on se retrouve pour le plaisir d'être ensemble. Pas d'esprit de compétition, on s'adapte à tous les niveaux.\nHâte de te voir sur notre prochaine {{session_single}} ! {{prenom_capitaine}}"
   },
   {
     id: "6.2",
     category: "accueil",
     label: "Après la première session",
     contextHint: "À envoyer 1-2h après sa toute première session.",
-    templateText: "Félicitations pour ta première session avec nous {{first_name}} ! 🎉\nJ'espère que tu as passé un bon moment et que l'ambiance t'a plu. On se retrouve très vite pour la prochaine session (et l'after-session au {{lieu_after}} !).\nÀ bientôt, {{prenom_capitaine}}"
+    templateText: "Félicitations pour ta première {{session_single}} avec nous {{first_name}} ! 🎉\nJ'espère que tu as passé un bon moment et que l'ambiance t'a plu. On se retrouve très vite pour la prochaine {{session_single}} (et l'after-session au {{lieu_after}} !).\nÀ bientôt, {{prenom_capitaine}}"
   },
   {
     id: "6.3",
     category: "accueil",
     label: "Relance en douceur",
     contextHint: "Si un nouveau n'est pas revenu après 2 semaines.",
-    templateText: "Salut {{first_name}} ! 👋\nÇa fait déjà deux semaines qu'on ne t'a pas vu sur les sessions de {{club_name}}.\nOn espère que tout va bien de ton côté. Nos prochaines sessions sont déjà ouvertes si tu veux nous rejoindre, la porte est toujours grande ouverte ! {{prenom_capitaine}}"
+    templateText: "Salut {{first_name}} ! 👋\nÇa fait déjà deux semaines qu'on ne t'a pas vu sur les {{session_plural}} de {{club_name}}.\nOn espère que tout va bien de ton côté. Nos prochaines {{session_plural}} sont déjà ouvertes si tu veux nous rejoindre, la porte est toujours grande ouverte ! {{prenom_capitaine}}"
   }
 ];
 
 // --- TEMPLATE PARSER ENGINE ---
-function parseTemplateText(text: string, run: any, club: any): string {
+function parseTemplateText(text: string, run: any, club: any, communityType?: string): string {
   if (!text) return "";
-  return text
+  const type = communityType || (typeof window !== 'undefined' ? localStorage.getItem('capten_community_type') : 'run_club') || 'run_club';
+  const L = getCommunityLabels(type);
+
+  let parsed = text
     .replace(/\{\{club_name\}\}/g, club.name || "")
     .replace(/\{\{run_name\}\}/g, run.name || "")
     .replace(/\{\{run_time\}\}/g, run.time || "")
@@ -276,9 +280,22 @@ function parseTemplateText(text: string, run: any, club: any): string {
     .replace(/\{\{promo_code\}\}/g, club.promo_code || "")
     .replace(/\{\{expiry_date\}\}/g, club.expiry_date || "")
     .replace(/\{\{prenom_capitaine\}\}/g, (club.coaches && club.coaches[0]?.name) || "Le Captain")
-    .replace(/\{\{lieu_after\}\}/g, club.spot_name || "after-run")
+    .replace(/\{\{lieu_after\}\}/g, club.spot_name || "after-session")
     .replace(/\{\{lien_rdv\}\}/g, run.run_url || "")
     .replace(/\{\{lien_check_retour\}\}/g, run.short_code ? `capten.app/r/${run.short_code}` : "capten.app/r/xxxxxx");
+
+  // Dynamic replacements for segment vocabulary
+  parsed = parsed
+    .replace(/\{\{session_single\}\}/g, L.session_single)
+    .replace(/\{\{session_single_cap\}\}/g, L.session_single_cap)
+    .replace(/\{\{session_plural\}\}/g, L.session_plural)
+    .replace(/\{\{session_plural_cap\}\}/g, L.session_plural_cap)
+    .replace(/\{\{session_named\}\}/g, L.session_named)
+    .replace(/\{\{members_plural_short\}\}/g, L.members_plural_short)
+    .replace(/\{\{member_singular\}\}/g, L.member_singular)
+    .replace(/\{\{pace\}\}/g, L.pace);
+
+  return parsed;
 }
 
 // --- SUBCOMPONENT: LIVE WHATSAPP CHAT BUBBLE PREVIEW ---
@@ -1251,14 +1268,33 @@ export default function MessagesPage() {
     }
   }, [selectedTemplate, simulator]);
 
+  // Community Type & Labels Listener
+  const [communityType, setCommunityType] = useState<string>('run_club');
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedType = localStorage.getItem('capten_community_type') || 'run_club';
+      setCommunityType(savedType);
+
+      const updateType = () => {
+        const t = localStorage.getItem('capten_community_type') || 'run_club';
+        setCommunityType(t);
+      };
+      window.addEventListener('capten_branding_change', updateType);
+      return () => window.removeEventListener('capten_branding_change', updateType);
+    }
+  }, []);
+
+  const L = getCommunityLabels(communityType);
+
   // Tab definitions
   const tabs = useMemo(() => [
     { id: 'accueil' as TemplateCategory, label: 'Accueil' },
-    { id: 'avant_run' as TemplateCategory, label: 'Avant le Run' },
-    { id: 'pendant_run' as TemplateCategory, label: 'Pendant le Run' },
-    { id: 'apres_run' as TemplateCategory, label: 'Après le Run' },
+    { id: 'avant_run' as TemplateCategory, label: `Avant ${L.session_named}` },
+    { id: 'pendant_run' as TemplateCategory, label: `Pendant ${L.session_named}` },
+    { id: 'apres_run' as TemplateCategory, label: `Après ${L.session_named}` },
     { id: 'social_spot' as TemplateCategory, label: 'Social Spot' }
-  ], []);
+  ], [L]);
 
   // Filter templates list
   const filteredTemplates = useMemo(() => {
