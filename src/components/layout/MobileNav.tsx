@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { 
   LayoutDashboard, Users, Map, Sparkles, 
-  MessageSquare, Ticket, Wallet, Store, ShieldCheck, CreditCard, Settings, Lock 
+  MessageSquare, Ticket, Wallet, Store, ShieldCheck, CreditCard, Settings, HelpCircle, Lock 
 } from "lucide-react";
 
 export default function MobileNav() {
@@ -41,6 +41,7 @@ export default function MobileNav() {
     { name: "Cagnotte", icon: <Wallet size={18} strokeWidth={1.5} />, href: "/cagnotte" },
     { name: "Spots", icon: <Store size={18} strokeWidth={1.5} />, href: "/spots/explorer" },
     { name: "Protection", icon: <ShieldCheck size={18} strokeWidth={1.5} />, href: "/securite" },
+    { name: "Support", icon: <HelpCircle size={18} strokeWidth={1.5} />, href: "/support" },
     { name: "Abonnement", icon: <CreditCard size={18} strokeWidth={1.5} />, href: "/plan" },
     { name: "Réglages", icon: <Settings size={18} strokeWidth={1.5} />, href: "/settings" },
   ];
