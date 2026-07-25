@@ -926,7 +926,7 @@ export default function DashboardPage() {
 
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pt-4 border-t border-black/5">
             <p className="text-[11px] text-neutral-500 font-mono">
-              Prochain prélèvement de 49,99€/mois à J+21. Résiliable en 1 clic dans les réglages.
+              Prochain prélèvement de 49,99€/mois à J+14. Résiliable en 1 clic dans les réglages.
             </p>
             <div className="flex items-center gap-3">
               {runs.length < 3 && (

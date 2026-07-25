@@ -79,7 +79,7 @@ async function handleOnboardingCron(request: Request) {
                 <div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto; padding: 25px; border: 1px solid #e5e5e5; border-radius: 12px; background-color: #FDFCF8;">
                   <h2 style="color: #FF5C00; text-transform: uppercase;">Prêt pour le premier run ?</h2>
                   <p>Salut ${profile.full_name || 'Capitaine'},</p>
-                  <p>Tu as lancé ton essai de 21 jours sur Capten il y a 48h, mais tu n'as pas encore créé de run.</p>
+                  <p>Tu as lancé ton essai de 14 jours sur Capten il y a 48h, mais tu n'as pas encore créé de run.</p>
                   <p>Planifier une session ne prend que 30 secondes et te permettra de tester les relances automatiques et les fiches de sécurité.</p>
                   <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'https://capten.app'}/runs/planifier" style="display: inline-block; padding: 12px 24px; background-color: #FF5C00; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; margin-top: 15px;">Planifier un run maintenant</a>
                 </div>
@@ -143,7 +143,7 @@ async function handleOnboardingCron(request: Request) {
                 <div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto; padding: 25px; border: 1px solid #e5e5e5; border-radius: 12px; background-color: #FDFCF8;">
                   <h2 style="color: #FF5C00; text-transform: uppercase;">Faisons le point à J+14</h2>
                   <p>Salut ${profile.full_name || 'Capitaine'},</p>
-                  <p>Ton essai gratuit de 21 jours se termine dans une semaine.</p>
+                  <p>Ton essai gratuit de 14 jours se termine dans une semaine.</p>
                   <p>Ton crew grandit, et nous espérons que les fonctionnalités avancées de Capten te facilitent la vie !</p>
                   <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'https://capten.app'}/dashboard" style="display: inline-block; padding: 12px 24px; background-color: #000; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; margin-top: 15px;">Piloter mon club</a>
                 </div>
@@ -175,7 +175,7 @@ async function handleOnboardingCron(request: Request) {
                 <div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto; padding: 25px; border: 1px solid #e5e5e5; border-radius: 12px; background-color: #FDFCF8;">
                   <h2 style="color: #FF5C00; text-transform: uppercase;">Fin de ton essai gratuit</h2>
                   <p>Salut ${profile.full_name || 'Capitaine'},</p>
-                  <p>Ton essai de 21 jours prendra fin dans 3 jours.</p>
+                  <p>Ton essai de 14 jours prendra fin dans 3 jours.</p>
                   <p>Si tu souhaites continuer, aucune action n'est requise. Ton abonnement se poursuivra automatiquement au tarif de 49,99 €/mois.</p>
                   <p>Si tu souhaites résilier et revenir au plan gratuit sans aucun frais, tu peux le faire en 1 clic dans tes réglages.</p>
                   <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'https://capten.app'}/settings" style="display: inline-block; padding: 12px 24px; background-color: #FF5C00; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; margin-top: 15px;">Gérer mon abonnement</a>
