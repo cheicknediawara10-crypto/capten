@@ -308,11 +308,11 @@ export default function PlanPage() {
       period: "/mois",
       billingNote: billingInterval === 'yearly' 
         ? "Facturé 499€/an (2 mois offerts)" 
-        : "Essai 14 jours gratuit — Rien ne t'est prélevé aujourd'hui",
+        : "Essai 21 jours gratuit — Rien ne t'est prélevé aujourd'hui",
       desc: "Le cockpit de pilotage ultime pour structurer ton crew et le faire grandir comme un pro.",
       tag: billingInterval === 'yearly'
         ? "RECOMMANDÉ — 2 MOIS OFFERTS"
-        : "ESSAI 14 JOURS GRATUITS",
+        : "ESSAI 21 JOURS GRATUITS",
       features: [
         { t: "Page publique du crew", d: "Inscriptions rapides en 1 lien partagé.", included: true },
         { t: "Sorties illimitées", d: "Planifie autant de sorties simultanées que tu veux.", included: true },
@@ -325,7 +325,7 @@ export default function PlanPage() {
       button: currentPlan === "CAPTEN" ? "PLAN ACTUEL" : (
         billingInterval === 'yearly' 
           ? "ACTIVER LE PLAN ANNUEL" 
-          : "ESSAI 14 JOURS GRATUIT"
+          : "ESSAI 21 JOURS GRATUIT"
       ),
       type: currentPlan === "CAPTEN" ? "current" : "action"
     }
@@ -503,7 +503,7 @@ export default function PlanPage() {
                           href="/login?mode=signup&upgrade=true"
                           className="w-full text-center py-4 rounded-[10px] text-[10px] sm:text-[11px] font-black uppercase tracking-[0.2em] transition-all bg-[#FF5C00] text-white hover:bg-black block cursor-pointer shadow-lg shadow-orange-500/20"
                         >
-                          {billingInterval === 'yearly' ? "ACTIVER LE PLAN ANNUEL" : "ESSAI 14 JOURS GRATUIT — ACCÈS COMPLET"}
+                          {billingInterval === 'yearly' ? "ACTIVER LE PLAN ANNUEL" : "ESSAI 21 JOURS GRATUIT — ACCÈS COMPLET"}
                         </Link>
                         <Link 
                           href="/login?mode=signup&free=true"

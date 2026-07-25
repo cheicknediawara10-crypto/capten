@@ -344,7 +344,7 @@ function LoginForm() {
           
           if (targetPlan === 'trial') {
             const ends = new Date();
-            ends.setDate(ends.getDate() + 14);
+            ends.setDate(ends.getDate() + 21);
             localStorage.setItem('capten_trial_ends_at', ends.toISOString());
           }
           
@@ -491,7 +491,7 @@ function LoginForm() {
               ? (!isFreePlanUrl
                   ? (signupStep === 1 
                       ? "Saisis tes informations de compte pour commencer ton essai."
-                      : "Enregistre ta carte pour activer l'essai de 14 jours. Aucun prélèvement aujourd'hui.")
+                      : "Enregistre ta carte pour activer l'essai de 21 jours. Aucun prélèvement aujourd'hui.")
                   : "Crée ton compte et lance ton crew en 2 minutes.")
               : "Saisis ton e-mail pour recevoir un lien de réinitialisation."}
         </p>
@@ -870,7 +870,7 @@ function LoginForm() {
                 letterSpacing: 0.5,
                 marginBottom: 10,
               }}>
-                ESSAI CAPTEN — 14 JOURS
+                ESSAI CAPTEN — 21 JOURS
               </h4>
               <ul style={{
                 fontSize: 12,
@@ -882,7 +882,7 @@ function LoginForm() {
               }}>
                 <li>Accès complet premium immédiat sans restriction.</li>
                 <li style={{ fontWeight: 800, color: C.text }}>Rien ne t'est prélevé aujourd'hui.</li>
-                <li>Débit de 49,99 €/mois à partir du <span style={{ fontWeight: 700 }}>{new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR')}</span>.</li>
+                <li>Débit de 49,99 €/mois à partir du <span style={{ fontWeight: 700 }}>{new Date(Date.now() + 21 * 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR')}</span>.</li>
                 <li>Annulation en 1 clic sans justification depuis tes réglages.</li>
               </ul>
             </div>
@@ -1157,7 +1157,7 @@ function LoginForm() {
               letterSpacing: 1,
             }}>
               {mode === "password" 
-                ? "Essai gratuit de 14 jours"
+                ? "Essai gratuit de 21 jours"
                 : "Déjà un compte ?"}
             </span>
             <div style={{ flex: 1, height: 1, background: C.border }} />

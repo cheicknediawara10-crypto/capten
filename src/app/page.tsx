@@ -198,7 +198,7 @@ function Hero() {
               fontFamily: "'DM Mono',monospace", fontSize: 11, fontWeight: 500, letterSpacing: 1.5, textTransform: "uppercase"
             }}>
               <span style={{ width: 6, height: 6, borderRadius: "50%", background: C.orange, animation: "pulse 2s infinite" }} />
-              V1 disponible · 14 jours gratuits
+              V1 disponible · 21 jours gratuits
             </span>
           </div>
 
@@ -250,7 +250,7 @@ function Hero() {
           </div>
 
           <p className="fade-up d4" style={{ fontSize: 12, color: C.grayLight, fontFamily: "'DM Mono',monospace" }}>
-            Essai 14 jours · Aucune carte bancaire · Annulable en 1 clic
+            Essai 21 jours · Aucune carte bancaire · Annulable en 1 clic
           </p>
 
           {/* Social proof */}
@@ -258,7 +258,7 @@ function Hero() {
             {[
               { val: "0%",  label: "Commission cagnottes" },
               { val: "50",  label: "Check-ins simultanés" },
-              { val: "14j", label: "Essai gratuit" },
+              { val: "21j", label: "Essai gratuit" },
             ].map(({ val, label }) => (
               <div key={label}>
                 <div style={{ fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontStyle: "italic", fontSize: 34, color: C.orange }}>{val}</div>
@@ -958,7 +958,7 @@ function FAQ() {
       a: "Tu colles ton lien Lydia ou Revolut dans les réglages. Tes coureurs contribuent depuis le portail d'inscription. L'argent arrive directement sur ton téléphone. Capten ne prend aucune commission.",
     },
     {
-      q: "Que se passe-t-il après les 14 jours gratuits ?",
+      q: "Que se passe-t-il après les 21 jours gratuits ?",
       a: "Tu repasses en accès limité automatiquement. Aucune carte débitée sans ton accord explicite. Pas de surprise. Pas de piège.",
     },
   ];
@@ -1025,7 +1025,7 @@ function FooterCTA() {
         </h2>
         <p style={{ color: "#888", fontSize: 16, lineHeight: 1.75, marginBottom: 40, maxWidth: 520, margin: "0 auto 40px" }}>
           Run club, walk club, groupe de trail — peu importe comment tu l'appelles.
-          <br />14 jours pour voir ce que ça fait de ne plus stresser pour l'admin.
+          <br />21 jours pour voir ce que ça fait de ne plus stresser pour l'admin.
         </p>
         <a href="/login?mode=signup" className="btn-main" style={{ padding: "16px 40px", fontFamily: "'Barlow Condensed',sans-serif", fontStyle: "italic", fontSize: 22, fontWeight: 900, textTransform: "uppercase", letterSpacing: 1, display: "inline-flex", justifyContent: "center" }}>
           Lancer mon crew gratuitement →
