@@ -6,6 +6,7 @@ import { Search, Plus, Zap, Activity, CheckCircle2, XCircle, RefreshCw, X, Phone
 import { getSupabase } from '@/lib/supabase';
 import { useAuth } from '@/context/AuthContext';
 import { getAppUrl } from '@/lib/domain';
+import { getCommunityLabels } from '@/lib/community-labels';
 
 const getInitials = (name: string) => {
   if (!name) return "";
@@ -92,8 +93,25 @@ const mapRunnerToAthlete = (runner: any): Athlete => {
 
 export default function AthletesPage() {
   const { user, isMock } = useAuth();
+  const [communityType, setCommunityType] = useState<string>('run_club');
   const [selectedAthlete, setSelectedAthlete] = useState<Athlete | null>(null);
   const [athletes, setAthletes] = useState<Athlete[]>([]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedType = localStorage.getItem('capten_community_type') || 'run_club';
+      setCommunityType(savedType);
+      
+      const updateType = () => {
+        const t = localStorage.getItem('capten_community_type') || 'run_club';
+        setCommunityType(t);
+      };
+      window.addEventListener('capten_branding_change', updateType);
+      return () => window.removeEventListener('capten_branding_change', updateType);
+    }
+  }, []);
+
+  const L = getCommunityLabels(communityType);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
@@ -355,7 +373,7 @@ export default function AthletesPage() {
                 <p className="text-[16px] font-display italic font-black text-[#FF5C00] leading-none">{athlete.pace}</p>
               </div>
               <div>
-                <p className="text-[8px] font-black text-[#D1D1D1] uppercase tracking-[0.15em] italic mb-1">RUNS</p>
+                <p className="text-[8px] font-black text-[#D1D1D1] uppercase tracking-[0.15em] italic mb-1">{L.session_plural_cap.toUpperCase()}</p>
                 <p className="text-[16px] font-display italic font-black text-black leading-none">{athlete.runs}</p>
               </div>
               <div>
@@ -411,7 +429,7 @@ export default function AthletesPage() {
                 {[
                   { label: 'FIABILITÉ', value: `${selectedAthlete.reliability}%` },
                   { label: 'ALLURE', value: selectedAthlete.pace },
-                  { label: 'RUNS', value: `${selectedAthlete.runs}` },
+                  { label: L.session_plural_cap.toUpperCase(), value: `${selectedAthlete.runs}` },
                   { label: 'SÉRIE', value: selectedAthlete.streak > 0 ? `${selectedAthlete.streak} sem` : '—' },
                 ].map((s, i) => (
                   <div key={i} className="bg-[#F4F5F7] rounded-card-inner p-3 sm:p-4 text-center">
