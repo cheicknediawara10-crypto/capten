@@ -1,0 +1,9 @@
+# Railway Configuration for Capten 24/7 Resilience
+[deploy]
+  restartPolicyType = "ON_FAILURE"
+  restartPolicyMaxRetries = 3
+
+[healthcheck]
+  path = "/api/health"
+  intervalSeconds = 30
+  timeoutSeconds = 5

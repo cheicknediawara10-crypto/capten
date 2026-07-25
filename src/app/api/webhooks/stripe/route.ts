@@ -3,6 +3,7 @@ import { stripe } from '@/lib/stripe';
 import { getSupabaseAdmin } from '@/lib/supabase';
 import { generateQrToken } from '@/lib/spots';
 import { resend } from '@/lib/resend';
+import { log } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 
@@ -16,21 +17,21 @@ export async function POST(request: Request) {
     try {
       if (!webhookSecret || !sigHeader) {
         if (process.env.NODE_ENV !== 'production') {
-          console.warn('[Stripe Webhook Warning] Signature not verified in development mode');
+          log('warn', 'stripe.webhook.unverified_dev_mode', { message: 'Signature not verified in development mode' });
           event = JSON.parse(bodyText);
         } else {
-          console.error('[Stripe Webhook Error] Missing STRIPE_WEBHOOK_SECRET or stripe-signature header in production');
+          log('error', 'stripe.webhook.missing_secret_or_sig', { message: 'Missing STRIPE_WEBHOOK_SECRET or stripe-signature header in production' });
           return NextResponse.json({ error: 'Signature verification required' }, { status: 400 });
         }
       } else {
         event = stripe.webhooks.constructEvent(bodyText, sigHeader, webhookSecret);
       }
     } catch (err: any) {
-      console.error(`[Stripe Webhook Signature Error]: ${err.message}`);
+      log('error', 'stripe.webhook.signature_failed', { error: err.message });
       return NextResponse.json({ error: `Webhook Error: ${err.message}` }, { status: 400 });
     }
 
-    console.log(`[Stripe Webhook Received] Event Type: ${event.type}`);
+    log('info', 'stripe.webhook.received', { event_type: event.type, event_id: event.id });
 
     // --- 1. Gestion des Abonnements CAPTEN Plan ---
     const subscriptionEvents = [
@@ -130,7 +131,7 @@ export async function POST(request: Request) {
             .maybeSingle();
 
           if (existingTicket) {
-            console.log(`[Stripe Webhook] PaymentIntent ${paymentIntentId} déjà traité — billet existant.`);
+            log('warn', 'stripe.webhook.duplicate_event', { payment_intent_id: paymentIntentId });
             return NextResponse.json({ received: true });
           }
 
@@ -153,9 +154,15 @@ export async function POST(request: Request) {
             .maybeSingle();
 
           if (ticketError) {
-            console.error('[Webhook Error] Failed to create spot ticket:', ticketError);
+            log('error', 'stripe.webhook.ticket_creation_failed', { payment_intent_id: paymentIntentId, error: ticketError.message });
           } else if (ticket) {
-            console.log(`[Webhook Success] Ticket created: ${ticket.id} for runner: ${runnerEmail}`);
+            log('info', 'payment.success', {
+              ticket_id: ticket.id,
+              amount_cents: amountCents,
+              spot_event_id: spotEventId,
+              runner_email: runnerEmail,
+              is_first_visit: isFirstVisit
+            });
             
             // Si c'est une première visite, on l'enregistre dans l'historique
             if (isFirstVisit) {
