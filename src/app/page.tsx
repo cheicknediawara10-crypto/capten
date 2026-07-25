@@ -210,15 +210,35 @@ function Hero() {
             textTransform: "uppercase", letterSpacing: -1,
             marginBottom: 28,
           }}>
-            LA PLATEFORME DES<br />
-            <span style={{ color: C.orange }}>COMMUNAUTÉS SPORTIVES</span><br />
-            LOCALES.
+            TU AS LANCÉ CE CREW
+            <br />
+            POUR BOUGER.
+            <br />
+            <span style={{ color: C.orange }}>PAS POUR FAIRE<br />L&apos;ADMIN.</span>
           </h1>
+
+          {/* Segments pills */}
+          <div className="fade-up d1" style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 20 }}>
+            {[
+              { icon: "🏃", label: "Run clubs" },
+              { icon: "🚶", label: "Walk clubs" },
+              { icon: "🏔️", label: "Trail & Rando" },
+            ].map(({ icon, label }) => (
+              <span key={label} style={{
+                display: "inline-flex", alignItems: "center", gap: 5,
+                background: C.bgCard, border: `1px solid ${C.border}`,
+                color: C.gray, padding: "5px 12px", borderRadius: 100,
+                fontFamily: "'DM Mono',monospace", fontSize: 11, fontWeight: 500
+              }}>
+                {icon} {label}
+              </span>
+            ))}
+          </div>
 
           {/* Subheadline */}
           <p className="fade-up d2" style={{ fontSize: 17, color: C.gray, lineHeight: 1.75, marginBottom: 32, maxWidth: 460 }}>
-            Run clubs, walk clubs, groupes de trail — gérez votre crew, protégez vos membres, générez des revenus.
-            <strong style={{ color: C.black }}> Vous bougez ensemble. Capten fait le reste.</strong>
+            Run club, walk club, groupe de trail — peu importe comment tu appelles ton crew.
+            <strong style={{ color: C.black }}> Vous bougez ensemble chaque semaine. Capten gère le reste.</strong>
           </p>
 
           {/* CTAs */}
@@ -334,43 +354,68 @@ function ProblemSection() {
   return (
     <section id="comment" ref={ref} style={{ padding: "100px 40px", maxWidth: 1200, margin: "0 auto" }}>
       <div style={{ textAlign: "center", marginBottom: 64 }}>
-        <Label>Le dimanche soir d'une fondatrice</Label>
+        <Label>Le dimanche soir d&apos;un·e fondateur·rice</Label>
         <SecTitle style={{ opacity: v ? 1 : 0, transform: v ? "none" : "translateY(16px)", transition: "all 0.7s ease" }}>
           Tu stresses.<br />
           <span style={{ color: C.orange }}>On le sait.</span>
         </SecTitle>
+        <p style={{ color: C.gray, fontSize: 16, maxWidth: 520, margin: "16px auto 0", opacity: v ? 1 : 0, transition: "opacity 0.7s 0.3s ease" }}>
+          Peu importe si tu organises un run, une marche ou une sortie trail.
+          Le dimanche soir, c&apos;est toujours le même stress.
+        </p>
       </div>
 
-      {/* Le monologue de Sarah */}
-      <div style={{
-        background: C.bgCard, border: `1px solid ${C.border}`,
-        borderRadius: 20, padding: "40px 48px", marginBottom: 40,
-        borderLeft: `4px solid ${C.orange}`,
-        opacity: v ? 1 : 0, transition: "opacity 0.8s 0.2s ease",
-      }}>
-        <div style={{ display: "flex", gap: 16, alignItems: "flex-start" }}>
-          <div style={{ width: 42, height: 42, borderRadius: "50%", background: C.orangeBg, border: `1px solid ${C.orangeBorder}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>🏃‍♀️</div>
-          <div>
-            <div style={{ fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 700, fontSize: 14, letterSpacing: 1, color: C.orange, marginBottom: 12 }}>SARAH · FONDATRICE · CITY RUNNERS · PARIS</div>
+      {/* Les 3 monologues - Run, Walk, Trail */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16, marginBottom: 40 }} className="feat-grid">
+        {[
+          {
+            emoji: "🏃", color: C.orange, label: "NINA · RUN CLUB · LYON",
+            moments: [
+              { time: "Dimanche 22h", msg: "Je prépare le run de lundi. Qui est inscrit ? J'ai une liste quelque part sur mon téléphone.", emoji: "📱" },
+              { time: "Lundi 19h45", msg: "Quelqu'un trébuche au 4ème km. 10 secondes de panique : je connais même pas son groupe sanguin.", emoji: "🚨" },
+              { time: "Mardi matin", msg: "Un mec a envoyé des messages déplacés après le run. Je peux rien faire. Il a rien signé.", emoji: "😤" },
+            ]
+          },
+          {
+            emoji: "🚶‍♀️", color: "#7C3AED", label: "MARIE · WALK CLUB · PARIS",
+            moments: [
+              { time: "Vendredi soir", msg: "On est 40 pour la marche de samedi. J'ai les noms dans 3 endroits différents. C'est ingérable.", emoji: "📋" },
+              { time: "Samedi 9h", msg: "Une nouvelle arrive. Elle dit qu'elle a payé la cagnotte café. J'ai aucune trace.", emoji: "😰" },
+              { time: "Lundi", msg: "Encore 30 messages dans le groupe WhatsApp. Toujours les mêmes questions. Je réponds encore.", emoji: "💬" },
+            ]
+          },
+          {
+            emoji: "🏔️", color: C.green, label: "THOMAS · TRAIL CLUB · GRENOBLE",
+            moments: [
+              { time: "Jeudi soir", msg: "Sortie trail dimanche, 25 inscrits. Je sais pas qui vient vraiment. Aucune fiche d'urgence.", emoji: "📱" },
+              { time: "Dimanche 7h", msg: "Quelqu'un s'est tordu la cheville en descente. J'ai rien sur lui. Ni médoc, ni contact.", emoji: "🚨" },
+              { time: "Dimanche soir", msg: "Deux participants se plaignent d'un comportement. Il a rien signé. Je peux rien prouver.", emoji: "😤" },
+            ]
+          },
+        ].map(({ emoji, color, label, moments }) => (
+          <div key={label} style={{
+            background: C.bgCard, border: `1px solid ${C.border}`,
+            borderRadius: 16, padding: "24px 28px",
+            borderTop: `3px solid ${color}`,
+            opacity: v ? 1 : 0, transition: "opacity 0.8s 0.2s ease",
+          }}>
+            <div style={{ display: "flex", gap: 10, alignItems: "center", marginBottom: 16 }}>
+              <div style={{ width: 36, height: 36, borderRadius: "50%", background: `${color}15`, border: `1px solid ${color}30`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>{emoji}</div>
+              <div style={{ fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 700, fontSize: 12, letterSpacing: 1, color }}>{label}</div>
+            </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {[
-                { time: "Dimanche 22h", msg: "Je prépare le run de lundi. Qui est inscrit ? J'ai une liste quelque part sur mon téléphone.", emoji: "📱" },
-                { time: "Lundi 12h", msg: "Je passe ma pause déj à répondre aux mêmes questions dans le groupe. Même heure, même endroit que d'habitude.", emoji: "💬" },
-                { time: "Lundi 18h30", msg: "Une fille que j'ai jamais vue arrive. Elle dit qu'elle s'est inscrite. Je retrouve pas son nom.", emoji: "😰" },
-                { time: "Lundi 19h45", msg: "Quelqu'un trébuche au 4ème km. Il va bien. Mais pendant 10 secondes j'ai eu une bouffée d'angoisse. Je connaissais même pas son groupe sanguin.", emoji: "🚨" },
-                { time: "Mardi matin", msg: "Une fille m'envoie un message privé. Un mec du groupe lui a envoyé des trucs déplacés après le run. Je peux rien faire. Il a rien signé.", emoji: "😤" },
-              ].map(({ time, msg, emoji }) => (
-                <div key={time} style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
-                  <span style={{ fontSize: 16, flexShrink: 0, marginTop: 2 }}>{emoji}</span>
+              {moments.map(({ time, msg, emoji: e }) => (
+                <div key={time} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+                  <span style={{ fontSize: 14, flexShrink: 0, marginTop: 2 }}>{e}</span>
                   <div>
-                    <span style={{ fontFamily: "'DM Mono',monospace", fontSize: 10, color: C.grayLight }}>{time} · </span>
-                    <span style={{ fontSize: 14, color: C.gray, lineHeight: 1.7 }}>{msg}</span>
+                    <span style={{ fontFamily: "'DM Mono',monospace", fontSize: 9, color: C.grayLight }}>{time} · </span>
+                    <span style={{ fontSize: 13, color: C.gray, lineHeight: 1.6 }}>{msg}</span>
                   </div>
                 </div>
               ))}
             </div>
           </div>
-        </div>
+        ))}
       </div>
 
       {/* Avant / Après */}
@@ -382,14 +427,14 @@ function ProblemSection() {
             <span style={{ fontFamily: "'DM Mono',monospace", fontSize: 11, color: C.gray }}>SANS CAPTEN</span>
           </div>
           {[
-            "Liste d'inscriptions sur une note iPhone",
-            "Si quelqu'un tombe : tu n'as aucune info",
-            "Un mec se comporte mal : tu ne peux rien faire",
-            "Impossible de savoir qui vient vraiment",
-            "23 messages non lus le lundi matin",
-            "Copier-coller la météo manuellement",
-            "Cagnotte complexe ou frais abusifs",
-            "Prix qui augmente quand le crew grandit",
+            "Liste d'inscrits dans les notes de ton téléphone",
+            "Si quelqu'un tombe ou se blesse : tu as zéro info",
+            "Comportement déplacé → aucune trace, tu ne peux rien",
+            "Impossible de savoir qui vient vraiment ce soir",
+            "30 messages non lus avant même le départ",
+            "Météo et itinéraire copiés-collés à la main",
+            "Cagnotte café avec frais de plateforme abusifs",
+            "Outil trop cher dès que ton crew dépasse 50 membres",
           ].map(t => (
             <div key={t} style={{ display: "flex", gap: 10, marginBottom: 10, alignItems: "flex-start" }}>
               <span style={{ color: C.red, fontSize: 14, flexShrink: 0, marginTop: 1 }}>✕</span>
@@ -405,14 +450,14 @@ function ProblemSection() {
             <span style={{ fontFamily: "'DM Mono',monospace", fontSize: 11, color: C.orange }}>AVEC CAPTEN</span>
           </div>
           {[
-            "Portail d'inscription — tes coureurs gèrent seuls",
-            "Groupe sanguin et contact en 2 secondes",
-            "Charte signée → exclusion immédiate si nécessaire",
-            "50 check-ins simultanés, zero file d'attente",
-            "Le message du soir rédigé en 1 clic",
-            "La météo s'intègre automatiquement dans ton texte",
-            "Le café post-run — Capten prend 0% de frais",
-            "Ton crew grandit, le prix lui ne bouge pas",
+            "Portail d'inscription en ligne — tes membres gèrent seuls",
+            "Groupe sanguin, allergies, contact d'urgence en 2s",
+            "Charte signée dès l'inscription → exclusion en 1 clic",
+            "50 check-ins GPS simultanés, zéro file d'attente",
+            "Le message du soir généré automatiquement",
+            "Météo et point de RDV intégrés dans chaque message",
+            "Cagnotte post-sortie — Capten prend 0% de commission",
+            "Ton crew grandit librement, le prix reste identique",
           ].map(t => (
             <div key={t} style={{ display: "flex", gap: 10, marginBottom: 10, alignItems: "flex-start" }}>
               <span style={{ color: C.green, fontSize: 14, flexShrink: 0, marginTop: 1 }}>✓</span>
@@ -434,19 +479,19 @@ function FearsSection() {
       color: C.red,
       colorBg: C.redBg,
       colorBorder: "rgba(220,38,38,0.2)",
-      tag: "Si quelqu'un tombe",
-      title: "Tu saurais quoi dire aux secours ?",
-      desc: "Groupe sanguin. Allergies. Qui appeler en urgence. Chaque coureur le remplit à l'inscription depuis son téléphone. Toi tu l'as en 2 secondes si ça tourne mal.",
-      detail: "Rempli par le coureur lui-même · Accessible uniquement par toi · Jamais visible par les autres membres",
+      tag: "Run club · Walk club · Trail & Rando",
+      title: "Si quelqu'un se blesse, tu saurais quoi dire ?",
+      desc: "Groupe sanguin. Allergies. Médicaments. Qui appeler. Chaque membre le remplit à l'inscription depuis son téléphone — que ce soit avant un run de 5km ou une sortie trail de 4h. Toi, tu l'as en 2 secondes si ça tourne mal.",
+      detail: "Rempli par le membre lui-même · Accessible uniquement par le fondateur · Jamais visible par les autres",
     },
     {
       icon: "🛡️",
       color: "#7C3AED",
       colorBg: "#F5F0FF",
       colorBorder: "rgba(124,58,237,0.2)",
-      tag: "Si quelqu'un se comporte mal",
-      title: "Il a signé avant d'entrer.",
-      desc: "Chaque coureur signe une charte de bienveillance à l'inscription. Comportement déplacé, messages inappropriés, remarques sexistes — tu as une trace. Tu peux agir. Immédiatement.",
+      tag: "Comportement déplacé — dans tous les crews",
+      title: "Il a signé avant de rejoindre.",
+      desc: "Chaque membre signe une charte de bienveillance à l'inscription. Messages inappropriés après la marche, attitude toxique sur le trail, pression dans le groupe WhatsApp — tu as une trace. Tu peux exclure. Immédiatement.",
       detail: "Signature numérique horodatée · Charte personnalisable · Exclusion en 1 clic",
     },
     {
@@ -455,9 +500,9 @@ function FearsSection() {
       colorBg: C.orangeBg,
       colorBorder: C.orangeBorder,
       tag: "Le reste du temps",
-      title: "Toi tu cours. Capten gère.",
-      desc: "Inscriptions, rappels, check-in de 50 coureurs simultanément, messages WhatsApp pré-rédigés, météo intégrée, cagnottes pour le café. Tout automatique. Zéro WhatsApp de ta part.",
-      detail: "25 templates · Check-in GPS simultané · Météo auto · 0% commission",
+      title: "Toi tu bouges. Capten gère.",
+      desc: "Inscriptions, rappels, check-in de 50 membres simultanément, messages WhatsApp pré-rédigés pour ton run / ta marche / ta sortie trail, météo intégrée, cagnottes sans commission. Tout automatique.",
+      detail: "25 templates · Check-in GPS · Météo auto · 0% commission",
     },
   ];
 
@@ -465,10 +510,10 @@ function FearsSection() {
     <section id="pourquoi" ref={ref} style={{ padding: "80px 40px 100px", background: C.bgSection }}>
       <div style={{ maxWidth: 1200, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: 64 }}>
-          <Label>Ce que Capten résout</Label>
+          <Label>Run club · Walk club · Trail &amp; Rando — même réalité</Label>
           <SecTitle style={{ opacity: v ? 1 : 0, transform: v ? "none" : "translateY(16px)", transition: "all 0.7s ease" }}>
-            Trois choses<br />
-            <span style={{ color: C.orange }}>qui t'empêchent<br />de dormir.</span>
+            Trois peurs.<br />
+            <span style={{ color: C.orange }}>Tous les crews.<br />Chaque semaine.</span>
           </SecTitle>
         </div>
 
@@ -658,23 +703,23 @@ function GPSSection() {
         <div ref={ref} style={{ display: "flex", gap: 80, alignItems: "center" }}>
           {/* Left */}
           <div style={{ flex: 1 }}>
-            <Label>Check-in</Label>
+            <Label>Check-in GPS · Run · Walk · Trail</Label>
             <h2 style={{
               fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontStyle: "italic",
               fontSize: 60, textTransform: "uppercase", lineHeight: 0.88, marginBottom: 24,
               opacity: v ? 1 : 0, transform: v ? "none" : "translateX(-20px)", transition: "all 0.8s ease",
             }}>
-              50 coureurs.<br />
-              <span style={{ color: C.orange }}>Zéro file<br />d'attente.</span>
+              50 membres.<br />
+              <span style={{ color: C.orange }}>Zéro file<br />d&apos;attente.</span>
             </h2>
             <p style={{ color: C.gray, fontSize: 16, lineHeight: 1.8, marginBottom: 28, maxWidth: 420, opacity: v ? 1 : 0, transition: "opacity 0.7s 0.2s ease" }}>
-              Chaque coureur reçoit son lien dans le groupe WhatsApp. Il arrive au parc. Il clique. Sa présence est validée à moins de 50 mètres du départ. En 2 secondes. Toi tu cours déjà.
+              Chaque membre reçoit son lien dans le groupe WhatsApp. Il arrive au point de RDV — parc, trailhead ou point de départ de marche. Il clique. Sa présence est validée à moins de 50 mètres. En 2 secondes. Toi tu es déjà en train de gérer le départ.
             </p>
             {[
-              { icon: "📍", text: "Validation à moins de 50m du point de départ" },
-              { icon: "⚡", text: "50 check-ins simultanés — personne n'attend derrière toi" },
-              { icon: "🔒", text: "Zéro tracking pendant le run — vie privée respectée" },
-              { icon: "✋", text: "Validation manuelle si quelqu'un est en panne de batterie" },
+              { icon: "📍", text: "Validation GPS à moins de 50m du point de rendez-vous" },
+              { icon: "⚡", text: "50 check-ins simultanés — run, walk ou trail, personne n'attend" },
+              { icon: "🔒", text: "Zéro tracking pendant la sortie — vie privée respectée" },
+              { icon: "✋", text: "Validation manuelle si un membre est en panne de batterie" },
             ].map(({ icon, text }, i) => (
               <div key={text} style={{ display: "flex", gap: 12, alignItems: "flex-start", marginBottom: 14, opacity: v ? 1 : 0, transition: `opacity 0.6s ${0.3 + i * 0.1}s ease` }}>
                 <span style={{ fontSize: 18, flexShrink: 0 }}>{icon}</span>
@@ -720,7 +765,7 @@ function GPSSection() {
 
               {/* Stats */}
               <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:10 }}>
-                {[{icon:"⚡",v:`${count}`,l:"Simultanés"},{icon:"⏱️",v:"2s",l:"Par coureur"},{icon:"🏃",v:"Libre",l:"Le fondateur"}].map(({icon,v:val,l}) => (
+                {[{icon:"⚡",v:`${count}`,l:"Simultanés"},{icon:"⏱️",v:"2s",l:"Par membre"},{icon:"🏔️",v:"Libre",l:"Le fondateur"}].map(({icon,v:val,l}) => (
                   <div key={l} style={{ textAlign:"center", background:C.bgSection, borderRadius:8, padding:10 }}>
                     <div style={{ fontSize:18, marginBottom:4 }}>{icon}</div>
                     <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:900, fontStyle:"italic", fontSize:24, color:C.orange }}>{val}</div>
@@ -898,7 +943,17 @@ function FAQ() {
 function FooterCTA() {
   return (
     <section style={{ background: C.black, padding: "80px 40px" }}>
-      <div style={{ maxWidth: 700, margin: "0 auto", textAlign: "center" }}>
+      <div style={{ maxWidth: 760, margin: "0 auto", textAlign: "center" }}>
+        {/* Segment badges */}
+        <div style={{ display: "flex", justifyContent: "center", gap: 10, marginBottom: 32, flexWrap: "wrap" }}>
+          {["🏃 Run club", "🚶 Walk club", "🏔️ Trail & Rando"].map(s => (
+            <span key={s} style={{
+              fontFamily: "'DM Mono',monospace", fontSize: 11,
+              color: "#888", border: "1px solid #333",
+              padding: "4px 12px", borderRadius: 100
+            }}>{s}</span>
+          ))}
+        </div>
         <h2 style={{
           fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontStyle: "italic",
           fontSize: 72, textTransform: "uppercase", lineHeight: 0.88,
@@ -907,8 +962,9 @@ function FooterCTA() {
           Ton crew mérite<br />
           <span style={{ color: C.orange }}>mieux que<br />WhatsApp.</span>
         </h2>
-        <p style={{ color: "#888", fontSize: 16, lineHeight: 1.7, marginBottom: 40 }}>
-          Rejoins les fondateurs qui ont décidé de courir<br />sans stresser pour l'admin. 14 jours pour le voir.
+        <p style={{ color: "#888", fontSize: 16, lineHeight: 1.75, marginBottom: 40, maxWidth: 520, margin: "0 auto 40px" }}>
+          Run club, walk club, groupe de trail — peu importe comment tu l'appelles.
+          <br />14 jours pour voir ce que ça fait de ne plus stresser pour l'admin.
         </p>
         <a href="/login?mode=signup" className="btn-main" style={{ padding: "16px 40px", fontFamily: "'Barlow Condensed',sans-serif", fontStyle: "italic", fontSize: 22, fontWeight: 900, textTransform: "uppercase", letterSpacing: 1, display: "inline-flex", justifyContent: "center" }}>
           Lancer mon crew gratuitement →
