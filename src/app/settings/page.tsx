@@ -523,7 +523,7 @@ export default function SettingsPage() {
                    NUMÉROS D'URGENCE
                  </p>
                  <p className="text-[10px] font-medium leading-relaxed text-[#6B6B63]">
-                   Affichés sur ton portail d'inscription. Tes coureurs les voient avant chaque run.
+                   Affichés sur ton portail d'inscription. Tes membres les voient avant chaque session.
                  </p>
               </div>
            </div>

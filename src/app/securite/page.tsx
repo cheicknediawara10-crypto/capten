@@ -64,9 +64,9 @@ export default function SecuritePage() {
   const [isEditingRules, setIsEditingRules] = useState(false);
   const [rules, setRules] = useState<string[]>([
     "Zéro tolérance pour le harcèlement sexiste/moral.",
-    "Respect absolu du niveau de chaque coureur.",
+    "Respect absolu du niveau de chaque membre.",
     "Interdiction de partage de données privées hors club.",
-    "Obligation de secours en cas d'accident sur run."
+    "Obligation de secours en cas d'accident sur la session."
   ]);
   const [tempRules, setTempRules] = useState<string[]>([]);
 
@@ -418,8 +418,8 @@ export default function SecuritePage() {
              </div>
              <p className="text-[10px] font-medium text-[#A3A3A3] uppercase leading-relaxed tracking-wider">
                {unsignedList.length > 0 
-                 ? `${unsignedList.length} coureur(s) restant(s) à régulariser.`
-                 : "Tous les coureurs actifs sont en règle juridiquement."}
+                 ? `${unsignedList.length} membre(s) restant(s) à régulariser.`
+                 : "Tous les membres actifs sont en règle juridiquement."}
              </p>
           </div>
         </div>
@@ -654,17 +654,17 @@ export default function SecuritePage() {
                 <span className="text-sm font-black text-black uppercase">DÉCHARGE DE RESPONSABILITÉ</span>
               </div>
               <p className="text-xs text-[#475569] font-medium leading-relaxed">
-                Ce contrat exige que tout nouveau coureur s&apos;engage sur son aptitude physique, exonère le capitaine et la plateforme CAPTEN, et autorise le droit à l&apos;image.
+                Ce contrat exige que tout nouveau membre s&apos;engage sur son aptitude physique, exonère le capitaine et la plateforme CAPTEN, et autorise le droit à l&apos;image.
               </p>
               <div className="border-t border-black/10 pt-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                 <span className="text-[11px] font-bold text-[#475569] uppercase font-sans">Taux de signature</span>
                 {signedList.length + unsignedList.length > 0 ? (
                   <span className="text-xs font-black text-[#FF5C00]">
-                    {signedList.length} / {signedList.length + unsignedList.length} Coureurs ({Math.round((signedList.length / (signedList.length + unsignedList.length)) * 100)}%)
+                    {signedList.length} / {signedList.length + unsignedList.length} Membres ({Math.round((signedList.length / (signedList.length + unsignedList.length)) * 100)}%)
                   </span>
                 ) : (
                   <div className="text-right">
-                    <span className="text-xs font-black text-[#9B9B93]">— coureur</span>
+                    <span className="text-xs font-black text-[#9B9B93]">— membre</span>
                     <p className="text-[11px] text-[#9B9B93] mt-0.5">Visible après les 1ères inscriptions</p>
                   </div>
                 )}
@@ -734,7 +734,7 @@ export default function SecuritePage() {
           </div>
           <div className="space-y-1">
             <h3 className="text-[16px] sm:text-[18px] font-display italic font-black uppercase text-black leading-tight">Retirer un membre du club</h3>
-            <p className="text-[11px] sm:text-[12px] font-medium text-[#A3A3A3] uppercase tracking-wider">En cas de non-respect répété de la charte, tu peux suspendre définitivement l'accès d'un coureur à ton club CAPTEN.</p>
+            <p className="text-[11px] sm:text-[12px] font-medium text-[#A3A3A3] uppercase tracking-wider">En cas de non-respect répété de la charte, tu peux suspendre définitivement l'accès d'un membre à ton club CAPTEN.</p>
           </div>
         </div>
         <Link href="/athletes" className="w-full sm:w-auto btn-secondary">

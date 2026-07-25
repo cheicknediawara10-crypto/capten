@@ -298,7 +298,7 @@ export default function AthletesPage() {
               onClick={() => setIsCreateModalOpen(true)}
               className="w-full sm:w-auto btn-primary"
             >
-              <Plus size={14} strokeWidth={3} /> AJOUTER UN COUREUR
+              <Plus size={14} strokeWidth={3} /> AJOUTER UN MEMBRE
             </button>
           </div>
       </header>
@@ -309,7 +309,7 @@ export default function AthletesPage() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#D1D1D1]" size={16} />
           <input 
             type="text" 
-            placeholder="Rechercher un coureur..." 
+            placeholder="Rechercher un membre..." 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full h-11 pl-10 pr-4 bg-[#F4F5F7] border border-black/10 rounded-control text-[12px] font-bold text-black placeholder:text-neutral-400 focus:outline-none focus:border-[#FF5C00] focus:bg-white transition-all" 
@@ -568,8 +568,8 @@ export default function AthletesPage() {
                           const athleteIdParam = match ? match[1] : "";
                           const waiverUrl = `${getAppUrl()}/waiver?athleteId=${athleteIdParam}`;
                           const cleanPhone = selectedAthlete.phone ? selectedAthlete.phone.replace(/[^+\d]/g, "") : "";
-                          const firstName = selectedAthlete.name ? selectedAthlete.name.split(" ")[0] : "coureur";
-                          const message = `Salut ${firstName} ! C'est ton Capitaine de course 🏃‍♂️. Peux-tu prendre 1 minute pour signer la décharge de responsabilité CAPTEN obligatoire pour participer à nos runs ? C'est super rapide, voici le lien unique : ${waiverUrl}`;
+                          const firstName = selectedAthlete.name ? selectedAthlete.name.split(" ")[0] : "membre";
+                          const message = `Salut ${firstName} ! C'est ton Capitaine ⚡. Peux-tu prendre 1 minute pour signer la décharge de responsabilité CAPTEN obligatoire pour participer à nos sessions ? C'est super rapide, voici le lien unique : ${waiverUrl}`;
                           const waUrl = `https://api.whatsapp.com/send?phone=${encodeURIComponent(cleanPhone)}&text=${encodeURIComponent(message)}`;
                           window.open(waUrl, "_blank");
                           setWhatsAppSendStatus("envoyé");
@@ -640,7 +640,7 @@ export default function AthletesPage() {
             <div className="space-y-1.5 pb-4 border-b-[0.5px] border-black/10">
               <div className="flex items-center gap-2">
                 <div className="w-2.5 h-2.5 bg-[#FF5C00] rounded-full" />
-                <h3 className="text-[18px] font-display italic font-black uppercase text-black">AJOUTER UN COUREUR</h3>
+                <h3 className="text-[18px] font-display italic font-black uppercase text-black">AJOUTER UN MEMBRE</h3>
               </div>
               <p className="text-[9px] font-bold text-[#A3A3A3] uppercase tracking-wider">
                 Création de la fiche membre et informations de sécurité
@@ -655,7 +655,7 @@ export default function AthletesPage() {
                 <div className="space-y-1">
                   <h4 className="text-[18px] font-display italic font-black uppercase text-black">MEMBRE AJOUTÉ !</h4>
                   <p className="text-[10px] font-bold text-[#A3A3A3] uppercase tracking-widest">
-                    Fiche membre créée et coureur ajouté.
+                    Fiche membre créée et membre ajouté.
                   </p>
                 </div>
                 
@@ -665,7 +665,7 @@ export default function AthletesPage() {
                       <AlertTriangle size={12} /> ACTION REQUISE : DÉCHARGE À SIGNER
                     </p>
                     <p className="text-xs text-amber-800 font-medium leading-relaxed">
-                      Pour finaliser l&apos;adhésion en toute conformité légale, copiez le lien ci-dessous et transmettez-le au coureur pour signature :
+                      Pour finaliser l&apos;adhésion en toute conformité légale, copiez le lien ci-dessous et transmettez-le au membre pour signature :
                     </p>
                     <div className="flex gap-2">
                       <input

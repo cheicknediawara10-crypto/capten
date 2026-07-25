@@ -273,7 +273,7 @@ export default function CheckRetourPage({ params }: { params: { short_code: stri
               marginTop: 8
             }}>
               <span style={{ fontSize: 12, fontWeight: 700, color: C.textSecondary }}>
-                🏠 {result.total || runInfo?.check_retour_total || 0} coureurs confirmés bien rentrés.
+                🏠 {result.total || runInfo?.check_retour_total || 0} membres confirmés bien rentrés.
               </span>
             </div>
           </div>
@@ -296,12 +296,12 @@ export default function CheckRetourPage({ params }: { params: { short_code: stri
             <div style={{ fontSize: 13, lineHeight: 1.5, color: C.errorBorder }}>
               {result.status === "not_found" && (
                 <>
-                  <strong>Profil non trouvé.</strong> On ne te trouve pas parmi les inscrits à ce run. Vérifie ton prénom, ton nom et ta date de naissance.
+                  <strong>Profil non trouvé.</strong> On ne te trouve pas parmi les inscrits à cette session. Vérifie ton prénom, ton nom et ta date de naissance.
                 </>
               )}
               {result.status === "ambiguous" && (
                 <>
-                  <strong>Homonyme détecté.</strong> Plusieurs coureurs correspondent. Contacte directement le capitaine du crew pour te valider.
+                  <strong>Homonyme détecté.</strong> Plusieurs membres correspondent. Contacte directement le capitaine du crew pour te valider.
                 </>
               )}
               {result.status === "expired" && (

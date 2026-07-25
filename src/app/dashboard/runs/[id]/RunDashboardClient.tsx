@@ -344,7 +344,7 @@ export default function RunDashboardClient({ run, initialRegistrations, isDemo }
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400" size={16} />
             <input 
               type="text"
-              placeholder="Rechercher un coureur par nom ou téléphone..."
+              placeholder="Rechercher un membre par nom ou téléphone..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full bg-[#F4F5F7] border border-black/5 rounded-xl pl-10 pr-4 py-3 text-xs text-black font-bold outline-none placeholder-neutral-400 focus:bg-white focus:border-black focus:ring-1 focus:ring-black transition-all"
@@ -365,7 +365,7 @@ export default function RunDashboardClient({ run, initialRegistrations, isDemo }
           {filteredRegistrations.length === 0 ? (
             <div className="py-12 text-center text-neutral-500 border border-dashed border-black/10 rounded-[16px] space-y-2">
               <HelpCircle className="mx-auto text-neutral-300" size={28} />
-              <p className="text-xs font-bold uppercase tracking-wider text-black">Aucun coureur trouvé</p>
+              <p className="text-xs font-bold uppercase tracking-wider text-black">Aucun membre trouvé</p>
               <p className="text-[10px] text-neutral-400">Essayez une autre recherche ou vérifiez l'orthographe.</p>
             </div>
           ) : (
@@ -721,7 +721,7 @@ function CheckRetourSection({
             </div>
 
             <p className="text-neutral-500 text-[11px] leading-relaxed font-bold uppercase tracking-wider">
-              Cochez les coureurs qui vous ont confirmé leur retour (par message direct, etc.) :
+              Cochez les membres qui vous ont confirmé leur retour (par message direct, etc.) :
             </p>
 
             <div className="max-h-60 overflow-y-auto space-y-2 pr-1">

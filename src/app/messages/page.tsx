@@ -202,7 +202,7 @@ const TEMPLATES_DATABASE: MessageTemplate[] = [
     category: "social_spot",
     label: "Template 5.2 — Débrief + spot",
     contextHint: "Le lendemain matin",
-    templateText: "{{club_name}} ✅\nOn était {{checkin_count}} coureurs hier soir, merci pour l'énergie.\nOn se retrouve au prochain run le {{next_run_date}} !"
+    templateText: "{{club_name}} ✅\nOn était {{checkin_count}} membres hier soir, merci pour l'énergie.\nOn se retrouve à la prochaine session le {{next_run_date}} !"
   },
   {
     id: "5.3",
