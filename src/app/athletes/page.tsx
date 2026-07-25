@@ -369,8 +369,10 @@ export default function AthletesPage() {
                 <p className="text-[16px] font-display italic font-black text-black leading-none">{athlete.reliability}%</p>
               </div>
               <div>
-                <p className="text-[8px] font-black text-[#D1D1D1] uppercase tracking-[0.15em] italic mb-1">ALLURE</p>
-                <p className="text-[16px] font-display italic font-black text-[#FF5C00] leading-none">{athlete.pace}</p>
+                <p className="text-[8px] font-black text-[#D1D1D1] uppercase tracking-[0.15em] italic mb-1">{L.pace_label}</p>
+                <p className="text-[16px] font-display italic font-black text-[#FF5C00] leading-none">
+                  {(!athlete.pace || athlete.pace.includes('/K')) ? L.default_pace_value : athlete.pace}
+                </p>
               </div>
               <div>
                 <p className="text-[8px] font-black text-[#D1D1D1] uppercase tracking-[0.15em] italic mb-1">{L.session_plural_cap.toUpperCase()}</p>
@@ -428,7 +430,7 @@ export default function AthletesPage() {
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
                 {[
                   { label: 'FIABILITÉ', value: `${selectedAthlete.reliability}%` },
-                  { label: 'ALLURE', value: selectedAthlete.pace },
+                  { label: L.pace_label, value: (!selectedAthlete.pace || selectedAthlete.pace.includes('/K')) ? L.default_pace_value : selectedAthlete.pace },
                   { label: L.session_plural_cap.toUpperCase(), value: `${selectedAthlete.runs}` },
                   { label: 'SÉRIE', value: selectedAthlete.streak > 0 ? `${selectedAthlete.streak} sem` : '—' },
                 ].map((s, i) => (
@@ -850,10 +852,10 @@ export default function AthletesPage() {
                     <label className="text-[8px] font-black text-black uppercase tracking-widest block">E-mail</label>
                     <input type="email" value={formData.email} onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))} className="brutalist-input" />
                   </div>
-                  {/* Pace */}
+                  {/* Pace / Durée / Dénivelé */}
                   <div className="space-y-1">
-                    <label className="text-[8px] font-black text-black uppercase tracking-widest block">Allure moyenne</label>
-                    <input type="text" placeholder="ex. 4:45/K" value={formData.pace} onChange={(e) => setFormData(prev => ({ ...prev, pace: e.target.value }))} className="brutalist-input" />
+                    <label className="text-[8px] font-black text-black uppercase tracking-widest block">{L.pace_label}</label>
+                    <input type="text" placeholder={`ex. ${L.default_pace_value}`} value={formData.pace} onChange={(e) => setFormData(prev => ({ ...prev, pace: e.target.value }))} className="brutalist-input" />
                   </div>
                   {/* Birth */}
                   <div className="space-y-1">

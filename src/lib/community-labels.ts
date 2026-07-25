@@ -54,6 +54,8 @@ export interface CommunityLabels {
   next_session: string;            // "PROCHAIN RUN", "PROCHAINE MARCHE", "PROCHAINE SORTIE"
   session_leader: string;          // "RUN LEADER", "WALK LEADER", "TRAIL LEADER"
   pace: string;                    // "le pace", "l'allure de marche", "le rythme de groupe"
+  pace_label: string;              // "ALLURE", "DURÉE / RYTHME", "DÉNIVELÉ / RYTHME"
+  default_pace_value: string;      // "5:30/km", "1h15 · Chill", "+450m D+"
   sweeper: string;                 // "le serre-file"
   checkin_members: string;         // "check-in coureurs", "check-in marcheurs", "check-in groupe"
 }
@@ -86,6 +88,8 @@ export function getCommunityLabels(
         next_session: 'PROCHAINE MARCHE',
         session_leader: 'WALK LEADER',
         pace: "l'allure de marche",
+        pace_label: 'DURÉE / RYTHME',
+        default_pace_value: '1h15 · Chill',
         sweeper: 'le serre-file',
         checkin_members: 'check-in marcheurs',
       };
@@ -111,6 +115,8 @@ export function getCommunityLabels(
         next_session: 'PROCHAINE SORTIE',
         session_leader: 'TRAIL LEADER',
         pace: 'le rythme de groupe',
+        pace_label: 'DÉNIVELÉ / RYTHME',
+        default_pace_value: '+450m D+',
         sweeper: 'le serre-file',
         checkin_members: 'check-in groupe',
       };
@@ -137,6 +143,8 @@ export function getCommunityLabels(
         next_session: 'PROCHAINE SESSION',
         session_leader: 'SESSION LEADER',
         pace: "l'allure",
+        pace_label: 'RYTHME',
+        default_pace_value: 'Tous niveaux',
         sweeper: 'le serre-file',
         checkin_members: 'check-in membres',
       };
@@ -163,6 +171,8 @@ export function getCommunityLabels(
         next_session: 'PROCHAIN RUN',
         session_leader: 'RUN LEADER',
         pace: 'le pace',
+        pace_label: 'ALLURE',
+        default_pace_value: '5:00/K',
         sweeper: 'le serre-file',
         checkin_members: 'check-in coureurs',
       };

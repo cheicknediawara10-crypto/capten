@@ -714,14 +714,14 @@ export default function RunsPage() {
                   </span>
                   <div className="relative">
                     <pre className="text-[11.5px] font-semibold font-sans text-neutral-800 whitespace-pre-wrap leading-relaxed max-h-[160px] overflow-y-auto bg-white border border-black/5 p-4 rounded-xl select-all select-none">
-                      {`THE CREW TRAIL 🏃\n\nNouveau run planifié : *${createdRun.name.toUpperCase()}* ! 🔥\n\n📅 Date : ${createdRun.date} à ${createdRun.time}\n📍 Lieu : ${createdRun.location}\n⚡ Distance : ${createdRun.distance} (${createdRun.vibe})\n\nRéserve ta place ici (requis pour participer) :\n${getAppUrl()}/waiver?runId=${createdRun.id}`}
+                      {`${(club?.name || 'CAPTEN CREW').toUpperCase()} ⚡\n\n${L.session_single_cap} planifiée : *${createdRun.name.toUpperCase()}* ! 🔥\n\n📅 Date : ${createdRun.date} à ${createdRun.time}\n📍 Lieu : ${createdRun.location}\n⚡ Format : ${createdRun.distance} (${createdRun.vibe})\n\nRéserve ta place ici (requis pour participer) :\n${getAppUrl()}/waiver?runId=${createdRun.id}`}
                     </pre>
                   </div>
                   <div className="flex flex-col sm:flex-row gap-2.5 pt-1">
                     <button 
                       type="button"
                       onClick={async () => {
-                        const text = `THE CREW TRAIL 🏃\n\nNouveau run planifié : *${createdRun.name.toUpperCase()}* ! 🔥\n\n📅 Date : ${createdRun.date} à ${createdRun.time}\n📍 Lieu : ${createdRun.location}\n⚡ Distance : ${createdRun.distance} (${createdRun.vibe})\n\nRéserve ta place ici (requis pour participer) :\n${getAppUrl()}/waiver?runId=${createdRun.id}`;
+                        const text = `${(club?.name || 'CAPTEN CREW').toUpperCase()} ⚡\n\n${L.session_single_cap} planifiée : *${createdRun.name.toUpperCase()}* ! 🔥\n\n📅 Date : ${createdRun.date} à ${createdRun.time}\n📍 Lieu : ${createdRun.location}\n⚡ Format : ${createdRun.distance} (${createdRun.vibe})\n\nRéserve ta place ici (requis pour participer) :\n${getAppUrl()}/waiver?runId=${createdRun.id}`;
                         try {
                           await navigator.clipboard.writeText(text);
                           alert("Message copié dans le presse-papiers !");
@@ -736,7 +736,7 @@ export default function RunsPage() {
                     <button 
                       type="button"
                       onClick={() => {
-                        const text = `THE CREW TRAIL 🏃\n\nNouveau run planifié : *${createdRun.name.toUpperCase()}* ! 🔥\n\n📅 Date : ${createdRun.date} à ${createdRun.time}\n📍 Lieu : ${createdRun.location}\n⚡ Distance : ${createdRun.distance} (${createdRun.vibe})\n\nRéserve ta place ici (requis pour participer) :\n${getAppUrl()}/waiver?runId=${createdRun.id}`;
+                        const text = `${(club?.name || 'CAPTEN CREW').toUpperCase()} ⚡\n\n${L.session_single_cap} planifiée : *${createdRun.name.toUpperCase()}* ! 🔥\n\n📅 Date : ${createdRun.date} à ${createdRun.time}\n📍 Lieu : ${createdRun.location}\n⚡ Format : ${createdRun.distance} (${createdRun.vibe})\n\nRéserve ta place ici (requis pour participer) :\n${getAppUrl()}/waiver?runId=${createdRun.id}`;
                         window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
                       }}
                       className="py-3 px-4 bg-[#25D366]/10 text-[#20BA5A] border border-[#25D366]/20 hover:bg-[#25D366] hover:text-white transition-all duration-300 rounded-[10px] text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 active:scale-95 cursor-pointer"
