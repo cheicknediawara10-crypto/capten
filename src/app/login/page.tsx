@@ -214,11 +214,11 @@ const FEATURES = [
   },
 ];
 
-/* ── Stats ─────────────────────────────────────────────── */
+/* ── Engagements & Garanties Authentiques ──────────────── */
 const STATS = [
-  { value: "500+", label: "Crews Actifs" },
-  { value: "15K+", label: "Membres" },
-  { value: "99.9%", label: "Uptime" },
+  { value: "3 min", label: "Pour lancer ton crew" },
+  { value: "100%", label: "Protection RGPD" },
+  { value: "0%", label: "Frais cagnotte" },
 ];
 
 /* ── Login Form Component ──────────────────────────────── */
