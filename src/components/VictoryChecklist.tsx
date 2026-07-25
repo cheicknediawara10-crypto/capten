@@ -3,6 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { CheckCircle2 } from 'lucide-react';
+import { getCommunityLabels } from '@/lib/community-labels';
 
 interface VictoryChecklistProps {
   completedMissionsCount: number;
@@ -35,6 +36,9 @@ export default function VictoryChecklist({
   club,
   refreshClub
 }: VictoryChecklistProps) {
+  const communityType = club?.community_type || (typeof window !== 'undefined' ? localStorage.getItem('capten_community_type') : null);
+  const L = getCommunityLabels(communityType, club?.community_type_custom);
+
   return (
     <div className="bg-white border border-[#E5E5E5] rounded-card-outer p-6 sm:p-8 space-y-6 shadow-sm relative overflow-hidden transition-all duration-300 hover:border-black/15">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-black/5 pb-4">
@@ -111,7 +115,7 @@ export default function VictoryChecklist({
               </div>
               <h4 className="text-[13px] font-bold text-black uppercase tracking-wider mb-2">Configure ta marque</h4>
               <p className="text-[11px] text-[#71717A] uppercase tracking-wider leading-normal">
-                Indique le nom de ton Run Club ou dépose ton logo officiel pour signer ton cockpit.
+                Indique le nom de ton crew ou dépose ton logo officiel pour signer ton cockpit.
               </p>
             </div>
             <div className="mt-4">
@@ -189,9 +193,9 @@ export default function VictoryChecklist({
                   <span className="text-[#FF5C00] font-black text-[9px] uppercase tracking-widest animate-pulse">● À FAIRE</span>
                 )}
               </div>
-              <h4 className="text-[13px] font-bold text-black uppercase tracking-wider mb-2">Lance ton premier run</h4>
+              <h4 className="text-[13px] font-bold text-black uppercase tracking-wider mb-2">Lance ta première session</h4>
               <p className="text-[11px] text-[#71717A] uppercase tracking-wider leading-normal">
-                Planifie une session pour que tes coureurs puissent valider leur présence ce soir.
+                Planifie une session pour que {L.members_plural} puissent valider leur présence ce soir.
               </p>
             </div>
             <div className="mt-4">
@@ -200,18 +204,18 @@ export default function VictoryChecklist({
                   href="/runs?openPlanifier=true"
                   className="w-full bg-[#FF5C00] text-white px-4 py-2.5 rounded-control text-[10px] font-black uppercase tracking-wider flex items-center justify-center gap-2 hover:bg-black transition-all active:scale-95 cursor-pointer shadow-sm text-center block"
                 >
-                  🗺️ LANCER UN RUN +
+                  🗺️ {L.launch_session_cap} +
                 </Link>
               ) : (
                 <div className="space-y-2">
                   <div className="text-green-600 text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5 py-1">
-                    <CheckCircle2 size={12} /> PREMIER RUN PRÊT ✓
+                    <CheckCircle2 size={12} /> PREMIÈRE SESSION PRÊTE ✓
                   </div>
                   <Link
                     href="/runs"
                     className="text-[9px] font-black text-[#A3A3A3] uppercase tracking-wider hover:text-black hover:underline block"
                   >
-                    🗺️ ACCÉDER AUX RUNS
+                    🗺️ ACCÉDER AUX SESSIONS
                   </Link>
                 </div>
               )}
@@ -250,7 +254,7 @@ export default function VictoryChecklist({
         <div className="bg-[#F8FFF8] border border-green-500/20 rounded-card-inner p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mt-4 shadow-sm">
           <div>
             <p className="text-[12px] font-black text-green-700 uppercase tracking-wider">
-              🎉 FÉLICITATIONS, TON RUN CLUB EST PRÊT !
+              🎉 FÉLICITATIONS, TON CREW EST PRÊT !
             </p>
             <p className="text-[9px] font-bold text-[#71717A] uppercase tracking-widest leading-relaxed mt-1">
               {"Les fondations sont posées. Tu peux maintenant fermer cette checklist pour libérer de l'espace."}

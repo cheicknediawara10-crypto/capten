@@ -634,7 +634,7 @@ export default function DashboardPage() {
                 )}
               </time>
               <Link href="/runs?openPlanifier=true" className="flex-1 sm:flex-initial bg-[#FF5C00] text-white px-4 sm:px-5 py-2.5 rounded-control text-[10px] sm:text-[11px] font-black uppercase tracking-wider flex items-center justify-center gap-2 hover:bg-black transition-all shadow-sm active:scale-95">
-                <Plus size={14} /> LANCER UN RUN +
+                <Plus size={14} /> {L.launch_session_cap} +
               </Link>
             </div>
           </div>
@@ -781,8 +781,8 @@ export default function DashboardPage() {
               </div>
 
               <p className="text-[13px] font-sans text-[#9B9B93] leading-relaxed">
-                Tes coureurs peuvent déjà s&apos;inscrire.<br />
-                Lance ton premier run quand tu veux.
+                Tes {L.members_plural_short} peuvent déjà s&apos;inscrire.<br />
+                Lance ta première session quand tu veux.
               </p>
 
               <button
@@ -820,7 +820,7 @@ export default function DashboardPage() {
                 href="/runs?openPlanifier=true"
                 className="w-full bg-[#FF5C00] text-white py-4 rounded-control text-[14px] font-bold font-sans hover:bg-black transition-all active:scale-95 cursor-pointer shadow-sm text-center block"
               >
-                + Lancer mon premier run →
+                + {L.launch_session_cap} →
               </Link>
 
               <button
@@ -882,7 +882,7 @@ export default function DashboardPage() {
                 )}
               </time>
               <Link href="/runs?openPlanifier=true" className="flex-1 sm:flex-initial bg-[#FF5C00] text-white px-4 sm:px-5 py-2.5 rounded-control text-[10px] sm:text-[11px] font-black uppercase tracking-wider flex items-center justify-center gap-2 hover:bg-black transition-all shadow-sm active:scale-95">
-                <Plus size={14} /> LANCER UN RUN +
+                <Plus size={14} /> {L.launch_session_cap} +
               </Link>
             </div>
           </div>
@@ -1097,7 +1097,7 @@ export default function DashboardPage() {
                   AUCUNE <br /> <span className="text-black/10">SESSION</span>
                 </h2>
                 <p className="text-[11px] font-medium text-neutral-500 uppercase tracking-widest leading-relaxed mt-2 text-left">
-                   Ton premier run, et ça commence.
+                   {L.session_single_cap}, et ça commence.
                 </p>
              </div>
              
@@ -1106,7 +1106,7 @@ export default function DashboardPage() {
                    <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#F4F5F7] border-2 border-white flex items-center justify-center text-[10px] font-black text-[#A3A3A3]">{activeMembersCount}</div>
                 </div>
                 <Link href="/runs?openPlanifier=true" className="w-full sm:w-auto bg-black text-white px-6 sm:px-8 py-3.5 sm:py-4 rounded-control text-[11px] sm:text-[12px] font-black uppercase tracking-[0.2em] hover:bg-[#FF5C00] transition-all flex items-center justify-center gap-3 active:scale-95">
-                   <Plus size={16} /> LANCER UN RUN +
+                   <Plus size={16} /> {L.launch_session_cap} +
                 </Link>
              </div>
     
@@ -1129,7 +1129,7 @@ export default function DashboardPage() {
                           textTransform: 'uppercase'
                         }}
                       >
-                        Cagnotte post-run
+                        Cagnotte du crew
                       </span>
                       <Wallet size={16} className="text-black/20" />
                    </div>
@@ -1156,7 +1156,7 @@ export default function DashboardPage() {
                           textTransform: 'uppercase'
                         }}
                       >
-                        Cagnotte post-run
+                        Cagnotte du crew
                       </span>
                       <Wallet size={16} className="text-black/20" />
                    </div>
@@ -1169,7 +1169,7 @@ export default function DashboardPage() {
                          lineHeight: '1.4'
                        }}
                      >
-                       Ajoute ton lien Lydia, Revolut ou Wero pour collecter les contributions de tes coureurs.
+                       Ajoute ton lien Lydia, Revolut ou Wero pour collecter les contributions de tes {L.members_plural_short}.
                      </p>
                      <Link 
                        href="/settings"

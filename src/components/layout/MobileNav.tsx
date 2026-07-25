@@ -11,11 +11,32 @@ import {
 export default function MobileNav() {
   const pathname = usePathname();
   const containerRef = useRef<HTMLDivElement>(null);
+  const [sessionMenuLabel, setSessionMenuLabel] = React.useState("Les Sorties");
+
+  useEffect(() => {
+    const updateBranding = () => {
+      const savedType = typeof window !== 'undefined' ? localStorage.getItem("capten_community_type") : null;
+      if (savedType === "run_club") {
+        setSessionMenuLabel("Les Runs");
+      } else if (savedType === "walk_club") {
+        setSessionMenuLabel("Les Marches");
+      } else if (savedType === "trail_hiking") {
+        setSessionMenuLabel("Sorties Trail");
+      } else {
+        setSessionMenuLabel("Les Sorties");
+      }
+    };
+    updateBranding();
+    if (typeof window !== 'undefined') {
+      window.addEventListener("capten_branding_change", updateBranding);
+      return () => window.removeEventListener("capten_branding_change", updateBranding);
+    }
+  }, []);
 
   const items = [
     { name: "Tableau de bord", icon: <LayoutDashboard size={18} strokeWidth={1.5} />, href: "/dashboard" },
     { name: "Le Crew", icon: <Users size={18} strokeWidth={1.5} />, href: "/athletes" },
-    { name: "Les Runs", icon: <Map size={18} strokeWidth={1.5} />, href: "/runs" },
+    { name: sessionMenuLabel, icon: <Map size={18} strokeWidth={1.5} />, href: "/runs" },
     { name: "Messages", icon: <MessageSquare size={18} strokeWidth={1.5} />, href: "/messages" },
     { name: "Cagnotte", icon: <Wallet size={18} strokeWidth={1.5} />, href: "/cagnotte" },
     { name: "Spots", icon: <Store size={18} strokeWidth={1.5} />, href: "/spots/explorer" },

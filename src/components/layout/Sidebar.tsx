@@ -15,18 +15,30 @@ export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const [logo, setLogo] = useState("/logo.png");
+  const [sessionMenuLabel, setSessionMenuLabel] = useState("Les Sorties");
 
   useEffect(() => {
-    const updateLogo = () => {
+    const updateBranding = () => {
       const savedLogo = localStorage.getItem("capten_logo");
       setLogo(savedLogo || "/logo.png");
+
+      const savedType = localStorage.getItem("capten_community_type");
+      if (savedType === "run_club") {
+        setSessionMenuLabel("Les Runs");
+      } else if (savedType === "walk_club") {
+        setSessionMenuLabel("Les Marches");
+      } else if (savedType === "trail_hiking") {
+        setSessionMenuLabel("Les Sorties Trail");
+      } else {
+        setSessionMenuLabel("Les Sorties");
+      }
     };
 
-    updateLogo();
+    updateBranding();
     
-    window.addEventListener("capten_branding_change", updateLogo);
+    window.addEventListener("capten_branding_change", updateBranding);
     return () => {
-      window.removeEventListener("capten_branding_change", updateLogo);
+      window.removeEventListener("capten_branding_change", updateBranding);
     };
   }, []);
 
@@ -41,7 +53,7 @@ export default function Sidebar() {
       items: [
         { name: "Tableau de bord", icon: <LayoutDashboard size={18} strokeWidth={1.5} />, href: "/dashboard" },
         { name: "Le Crew", icon: <Users size={18} strokeWidth={1.5} />, href: "/athletes" },
-        { name: "Les Runs", icon: <Map size={18} strokeWidth={1.5} />, href: "/runs" },
+        { name: sessionMenuLabel, icon: <Map size={18} strokeWidth={1.5} />, href: "/runs" },
         { name: "Messages", icon: <MessageSquare size={18} strokeWidth={1.5} />, href: "/messages" },
       ]
     },
