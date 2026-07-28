@@ -7,14 +7,14 @@ import {
   XCircle, ChevronDown, ChevronUp, ArrowRight, Sparkles, Store, Lock,
   PhoneCall, Check, MessageSquare, Flame, AlertCircle, FileCheck, Smartphone,
   Coffee, Shield, Award, UserCheck, Activity, Compass, Footprints, Bike,
-  Camera, Eye, Heart
+  Camera, Eye, Heart, QrCode
 } from "lucide-react";
 
 // ============================================================
 // CAPTEN — LANDING PAGE REDESIGN (Framer / Dribbble SaaS Aesthetic)
-// Strategic Photo-branding Integration (4 Key Visuals)
+// Product-First SaaS Focus + Strategic Photo-branding Integration
 // Palette: Base #FAFAFA | Rupture #09090B | Accent #FF5500 (Neon Orange)
-// Typography: H1 Barlow Condensed | All H2/H3/Body Plus Jakarta Sans
+// Typography: H1 Barlow Condensed ONLY | All H2/H3/Body Plus Jakarta Sans
 // ============================================================
 
 const FONTS = `
@@ -145,13 +145,11 @@ const CSS = `
     .bento-card { grid-column: span 12 !important; }
     .vs-grid { grid-template-columns: 1fr !important; }
     .spots-bento-grid { grid-template-columns: 1fr !important; }
-    .gallery-grid { grid-template-columns: 1fr 1fr !important; }
   }
   @media (max-width: 640px) {
-    .h1-display { font-size: 50px !important; }
+    .h1-display { font-size: 48px !important; }
     .h2-sans { font-size: 32px !important; }
     .nav-items { display: none !important; }
-    .gallery-grid { grid-template-columns: 1fr !important; }
   }
 `;
 
@@ -167,13 +165,11 @@ export default function LandingPage() {
   }, []);
 
   const sports = [
-    { id: "run", label: "Run Club", icon: "🏃", image: "/landing/urban-dusk-crew.jpg" },
-    { id: "walk", label: "Social Walk", icon: "🚶", image: "/landing/community-happy-girls.jpg" },
-    { id: "trail", label: "Trail & Rando", icon: "🥾", image: "/landing/trail-ridge-peak.jpg" },
-    { id: "bike", label: "Cyclisme (bientôt)", icon: "🚴", image: "/landing/cyclist-grass-phone.jpg", disabled: true }
+    { id: "run", label: "Run Club", icon: "🏃" },
+    { id: "walk", label: "Social Walk", icon: "🚶" },
+    { id: "trail", label: "Trail & Rando", icon: "🥾" },
+    { id: "bike", label: "Cyclisme (bientôt)", icon: "🚴", disabled: true }
   ];
-
-  const currentSportObj = sports.find(s => s.id === activeSport) || sports[0];
 
   const faqs = [
     {
@@ -246,7 +242,7 @@ export default function LandingPage() {
       </header>
 
       {/* ============================================================ */}
-      {/* 1. HERO SECTION (Fond #FAFAFA avec Visuel Humain & Carte Preuve Sociale) */}
+      {/* 1. HERO SECTION (Fond #FAFAFA avec MOCKUP SMARTPHONE PRODUIT PRINCIPAL) */}
       {/* ============================================================ */}
       <section style={{ backgroundColor: "#FAFAFA", paddingTop: 140, paddingBottom: 90, position: "relative", overflow: "hidden" }}>
         {/* Subtle Background Glow Accent */}
@@ -295,7 +291,7 @@ export default function LandingPage() {
                 </span>
               </div>
 
-              {/* H1 Headline — Barlow Condensed ALL CAPS */}
+              {/* H1 Headline — Barlow Condensed ALL CAPS (SEUL H1 DE LA PAGE) */}
               <h1
                 className="h1-display"
                 style={{
@@ -364,49 +360,70 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* Right Hero Visual: Authentic Sports Photo + Floating UI Mockup */}
+            {/* Right Hero Visual: MOCKUP SMARTPHONE CAPTEN PRODUIT PRINCIPAL */}
             <div style={{ position: "relative", display: "flex", justifyContent: "center" }}>
-              {/* Main Photo Chassis Frame */}
+              {/* Smartphone Frame Chassis */}
               <div
                 className="shadow-dribbble"
                 style={{
-                  width: "100%",
-                  maxWidth: 420,
-                  height: 520,
-                  borderRadius: 32,
-                  overflow: "hidden",
+                  width: 320,
+                  backgroundColor: "#09090B",
+                  borderRadius: 44,
+                  padding: 12,
+                  border: "4px solid #27272A",
                   position: "relative",
-                  border: "4px solid #FFFFFF",
-                  boxShadow: "0 25px 60px -15px rgba(9, 9, 11, 0.25)"
+                  zIndex: 2
                 }}
               >
-                {/* Dynamic Real Photo */}
-                <img
-                  src={currentSportObj.image}
-                  alt={currentSportObj.label}
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                    transition: "all 0.5s ease"
-                  }}
-                />
-
-                {/* Dark Gradient Overlay for contrast */}
-                <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(9,9,11,0.85) 0%, rgba(9,9,11,0.1) 60%)" }} />
-
-                {/* Bottom Photo Overlay Tag */}
-                <div style={{ position: "absolute", bottom: 20, left: 20, right: 20, color: "#FFFFFF" }}>
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
-                    <span style={{ fontSize: 10, fontFamily: "'JetBrains Mono', monospace", color: "#FF5500", fontWeight: 700, letterSpacing: 1 }}>
-                      TERRAIN · {currentSportObj.label.toUpperCase()}
-                    </span>
-                    <span style={{ fontSize: 10, backgroundColor: "rgba(255,255,255,0.2)", padding: "2px 8px", borderRadius: 100, backdropFilter: "blur(4px)" }}>
-                      100% SÉCURISÉ
-                    </span>
+                {/* Screen Inner */}
+                <div style={{ backgroundColor: "#FAFAFA", borderRadius: 34, overflow: "hidden", border: "1px solid #18181B", minHeight: 560 }}>
+                  {/* App Screen Header */}
+                  <div style={{ backgroundColor: "#09090B", color: "#FFFFFF", padding: "20px 18px 16px" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                      <span style={{ fontSize: 10, fontFamily: "'JetBrains Mono', monospace", color: "#FF5500", fontWeight: 700, letterSpacing: 1 }}>SESSION EN COURS</span>
+                      <span style={{ fontSize: 10, backgroundColor: "rgba(255,255,255,0.1)", padding: "2px 8px", borderRadius: 100 }}>19:30 · PARIS</span>
+                    </div>
+                    <div style={{ fontSize: 18, fontWeight: 800 }}>RUN &amp; CHILL #42</div>
+                    <div style={{ fontSize: 12, color: "#A1A1AA", marginTop: 2 }}>Point de RDV : République</div>
                   </div>
-                  <div style={{ fontSize: 16, fontWeight: 800 }}>Rassemblement hebdomadaire</div>
-                  <div style={{ fontSize: 12, color: "rgba(255,255,255,0.8)", marginTop: 2 }}>Capitaine aux commandes · 42 présent(e)s</div>
+
+                  {/* Body Screen Product Content */}
+                  <div style={{ padding: 16 }}>
+                    {/* Live Check-in Gauge */}
+                    <div style={{ backgroundColor: "#FFFFFF", borderRadius: 16, padding: 14, border: "1px solid #E4E4E7", marginBottom: 12 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                        <span style={{ fontSize: 11, fontWeight: 700, color: "#09090B" }}>CHECK-IN PRESENCE</span>
+                        <span style={{ fontSize: 11, fontWeight: 800, color: "#FF5500" }}>42 / 45</span>
+                      </div>
+                      <div style={{ height: 8, backgroundColor: "#F4F4F5", borderRadius: 100, overflow: "hidden" }}>
+                        <div style={{ width: "93%", height: "100%", backgroundColor: "#FF5500", borderRadius: 100 }} />
+                      </div>
+                    </div>
+
+                    {/* Member Item Preview */}
+                    {[
+                      { name: "Sophie Martin", status: "Validé (GPS)", ice: "OK O+", badge: "🟢" },
+                      { name: "Thomas Dubois", status: "Validé (GPS)", ice: "OK A-", badge: "🟢" },
+                      { name: "Alexandre V.", status: "En route", ice: "Vérifié", badge: "🟠" }
+                    ].map((m, idx) => (
+                      <div key={idx} style={{ backgroundColor: "#FFFFFF", borderRadius: 12, padding: 10, border: "1px solid #F4F4F5", marginBottom: 8, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                          <span style={{ fontSize: 12 }}>{m.badge}</span>
+                          <div>
+                            <div style={{ fontSize: 12, fontWeight: 700, color: "#09090B" }}>{m.name}</div>
+                            <div style={{ fontSize: 10, color: "#71717A" }}>{m.status}</div>
+                          </div>
+                        </div>
+                        <span style={{ marginLeft: "auto", fontSize: 9, fontWeight: 700, backgroundColor: "#F4F4F5", padding: "3px 7px", borderRadius: 6, color: "#09090B" }}>
+                          ICE {m.ice}
+                        </span>
+                      </div>
+                    ))}
+
+                    <div style={{ marginTop: 12, padding: 10, borderRadius: 12, backgroundColor: "#09090B", color: "#FFFFFF", textAlign: "center", fontSize: 11, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+                      <Zap size={14} color="#FF5500" /> Scanner un membre
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -592,7 +609,7 @@ export default function LandingPage() {
       </section>
 
       {/* ============================================================ */}
-      {/* 3. SECTION FONCTIONNALITÉS — BENTO GRID (Fond #FAFAFA) */}
+      {/* 3. SECTION FONCTIONNALITÉS — BENTO GRID (PRODUCT UI FOCUS) */}
       {/* ============================================================ */}
       <section id="fonctionnalites" style={{ backgroundColor: "#FAFAFA", padding: "110px 24px" }}>
         <div style={{ maxWidth: 1280, margin: "0 auto" }}>
@@ -616,10 +633,10 @@ export default function LandingPage() {
             </h2>
           </div>
 
-          {/* Asymmetric Bento Grid */}
+          {/* Asymmetric Bento Grid Focus Interface */}
           <div className="bento-grid" style={{ display: "grid", gridTemplateColumns: "repeat(12, 1fr)", gap: 24 }}>
 
-            {/* BENTO CARDE A (Large 8/12) — Check-in GPS & Registre Horodaté */}
+            {/* BENTO CARDE A (Large 8/12) — Check-in GPS & Registre Horodaté (GROS ZOOM UI) */}
             <div className="bento-card" style={{ gridColumn: "span 8" }}>
               <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "flex-start", gap: 20, marginBottom: 28 }}>
                 <div>
@@ -638,66 +655,78 @@ export default function LandingPage() {
                 </div>
               </div>
 
-              {/* Map & Live Counter Mockup Illustration */}
-              <div style={{ borderRadius: 20, overflow: "hidden", border: "1px solid #E4E4E7", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 0, position: "relative" }}>
-                {/* Left Mini Map */}
-                <div style={{ backgroundColor: "#FFFFFF", padding: 20, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
-                    <MapPin size={18} color="#FF5500" />
-                    <span style={{ fontSize: 12, fontWeight: 700 }}>Point de Rassemblement</span>
+              {/* Map & Live Counter UI ZOOM Mockup */}
+              <div style={{ borderRadius: 20, overflow: "hidden", border: "1px solid #E4E4E7", display: "grid", gridTemplateColumns: "1.1fr 0.9fr", gap: 0 }}>
+                {/* Left Mini Map Live UI */}
+                <div style={{ backgroundColor: "#FFFFFF", padding: 24, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <MapPin size={18} color="#FF5500" />
+                      <span style={{ fontSize: 13, fontWeight: 800 }}>Point de Rassemblement GPS</span>
+                    </div>
+                    <span style={{ fontSize: 10, backgroundColor: "rgba(255,85,0,0.1)", color: "#FF5500", padding: "2px 8px", borderRadius: 100, fontWeight: 700 }}>PÉRIMÈTRE 50M</span>
                   </div>
-                  <div style={{ height: 110, backgroundColor: "#F4F4F5", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid #E4E4E7", position: "relative" }}>
-                    <span style={{ fontSize: 11, fontWeight: 700, color: "#71717A" }}>🗺️ MAP GPS LIVE</span>
-                    <span style={{ position: "absolute", top: "40%", left: "48%", width: 14, height: 14, backgroundColor: "#FF5500", borderRadius: "50%", border: "2px solid #fff" }} />
+                  <div style={{ height: 120, backgroundColor: "#F4F4F7", borderRadius: 14, display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid #E4E4E7", position: "relative" }}>
+                    <div style={{ textAlign: "center" }}>
+                      <span style={{ fontSize: 12, fontWeight: 800, color: "#09090B", display: "block" }}>📍 Place de la République, Paris</span>
+                      <span style={{ fontSize: 10, color: "#71717A", fontWeight: 600 }}>Validation automatique à l&apos;approche</span>
+                    </div>
+                    <span style={{ position: "absolute", top: "25%", left: "48%", width: 16, height: 16, backgroundColor: "#FF5500", borderRadius: "50%", border: "3px solid #fff", boxShadow: "0 0 12px rgba(255,85,0,0.6)" }} />
                   </div>
                 </div>
 
-                {/* Right Live Counter */}
-                <div style={{ backgroundColor: "#09090B", color: "#FFFFFF", padding: 20, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                {/* Right Live Counter UI */}
+                <div style={{ backgroundColor: "#09090B", color: "#FFFFFF", padding: 24, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <span style={{ fontSize: 11, color: "#A1A1AA", fontWeight: 600 }}>EMARGEMENT DIRECT</span>
                     <span style={{ fontSize: 10, backgroundColor: "rgba(255,85,0,0.2)", color: "#FF5500", padding: "2px 8px", borderRadius: 100, fontWeight: 700 }}>LIVE</span>
                   </div>
-                  <div style={{ fontSize: 36, fontWeight: 900, color: "#FFFFFF", margin: "10px 0" }}>
-                    47 <span style={{ fontSize: 18, color: "#A1A1AA", fontWeight: 600 }}>/ 47</span>
+                  <div style={{ fontSize: 38, fontWeight: 900, color: "#FFFFFF", margin: "10px 0" }}>
+                    47 <span style={{ fontSize: 20, color: "#A1A1AA", fontWeight: 600 }}>/ 47</span>
                   </div>
                   <div style={{ fontSize: 12, color: "#56E39F", fontWeight: 700, display: "flex", alignItems: "center", gap: 6 }}>
-                    <CheckCircle2 size={16} /> Tous les membres sont validés (GPS)
+                    <CheckCircle2 size={16} /> Registre horodaté verrouillé
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* PHOTO 3 INTEGRATION: CARTE BENTO GRID MULTISPORT (Trail & Rando Crête de Montagne) */}
-            <div className="bento-card" style={{ gridColumn: "span 4", backgroundColor: "#09090B", color: "#FFFFFF", border: "1px solid rgba(255,255,255,0.1)", minHeight: 340, padding: 0 }}>
-              <div style={{ position: "absolute", inset: 0 }}>
-                <img src="/landing/trail-ridge-peak.jpg" alt="Trail & Rando montagne" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(9,9,11,0.95) 20%, rgba(9,9,11,0.4) 100%)" }} />
+            {/* BENTO CARDE B (4/12 - Sécurité & Fiches ICE - GROS ZOOM UI FICHE MÉDICALE) */}
+            <div className="bento-card" style={{ gridColumn: "span 4", backgroundColor: "#09090B", color: "#FFFFFF", border: "1px solid rgba(255,255,255,0.1)", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+              <div>
+                <span style={{ fontSize: 11, fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, color: "#FF5500", textTransform: "uppercase", letterSpacing: 1.5 }}>
+                  FONCTIONNALITÉ #2
+                </span>
+                <h3 style={{ fontSize: 22, fontWeight: 800, color: "#FFFFFF", marginTop: 4, marginBottom: 8 }}>
+                  Sécurité &amp; Fiches ICE
+                </h3>
+                <p style={{ fontSize: 13, color: "#A1A1AA", fontWeight: 500, marginBottom: 20 }}>
+                  Accès en 1-clic aux antécédents médicaux d&apos;urgence et contacts des proches pour chaque participant.
+                </p>
               </div>
-              <div style={{ position: "relative", zIndex: 2, padding: 28, height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span style={{ fontSize: 11, fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, color: "#FF5500", textTransform: "uppercase", letterSpacing: 1.5 }}>
-                    MULTISPORT TERRAIN
-                  </span>
-                  <span style={{ fontSize: 10, backgroundColor: "rgba(255,255,255,0.2)", padding: "3px 8px", borderRadius: 100, backdropFilter: "blur(4px)" }}>
-                    🥾 TRAIL &amp; RANDO
-                  </span>
-                </div>
 
-                <div>
-                  <h3 style={{ fontSize: 22, fontWeight: 800, color: "#FFFFFF", marginBottom: 6 }}>
-                    Conçu pour tous les terrains
-                  </h3>
-                  <p style={{ fontSize: 13, color: "rgba(255,255,255,0.85)", fontWeight: 500, lineHeight: 1.5 }}>
-                    De la ville jusqu&apos;aux crêtes isolées de montagne. Les fiches d&apos;urgence ICE restent accessibles hors-ligne sans réseau.
-                  </p>
+              {/* ICE Card UI Zoom Detail */}
+              <div style={{ backgroundColor: "#121215", border: "1px solid rgba(255,85,0,0.3)", borderRadius: 18, padding: 18, boxShadow: "0 10px 30px rgba(0,0,0,0.5)" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12, borderBottom: "1px solid rgba(255,255,255,0.08)", paddingBottom: 10 }}>
+                  <span style={{ fontSize: 11, fontWeight: 800, color: "#FF5500", display: "flex", alignItems: "center", gap: 6 }}>
+                    <ShieldCheck size={16} /> FICHE ICE URGENCE
+                  </span>
+                  <span style={{ fontSize: 11, backgroundColor: "#FF5500", color: "#fff", padding: "2px 8px", borderRadius: 6, fontWeight: 900 }}>O+</span>
+                </div>
+                <div style={{ fontSize: 14, fontWeight: 800, color: "#FFFFFF" }}>Camille Laurent</div>
+                <div style={{ fontSize: 11, color: "#A1A1AA", marginTop: 4 }}>Contact ICE : 06 12 34 56 78 (Époux)</div>
+                <div style={{ fontSize: 11, color: "#EF4444", fontWeight: 700, marginTop: 8, backgroundColor: "rgba(239,68,68,0.12)", padding: "6px 10px", borderRadius: 8, display: "flex", alignItems: "center", gap: 6 }}>
+                  <AlertCircle size={14} /> Allergie : Pénicilline
+                </div>
+                <div style={{ marginTop: 12, backgroundColor: "rgba(255,255,255,0.06)", borderRadius: 10, padding: 8, textAlign: "center", fontSize: 11, fontWeight: 700, color: "#FFFFFF", cursor: "pointer" }}>
+                  📞 Appeler le 112 / Secours
                 </div>
               </div>
             </div>
 
-            {/* PHOTO 4 INTEGRATION: CARTE BENTO GRID SPOTS & PAUSE (Sportif allongé sur l'herbe avec smartphone) */}
+            {/* BENTO CARDE C (Full 12/12) — CAPTEN Spots (DASHBOARD PARTENAIRE UI ZOOM + PHOTO LIFESTYLE) */}
             <div className="bento-card" style={{ gridColumn: "span 12", padding: 0 }}>
-              <div className="spots-bento-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1.2fr", alignItems: "stretch" }}>
+              <div className="spots-bento-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1.1fr", alignItems: "stretch" }}>
                 <div style={{ padding: 40, display: "flex", flexDirection: "column", justifyContent: "center" }}>
                   <span style={{ fontSize: 11, fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, color: "#FF5500", textTransform: "uppercase", letterSpacing: 1.5 }}>
                     FONCTIONNALITÉ #3
@@ -706,16 +735,27 @@ export default function LandingPage() {
                     CAPTEN Spots — Valorisez votre communauté auprès des commerces locaux
                   </h3>
                   <p style={{ fontSize: 15, color: "#71717A", fontWeight: 500, lineHeight: 1.6, marginBottom: 20 }}>
-                    Transformez vos fins de sorties (cafés, shops, bars) en avantages exclusifs. Vos membres profitent de la pause pour consulter l&apos;application sur l&apos;herbe ou au shop.
+                    Transformez vos fins de sorties (cafés, shops, bars) en avantages exclusifs. Vos membres profitent de la pause pour consulter l&apos;application et valider leurs remises en 1 clic.
                   </p>
-                  <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-                    <span style={{ backgroundColor: "#F4F4F5", padding: "6px 12px", borderRadius: 8, fontSize: 12, fontWeight: 700, color: "#09090B" }}>☕ Remises Cafés</span>
-                    <span style={{ backgroundColor: "#F4F4F5", padding: "6px 12px", borderRadius: 8, fontSize: 12, fontWeight: 700, color: "#09090B" }}>🏷️ Deals Partenaires</span>
-                    <span style={{ backgroundColor: "#F4F4F5", padding: "6px 12px", borderRadius: 8, fontSize: 12, fontWeight: 700, color: "#09090B" }}>📊 Dashboard Partenaire</span>
+
+                  {/* UI Zoom Spot Coupon */}
+                  <div style={{ backgroundColor: "#F4F4F5", borderRadius: 16, padding: 18, border: "1px solid #E4E4E7", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                      <div style={{ width: 42, height: 42, borderRadius: 12, backgroundColor: "#09090B", color: "#FF5500", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <Coffee size={22} />
+                      </div>
+                      <div>
+                        <div style={{ fontSize: 13, fontWeight: 800, color: "#09090B" }}>Café du Cycliste — Social Spot</div>
+                        <div style={{ fontSize: 11, color: "#71717A", fontWeight: 600 }}>Avantage membre : -15% sur les consommations</div>
+                      </div>
+                    </div>
+                    <span style={{ backgroundColor: "#FF5500", color: "#fff", padding: "6px 12px", borderRadius: 8, fontSize: 11, fontWeight: 800 }}>
+                      Scanner QR Code
+                    </span>
                   </div>
                 </div>
 
-                {/* Photo 4 Lifestyle Visual Container */}
+                {/* PHOTO 4 INTEGRATION: Lifestyle Image (Sportif allongé sur l'herbe avec smartphone) */}
                 <div style={{ position: "relative", minHeight: 320, overflow: "hidden" }}>
                   <img src="/landing/cyclist-grass-phone.jpg" alt="Detente apres effort Capten Spots" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                   <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(9,9,11,0.5) 0%, transparent 60%)" }} />
