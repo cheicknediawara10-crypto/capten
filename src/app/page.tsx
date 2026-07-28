@@ -6,11 +6,13 @@ import {
   ShieldAlert, ShieldCheck, HeartPulse, MapPin, Users, Zap, CheckCircle2,
   XCircle, ChevronDown, ChevronUp, ArrowRight, Sparkles, Store, Lock,
   PhoneCall, Check, MessageSquare, Flame, AlertCircle, FileCheck, Smartphone,
-  Coffee, Shield, Award, UserCheck, Activity, Compass, Footprints, Bike
+  Coffee, Shield, Award, UserCheck, Activity, Compass, Footprints, Bike,
+  Camera, Eye, Heart
 } from "lucide-react";
 
 // ============================================================
 // CAPTEN — LANDING PAGE REDESIGN (Framer / Dribbble SaaS Aesthetic)
+// Strategic Photo-branding Integration (4 Key Visuals)
 // Palette: Base #FAFAFA | Rupture #09090B | Accent #FF5500 (Neon Orange)
 // Typography: H1 Barlow Condensed | All H2/H3/Body Plus Jakarta Sans
 // ============================================================
@@ -143,11 +145,13 @@ const CSS = `
     .bento-card { grid-column: span 12 !important; }
     .vs-grid { grid-template-columns: 1fr !important; }
     .spots-bento-grid { grid-template-columns: 1fr !important; }
+    .gallery-grid { grid-template-columns: 1fr 1fr !important; }
   }
   @media (max-width: 640px) {
-    .h1-display { font-size: 52px !important; }
+    .h1-display { font-size: 50px !important; }
     .h2-sans { font-size: 32px !important; }
     .nav-items { display: none !important; }
+    .gallery-grid { grid-template-columns: 1fr !important; }
   }
 `;
 
@@ -163,11 +167,13 @@ export default function LandingPage() {
   }, []);
 
   const sports = [
-    { id: "run", label: "Run Club", icon: "🏃" },
-    { id: "walk", label: "Social Walk", icon: "🚶" },
-    { id: "trail", label: "Trail & Rando", icon: "🥾" },
-    { id: "bike", label: "Cyclisme (bientôt)", icon: "🚴", disabled: true }
+    { id: "run", label: "Run Club", icon: "🏃", image: "/landing/urban-dusk-crew.jpg" },
+    { id: "walk", label: "Social Walk", icon: "🚶", image: "/landing/community-happy-girls.jpg" },
+    { id: "trail", label: "Trail & Rando", icon: "🥾", image: "/landing/trail-ridge-peak.jpg" },
+    { id: "bike", label: "Cyclisme (bientôt)", icon: "🚴", image: "/landing/cyclist-grass-phone.jpg", disabled: true }
   ];
+
+  const currentSportObj = sports.find(s => s.id === activeSport) || sports[0];
 
   const faqs = [
     {
@@ -240,7 +246,7 @@ export default function LandingPage() {
       </header>
 
       {/* ============================================================ */}
-      {/* 1. HERO SECTION (Fond #FAFAFA) */}
+      {/* 1. HERO SECTION (Fond #FAFAFA avec Visuel Humain & Carte Preuve Sociale) */}
       {/* ============================================================ */}
       <section style={{ backgroundColor: "#FAFAFA", paddingTop: 140, paddingBottom: 90, position: "relative", overflow: "hidden" }}>
         {/* Subtle Background Glow Accent */}
@@ -322,7 +328,7 @@ export default function LandingPage() {
               </p>
 
               {/* CTAs */}
-              <div className="hero-ctas" style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 16, marginBottom: 24 }}>
+              <div className="hero-ctas" style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 16, marginBottom: 28 }}>
                 <Link href="/login?mode=signup" className="btn-accent" style={{ fontSize: 16, padding: "16px 32px" }}>
                   Tester la Bêta gratuitement <ArrowRight size={18} />
                 </Link>
@@ -331,77 +337,76 @@ export default function LandingPage() {
                 </a>
               </div>
 
-              <div style={{ display: "flex", alignItems: "center", gap: 16, color: "#71717A", fontSize: 13, fontWeight: 600 }}>
-                <span style={{ display: "flex", alignItems: "center", gap: 6 }}><Check size={16} color="#FF5500" /> Bêta gratuite réservée aux capitaines</span>
-                <span>•</span>
-                <span style={{ display: "flex", alignItems: "center", gap: 6 }}><Check size={16} color="#FF5500" /> Sans carte bancaire</span>
+              {/* PHOTO 1 INTEGRATION: CARTE PREUVE SOCIALE (Hero / Sous CTA) */}
+              <div
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 14,
+                  padding: "10px 18px",
+                  borderRadius: 100,
+                  backgroundColor: "#FFFFFF",
+                  border: "1px solid #E4E4E7",
+                  boxShadow: "0 10px 25px -5px rgba(9, 9, 11, 0.08)"
+                }}
+              >
+                <div style={{ width: 44, height: 44, borderRadius: "50%", overflow: "hidden", border: "2px solid #FF5500", flexShrink: 0 }}>
+                  <img src="/landing/community-happy-girls.jpg" alt="Communaute CAPTEN" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                </div>
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: "#09090B", display: "flex", alignItems: "center", gap: 6 }}>
+                    <span>« Conçu par des capitaines, pour des communautés vivantes. »</span>
+                  </div>
+                  <div style={{ fontSize: 11, color: "#71717A", fontWeight: 600 }}>
+                    120+ clubs &amp; 4 200+ membres actifs
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Right Hero Visual Mockup with Floating Badges */}
+            {/* Right Hero Visual: Authentic Sports Photo + Floating UI Mockup */}
             <div style={{ position: "relative", display: "flex", justifyContent: "center" }}>
-              {/* Smartphone Frame Chassis */}
+              {/* Main Photo Chassis Frame */}
               <div
                 className="shadow-dribbble"
                 style={{
-                  width: 320,
-                  backgroundColor: "#09090B",
-                  borderRadius: 44,
-                  padding: 12,
-                  border: "4px solid #27272A",
+                  width: "100%",
+                  maxWidth: 420,
+                  height: 520,
+                  borderRadius: 32,
+                  overflow: "hidden",
                   position: "relative",
-                  zIndex: 2
+                  border: "4px solid #FFFFFF",
+                  boxShadow: "0 25px 60px -15px rgba(9, 9, 11, 0.25)"
                 }}
               >
-                {/* Screen Inner */}
-                <div style={{ backgroundColor: "#FAFAFA", borderRadius: 34, overflow: "hidden", border: "1px solid #18181B", minHeight: 560 }}>
-                  {/* Dynamic Header Screen */}
-                  <div style={{ backgroundColor: "#09090B", color: "#FFFFFF", padding: "20px 18px 16px" }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-                      <span style={{ fontSize: 10, fontFamily: "'JetBrains Mono', monospace", color: "#FF5500", fontWeight: 700, letterSpacing: 1 }}>SESSION EN COURS</span>
-                      <span style={{ fontSize: 10, backgroundColor: "rgba(255,255,255,0.1)", padding: "2px 8px", borderRadius: 100 }}>19:30 · PARIS</span>
-                    </div>
-                    <div style={{ fontSize: 18, fontWeight: 800 }}>RUN &amp; CHILL #42</div>
-                    <div style={{ fontSize: 12, color: "#A1A1AA", marginTop: 2 }}>Point de RDV : République</div>
+                {/* Dynamic Real Photo */}
+                <img
+                  src={currentSportObj.image}
+                  alt={currentSportObj.label}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    transition: "all 0.5s ease"
+                  }}
+                />
+
+                {/* Dark Gradient Overlay for contrast */}
+                <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(9,9,11,0.85) 0%, rgba(9,9,11,0.1) 60%)" }} />
+
+                {/* Bottom Photo Overlay Tag */}
+                <div style={{ position: "absolute", bottom: 20, left: 20, right: 20, color: "#FFFFFF" }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
+                    <span style={{ fontSize: 10, fontFamily: "'JetBrains Mono', monospace", color: "#FF5500", fontWeight: 700, letterSpacing: 1 }}>
+                      TERRAIN · {currentSportObj.label.toUpperCase()}
+                    </span>
+                    <span style={{ fontSize: 10, backgroundColor: "rgba(255,255,255,0.2)", padding: "2px 8px", borderRadius: 100, backdropFilter: "blur(4px)" }}>
+                      100% SÉCURISÉ
+                    </span>
                   </div>
-
-                  {/* Body Screen Mock Content */}
-                  <div style={{ padding: 16 }}>
-                    {/* Live Check-in Gauge */}
-                    <div style={{ backgroundColor: "#FFFFFF", borderRadius: 16, padding: 14, border: "1px solid #E4E4E7", marginBottom: 12 }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-                        <span style={{ fontSize: 11, fontWeight: 700, color: "#09090B" }}>CHECK-IN PRESENCE</span>
-                        <span style={{ fontSize: 11, fontWeight: 800, color: "#FF5500" }}>42 / 45</span>
-                      </div>
-                      <div style={{ height: 8, backgroundColor: "#F4F4F5", borderRadius: 100, overflow: "hidden" }}>
-                        <div style={{ width: "93%", height: "100%", backgroundColor: "#FF5500", borderRadius: 100 }} />
-                      </div>
-                    </div>
-
-                    {/* Member Item Preview */}
-                    {[
-                      { name: "Sophie Martin", status: "Validé (GPS)", ice: "OK O+", badge: "🟢" },
-                      { name: "Thomas Dubois", status: "Validé (GPS)", ice: "OK A-", badge: "🟢" },
-                      { name: "Alexandre V.", status: "En route", ice: "Vérifié", badge: "🟠" }
-                    ].map((m, idx) => (
-                      <div key={idx} style={{ backgroundColor: "#FFFFFF", borderRadius: 12, padding: 10, border: "1px solid #F4F4F5", marginBottom: 8, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                          <span style={{ fontSize: 12 }}>{m.badge}</span>
-                          <div>
-                            <div style={{ fontSize: 12, fontWeight: 700, color: "#09090B" }}>{m.name}</div>
-                            <div style={{ fontSize: 10, color: "#71717A" }}>{m.status}</div>
-                          </div>
-                        </div>
-                        <span style={{ marginLeft: "auto", fontSize: 9, fontWeight: 700, backgroundColor: "#F4F4F5", padding: "3px 7px", borderRadius: 6, color: "#09090B" }}>
-                          ICE {m.ice}
-                        </span>
-                      </div>
-                    ))}
-
-                    <div style={{ marginTop: 12, padding: 10, borderRadius: 12, backgroundColor: "#09090B", color: "#FFFFFF", textAlign: "center", fontSize: 11, fontWeight: 700 }}>
-                      ⚡ Scanner un membre
-                    </div>
-                  </div>
+                  <div style={{ fontSize: 16, fontWeight: 800 }}>Rassemblement hebdomadaire</div>
+                  <div style={{ fontSize: 12, color: "rgba(255,255,255,0.8)", marginTop: 2 }}>Capitaine aux commandes · 42 présent(e)s</div>
                 </div>
               </div>
 
@@ -410,21 +415,21 @@ export default function LandingPage() {
                 className="animate-float"
                 style={{
                   position: "absolute",
-                  top: "12%",
-                  left: "-15%",
+                  top: "8%",
+                  left: "-12%",
                   zIndex: 3,
                   backgroundColor: "#FFFFFF",
                   border: "1px solid #E4E4E7",
-                  borderRadius: 16,
-                  padding: "12px 18px",
-                  boxShadow: "0 20px 35px -10px rgba(9, 9, 11, 0.15)",
+                  borderRadius: 18,
+                  padding: "14px 20px",
+                  boxShadow: "0 20px 40px -10px rgba(9, 9, 11, 0.2)",
                   display: "flex",
                   alignItems: "center",
                   gap: 12
                 }}
               >
-                <div style={{ width: 36, height: 36, borderRadius: 10, backgroundColor: "rgba(22, 163, 74, 0.1)", display: "flex", alignItems: "center", justifyContent: "center", color: "#16A34A" }}>
-                  <UserCheck size={20} />
+                <div style={{ width: 38, height: 38, borderRadius: 10, backgroundColor: "rgba(22, 163, 74, 0.1)", display: "flex", alignItems: "center", justifyContent: "center", color: "#16A34A" }}>
+                  <UserCheck size={22} />
                 </div>
                 <div>
                   <div style={{ fontSize: 13, fontWeight: 800, color: "#09090B" }}>🟢 42 membres enregistrés</div>
@@ -437,22 +442,22 @@ export default function LandingPage() {
                 className="animate-float-del"
                 style={{
                   position: "absolute",
-                  bottom: "15%",
-                  right: "-12%",
+                  bottom: "12%",
+                  right: "-10%",
                   zIndex: 3,
                   backgroundColor: "#09090B",
                   border: "1px solid rgba(255, 255, 255, 0.12)",
-                  borderRadius: 16,
-                  padding: "14px 20px",
-                  boxShadow: "0 25px 40px -10px rgba(0, 0, 0, 0.6)",
+                  borderRadius: 18,
+                  padding: "16px 22px",
+                  boxShadow: "0 25px 45px -10px rgba(0, 0, 0, 0.7)",
                   display: "flex",
                   alignItems: "center",
                   gap: 12,
                   color: "#FFFFFF"
                 }}
               >
-                <div style={{ width: 38, height: 38, borderRadius: 10, backgroundColor: "rgba(255, 85, 0, 0.2)", display: "flex", alignItems: "center", justifyContent: "center", color: "#FF5500" }}>
-                  <ShieldCheck size={22} />
+                <div style={{ width: 40, height: 40, borderRadius: 10, backgroundColor: "rgba(255, 85, 0, 0.2)", display: "flex", alignItems: "center", justifyContent: "center", color: "#FF5500" }}>
+                  <ShieldCheck size={24} />
                 </div>
                 <div>
                   <div style={{ fontSize: 13, fontWeight: 800, color: "#FFFFFF" }}>🛡️ Fiche ICE vérifiée</div>
@@ -465,10 +470,24 @@ export default function LandingPage() {
       </section>
 
       {/* ============================================================ */}
-      {/* 2. SECTION PROBLÈME / SÉCURITÉ (Fond Sombre #09090B - Rupture Dribbble) */}
+      {/* 2. SECTION PROBLÈME / SÉCURITÉ (Fond Sombre #09090B avec Texture Photo Urban Crew #2 Overlay Opacity 0.15) */}
       {/* ============================================================ */}
-      <section id="probleme" style={{ backgroundColor: "#09090B", color: "#FFFFFF", padding: "110px 24px", position: "relative" }}>
-        <div style={{ maxWidth: 1280, margin: "0 auto" }}>
+      <section id="probleme" style={{ backgroundColor: "#09090B", color: "#FFFFFF", padding: "110px 24px", position: "relative", overflow: "hidden" }}>
+        {/* PHOTO 2 INTEGRATION: Image de fond "Urban Crew de début de soirée" avec Opacity 0.15 */}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            backgroundImage: "url('/landing/urban-dusk-crew.jpg')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            opacity: 0.15,
+            pointerEvents: "none",
+            filter: "grayscale(30%)"
+          }}
+        />
+
+        <div style={{ maxWidth: 1280, margin: "0 auto", position: "relative", zIndex: 2 }}>
           {/* Header Section */}
           <div style={{ textAlign: "center", maxWidth: 760, margin: "0 auto 70px" }}>
             <span style={{ fontSize: 12, fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, color: "#FF5500", textTransform: "uppercase", letterSpacing: 2, display: "block", marginBottom: 12 }}>
@@ -501,7 +520,8 @@ export default function LandingPage() {
             <div
               className="shadow-dark-card"
               style={{
-                backgroundColor: "#121215",
+                backgroundColor: "rgba(18, 18, 21, 0.95)",
+                backdropFilter: "blur(12px)",
                 border: "1px solid rgba(255, 255, 255, 0.08)",
                 borderRadius: 24,
                 padding: 36,
@@ -524,7 +544,8 @@ export default function LandingPage() {
             <div
               className="shadow-dark-card"
               style={{
-                backgroundColor: "#121215",
+                backgroundColor: "rgba(18, 18, 21, 0.95)",
+                backdropFilter: "blur(12px)",
                 border: "1px solid rgba(255, 255, 255, 0.08)",
                 borderRadius: 24,
                 padding: 36,
@@ -547,7 +568,8 @@ export default function LandingPage() {
             <div
               className="shadow-dark-card"
               style={{
-                backgroundColor: "#121215",
+                backgroundColor: "rgba(18, 18, 21, 0.95)",
+                backdropFilter: "blur(12px)",
                 border: "1px solid rgba(255, 255, 255, 0.08)",
                 borderRadius: 24,
                 padding: 36,
@@ -617,65 +639,66 @@ export default function LandingPage() {
               </div>
 
               {/* Map & Live Counter Mockup Illustration */}
-              <div style={{ backgroundColor: "#F4F4F5", borderRadius: 16, padding: 20, border: "1px solid #E4E4E7", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+              <div style={{ borderRadius: 20, overflow: "hidden", border: "1px solid #E4E4E7", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 0, position: "relative" }}>
                 {/* Left Mini Map */}
-                <div style={{ backgroundColor: "#FFFFFF", borderRadius: 12, padding: 14, border: "1px solid #E4E4E7", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                <div style={{ backgroundColor: "#FFFFFF", padding: 20, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
                     <MapPin size={18} color="#FF5500" />
                     <span style={{ fontSize: 12, fontWeight: 700 }}>Point de Rassemblement</span>
                   </div>
-                  <div style={{ height: 90, backgroundColor: "#F4F4F5", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid #E4E4E7", position: "relative" }}>
+                  <div style={{ height: 110, backgroundColor: "#F4F4F5", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid #E4E4E7", position: "relative" }}>
                     <span style={{ fontSize: 11, fontWeight: 700, color: "#71717A" }}>🗺️ MAP GPS LIVE</span>
                     <span style={{ position: "absolute", top: "40%", left: "48%", width: 14, height: 14, backgroundColor: "#FF5500", borderRadius: "50%", border: "2px solid #fff" }} />
                   </div>
                 </div>
 
                 {/* Right Live Counter */}
-                <div style={{ backgroundColor: "#09090B", color: "#FFFFFF", borderRadius: 12, padding: 16, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                <div style={{ backgroundColor: "#09090B", color: "#FFFFFF", padding: 20, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <span style={{ fontSize: 11, color: "#A1A1AA", fontWeight: 600 }}>EMARGEMENT DIRECT</span>
                     <span style={{ fontSize: 10, backgroundColor: "rgba(255,85,0,0.2)", color: "#FF5500", padding: "2px 8px", borderRadius: 100, fontWeight: 700 }}>LIVE</span>
                   </div>
-                  <div style={{ fontSize: 32, fontWeight: 900, color: "#FFFFFF", margin: "10px 0" }}>
+                  <div style={{ fontSize: 36, fontWeight: 900, color: "#FFFFFF", margin: "10px 0" }}>
                     47 <span style={{ fontSize: 18, color: "#A1A1AA", fontWeight: 600 }}>/ 47</span>
                   </div>
-                  <div style={{ fontSize: 11, color: "#56E39F", fontWeight: 700, display: "flex", alignItems: "center", gap: 4 }}>
-                    <CheckCircle2 size={14} /> Tous les membres sont validés
+                  <div style={{ fontSize: 12, color: "#56E39F", fontWeight: 700, display: "flex", alignItems: "center", gap: 6 }}>
+                    <CheckCircle2 size={16} /> Tous les membres sont validés (GPS)
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* BENTO CARDE B (1/3 Width - Dark Accent #09090B) — Sécurité & Fiches ICE */}
-            <div className="bento-card" style={{ gridColumn: "span 4", backgroundColor: "#09090B", color: "#FFFFFF", border: "1px solid rgba(255,255,255,0.1)" }}>
-              <span style={{ fontSize: 11, fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, color: "#FF5500", textTransform: "uppercase", letterSpacing: 1.5 }}>
-                FONCTIONNALITÉ #2
-              </span>
-              <h3 style={{ fontSize: 22, fontWeight: 800, color: "#FFFFFF", marginTop: 4, marginBottom: 8 }}>
-                Sécurité &amp; Fiches ICE
-              </h3>
-              <p style={{ fontSize: 13, color: "#A1A1AA", fontWeight: 500, marginBottom: 20 }}>
-                Accès en 1-clic aux antécédents médicaux d&apos;urgence et contacts des proches pour chaque participant.
-              </p>
-
-              {/* ICE Card Mockup Detail */}
-              <div style={{ backgroundColor: "#121215", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 16, padding: 16 }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12, borderBottom: "1px solid rgba(255,255,255,0.08)", paddingBottom: 10 }}>
-                  <span style={{ fontSize: 11, fontWeight: 800, color: "#FF5500" }}>🛡️ FICHE ICE URGENCE</span>
-                  <span style={{ fontSize: 10, backgroundColor: "#FF5500", color: "#fff", padding: "2px 6px", borderRadius: 4, fontWeight: 800 }}>O+</span>
+            {/* PHOTO 3 INTEGRATION: CARTE BENTO GRID MULTISPORT (Trail & Rando Crête de Montagne) */}
+            <div className="bento-card" style={{ gridColumn: "span 4", backgroundColor: "#09090B", color: "#FFFFFF", border: "1px solid rgba(255,255,255,0.1)", minHeight: 340, padding: 0 }}>
+              <div style={{ position: "absolute", inset: 0 }}>
+                <img src="/landing/trail-ridge-peak.jpg" alt="Trail & Rando montagne" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(9,9,11,0.95) 20%, rgba(9,9,11,0.4) 100%)" }} />
+              </div>
+              <div style={{ position: "relative", zIndex: 2, padding: 28, height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <span style={{ fontSize: 11, fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, color: "#FF5500", textTransform: "uppercase", letterSpacing: 1.5 }}>
+                    MULTISPORT TERRAIN
+                  </span>
+                  <span style={{ fontSize: 10, backgroundColor: "rgba(255,255,255,0.2)", padding: "3px 8px", borderRadius: 100, backdropFilter: "blur(4px)" }}>
+                    🥾 TRAIL &amp; RANDO
+                  </span>
                 </div>
-                <div style={{ fontSize: 12, fontWeight: 700, color: "#FFFFFF" }}>Camille Laurent</div>
-                <div style={{ fontSize: 11, color: "#A1A1AA", marginTop: 2 }}>Contact ICE : 06 12 34 56 78 (Époux)</div>
-                <div style={{ fontSize: 10, color: "#EF4444", fontWeight: 700, marginTop: 6, backgroundColor: "rgba(239,68,68,0.1)", padding: "4px 8px", borderRadius: 6 }}>
-                  ⚠️ Allergie : Pénicilline
+
+                <div>
+                  <h3 style={{ fontSize: 22, fontWeight: 800, color: "#FFFFFF", marginBottom: 6 }}>
+                    Conçu pour tous les terrains
+                  </h3>
+                  <p style={{ fontSize: 13, color: "rgba(255,255,255,0.85)", fontWeight: 500, lineHeight: 1.5 }}>
+                    De la ville jusqu&apos;aux crêtes isolées de montagne. Les fiches d&apos;urgence ICE restent accessibles hors-ligne sans réseau.
+                  </p>
                 </div>
               </div>
             </div>
 
-            {/* BENTO CARDE C (Full 12/12) — CAPTEN Spots (Économie Locale) */}
-            <div className="bento-card" style={{ gridColumn: "span 12" }}>
-              <div className="spots-bento-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1.2fr", gap: 32, alignItems: "center" }}>
-                <div>
+            {/* PHOTO 4 INTEGRATION: CARTE BENTO GRID SPOTS & PAUSE (Sportif allongé sur l'herbe avec smartphone) */}
+            <div className="bento-card" style={{ gridColumn: "span 12", padding: 0 }}>
+              <div className="spots-bento-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1.2fr", alignItems: "stretch" }}>
+                <div style={{ padding: 40, display: "flex", flexDirection: "column", justifyContent: "center" }}>
                   <span style={{ fontSize: 11, fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, color: "#FF5500", textTransform: "uppercase", letterSpacing: 1.5 }}>
                     FONCTIONNALITÉ #3
                   </span>
@@ -683,7 +706,7 @@ export default function LandingPage() {
                     CAPTEN Spots — Valorisez votre communauté auprès des commerces locaux
                   </h3>
                   <p style={{ fontSize: 15, color: "#71717A", fontWeight: 500, lineHeight: 1.6, marginBottom: 20 }}>
-                    Transformez vos fins de sorties (cafés, shops, bars) en avantages exclusifs. Montrez l&apos;impact économique de votre crew et débloquez des partenariats mesurables.
+                    Transformez vos fins de sorties (cafés, shops, bars) en avantages exclusifs. Vos membres profitent de la pause pour consulter l&apos;application sur l&apos;herbe ou au shop.
                   </p>
                   <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
                     <span style={{ backgroundColor: "#F4F4F5", padding: "6px 12px", borderRadius: 8, fontSize: 12, fontWeight: 700, color: "#09090B" }}>☕ Remises Cafés</span>
@@ -692,27 +715,20 @@ export default function LandingPage() {
                   </div>
                 </div>
 
-                {/* Spots Partner Dashboard Graphic */}
-                <div style={{ backgroundColor: "#09090B", color: "#FFFFFF", borderRadius: 16, padding: 24, border: "1px solid #27272A" }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                {/* Photo 4 Lifestyle Visual Container */}
+                <div style={{ position: "relative", minHeight: 320, overflow: "hidden" }}>
+                  <img src="/landing/cyclist-grass-phone.jpg" alt="Detente apres effort Capten Spots" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(9,9,11,0.5) 0%, transparent 60%)" }} />
+                  
+                  {/* Floating Overlay Badge on Grass Photo */}
+                  <div style={{ position: "absolute", bottom: 20, right: 20, backgroundColor: "rgba(9, 9, 11, 0.9)", color: "#FFFFFF", padding: "14px 20px", borderRadius: 16, border: "1px solid rgba(255,255,255,0.15)", backdropFilter: "blur(8px)" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
                       <Coffee size={18} color="#FF5500" />
-                      <span style={{ fontSize: 13, fontWeight: 800 }}>Café du Cycliste — Social Spot</span>
+                      <span style={{ fontSize: 13, fontWeight: 800 }}>Troisième Mi-Temps &amp; Café</span>
                     </div>
-                    <span style={{ fontSize: 10, backgroundColor: "rgba(86,227,159,0.15)", color: "#56E39F", padding: "3px 8px", borderRadius: 100, fontWeight: 700 }}>PARTENAIRE ACTIF</span>
-                  </div>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
-                    <div style={{ backgroundColor: "#121215", padding: 14, borderRadius: 12, border: "1px solid rgba(255,255,255,0.08)" }}>
-                      <div style={{ fontSize: 10, color: "#A1A1AA", fontWeight: 600 }}>MEMBRES APPORTÉS</div>
-                      <div style={{ fontSize: 22, fontWeight: 900, color: "#FFFFFF", marginTop: 2 }}>142 clients</div>
+                    <div style={{ fontSize: 11, color: "#A1A1AA" }}>
+                      1-clic pour débloquer votre tarif partenaire au shop
                     </div>
-                    <div style={{ backgroundColor: "#121215", padding: 14, borderRadius: 12, border: "1px solid rgba(255,255,255,0.08)" }}>
-                      <div style={{ fontSize: 10, color: "#A1A1AA", fontWeight: 600 }}>CUMUL CAFÉS OFFERTS</div>
-                      <div style={{ fontSize: 22, fontWeight: 900, color: "#FF5500", marginTop: 2 }}>380 €</div>
-                    </div>
-                  </div>
-                  <div style={{ fontSize: 11, color: "#A1A1AA", textAlign: "center" }}>
-                    &ldquo;Prochaine session réservée au shop jeudi soir&rdquo;
                   </div>
                 </div>
               </div>
