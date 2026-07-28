@@ -1,1080 +1,985 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import Link from "next/link";
+import {
+  ShieldAlert, ShieldCheck, HeartPulse, MapPin, Users, Zap, CheckCircle2,
+  XCircle, ChevronDown, ChevronUp, ArrowRight, Sparkles, Store, Lock,
+  PhoneCall, Check, MessageSquare, Flame, AlertCircle, FileCheck, Smartphone,
+  Coffee, Shield, Award, UserCheck, Activity, Compass, Footprints, Bike
+} from "lucide-react";
 
 // ============================================================
-// CAPTEN — SITE VITRINE FINAL
-// Copywriting : langage de Sarah, pas de jargon
-// Design : Light premium, blanc #FAFAF8, orange #FF5C00
-// 3 vraies peurs : harcèlement, urgence médicale, chaos admin
+// CAPTEN — LANDING PAGE REDESIGN (Framer / Dribbble SaaS Aesthetic)
+// Palette: Base #FAFAFA | Rupture #09090B | Accent #FF5500 (Neon Orange)
+// Typography: H1 Barlow Condensed | All H2/H3/Body Plus Jakarta Sans
 // ============================================================
-
-const C = {
-  bg: "#FAFAF8",
-  bgCard: "#FFFFFF",
-  bgSection: "#F4F4F2",
-  black: "#0F0F0D",
-  gray: "#6B6B63",
-  grayLight: "#9B9B93",
-  border: "#E8E6E0",
-  orange: "#FF5C00",
-  orangeBg: "rgba(255,92,0,0.06)",
-  orangeBorder: "rgba(255,92,0,0.2)",
-  green: "#16A34A",
-  greenBg: "rgba(22,163,74,0.06)",
-  red: "#DC2626",
-  redBg: "rgba(220,38,38,0.06)",
-  shadow: "0 1px 4px rgba(0,0,0,0.06)",
-  shadowMd: "0 4px 16px rgba(0,0,0,0.08)",
-};
 
 const FONTS = `
-  @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,700;0,900;1,700;1,900&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,700;0,800;0,900;1,700;1,900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 `;
 
 const CSS = `
   ${FONTS}
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  html { scroll-behavior: smooth; }
-  body { background: ${C.bg}; color: ${C.black}; font-family: 'DM Sans', sans-serif; -webkit-font-smoothing: antialiased; }
+  html { scroll-behavior: smooth; font-size: 16px; }
+  body { 
+    background-color: #FAFAFA; 
+    color: #09090B; 
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif; 
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
   a { text-decoration: none; color: inherit; }
 
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to   { opacity: 1; transform: translateY(0); }
+  /* Keyframe Animations */
+  @keyframes floatSlow {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-10px) rotate(1deg); }
   }
-  @keyframes fadeIn {
-    from { opacity: 0; } to { opacity: 1; }
+  @keyframes floatReverse {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(10px) rotate(-1deg); }
   }
-  @keyframes popIn {
-    0%   { opacity: 0; transform: scale(0.8); }
-    100% { opacity: 1; transform: scale(1); }
+  @keyframes pulseGlow {
+    0%, 100% { opacity: 0.6; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.05); }
   }
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50%       { opacity: 0.4; }
+  @keyframes beaconPulse {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 85, 0, 0.7); }
+    70% { transform: scale(1); box-shadow: 0 0 0 12px rgba(255, 85, 0, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 85, 0, 0); }
   }
 
-  .fade-up  { animation: fadeUp 0.7s ease both; }
-  .d1 { animation-delay: 0.1s; }
-  .d2 { animation-delay: 0.2s; }
-  .d3 { animation-delay: 0.3s; }
-  .d4 { animation-delay: 0.45s; }
+  .animate-float { animation: floatSlow 5s ease-in-out infinite; }
+  .animate-float-del { animation: floatReverse 6s ease-in-out infinite; }
+  .animate-pulse-glow { animation: pulseGlow 3s ease-in-out infinite; }
+  .animate-beacon { animation: beaconPulse 2s infinite; }
 
-  .btn-main {
-    background: ${C.orange}; color: #fff; border: none;
-    padding: 14px 28px; border-radius: 10px;
-    font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 600;
-    cursor: pointer; transition: all 0.15s ease; display: inline-flex;
-    align-items: center; gap: 8px;
+  /* Custom Glows & Shadows */
+  .shadow-dribbble {
+    box-shadow: 0 25px 50px -12px rgba(9, 9, 11, 0.18), 0 0 0 1px rgba(9, 9, 11, 0.05);
   }
-  .btn-main:hover { background: #e84d00; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(255,92,0,0.25); }
-
-  .btn-ghost {
-    background: transparent; color: ${C.gray};
-    border: 1px solid ${C.border}; padding: 14px 24px;
-    border-radius: 10px; font-family: 'DM Sans', sans-serif;
-    font-size: 15px; font-weight: 500; cursor: pointer;
-    transition: all 0.15s ease;
+  .shadow-dark-card {
+    box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.08);
   }
-  .btn-ghost:hover { border-color: ${C.black}; color: ${C.black}; }
 
-  .nav-link { color: ${C.gray}; font-size: 14px; font-weight: 500; transition: color 0.15s; }
-  .nav-link:hover { color: ${C.black}; }
-
-  .card {
-    background: ${C.bgCard}; border: 1px solid ${C.border};
-    border-radius: 14px; transition: all 0.2s ease;
+  /* Buttons */
+  .btn-accent {
+    background-color: #FF5500;
+    color: #FFFFFF;
+    font-weight: 700;
+    border: none;
+    border-radius: 12px;
+    padding: 14px 28px;
+    font-size: 15px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 10px 25px -5px rgba(255, 85, 0, 0.35);
   }
-  .card:hover { border-color: rgba(255,92,0,0.3); box-shadow: 0 4px 20px rgba(255,92,0,0.08); transform: translateY(-2px); }
+  .btn-accent:hover {
+    background-color: #E04B00;
+    transform: translateY(-2px);
+    box-shadow: 0 15px 30px -5px rgba(255, 85, 0, 0.45);
+  }
+  .btn-accent:active {
+    transform: translateY(0);
+  }
 
-  .faq-item { border-bottom: 1px solid ${C.border}; }
-  .faq-item:last-child { border-bottom: none; }
+  .btn-outline-dark {
+    background: transparent;
+    color: #09090B;
+    font-weight: 600;
+    border: 1px solid #E4E4E7;
+    border-radius: 12px;
+    padding: 14px 24px;
+    font-size: 15px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .btn-outline-dark:hover {
+    border-color: #09090B;
+    background-color: #FFFFFF;
+    transform: translateY(-1px);
+  }
 
-  @media (max-width: 768px) {
-    .hero-grid { flex-direction: column !important; }
-    .hero-title { font-size: 64px !important; }
-    .sec-title  { font-size: 48px !important; }
-    .nav-links  { display: none !important; }
-    .feat-grid  { grid-template-columns: 1fr !important; }
-    .proof-grid { grid-template-columns: 1fr 1fr !important; }
-    .kit-layout { flex-direction: column !important; }
-    .pricing-feats { grid-template-columns: 1fr !important; }
-    .footer-row { flex-direction: column !important; text-align: center; gap: 16px !important; }
-    .hero-btns  { flex-direction: column !important; }
-    .problem-grid { flex-direction: column !important; }
+  /* Bento Grid Card Base */
+  .bento-card {
+    background: #FFFFFF;
+    border: 1px solid #E4E4E7;
+    border-radius: 24px;
+    padding: 32px;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+  }
+  .bento-card:hover {
+    border-color: rgba(255, 85, 0, 0.3);
+    box-shadow: 0 20px 40px -15px rgba(9, 9, 11, 0.08);
+    transform: translateY(-3px);
+  }
+
+  .footer-link {
+    color: #A1A1AA;
+    transition: color 0.2s ease;
+  }
+  .footer-link:hover {
+    color: #FFFFFF;
+  }
+
+  /* Responsive Adjustments */
+  @media (max-width: 1024px) {
+    .hero-grid { grid-template-columns: 1fr !important; text-align: center; }
+    .hero-ctas { justify-content: center !important; }
+    .bento-grid { grid-template-columns: 1fr !important; }
+    .bento-card { grid-column: span 12 !important; }
+    .vs-grid { grid-template-columns: 1fr !important; }
+    .spots-bento-grid { grid-template-columns: 1fr !important; }
+  }
+  @media (max-width: 640px) {
+    .h1-display { font-size: 52px !important; }
+    .h2-sans { font-size: 32px !important; }
+    .nav-items { display: none !important; }
   }
 `;
 
-// ── HELPERS ──────────────────────────────────────────────────
-function useInView(threshold = 0.15) {
-  const ref = useRef<any>(null);
-  const [v, setV] = useState(false);
+export default function LandingPage() {
+  const [activeSport, setActiveSport] = useState<string>("run");
+  const [scrolled, setScrolled] = useState(false);
+  const [openFaq, setOpenFaq] = useState<number | null>(0);
+
   useEffect(() => {
-    const o = new IntersectionObserver(([e]) => { if (e.isIntersecting) setV(true); }, { threshold });
-    if (ref.current) o.observe(ref.current);
-    return () => o.disconnect();
-  }, [threshold]);
-  return [ref, v] as const;
-}
-
-function Label({ children, color = C.orange }: { children: React.ReactNode; color?: string }) {
-  return (
-    <div style={{ marginBottom: 14 }}>
-      <span style={{ fontFamily: "'DM Mono',monospace", fontSize: 11, color, letterSpacing: 2, textTransform: "uppercase", fontWeight: 500 }}>
-        {children}
-      </span>
-    </div>
-  );
-}
-
-function SecTitle({ children, style = {} }: { children: React.ReactNode; style?: React.CSSProperties }) {
-  return (
-    <h2 className="sec-title" style={{
-      fontFamily: "'Barlow Condensed',sans-serif",
-      fontWeight: 900, fontStyle: "italic",
-      fontSize: 64, textTransform: "uppercase",
-      lineHeight: 0.9, color: C.black, ...style
-    }}>
-      {children}
-    </h2>
-  );
-}
-
-// ── NAV ──────────────────────────────────────────────────────
-function Nav() {
-  const [solid, setSolid] = useState(false);
-  useEffect(() => {
-    const fn = () => setSolid(window.scrollY > 40);
-    window.addEventListener("scroll", fn);
-    return () => window.removeEventListener("scroll", fn);
+    const handleScroll = () => setScrolled(window.scrollY > 30);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const sports = [
+    { id: "run", label: "Run Club", icon: "🏃" },
+    { id: "walk", label: "Social Walk", icon: "🚶" },
+    { id: "trail", label: "Trail & Rando", icon: "🥾" },
+    { id: "bike", label: "Cyclisme (bientôt)", icon: "🚴", disabled: true }
+  ];
+
+  const faqs = [
+    {
+      q: "Comment fonctionne le respect de la vie privée et du RGPD ?",
+      a: "Toutes les données médicales (fiches ICE) et coordonnées d'urgence sont chiffrées et uniquement accessibles par le Capitaine du club en cas de besoin terrain. Aucune donnée n'est revendue ni partagée."
+    },
+    {
+      q: "Mes membres doivent-ils télécharger une application ?",
+      a: "Non ! C'est la force de CAPTEN. Vos membres scannent un QR Code ou cliquent sur votre lien Web unique (ex: capten.app/r/brc). Tout s'ouvre instantanément dans leur navigateur en 3 secondes."
+    },
+    {
+      q: "Puis-je utiliser CAPTEN même sans connexion Internet en montagne ou en forêt ?",
+      a: "Oui. Le registre des membres enregistrés et les fiches d'urgence ICE de votre session s'enregistrent en cache local sur votre téléphone avant le départ. Accessible hors-ligne."
+    },
+    {
+      q: "Comment fonctionne l'essai gratuit de 21 jours ?",
+      a: "Vous bénéficiez d'un accès complet à toutes les fonctionnalités pendant 21 jours, sans carte bancaire requise. Vous testez sur vos sorties réelles avec votre crew."
+    }
+  ];
+
   return (
-    <nav style={{
-      position: "fixed", top: 0, left: 0, right: 0, zIndex: 100,
-      padding: "0 40px", height: 75,
-      display: "flex", alignItems: "center", justifyContent: "space-between",
-      background: solid ? "rgba(250,250,248,0.95)" : "transparent",
-      backdropFilter: solid ? "blur(16px)" : "none",
-      borderBottom: solid ? `1px solid ${C.border}` : "1px solid transparent",
-      transition: "all 0.3s ease",
-    }}>
-      {/* Logo */}
-      <div style={{ display: "flex", alignItems: "center", height: "100%" }}>
-        <img src="/logo.png" style={{ height: 48, display: "block", transform: "translateY(16px)" }} alt="Capten" />
-      </div>
+    <>
+      <style>{CSS}</style>
 
-      {/* Links */}
-      <div className="nav-links" style={{ display: "flex", gap: 32 }}>
-        {[["#pourquoi","Pourquoi"],["#comment","Comment"],["#templates","Templates"],["#tarif","Tarifs"]].map(([h,l]) => (
-          <a key={l} href={h} className="nav-link">{l}</a>
-        ))}
-      </div>
+      {/* ============================================================ */}
+      {/* 1. HEADER & NAVBAR */}
+      {/* ============================================================ */}
+      <header
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: 100,
+          padding: "0 24px",
+          height: 72,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          backgroundColor: scrolled ? "rgba(250, 250, 250, 0.92)" : "transparent",
+          backdropFilter: scrolled ? "blur(16px)" : "none",
+          borderBottom: scrolled ? "1px solid #E4E4E7" : "1px solid transparent",
+          transition: "all 0.3s ease"
+        }}
+      >
+        <div style={{ maxWidth: 1280, width: "100%", margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          {/* Logo */}
+          <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <img src="/logo.png" alt="CAPTEN" style={{ height: 38, width: "auto" }} />
+          </Link>
 
-      {/* CTA */}
-      <div style={{ display: "flex", gap: 10 }}>
-        <a href="/login" className="btn-ghost" style={{ padding: "8px 16px", fontSize: 14, display: "inline-flex", alignItems: "center" }}>Se connecter</a>
-        <a href="/login?mode=signup" className="btn-main" style={{ padding: "8px 18px", fontSize: 14 }}>Commencer gratuitement</a>
-      </div>
-    </nav>
-  );
-}
+          {/* Navigation Links */}
+          <nav className="nav-items" style={{ display: "flex", alignItems: "center", gap: 32 }}>
+            <a href="#probleme" style={{ fontSize: 14, fontWeight: 600, color: "#71717A", transition: "color 0.2s" }} onMouseEnter={(e) => e.currentTarget.style.color = "#09090B"} onMouseLeave={(e) => e.currentTarget.style.color = "#71717A"}>Sécurité &amp; Enjeux</a>
+            <a href="#fonctionnalites" style={{ fontSize: 14, fontWeight: 600, color: "#71717A", transition: "color 0.2s" }} onMouseEnter={(e) => e.currentTarget.style.color = "#09090B"} onMouseLeave={(e) => e.currentTarget.style.color = "#71717A"}>Bento Grid</a>
+            <a href="#comparatif" style={{ fontSize: 14, fontWeight: 600, color: "#71717A", transition: "color 0.2s" }} onMouseEnter={(e) => e.currentTarget.style.color = "#09090B"} onMouseLeave={(e) => e.currentTarget.style.color = "#71717A"}>vs WhatsApp</a>
+            <a href="#tarifs" style={{ fontSize: 14, fontWeight: 600, color: "#71717A", transition: "color 0.2s" }} onMouseEnter={(e) => e.currentTarget.style.color = "#09090B"} onMouseLeave={(e) => e.currentTarget.style.color = "#71717A"}>Tarifs</a>
+          </nav>
 
-// ── HERO ─────────────────────────────────────────────────────
-function Hero() {
-  return (
-    <section style={{ minHeight: "100vh", display: "flex", alignItems: "center", padding: "140px 40px 60px", maxWidth: 1200, margin: "0 auto" }}>
-      <div className="hero-grid" style={{ display: "flex", gap: 60, alignItems: "flex-start", width: "100%" }}>
+          {/* CTA Header */}
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <Link href="/login" style={{ fontSize: 14, fontWeight: 600, color: "#09090B", padding: "8px 16px" }}>
+              Se connecter
+            </Link>
+            <Link href="/login?mode=signup" className="btn-accent" style={{ padding: "10px 20px", fontSize: 14, borderRadius: 10 }}>
+              Tester la Bêta
+            </Link>
+          </div>
+        </div>
+      </header>
 
-        {/* Left */}
-        <div style={{ flex: 1 }}>
-          {/* Badge */}
-          <div className="fade-up" style={{ marginBottom: 24 }}>
-            <span style={{
-              display: "inline-flex", alignItems: "center", gap: 7,
-              background: C.orangeBg, border: `1px solid ${C.orangeBorder}`,
-              color: C.orange, padding: "5px 13px", borderRadius: 100,
-              fontFamily: "'DM Mono',monospace", fontSize: 11, fontWeight: 500, letterSpacing: 1.5, textTransform: "uppercase"
-            }}>
-              <span style={{ width: 6, height: 6, borderRadius: "50%", background: C.orange, animation: "pulse 2s infinite" }} />
-              V1 disponible · 21 jours gratuits
+      {/* ============================================================ */}
+      {/* 1. HERO SECTION (Fond #FAFAFA) */}
+      {/* ============================================================ */}
+      <section style={{ backgroundColor: "#FAFAFA", paddingTop: 140, paddingBottom: 90, position: "relative", overflow: "hidden" }}>
+        {/* Subtle Background Glow Accent */}
+        <div style={{ position: "absolute", top: -100, right: "10%", width: 500, height: 500, borderRadius: "50%", background: "radial-gradient(circle, rgba(255, 85, 0, 0.08) 0%, rgba(250, 250, 250, 0) 70%)", pointerEvents: "none" }} />
+
+        <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 24px" }}>
+          {/* Sports Pill Selector */}
+          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 8, marginBottom: 32 }}>
+            <span style={{ fontSize: 11, fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, color: "#71717A", textTransform: "uppercase", letterSpacing: 1.5, marginRight: 4 }}>
+              CONÇU POUR :
             </span>
-          </div>
-
-          {/* Headline */}
-          <h1 className="fade-up d1 hero-title" style={{
-            fontFamily: "'Barlow Condensed',sans-serif",
-            fontWeight: 900, fontStyle: "italic",
-            fontSize: 88, lineHeight: 0.88,
-            textTransform: "uppercase", letterSpacing: -1,
-            marginBottom: 28,
-          }}>
-            TU AS LANCÉ CE CREW
-            <br />
-            POUR BOUGER.
-            <br />
-            <span style={{ color: C.orange }}>PAS POUR FAIRE<br />L&apos;ADMIN.</span>
-          </h1>
-
-          {/* Segments pills */}
-          <div className="fade-up d1" style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 20 }}>
-            {[
-              { icon: "🏃", label: "Run clubs" },
-              { icon: "🚶", label: "Walk clubs" },
-              { icon: "🏔️", label: "Trail & Rando" },
-            ].map(({ icon, label }) => (
-              <span key={label} style={{
-                display: "inline-flex", alignItems: "center", gap: 5,
-                background: C.bgCard, border: `1px solid ${C.border}`,
-                color: C.gray, padding: "5px 12px", borderRadius: 100,
-                fontFamily: "'DM Mono',monospace", fontSize: 11, fontWeight: 500
-              }}>
-                {icon} {label}
-              </span>
-            ))}
-          </div>
-
-          {/* Subheadline */}
-          <p className="fade-up d2" style={{ fontSize: 17, color: C.gray, lineHeight: 1.75, marginBottom: 32, maxWidth: 460 }}>
-            Run club, walk club, groupe de trail — peu importe comment tu appelles ton crew.
-            <strong style={{ color: C.black }}> Vous bougez ensemble chaque semaine. Capten gère le reste.</strong>
-          </p>
-
-          {/* CTAs */}
-          <div className="fade-up d3 hero-btns" style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 20 }}>
-            <a href="/login?mode=signup" className="btn-main" style={{ fontSize: 16, padding: "14px 28px" }}>
-              Lancer mon crew gratuitement →
-            </a>
-            <a href="#pourquoi" className="btn-ghost" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center" }}>Voir comment ça marche</a>
-          </div>
-
-          <p className="fade-up d4" style={{ fontSize: 12, color: C.grayLight, fontFamily: "'DM Mono',monospace" }}>
-            Essai 21 jours · Aucune carte bancaire · Annulable en 1 clic
-          </p>
-
-          {/* Social proof */}
-          <div className="fade-up d4" style={{ display: "flex", gap: 24, marginTop: 40, paddingTop: 32, borderTop: `1px solid ${C.border}`, flexWrap: "wrap" }}>
-            {[
-              { val: "0%",  label: "Commission cagnottes" },
-              { val: "50",  label: "Check-ins simultanés" },
-              { val: "21j", label: "Essai gratuit" },
-            ].map(({ val, label }) => (
-              <div key={label}>
-                <div style={{ fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontStyle: "italic", fontSize: 34, color: C.orange }}>{val}</div>
-                <div style={{ fontSize: 12, color: C.grayLight, fontFamily: "'DM Mono',monospace" }}>{label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Right — Dashboard mockup */}
-        <div className="fade-up d3" style={{ flex: 1, maxWidth: 520 }}>
-          <DashboardMockup />
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function DashboardMockup() {
-  const [activeTab, setActiveTab] = useState(0);
-
-  const mockups = [
-    {
-      type: "Run Club",
-      name: "PARIS RUN CLUB",
-      sub: "Paris · 47 coureurs protégés",
-      tag: "RUN CE SOIR",
-      title: "AFTERWORK CANAL",
-      detail: "19h30 · 7km · République · 🌤️ 17°C",
-      groups: [["Hard","#DC2626"],["Tempo","#D97706"],["Easy","#16A34A"]],
-      sweeper: "✓ Voiture balai assignée",
-      membersText: "47/47 coureurs protégés",
-    },
-    {
-      type: "Walk Club",
-      name: "GIRLS WHO WALK PARIS",
-      sub: "Paris · 64 marcheuses protégées",
-      tag: "MARCHE DU SAMEDI",
-      title: "SUNSET TUILERIES",
-      detail: "18h00 · 5km · Palais Royal · 🌤️ 21°C",
-      groups: [["Pace Doux","#16A34A"],["Pace Rythmé","#D97706"]],
-      sweeper: "✓ Serre-file désignée",
-      membersText: "64/64 marcheuses protégées",
-    },
-    {
-      type: "Trail & Rando",
-      name: "ALPINE TRAIL CREW",
-      sub: "Grenoble · 32 traileurs protégés",
-      tag: "SORTIE SAMEDI",
-      title: "RIDGE TRAIL CHARTREUSE",
-      detail: "08h30 · 14km / +850m D+ · ⛅ 14°C",
-      groups: [["D+ Intense","#DC2626"],["Rando-Run","#16A34A"]],
-      sweeper: "✓ Serre-file équipé radio",
-      membersText: "32/32 traileurs protégés",
-    },
-  ];
-
-  const m = mockups[activeTab];
-
-  return (
-    <div style={{
-      background: C.bgCard, border: `1px solid ${C.border}`,
-      borderRadius: 18, overflow: "hidden",
-      boxShadow: "0 24px 64px rgba(0,0,0,0.10)",
-    }}>
-      {/* Chrome */}
-      <div style={{ background: "#F0EEE8", padding: "10px 16px", borderBottom: `1px solid ${C.border}`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          {["#FF5F57","#FFBD2E","#28C840"].map(c => <div key={c} style={{ width: 10, height: 10, borderRadius: "50%", background: c }} />)}
-          <div style={{ marginLeft: 8, background: C.bgCard, borderRadius: 5, padding: "3px 12px", fontSize: 11, color: C.grayLight, fontFamily: "monospace" }}>capten.app/dashboard</div>
-        </div>
-
-        {/* Community switcher pills */}
-        <div style={{ display: "flex", gap: 4 }}>
-          {mockups.map((item, idx) => (
-            <button
-              key={item.type}
-              onClick={() => setActiveTab(idx)}
-              style={{
-                fontSize: 10, fontFamily: "'DM Mono',monospace",
-                padding: "2px 8px", borderRadius: 4, cursor: "pointer",
-                background: activeTab === idx ? C.orange : "transparent",
-                color: activeTab === idx ? "#fff" : C.gray,
-                border: "none", transition: "all 0.15s ease",
-              }}
-            >
-              {item.type}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div style={{ padding: 20 }}>
-        {/* Header */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-          <div>
-            <div style={{ fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 700, fontSize: 14, letterSpacing: 2, color: C.orange, textTransform: "uppercase" }}>{m.name}</div>
-            <div style={{ fontSize: 11, color: C.grayLight, fontFamily: "'DM Mono',monospace" }}>{m.sub}</div>
-          </div>
-          <div style={{ background: C.greenBg, border: "1px solid rgba(22,163,74,0.3)", color: C.green, padding: "3px 10px", borderRadius: 100, fontSize: 10, fontFamily: "'DM Mono',monospace" }}>● ACTIF</div>
-        </div>
-
-        {/* 3 peurs résolues */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 14 }}>
-          {/* Urgence */}
-          <div style={{ background: "#FFF7F5", border: "1px solid rgba(220,38,38,0.15)", borderRadius: 10, padding: "10px 14px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <div>
-              <div style={{ fontSize: 10, color: C.red, fontFamily: "'DM Mono',monospace", letterSpacing: 1, marginBottom: 2 }}>EN CAS D'URGENCE</div>
-              <div style={{ fontSize: 13, fontWeight: 600 }}>{m.membersText}</div>
-              <div style={{ fontSize: 11, color: C.gray }}>Groupe sanguin · Qui appeler · Allergies</div>
-            </div>
-            <span style={{ fontSize: 22 }}>🚨</span>
-          </div>
-
-          {/* Harcèlement */}
-          <div style={{ background: "#F5F0FF", border: "1px solid rgba(124,58,237,0.15)", borderRadius: 10, padding: "10px 14px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <div>
-              <div style={{ fontSize: 10, color: "#7C3AED", fontFamily: "'DM Mono',monospace", letterSpacing: 1, marginBottom: 2 }}>CHARTE SIGNÉE</div>
-              <div style={{ fontSize: 13, fontWeight: 600 }}>100% des membres ont signé</div>
-              <div style={{ fontSize: 11, color: C.gray }}>Comportement déplacé → exclusion immédiate</div>
-            </div>
-            <span style={{ fontSize: 22 }}>🛡️</span>
-          </div>
-
-          {/* Session ce soir */}
-          <div style={{ background: C.orangeBg, border: `1px solid ${C.orangeBorder}`, borderRadius: 10, padding: "10px 14px" }}>
-            <div style={{ fontSize: 10, color: C.orange, fontFamily: "'DM Mono',monospace", letterSpacing: 1, marginBottom: 4 }}>{m.tag}</div>
-            <div style={{ fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 700, fontSize: 15 }}>{m.title}</div>
-            <div style={{ fontSize: 11, color: C.gray, marginBottom: 8 }}>{m.detail}</div>
-            <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center" }}>
-              {m.groups.map(([g,c]) => (
-                <span key={g} style={{ fontSize: 9, padding: "2px 7px", borderRadius: 4, border: `1px solid ${c}40`, color: c, fontFamily: "'DM Mono',monospace" }}>{g}</span>
-              ))}
-              <span style={{ marginLeft: "auto", fontSize: 11, color: C.green }}>{m.sweeper}</span>
-            </div>
-          </div>
-
-          {/* Message kit */}
-          <div style={{ background: C.bgSection, borderRadius: 10, padding: "10px 14px" }}>
-            <div style={{ fontSize: 10, color: C.grayLight, fontFamily: "'DM Mono',monospace", marginBottom: 8 }}>MESSAGE AUTOMATIQUE — PRÊT</div>
-            <button style={{ width: "100%", background: C.orangeBg, border: `1px solid ${C.orangeBorder}`, color: C.orange, padding: "8px", borderRadius: 7, fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
-              📋 Copier le rappel → WhatsApp
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ── SECTION PROBLÈME ──────────────────────────────────────────
-function ProblemSection() {
-  const [ref, v] = useInView();
-  return (
-    <section id="comment" ref={ref} style={{ padding: "100px 40px", maxWidth: 1200, margin: "0 auto" }}>
-      <div style={{ textAlign: "center", marginBottom: 64 }}>
-        <Label>Le dimanche soir d&apos;un·e fondateur·rice</Label>
-        <SecTitle style={{ opacity: v ? 1 : 0, transform: v ? "none" : "translateY(16px)", transition: "all 0.7s ease" }}>
-          Tu stresses.<br />
-          <span style={{ color: C.orange }}>On le sait.</span>
-        </SecTitle>
-        <p style={{ color: C.gray, fontSize: 16, maxWidth: 520, margin: "16px auto 0", opacity: v ? 1 : 0, transition: "opacity 0.7s 0.3s ease" }}>
-          Peu importe si tu organises un run, une marche ou une sortie trail.
-          Le dimanche soir, c&apos;est toujours le même stress.
-        </p>
-      </div>
-
-      {/* Les 3 monologues - Run, Walk, Trail */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16, marginBottom: 40 }} className="feat-grid">
-        {[
-          {
-            emoji: "🏃", color: C.orange, label: "NINA · RUN CLUB · LYON",
-            moments: [
-              { time: "Dimanche 22h", msg: "Je prépare le run de lundi. Qui est inscrit ? J'ai une liste quelque part sur mon téléphone.", emoji: "📱" },
-              { time: "Lundi 19h45", msg: "Quelqu'un trébuche au 4ème km. 10 secondes de panique : je connais même pas son groupe sanguin.", emoji: "🚨" },
-              { time: "Mardi matin", msg: "Un mec a envoyé des messages déplacés après le run. Je peux rien faire. Il a rien signé.", emoji: "😤" },
-            ]
-          },
-          {
-            emoji: "🚶‍♀️", color: "#7C3AED", label: "MARIE · WALK CLUB · PARIS",
-            moments: [
-              { time: "Vendredi soir", msg: "On est 40 pour la marche de samedi. J'ai les noms dans 3 endroits différents. C'est ingérable.", emoji: "📋" },
-              { time: "Samedi 9h", msg: "Une nouvelle arrive. Elle dit qu'elle a payé la cagnotte café. J'ai aucune trace.", emoji: "😰" },
-              { time: "Lundi", msg: "Encore 30 messages dans le groupe WhatsApp. Toujours les mêmes questions. Je réponds encore.", emoji: "💬" },
-            ]
-          },
-          {
-            emoji: "🏔️", color: C.green, label: "THOMAS · TRAIL CLUB · GRENOBLE",
-            moments: [
-              { time: "Jeudi soir", msg: "Sortie trail dimanche, 25 inscrits. Je sais pas qui vient vraiment. Aucune fiche d'urgence.", emoji: "📱" },
-              { time: "Dimanche 7h", msg: "Quelqu'un s'est tordu la cheville en descente. J'ai rien sur lui. Ni médoc, ni contact.", emoji: "🚨" },
-              { time: "Dimanche soir", msg: "Deux participants se plaignent d'un comportement. Il a rien signé. Je peux rien prouver.", emoji: "😤" },
-            ]
-          },
-        ].map(({ emoji, color, label, moments }) => (
-          <div key={label} style={{
-            background: C.bgCard, border: `1px solid ${C.border}`,
-            borderRadius: 16, padding: "24px 28px",
-            borderTop: `3px solid ${color}`,
-            opacity: v ? 1 : 0, transition: "opacity 0.8s 0.2s ease",
-          }}>
-            <div style={{ display: "flex", gap: 10, alignItems: "center", marginBottom: 16 }}>
-              <div style={{ width: 36, height: 36, borderRadius: "50%", background: `${color}15`, border: `1px solid ${color}30`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>{emoji}</div>
-              <div style={{ fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 700, fontSize: 12, letterSpacing: 1, color }}>{label}</div>
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {moments.map(({ time, msg, emoji: e }) => (
-                <div key={time} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-                  <span style={{ fontSize: 14, flexShrink: 0, marginTop: 2 }}>{e}</span>
-                  <div>
-                    <span style={{ fontFamily: "'DM Mono',monospace", fontSize: 9, color: C.grayLight }}>{time} · </span>
-                    <span style={{ fontSize: 13, color: C.gray, lineHeight: 1.6 }}>{msg}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Avant / Après */}
-      <div className="problem-grid" style={{ display: "flex", gap: 20 }}>
-        {/* Avant */}
-        <div style={{ flex: 1, background: C.bgCard, border: `1px solid ${C.border}`, borderRadius: 14, padding: 24, opacity: v ? 1 : 0, transition: "opacity 0.7s 0.3s ease" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
-            <div style={{ width: 8, height: 8, borderRadius: "50%", background: C.red }} />
-            <span style={{ fontFamily: "'DM Mono',monospace", fontSize: 11, color: C.gray }}>SANS CAPTEN</span>
-          </div>
-          {[
-            "Liste d'inscrits dans les notes de ton téléphone",
-            "Si quelqu'un tombe ou se blesse : tu as zéro info",
-            "Comportement déplacé → aucune trace, tu ne peux rien",
-            "Impossible de savoir qui vient vraiment ce soir",
-            "30 messages non lus avant même le départ",
-            "Météo et itinéraire copiés-collés à la main",
-            "Cagnotte café avec frais de plateforme abusifs",
-            "Outil trop cher dès que ton crew dépasse 50 membres",
-          ].map(t => (
-            <div key={t} style={{ display: "flex", gap: 10, marginBottom: 10, alignItems: "flex-start" }}>
-              <span style={{ color: C.red, fontSize: 14, flexShrink: 0, marginTop: 1 }}>✕</span>
-              <span style={{ fontSize: 13, color: C.gray, lineHeight: 1.5 }}>{t}</span>
-            </div>
-          ))}
-        </div>
-
-        {/* Après */}
-        <div style={{ flex: 1, background: C.bgCard, border: `1.5px solid ${C.orange}`, borderRadius: 14, padding: 24, opacity: v ? 1 : 0, transition: "opacity 0.7s 0.4s ease" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
-            <div style={{ width: 8, height: 8, borderRadius: "50%", background: C.green }} />
-            <span style={{ fontFamily: "'DM Mono',monospace", fontSize: 11, color: C.orange }}>AVEC CAPTEN</span>
-          </div>
-          {[
-            "Portail d'inscription en ligne — tes membres gèrent seuls",
-            "Groupe sanguin, allergies, contact d'urgence en 2s",
-            "Charte signée dès l'inscription → exclusion en 1 clic",
-            "50 check-ins GPS simultanés, zéro file d'attente",
-            "Le message du soir généré automatiquement",
-            "Météo et point de RDV intégrés dans chaque message",
-            "Cagnotte post-sortie — Capten prend 0% de commission",
-            "Ton crew grandit librement, le prix reste identique",
-          ].map(t => (
-            <div key={t} style={{ display: "flex", gap: 10, marginBottom: 10, alignItems: "flex-start" }}>
-              <span style={{ color: C.green, fontSize: 14, flexShrink: 0, marginTop: 1 }}>✓</span>
-              <span style={{ fontSize: 13, color: C.black, lineHeight: 1.5 }}>{t}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ── SECTION 3 PEURS ──────────────────────────────────────────
-function FearsSection() {
-  const [ref, v] = useInView();
-  const fears = [
-    {
-      icon: "🚨",
-      color: C.red,
-      colorBg: C.redBg,
-      colorBorder: "rgba(220,38,38,0.2)",
-      tag: "Run club · Walk club · Trail & Rando",
-      title: "Si quelqu'un se blesse, tu saurais quoi dire ?",
-      desc: "Groupe sanguin. Allergies. Médicaments. Qui appeler. Chaque membre le remplit à l'inscription depuis son téléphone — que ce soit avant un run de 5km ou une sortie trail de 4h. Toi, tu l'as en 2 secondes si ça tourne mal.",
-      detail: "Rempli par le membre lui-même · Accessible uniquement par le fondateur · Jamais visible par les autres",
-    },
-    {
-      icon: "🛡️",
-      color: "#7C3AED",
-      colorBg: "#F5F0FF",
-      colorBorder: "rgba(124,58,237,0.2)",
-      tag: "Comportement déplacé — dans tous les crews",
-      title: "Il a signé avant de rejoindre.",
-      desc: "Chaque membre signe une charte de bienveillance à l'inscription. Messages inappropriés après la marche, attitude toxique sur le trail, pression dans le groupe WhatsApp — tu as une trace. Tu peux exclure. Immédiatement.",
-      detail: "Signature numérique horodatée · Charte personnalisable · Exclusion en 1 clic",
-    },
-    {
-      icon: "⚡",
-      color: C.orange,
-      colorBg: C.orangeBg,
-      colorBorder: C.orangeBorder,
-      tag: "Le reste du temps",
-      title: "Toi tu bouges. Capten gère.",
-      desc: "Inscriptions, rappels, check-in de 50 membres simultanément, messages WhatsApp pré-rédigés pour ton run / ta marche / ta sortie trail, météo intégrée, cagnottes sans commission. Tout automatique.",
-      detail: "25 templates · Check-in GPS · Météo auto · 0% commission",
-    },
-  ];
-
-  return (
-    <section id="pourquoi" ref={ref} style={{ padding: "80px 40px 100px", background: C.bgSection }}>
-      <div style={{ maxWidth: 1200, margin: "0 auto" }}>
-        <div style={{ textAlign: "center", marginBottom: 64 }}>
-          <Label>Run club · Walk club · Trail &amp; Rando — même réalité</Label>
-          <SecTitle style={{ opacity: v ? 1 : 0, transform: v ? "none" : "translateY(16px)", transition: "all 0.7s ease" }}>
-            Trois peurs.<br />
-            <span style={{ color: C.orange }}>Tous les crews.<br />Chaque semaine.</span>
-          </SecTitle>
-        </div>
-
-        <div className="feat-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 20 }}>
-          {fears.map(({ icon, color, colorBg, colorBorder, tag, title, desc, detail }, i) => (
-            <div key={tag} className="card" style={{
-              padding: 28, cursor: "default",
-              opacity: v ? 1 : 0,
-              transform: v ? "none" : "translateY(16px)",
-              transition: `all 0.6s ${i * 0.1}s ease`,
-            }}>
-              {/* Tag */}
-              <div style={{ marginBottom: 16 }}>
-                <span style={{
-                  background: colorBg, border: `1px solid ${colorBorder}`,
-                  color, padding: "4px 10px", borderRadius: 100,
-                  fontFamily: "'DM Mono',monospace", fontSize: 10, fontWeight: 500, letterSpacing: 1, textTransform: "uppercase"
-                }}>{tag}</span>
-              </div>
-
-              {/* Icon + Title */}
-              <div style={{ fontSize: 28, marginBottom: 10 }}>{icon}</div>
-              <h3 style={{ fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 700, fontStyle: "italic", fontSize: 22, textTransform: "uppercase", lineHeight: 1.1, marginBottom: 12, color: C.black }}>{title}</h3>
-
-              {/* Desc */}
-              <p style={{ fontSize: 14, color: C.gray, lineHeight: 1.75, marginBottom: 16 }}>{desc}</p>
-
-              {/* Detail */}
-              <div style={{ borderTop: `1px solid ${C.border}`, paddingTop: 14 }}>
-                <p style={{ fontFamily: "'DM Mono',monospace", fontSize: 10, color: C.grayLight, lineHeight: 1.8 }}>{detail}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ── SECTION TEMPLATES ─────────────────────────────────────────
-function TemplatesSection() {
-  const [active, setActive] = useState(0);
-  const [ref, v] = useInView();
-
-  const cats = [
-    {
-      label: "Avant le run", icon: "⏰",
-      templates: ["Rappel standard", "Météo difficile", "Run complet", "J-1 rappel", "Place libérée", "Premier run"],
-      preview: `PARIS RUN CLUB 🏃
-
-Ce soir 19h30 au Canal. 7km, session tempo.
-🌤️ 17°C — conditions parfaites.
-
-Valide ta présence :
-capten.app/parisrunclub/run/ce-soir`,
-    },
-    {
-      label: "Pendant le run", icon: "🏃",
-      templates: ["Départ dans 5 min", "Run annulé météo", "Run annulé report"],
-      preview: `PARIS RUN CLUB ⏱️
-
-Départ dans 5 minutes. On part à l'heure.
-Si tu arrives après 19h35, rejoins le groupe
-Easy au Canal.`,
-    },
-    {
-      label: "Après le run", icon: "✅",
-      templates: ["Débrief standard", "Record de présence", "Avec cagnotte", "Challenge complété"],
-      preview: `PARIS RUN CLUB ✅
-
-42 présents hier soir. Bien joué.
-Ton score d'assiduité a été mis à jour.
-
-capten.app/parisrunclub/stats`,
-    },
-    {
-      label: "Social Spot", icon: "☕",
-      templates: ["Annonce du café", "Cagnotte collectée", "Débrief café"],
-      preview: `PARIS RUN CLUB ☕
-
-Après le run ce soir, on se retrouve
-au Boot Café — 92 rue du Fg Saint-Martin.
-
-On se retrouve tous là-bas !`,
-    },
-  ];
-
-  const cat = cats[active];
-
-  return (
-    <section id="templates" ref={ref} style={{ padding: "100px 40px", maxWidth: 1200, margin: "0 auto" }}>
-      <div style={{ textAlign: "center", marginBottom: 64 }}>
-        <Label>Communication</Label>
-        <SecTitle style={{ opacity: v ? 1 : 0, transform: v ? "none" : "translateY(16px)", transition: "all 0.7s ease", marginBottom: 16 }}>
-          25 messages.<br />
-          <span style={{ color: C.orange }}>Zéro à écrire.</span>
-        </SecTitle>
-        <p style={{ color: C.gray, fontSize: 17, maxWidth: 460, margin: "0 auto", opacity: v ? 1 : 0, transition: "opacity 0.7s 0.2s ease" }}>
-          Capten génère le message parfait selon la situation. Tu copies, tu colles dans ton groupe. C'est tout.
-        </p>
-      </div>
-
-      <div className="kit-layout" style={{ display: "flex", gap: 32 }}>
-        {/* Left */}
-        <div style={{ flex: 1 }}>
-          {/* Tabs */}
-          <div style={{ display: "flex", gap: 8, marginBottom: 20, flexWrap: "wrap" }}>
-            {cats.map((c, i) => (
-              <button key={i} onClick={() => setActive(i)} style={{
-                display: "flex", alignItems: "center", gap: 6,
-                background: active === i ? C.orange : C.bgCard,
-                border: `1px solid ${active === i ? C.orange : C.border}`,
-                color: active === i ? "#fff" : C.gray,
-                padding: "7px 14px", borderRadius: 8, fontSize: 13,
-                fontWeight: active === i ? 600 : 400,
-                cursor: "pointer", transition: "all 0.15s",
-              }}>
-                <span>{c.icon}</span> {c.label}
+            {sports.map((s) => (
+              <button
+                key={s.id}
+                onClick={() => !s.disabled && setActiveSport(s.id)}
+                disabled={s.disabled}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                  padding: "6px 14px",
+                  borderRadius: 100,
+                  fontSize: 13,
+                  fontWeight: 600,
+                  border: activeSport === s.id ? "1px solid #FF5500" : "1px solid #E4E4E7",
+                  backgroundColor: activeSport === s.id ? "#FFFFFF" : "rgba(255, 255, 255, 0.6)",
+                  color: activeSport === s.id ? "#FF5500" : s.disabled ? "#A1A1AA" : "#09090B",
+                  cursor: s.disabled ? "not-allowed" : "pointer",
+                  boxShadow: activeSport === s.id ? "0 4px 12px rgba(255, 85, 0, 0.15)" : "none",
+                  transition: "all 0.2s ease"
+                }}
+              >
+                <span>{s.icon}</span>
+                <span>{s.label}</span>
               </button>
             ))}
           </div>
 
-          {/* Template list */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-            {cat.templates.map(t => (
-              <div key={t} style={{
-                background: C.bgCard, border: `1px solid ${C.border}`,
-                borderRadius: 10, padding: "12px 16px",
-                display: "flex", alignItems: "center", justifyContent: "space-between",
-                cursor: "pointer", transition: "all 0.15s",
-              }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(255,92,0,0.3)"; e.currentTarget.style.background = C.orangeBg; }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.background = C.bgCard; }}>
-                <span style={{ fontSize: 14, fontWeight: 500 }}>{cat.icon} {t}</span>
-                <div style={{ display: "flex", gap: 8 }}>
-                  <span style={{ fontSize: 11, background: C.orangeBg, border: `1px solid ${C.orangeBorder}`, color: C.orange, padding: "2px 9px", borderRadius: 5, fontFamily: "'DM Mono',monospace" }}>Copier</span>
-                  <span style={{ fontSize: 11, background: "#128C7E15", border: "1px solid #128C7E30", color: "#25D366", padding: "2px 9px", borderRadius: 5, fontFamily: "'DM Mono',monospace" }}>WhatsApp</span>
-                </div>
+          <div className="hero-grid" style={{ display: "grid", gridTemplateColumns: "1.1fr 0.9fr", gap: 60, alignItems: "center" }}>
+            {/* Left Content */}
+            <div>
+              <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "6px 14px", borderRadius: 100, backgroundColor: "#FFFFFF", border: "1px solid #E4E4E7", marginBottom: 24, boxShadow: "0 2px 8px rgba(0,0,0,0.04)" }}>
+                <span className="animate-beacon" style={{ width: 8, height: 8, borderRadius: "50%", backgroundColor: "#FF5500" }} />
+                <span style={{ fontSize: 12, fontWeight: 700, color: "#09090B", textTransform: "uppercase", letterSpacing: 1 }}>
+                  Bêta Capitaines Ouverte · 21 jours offerts
+                </span>
               </div>
-            ))}
-          </div>
-        </div>
 
-        {/* Right — Preview */}
-        <div style={{ width: 360, flexShrink: 0 }}>
-          <div style={{ background: C.bgCard, border: `1.5px solid ${C.orangeBorder}`, borderRadius: 16, overflow: "hidden" }}>
-            {/* WhatsApp header */}
-            <div style={{ background: "#128C7E", padding: "12px 16px", display: "flex", alignItems: "center", gap: 10 }}>
-              <div style={{ width: 32, height: 32, borderRadius: "50%", background: "rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, color: "#fff", fontSize: 13 }}>P</div>
-              <div>
-                <div style={{ color: "#fff", fontWeight: 700, fontSize: 14 }}>PARIS RUN CLUB</div>
-                <div style={{ color: "rgba(255,255,255,0.7)", fontSize: 11 }}>Groupe WhatsApp · 47 membres</div>
+              {/* H1 Headline — Barlow Condensed ALL CAPS */}
+              <h1
+                className="h1-display"
+                style={{
+                  fontFamily: "'Barlow Condensed', sans-serif",
+                  fontWeight: 900,
+                  fontSize: 68,
+                  lineHeight: 0.95,
+                  textTransform: "uppercase",
+                  color: "#09090B",
+                  letterSpacing: -0.5,
+                  marginBottom: 24
+                }}
+              >
+                TU AS LANCÉ CE CREW POUR BOUGER. <br />
+                <span style={{ color: "#FF5500" }}>PAS POUR FAIRE L&apos;ADMIN.</span>
+              </h1>
+
+              {/* Subtitle */}
+              <p
+                style={{
+                  fontSize: 18,
+                  lineHeight: 1.6,
+                  color: "#71717A",
+                  fontWeight: 500,
+                  maxWidth: 580,
+                  marginBottom: 36
+                }}
+              >
+                La plateforme tout-en-un pour gérer vos rassemblements sportifs, sécuriser vos membres avec les fiches ICE d&apos;urgence et valoriser votre communauté.
+              </p>
+
+              {/* CTAs */}
+              <div className="hero-ctas" style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 16, marginBottom: 24 }}>
+                <Link href="/login?mode=signup" className="btn-accent" style={{ fontSize: 16, padding: "16px 32px" }}>
+                  Tester la Bêta gratuitement <ArrowRight size={18} />
+                </Link>
+                <a href="#probleme" className="btn-outline-dark" style={{ fontSize: 16, padding: "16px 24px" }}>
+                  Découvrir les enjeux
+                </a>
+              </div>
+
+              <div style={{ display: "flex", alignItems: "center", gap: 16, color: "#71717A", fontSize: 13, fontWeight: 600 }}>
+                <span style={{ display: "flex", alignItems: "center", gap: 6 }}><Check size={16} color="#FF5500" /> Bêta gratuite réservée aux capitaines</span>
+                <span>•</span>
+                <span style={{ display: "flex", alignItems: "center", gap: 6 }}><Check size={16} color="#FF5500" /> Sans carte bancaire</span>
               </div>
             </div>
 
-            {/* Message */}
-            <div style={{ padding: 20 }}>
-              <div style={{ background: "#1F2C34", borderRadius: "12px 12px 12px 2px", padding: 16, marginBottom: 12 }}>
-                <div style={{ color: "#E9EDE9", fontSize: 13, lineHeight: 1.7, whiteSpace: "pre-line" }}>{cat.preview}</div>
-                <div style={{ textAlign: "right", marginTop: 8, fontSize: 10, color: "#8696A0" }}>18:30 ✓✓</div>
-              </div>
-              <div style={{ display: "flex", gap: 8 }}>
-                <button style={{ flex: 1, background: C.orangeBg, border: `1px solid ${C.orangeBorder}`, color: C.orange, padding: "9px", borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: "pointer" }}>📋 Copier</button>
-                <button style={{ flex: 1, background: "#128C7E15", border: "1px solid #128C7E30", color: "#25D366", padding: "9px", borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: "pointer" }}>📱 Ouvrir WhatsApp</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
+            {/* Right Hero Visual Mockup with Floating Badges */}
+            <div style={{ position: "relative", display: "flex", justifyContent: "center" }}>
+              {/* Smartphone Frame Chassis */}
+              <div
+                className="shadow-dribbble"
+                style={{
+                  width: 320,
+                  backgroundColor: "#09090B",
+                  borderRadius: 44,
+                  padding: 12,
+                  border: "4px solid #27272A",
+                  position: "relative",
+                  zIndex: 2
+                }}
+              >
+                {/* Screen Inner */}
+                <div style={{ backgroundColor: "#FAFAFA", borderRadius: 34, overflow: "hidden", border: "1px solid #18181B", minHeight: 560 }}>
+                  {/* Dynamic Header Screen */}
+                  <div style={{ backgroundColor: "#09090B", color: "#FFFFFF", padding: "20px 18px 16px" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                      <span style={{ fontSize: 10, fontFamily: "'JetBrains Mono', monospace", color: "#FF5500", fontWeight: 700, letterSpacing: 1 }}>SESSION EN COURS</span>
+                      <span style={{ fontSize: 10, backgroundColor: "rgba(255,255,255,0.1)", padding: "2px 8px", borderRadius: 100 }}>19:30 · PARIS</span>
+                    </div>
+                    <div style={{ fontSize: 18, fontWeight: 800 }}>RUN &amp; CHILL #42</div>
+                    <div style={{ fontSize: 12, color: "#A1A1AA", marginTop: 2 }}>Point de RDV : République</div>
+                  </div>
 
-// ── SECTION GPS ───────────────────────────────────────────────
-function GPSSection() {
-  const [count, setCount] = useState(0);
-  const [ref, v] = useInView();
-  useEffect(() => {
-    if (!v) return;
-    const t = setInterval(() => setCount(p => p < 50 ? p + 1 : p), 60);
-    return () => clearInterval(t);
-  }, [v]);
-
-  return (
-    <section style={{ padding: "100px 40px", background: C.bgSection }}>
-      <div style={{ maxWidth: 1200, margin: "0 auto" }}>
-        <div ref={ref} style={{ display: "flex", gap: 80, alignItems: "center" }}>
-          {/* Left */}
-          <div style={{ flex: 1 }}>
-            <Label>Check-in GPS · Run · Walk · Trail</Label>
-            <h2 style={{
-              fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontStyle: "italic",
-              fontSize: 60, textTransform: "uppercase", lineHeight: 0.88, marginBottom: 24,
-              opacity: v ? 1 : 0, transform: v ? "none" : "translateX(-20px)", transition: "all 0.8s ease",
-            }}>
-              50 membres.<br />
-              <span style={{ color: C.orange }}>Zéro file<br />d&apos;attente.</span>
-            </h2>
-            <p style={{ color: C.gray, fontSize: 16, lineHeight: 1.8, marginBottom: 28, maxWidth: 420, opacity: v ? 1 : 0, transition: "opacity 0.7s 0.2s ease" }}>
-              Chaque membre reçoit son lien dans le groupe WhatsApp. Il arrive au point de RDV — parc, trailhead ou point de départ de marche. Il clique. Sa présence est validée à moins de 50 mètres. En 2 secondes. Toi tu es déjà en train de gérer le départ.
-            </p>
-            {[
-              { icon: "📍", text: "Validation GPS à moins de 50m du point de rendez-vous" },
-              { icon: "⚡", text: "50 check-ins simultanés — run, walk ou trail, personne n'attend" },
-              { icon: "🔒", text: "Zéro tracking pendant la sortie — vie privée respectée" },
-              { icon: "✋", text: "Validation manuelle si un membre est en panne de batterie" },
-            ].map(({ icon, text }, i) => (
-              <div key={text} style={{ display: "flex", gap: 12, alignItems: "flex-start", marginBottom: 14, opacity: v ? 1 : 0, transition: `opacity 0.6s ${0.3 + i * 0.1}s ease` }}>
-                <span style={{ fontSize: 18, flexShrink: 0 }}>{icon}</span>
-                <span style={{ color: C.gray, fontSize: 15, lineHeight: 1.6 }}>{text}</span>
-              </div>
-            ))}
-          </div>
-
-          {/* Right — GPS viz */}
-          <div style={{ flex: 1, maxWidth: 440 }}>
-            <div style={{ background: C.bgCard, border: `1px solid ${C.border}`, borderRadius: 18, padding: 24, boxShadow: C.shadowMd }}>
-              {/* Map */}
-              <div style={{ position: "relative", height: 240, background: "#0F1A0F", borderRadius: 12, overflow: "hidden", marginBottom: 16, border: "1px solid rgba(22,163,74,0.2)" }}>
-                {[20,40,60,80].map(p => <div key={p} style={{ position:"absolute", left:`${p}%`, top:0, bottom:0, width:1, background:"rgba(255,255,255,0.04)" }} />)}
-                {[33,66].map(p => <div key={p} style={{ position:"absolute", top:`${p}%`, left:0, right:0, height:1, background:"rgba(255,255,255,0.04)" }} />)}
-
-                {/* Center */}
-                <div style={{ position:"absolute", left:"50%", top:"50%", transform:"translate(-50%,-50%)" }}>
-                  <div style={{ width:14, height:14, borderRadius:"50%", background: C.orange, border:"3px solid rgba(255,92,0,0.3)" }} />
-                  <div style={{ position:"absolute", top:"50%", left:"50%", transform:"translate(-50%,-50%)", width:80, height:80, borderRadius:"50%", border:"1px dashed rgba(255,92,0,0.2)" }} />
-                </div>
-
-                {/* Dots */}
-                {Array.from({length:20},(_,i) => ({
-                  x: 12 + (i%5)*18, y: 18 + Math.floor(i/5)*22
-                })).map((d,i) => {
-                  const active = i < Math.floor(count * 20 / 50);
-                  return (
-                    <div key={i} style={{ position:"absolute", left:`${d.x}%`, top:`${d.y}%`, transform:"translate(-50%,-50%)", opacity: active ? 1 : 0.15, transition:"opacity 0.3s" }}>
-                      <div style={{ width:20, height:20, borderRadius:"50%", background: active ? "rgba(22,163,74,0.9)" : "rgba(255,255,255,0.1)", border:`1.5px solid ${active ? "rgba(22,163,74,0.5)" : "rgba(255,255,255,0.1)"}`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:8, color:"#fff", fontWeight:700 }}>
-                        {String.fromCharCode(65+i)}
+                  {/* Body Screen Mock Content */}
+                  <div style={{ padding: 16 }}>
+                    {/* Live Check-in Gauge */}
+                    <div style={{ backgroundColor: "#FFFFFF", borderRadius: 16, padding: 14, border: "1px solid #E4E4E7", marginBottom: 12 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                        <span style={{ fontSize: 11, fontWeight: 700, color: "#09090B" }}>CHECK-IN PRESENCE</span>
+                        <span style={{ fontSize: 11, fontWeight: 800, color: "#FF5500" }}>42 / 45</span>
+                      </div>
+                      <div style={{ height: 8, backgroundColor: "#F4F4F5", borderRadius: 100, overflow: "hidden" }}>
+                        <div style={{ width: "93%", height: "100%", backgroundColor: "#FF5500", borderRadius: 100 }} />
                       </div>
                     </div>
-                  );
-                })}
 
-                {/* Counter */}
-                <div style={{ position:"absolute", top:12, right:12, background:"rgba(250,250,248,0.95)", border:`1px solid ${C.border}`, borderRadius:10, padding:"8px 14px", textAlign:"center" }}>
-                  <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:900, fontStyle:"italic", fontSize:32, color:C.orange, lineHeight:1 }}>{count}/50</div>
-                  <div style={{ fontSize:9, color:C.grayLight, fontFamily:"'DM Mono',monospace" }}>CHECK-IN GPS</div>
+                    {/* Member Item Preview */}
+                    {[
+                      { name: "Sophie Martin", status: "Validé (GPS)", ice: "OK O+", badge: "🟢" },
+                      { name: "Thomas Dubois", status: "Validé (GPS)", ice: "OK A-", badge: "🟢" },
+                      { name: "Alexandre V.", status: "En route", ice: "Vérifié", badge: "🟠" }
+                    ].map((m, idx) => (
+                      <div key={idx} style={{ backgroundColor: "#FFFFFF", borderRadius: 12, padding: 10, border: "1px solid #F4F4F5", marginBottom: 8, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                          <span style={{ fontSize: 12 }}>{m.badge}</span>
+                          <div>
+                            <div style={{ fontSize: 12, fontWeight: 700, color: "#09090B" }}>{m.name}</div>
+                            <div style={{ fontSize: 10, color: "#71717A" }}>{m.status}</div>
+                          </div>
+                        </div>
+                        <span style={{ marginLeft: "auto", fontSize: 9, fontWeight: 700, backgroundColor: "#F4F4F5", padding: "3px 7px", borderRadius: 6, color: "#09090B" }}>
+                          ICE {m.ice}
+                        </span>
+                      </div>
+                    ))}
+
+                    <div style={{ marginTop: 12, padding: 10, borderRadius: 12, backgroundColor: "#09090B", color: "#FFFFFF", textAlign: "center", fontSize: 11, fontWeight: 700 }}>
+                      ⚡ Scanner un membre
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              {/* Stats */}
-              <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:10 }}>
-                {[{icon:"⚡",v:`${count}`,l:"Simultanés"},{icon:"⏱️",v:"2s",l:"Par membre"},{icon:"🏔️",v:"Libre",l:"Le fondateur"}].map(({icon,v:val,l}) => (
-                  <div key={l} style={{ textAlign:"center", background:C.bgSection, borderRadius:8, padding:10 }}>
-                    <div style={{ fontSize:18, marginBottom:4 }}>{icon}</div>
-                    <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:900, fontStyle:"italic", fontSize:24, color:C.orange }}>{val}</div>
-                    <div style={{ fontSize:10, color:C.grayLight, fontFamily:"'DM Mono',monospace" }}>{l}</div>
+              {/* Floating Micro Badge 1 (Top Left) */}
+              <div
+                className="animate-float"
+                style={{
+                  position: "absolute",
+                  top: "12%",
+                  left: "-15%",
+                  zIndex: 3,
+                  backgroundColor: "#FFFFFF",
+                  border: "1px solid #E4E4E7",
+                  borderRadius: 16,
+                  padding: "12px 18px",
+                  boxShadow: "0 20px 35px -10px rgba(9, 9, 11, 0.15)",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 12
+                }}
+              >
+                <div style={{ width: 36, height: 36, borderRadius: 10, backgroundColor: "rgba(22, 163, 74, 0.1)", display: "flex", alignItems: "center", justifyContent: "center", color: "#16A34A" }}>
+                  <UserCheck size={20} />
+                </div>
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: "#09090B" }}>🟢 42 membres enregistrés</div>
+                  <div style={{ fontSize: 11, color: "#71717A", fontWeight: 500 }}>Check-in horodaté en direct</div>
+                </div>
+              </div>
+
+              {/* Floating Micro Badge 2 (Bottom Right) */}
+              <div
+                className="animate-float-del"
+                style={{
+                  position: "absolute",
+                  bottom: "15%",
+                  right: "-12%",
+                  zIndex: 3,
+                  backgroundColor: "#09090B",
+                  border: "1px solid rgba(255, 255, 255, 0.12)",
+                  borderRadius: 16,
+                  padding: "14px 20px",
+                  boxShadow: "0 25px 40px -10px rgba(0, 0, 0, 0.6)",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 12,
+                  color: "#FFFFFF"
+                }}
+              >
+                <div style={{ width: 38, height: 38, borderRadius: 10, backgroundColor: "rgba(255, 85, 0, 0.2)", display: "flex", alignItems: "center", justifyContent: "center", color: "#FF5500" }}>
+                  <ShieldCheck size={22} />
+                </div>
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: "#FFFFFF" }}>🛡️ Fiche ICE vérifiée</div>
+                  <div style={{ fontSize: 11, color: "#A1A1AA", fontWeight: 500 }}>Groupe sanguin &amp; Urgence 112</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ============================================================ */}
+      {/* 2. SECTION PROBLÈME / SÉCURITÉ (Fond Sombre #09090B - Rupture Dribbble) */}
+      {/* ============================================================ */}
+      <section id="probleme" style={{ backgroundColor: "#09090B", color: "#FFFFFF", padding: "110px 24px", position: "relative" }}>
+        <div style={{ maxWidth: 1280, margin: "0 auto" }}>
+          {/* Header Section */}
+          <div style={{ textAlign: "center", maxWidth: 760, margin: "0 auto 70px" }}>
+            <span style={{ fontSize: 12, fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, color: "#FF5500", textTransform: "uppercase", letterSpacing: 2, display: "block", marginBottom: 12 }}>
+              L&apos;ENJEU DE LA RESPONSABILITÉ
+            </span>
+
+            {/* H2 Title in Plus Jakarta Sans Bold */}
+            <h2
+              className="h2-sans"
+              style={{
+                fontFamily: "'Plus Jakarta Sans', sans-serif",
+                fontWeight: 800,
+                fontSize: 44,
+                lineHeight: 1.15,
+                color: "#FFFFFF",
+                letterSpacing: -0.5,
+                marginBottom: 16
+              }}
+            >
+              Le piège du club informel.
+            </h2>
+            <p style={{ fontSize: 18, color: "#A1A1AA", fontWeight: 500, lineHeight: 1.6 }}>
+              &ldquo;On est juste un groupe de potes.&rdquo; L&apos;erreur classique qui laisse les capitaines entièrement à découvert en cas de pépin.
+            </p>
+          </div>
+
+          {/* 3 Dark Problem Cards */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 28 }}>
+            {/* Card 1 */}
+            <div
+              className="shadow-dark-card"
+              style={{
+                backgroundColor: "#121215",
+                border: "1px solid rgba(255, 255, 255, 0.08)",
+                borderRadius: 24,
+                padding: 36,
+                position: "relative",
+                overflow: "hidden"
+              }}
+            >
+              <div style={{ width: 48, height: 48, borderRadius: 14, backgroundColor: "rgba(239, 68, 68, 0.12)", display: "flex", alignItems: "center", justifyContent: "center", color: "#EF4444", marginBottom: 24 }}>
+                <ShieldAlert size={26} />
+              </div>
+              <h3 style={{ fontSize: 20, fontWeight: 700, color: "#FFFFFF", marginBottom: 12 }}>
+                1. Le Flou Juridique
+              </h3>
+              <p style={{ fontSize: 14, color: "#A1A1AA", lineHeight: 1.6, fontWeight: 500 }}>
+                Rassemblements hebdomadaires de 40 personnes sur la voie publique sans registre officiel des présences. En cas d&apos;accident, la responsabilité personnelle du capitaine peut être directement recherchée.
+              </p>
+            </div>
+
+            {/* Card 2 */}
+            <div
+              className="shadow-dark-card"
+              style={{
+                backgroundColor: "#121215",
+                border: "1px solid rgba(255, 255, 255, 0.08)",
+                borderRadius: 24,
+                padding: 36,
+                position: "relative",
+                overflow: "hidden"
+              }}
+            >
+              <div style={{ width: 48, height: 48, borderRadius: 14, backgroundColor: "rgba(255, 85, 0, 0.15)", display: "flex", alignItems: "center", justifyContent: "center", color: "#FF5500", marginBottom: 24 }}>
+                <HeartPulse size={26} />
+              </div>
+              <h3 style={{ fontSize: 20, fontWeight: 700, color: "#FFFFFF", marginBottom: 12 }}>
+                2. L&apos;Urgence Médicale
+              </h3>
+              <p style={{ fontSize: 14, color: "#A1A1AA", lineHeight: 1.6, fontWeight: 500 }}>
+                À 19h30, un membre fait une chute ou un malaise. Impossible de transmettre son groupe sanguin, ses allergies ou son contact d&apos;urgence ICE aux pompiers qui arrivent sur place.
+              </p>
+            </div>
+
+            {/* Card 3 */}
+            <div
+              className="shadow-dark-card"
+              style={{
+                backgroundColor: "#121215",
+                border: "1px solid rgba(255, 255, 255, 0.08)",
+                borderRadius: 24,
+                padding: 36,
+                position: "relative",
+                overflow: "hidden"
+              }}
+            >
+              <div style={{ width: 48, height: 48, borderRadius: 14, backgroundColor: "rgba(161, 161, 170, 0.15)", display: "flex", alignItems: "center", justifyContent: "center", color: "#A1A1AA", marginBottom: 24 }}>
+                <MessageSquare size={26} />
+              </div>
+              <h3 style={{ fontSize: 20, fontWeight: 700, color: "#FFFFFF", marginBottom: 12 }}>
+                3. Le Chaos WhatsApp
+              </h3>
+              <p style={{ fontSize: 14, color: "#A1A1AA", lineHeight: 1.6, fontWeight: 500 }}>
+                60 notifications par jour pour des questions répétitives (&ldquo;C&apos;est où le RDV ?&rdquo;), des informations de sécurité indispensables complètement perdues dans le fil de discussion.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ============================================================ */}
+      {/* 3. SECTION FONCTIONNALITÉS — BENTO GRID (Fond #FAFAFA) */}
+      {/* ============================================================ */}
+      <section id="fonctionnalites" style={{ backgroundColor: "#FAFAFA", padding: "110px 24px" }}>
+        <div style={{ maxWidth: 1280, margin: "0 auto" }}>
+          <div style={{ textAlign: "center", maxWidth: 720, margin: "0 auto 60px" }}>
+            <span style={{ fontSize: 12, fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, color: "#FF5500", textTransform: "uppercase", letterSpacing: 2, display: "block", marginBottom: 12 }}>
+              DESIGNED FOR CAPTAINS
+            </span>
+            <h2
+              className="h2-sans"
+              style={{
+                fontFamily: "'Plus Jakarta Sans', sans-serif",
+                fontWeight: 800,
+                fontSize: 44,
+                lineHeight: 1.15,
+                color: "#09090B",
+                letterSpacing: -0.5,
+                marginBottom: 16
+              }}
+            >
+              Tout ce dont votre crew a besoin. Sans la lourdeur d&apos;une asso.
+            </h2>
+          </div>
+
+          {/* Asymmetric Bento Grid */}
+          <div className="bento-grid" style={{ display: "grid", gridTemplateColumns: "repeat(12, 1fr)", gap: 24 }}>
+
+            {/* BENTO CARDE A (Large 8/12) — Check-in GPS & Registre Horodaté */}
+            <div className="bento-card" style={{ gridColumn: "span 8" }}>
+              <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "flex-start", gap: 20, marginBottom: 28 }}>
+                <div>
+                  <span style={{ fontSize: 11, fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, color: "#FF5500", textTransform: "uppercase", letterSpacing: 1.5 }}>
+                    FONCTIONNALITÉ #1
+                  </span>
+                  <h3 style={{ fontSize: 24, fontWeight: 800, color: "#09090B", marginTop: 4 }}>
+                    Check-in GPS &amp; Registre Horodaté
+                  </h3>
+                  <p style={{ fontSize: 14, color: "#71717A", fontWeight: 500, marginTop: 4, maxWidth: 440 }}>
+                    Validez la présence de vos membres au point de RDV en 1-clic. Registre d&apos;émargement officiel conservé automatiquement.
+                  </p>
+                </div>
+                <div style={{ backgroundColor: "#F4F4F5", padding: "8px 14px", borderRadius: 100, fontSize: 12, fontWeight: 700, color: "#09090B" }}>
+                  📍 RDV : 19h30 République
+                </div>
+              </div>
+
+              {/* Map & Live Counter Mockup Illustration */}
+              <div style={{ backgroundColor: "#F4F4F5", borderRadius: 16, padding: 20, border: "1px solid #E4E4E7", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+                {/* Left Mini Map */}
+                <div style={{ backgroundColor: "#FFFFFF", borderRadius: 12, padding: 14, border: "1px solid #E4E4E7", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+                    <MapPin size={18} color="#FF5500" />
+                    <span style={{ fontSize: 12, fontWeight: 700 }}>Point de Rassemblement</span>
+                  </div>
+                  <div style={{ height: 90, backgroundColor: "#F4F4F5", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid #E4E4E7", position: "relative" }}>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: "#71717A" }}>🗺️ MAP GPS LIVE</span>
+                    <span style={{ position: "absolute", top: "40%", left: "48%", width: 14, height: 14, backgroundColor: "#FF5500", borderRadius: "50%", border: "2px solid #fff" }} />
+                  </div>
+                </div>
+
+                {/* Right Live Counter */}
+                <div style={{ backgroundColor: "#09090B", color: "#FFFFFF", borderRadius: 12, padding: 16, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <span style={{ fontSize: 11, color: "#A1A1AA", fontWeight: 600 }}>EMARGEMENT DIRECT</span>
+                    <span style={{ fontSize: 10, backgroundColor: "rgba(255,85,0,0.2)", color: "#FF5500", padding: "2px 8px", borderRadius: 100, fontWeight: 700 }}>LIVE</span>
+                  </div>
+                  <div style={{ fontSize: 32, fontWeight: 900, color: "#FFFFFF", margin: "10px 0" }}>
+                    47 <span style={{ fontSize: 18, color: "#A1A1AA", fontWeight: 600 }}>/ 47</span>
+                  </div>
+                  <div style={{ fontSize: 11, color: "#56E39F", fontWeight: 700, display: "flex", alignItems: "center", gap: 4 }}>
+                    <CheckCircle2 size={14} /> Tous les membres sont validés
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* BENTO CARDE B (1/3 Width - Dark Accent #09090B) — Sécurité & Fiches ICE */}
+            <div className="bento-card" style={{ gridColumn: "span 4", backgroundColor: "#09090B", color: "#FFFFFF", border: "1px solid rgba(255,255,255,0.1)" }}>
+              <span style={{ fontSize: 11, fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, color: "#FF5500", textTransform: "uppercase", letterSpacing: 1.5 }}>
+                FONCTIONNALITÉ #2
+              </span>
+              <h3 style={{ fontSize: 22, fontWeight: 800, color: "#FFFFFF", marginTop: 4, marginBottom: 8 }}>
+                Sécurité &amp; Fiches ICE
+              </h3>
+              <p style={{ fontSize: 13, color: "#A1A1AA", fontWeight: 500, marginBottom: 20 }}>
+                Accès en 1-clic aux antécédents médicaux d&apos;urgence et contacts des proches pour chaque participant.
+              </p>
+
+              {/* ICE Card Mockup Detail */}
+              <div style={{ backgroundColor: "#121215", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 16, padding: 16 }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12, borderBottom: "1px solid rgba(255,255,255,0.08)", paddingBottom: 10 }}>
+                  <span style={{ fontSize: 11, fontWeight: 800, color: "#FF5500" }}>🛡️ FICHE ICE URGENCE</span>
+                  <span style={{ fontSize: 10, backgroundColor: "#FF5500", color: "#fff", padding: "2px 6px", borderRadius: 4, fontWeight: 800 }}>O+</span>
+                </div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: "#FFFFFF" }}>Camille Laurent</div>
+                <div style={{ fontSize: 11, color: "#A1A1AA", marginTop: 2 }}>Contact ICE : 06 12 34 56 78 (Époux)</div>
+                <div style={{ fontSize: 10, color: "#EF4444", fontWeight: 700, marginTop: 6, backgroundColor: "rgba(239,68,68,0.1)", padding: "4px 8px", borderRadius: 6 }}>
+                  ⚠️ Allergie : Pénicilline
+                </div>
+              </div>
+            </div>
+
+            {/* BENTO CARDE C (Full 12/12) — CAPTEN Spots (Économie Locale) */}
+            <div className="bento-card" style={{ gridColumn: "span 12" }}>
+              <div className="spots-bento-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1.2fr", gap: 32, alignItems: "center" }}>
+                <div>
+                  <span style={{ fontSize: 11, fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, color: "#FF5500", textTransform: "uppercase", letterSpacing: 1.5 }}>
+                    FONCTIONNALITÉ #3
+                  </span>
+                  <h3 style={{ fontSize: 26, fontWeight: 800, color: "#09090B", marginTop: 4, marginBottom: 12 }}>
+                    CAPTEN Spots — Valorisez votre communauté auprès des commerces locaux
+                  </h3>
+                  <p style={{ fontSize: 15, color: "#71717A", fontWeight: 500, lineHeight: 1.6, marginBottom: 20 }}>
+                    Transformez vos fins de sorties (cafés, shops, bars) en avantages exclusifs. Montrez l&apos;impact économique de votre crew et débloquez des partenariats mesurables.
+                  </p>
+                  <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+                    <span style={{ backgroundColor: "#F4F4F5", padding: "6px 12px", borderRadius: 8, fontSize: 12, fontWeight: 700, color: "#09090B" }}>☕ Remises Cafés</span>
+                    <span style={{ backgroundColor: "#F4F4F5", padding: "6px 12px", borderRadius: 8, fontSize: 12, fontWeight: 700, color: "#09090B" }}>🏷️ Deals Partenaires</span>
+                    <span style={{ backgroundColor: "#F4F4F5", padding: "6px 12px", borderRadius: 8, fontSize: 12, fontWeight: 700, color: "#09090B" }}>📊 Dashboard Partenaire</span>
+                  </div>
+                </div>
+
+                {/* Spots Partner Dashboard Graphic */}
+                <div style={{ backgroundColor: "#09090B", color: "#FFFFFF", borderRadius: 16, padding: 24, border: "1px solid #27272A" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <Coffee size={18} color="#FF5500" />
+                      <span style={{ fontSize: 13, fontWeight: 800 }}>Café du Cycliste — Social Spot</span>
+                    </div>
+                    <span style={{ fontSize: 10, backgroundColor: "rgba(86,227,159,0.15)", color: "#56E39F", padding: "3px 8px", borderRadius: 100, fontWeight: 700 }}>PARTENAIRE ACTIF</span>
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
+                    <div style={{ backgroundColor: "#121215", padding: 14, borderRadius: 12, border: "1px solid rgba(255,255,255,0.08)" }}>
+                      <div style={{ fontSize: 10, color: "#A1A1AA", fontWeight: 600 }}>MEMBRES APPORTÉS</div>
+                      <div style={{ fontSize: 22, fontWeight: 900, color: "#FFFFFF", marginTop: 2 }}>142 clients</div>
+                    </div>
+                    <div style={{ backgroundColor: "#121215", padding: 14, borderRadius: 12, border: "1px solid rgba(255,255,255,0.08)" }}>
+                      <div style={{ fontSize: 10, color: "#A1A1AA", fontWeight: 600 }}>CUMUL CAFÉS OFFERTS</div>
+                      <div style={{ fontSize: 22, fontWeight: 900, color: "#FF5500", marginTop: 2 }}>380 €</div>
+                    </div>
+                  </div>
+                  <div style={{ fontSize: 11, color: "#A1A1AA", textAlign: "center" }}>
+                    &ldquo;Prochaine session réservée au shop jeudi soir&rdquo;
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* ============================================================ */}
+      {/* 4. COMPARATIF "WHATSAPP VS CAPTEN" */}
+      {/* ============================================================ */}
+      <section id="comparatif" style={{ backgroundColor: "#FAFAFA", padding: "90px 24px", borderTop: "1px solid #E4E4E7" }}>
+        <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+          <div style={{ textAlign: "center", maxWidth: 640, margin: "0 auto 50px" }}>
+            <span style={{ fontSize: 12, fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, color: "#FF5500", textTransform: "uppercase", letterSpacing: 2, display: "block", marginBottom: 10 }}>
+              LE CHOIX CLAIR
+            </span>
+            <h2
+              className="h2-sans"
+              style={{
+                fontFamily: "'Plus Jakarta Sans', sans-serif",
+                fontWeight: 800,
+                fontSize: 40,
+                lineHeight: 1.15,
+                color: "#09090B"
+              }}
+            >
+              Pourquoi remplacer les groupes WhatsApp illisibles ?
+            </h2>
+          </div>
+
+          <div className="vs-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 32, alignItems: "stretch" }}>
+            {/* Left Card: WhatsApp Chaos */}
+            <div style={{ backgroundColor: "#FFFFFF", border: "1px solid #E4E4E7", borderRadius: 24, padding: 36, position: "relative" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 24 }}>
+                <div style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: "#F4F4F5", display: "flex", alignItems: "center", justifyContent: "center", color: "#71717A" }}>
+                  <XCircle size={22} color="#EF4444" />
+                </div>
+                <div>
+                  <h3 style={{ fontSize: 18, fontWeight: 800, color: "#09090B" }}>Groupe WhatsApp Seul</h3>
+                  <span style={{ fontSize: 12, color: "#71717A", fontWeight: 500 }}>Le chaos au quotidien</span>
+                </div>
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                {[
+                  "Fil de discussion noyé sous 60 messages/jour",
+                  "Aucun registre horodaté des présences",
+                  "Absence totale de fiches de santé & ICE",
+                  "Gestion manuelle épuisante pour le capitaine",
+                  "Risque juridique personnel en cas d'accident"
+                ].map((item, idx) => (
+                  <div key={idx} style={{ display: "flex", alignItems: "flex-start", gap: 12, fontSize: 14, color: "#71717A", fontWeight: 500 }}>
+                    <XCircle size={18} color="#EF4444" style={{ flexShrink: 0, marginTop: 2 }} />
+                    <span>{item}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Right Card: CAPTEN Solution */}
+            <div style={{ backgroundColor: "#09090B", color: "#FFFFFF", border: "1px solid #27272A", borderRadius: 24, padding: 36, position: "relative", boxShadow: "0 20px 40px -10px rgba(0,0,0,0.5)" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 24 }}>
+                <div style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: "rgba(255,85,0,0.2)", display: "flex", alignItems: "center", justifyContent: "center", color: "#FF5500" }}>
+                  <ShieldCheck size={22} color="#FF5500" />
+                </div>
+                <div>
+                  <h3 style={{ fontSize: 18, fontWeight: 800, color: "#FFFFFF" }}>Avec CAPTEN</h3>
+                  <span style={{ fontSize: 12, color: "#FF5500", fontWeight: 700 }}>Tranquillité &amp; Sécurité</span>
+                </div>
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                {[
+                  "1 Check-in GPS automatique au point de RDV",
+                  "Fiches ICE urgence centralisées et vérifiées",
+                  "Validation des présences en 3 secondes",
+                  "0 secrétariat & automatisation complète",
+                  "Protection juridique & décharges RGPD 1-clic"
+                ].map((item, idx) => (
+                  <div key={idx} style={{ display: "flex", alignItems: "flex-start", gap: 12, fontSize: 14, color: "#FFFFFF", fontWeight: 600 }}>
+                    <CheckCircle2 size={18} color="#56E39F" style={{ flexShrink: 0, marginTop: 2 }} />
+                    <span>{item}</span>
                   </div>
                 ))}
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </section>
-  );
-}
+      </section>
 
-// ── SECTION PRICING ───────────────────────────────────────────
-function PricingSection() {
-  const [annual, setAnnual] = useState(false);
-  const [ref, v] = useInView();
-
-  return (
-    <section id="tarif" ref={ref} style={{ padding: "100px 40px" }}>
-      <div style={{ maxWidth: 600, margin: "0 auto", textAlign: "center" }}>
-        <Label>Tarif</Label>
-        <SecTitle style={{ marginBottom: 16, opacity: v ? 1 : 0, transform: v ? "none" : "translateY(16px)", transition: "all 0.7s ease" }}>
-          Un prix.<br /><span style={{ color: C.orange }}>Tout inclus.</span>
-        </SecTitle>
-        <p style={{ color: C.gray, fontSize: 16, marginBottom: 12, opacity: v ? 1 : 0, transition: "opacity 0.7s 0.2s ease" }}>
-          Si tu organises 2 runs par mois,<br />Capten coûte moins qu'un café par run.
-        </p>
-        <p style={{ color: C.grayLight, fontSize: 13, marginBottom: 40, fontFamily: "'DM Mono',monospace", opacity: v ? 1 : 0, transition: "opacity 0.7s 0.3s ease" }}>
-          Pas de limites de membres · Pas d'options cachées
-        </p>
-
-        {/* Toggle */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12, marginBottom: 40, opacity: v ? 1 : 0, transition: "opacity 0.7s 0.3s ease" }}>
-          <span style={{ fontSize: 14, color: !annual ? C.black : C.grayLight, fontWeight: !annual ? 600 : 400 }}>Mensuel</span>
-          <div onClick={() => setAnnual(!annual)} style={{ width: 44, height: 24, background: annual ? C.orange : C.border, borderRadius: 100, cursor: "pointer", position: "relative", transition: "background 0.2s" }}>
-            <div style={{ position: "absolute", top: 3, left: annual ? 23 : 3, width: 18, height: 18, borderRadius: "50%", background: "#fff", transition: "left 0.2s", boxShadow: "0 1px 3px rgba(0,0,0,0.2)" }} />
-          </div>
-          <span style={{ fontSize: 14, color: annual ? C.black : C.grayLight, fontWeight: annual ? 600 : 400 }}>
-            Annuel <span style={{ background: C.orangeBg, border: `1px solid ${C.orangeBorder}`, color: C.orange, padding: "1px 7px", borderRadius: 100, fontSize: 11, marginLeft: 4 }}>−2 mois</span>
-          </span>
-        </div>
-
-        {/* Card */}
-        <div style={{
-          background: C.bgCard, border: `2px solid ${C.orange}`,
-          borderRadius: 20, padding: 44, position: "relative",
-          boxShadow: "0 8px 32px rgba(255,92,0,0.12)",
-          opacity: v ? 1 : 0, transition: "opacity 0.7s 0.4s ease",
-        }}>
-          <div style={{ position: "absolute", top: 16, right: 16, background: C.orange, color: "#fff", padding: "4px 12px", borderRadius: 100, fontSize: 11, fontWeight: 700, fontFamily: "'DM Mono',monospace" }}>
-            21 JOURS GRATUITS
-          </div>
-
-          {/* Price */}
-          <div style={{ marginBottom: 28 }}>
-            <div style={{ display: "flex", alignItems: "baseline", justifyContent: "center", gap: 4 }}>
-              <span style={{ fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontStyle: "italic", fontSize: 80, lineHeight: 1, color: C.black }}>
-                {annual ? "33" : "49"}
-              </span>
-              <div>
-                <div style={{ fontSize: 24, color: C.gray }}>,99€</div>
-                <div style={{ fontSize: 13, color: C.grayLight }}>/mois</div>
-              </div>
-            </div>
-            {annual && <div style={{ fontSize: 13, color: C.orange, marginTop: 4 }}>facturé 399€/an</div>}
-          </div>
-
-          {/* Features */}
-          <div className="pricing-feats" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px 24px", marginBottom: 32, textAlign: "left" }}>
-            {[
-              { t: "Tes membres s'inscrivent seuls.", d: "Tu ne touches à rien." },
-              { t: "Si quelqu'un tombe ce soir :", d: "groupe sanguin, allergies, qui appeler.\nEn 2 secondes." },
-              { t: "Il se comporte mal.", d: "Il a signé avant d'entrer.\nTu peux l'exclure maintenant." },
-              { t: "50 check-ins. Simultanés.", d: "Toi tu cours déjà." },
-              { t: "Le message du soir.", d: "1 clic. Tu colles dans WhatsApp.\nC'est tout." },
-              { t: "La météo s'intègre automatiquement.", d: "Ton message s'adapte tout seul." },
-              { t: "Le café post-run.", d: "Tes membres contribuent.\nCapten prend 0%." },
-              { t: "Ton crew grandit.", d: "Le prix, lui, ne bouge pas." }
-            ].map(({ t, d }) => (
-              <div key={t} style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
-                <span style={{ color: "#16A34A", flexShrink: 0, marginTop: 2, fontSize: 16 }}>✓</span>
-                <div>
-                  <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 15, color: "#0F0F0D", fontWeight: 600, lineHeight: 1.3 }}>{t}</div>
-                  <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: "#6B6B63", fontWeight: 400, lineHeight: 1.4, whiteSpace: "pre-line", marginTop: 2 }}>{d}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <a href="/login?mode=signup" className="btn-main" style={{ width: "100%", justifyContent: "center", padding: "16px", fontFamily: "'Barlow Condensed',sans-serif", fontStyle: "italic", fontSize: 20, fontWeight: 900, textTransform: "uppercase", letterSpacing: 1 }}>
-            Lancer mon crew gratuitement →
-          </a>
-          <p style={{ marginTop: 12, fontSize: 12, color: C.grayLight, fontFamily: "'DM Mono',monospace" }}>
-            Aucune carte bancaire · Annulable en 1 clic
-          </p>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ── FAQ ───────────────────────────────────────────────────────
-function FAQ() {
-  const [open, setOpen] = useState<number | null>(null);
-  const [ref, v] = useInView();
-
-  const faqs = [
-    {
-      q: "Est-ce que mes membres doivent télécharger une app ?",
-      a: "Non. Jamais. Ton membre reçoit un lien dans le groupe WhatsApp. Il clique. Il s'inscrit, remplit ses infos, signe la charte. Tout dans son navigateur. Aucune app à installer.",
-    },
-    {
-      q: "Qui voit les informations médicales de mes membres ?",
-      a: "Toi uniquement. Personne d'autre dans le crew n'y a accès. Ces informations ne sont là que pour toi, si quelque chose tourne mal pendant un run.",
-    },
-    {
-      q: "Est-ce que je peux exclure quelqu'un du crew facilement ?",
-      a: "Oui. Et parce que chaque coureur a signé la charte de bienveillance à l'inscription, tu as une trace de son engagement. Tu peux l'exclure immédiatement, sans discussion.",
-    },
-    {
-      q: "Je peux garder mon groupe WhatsApp ?",
-      a: "Oui. Capten génère les messages parfaits. Toi tu les copies et tu les colles dans ton groupe habituel. Tu gardes la relation humaine avec tes coureurs, Capten fait le travail administratif.",
-    },
-    {
-      q: "Comment fonctionne la cagnotte pour le café ?",
-      a: "Tu colles ton lien Lydia ou Revolut dans les réglages. Tes coureurs contribuent depuis le portail d'inscription. L'argent arrive directement sur ton téléphone. Capten ne prend aucune commission.",
-    },
-    {
-      q: "Que se passe-t-il après les 21 jours gratuits ?",
-      a: "Tu repasses en accès limité automatiquement. Aucune carte débitée sans ton accord explicite. Pas de surprise. Pas de piège.",
-    },
-  ];
-
-  return (
-    <section ref={ref} style={{ padding: "80px 40px 100px", background: C.bgSection }}>
-      <div style={{ maxWidth: 680, margin: "0 auto" }}>
-        <div style={{ textAlign: "center", marginBottom: 48 }}>
-          <Label>Questions</Label>
-          <SecTitle style={{ opacity: v ? 1 : 0, transform: v ? "none" : "translateY(16px)", transition: "all 0.7s ease" }}>
-            Ce que tu<br /><span style={{ color: C.orange }}>te demandes.</span>
-          </SecTitle>
-        </div>
-
-        <div style={{ background: C.bgCard, border: `1px solid ${C.border}`, borderRadius: 16, overflow: "hidden" }}>
-          {faqs.map((f, i) => (
-            <div key={i} className="faq-item">
-              <button onClick={() => setOpen(open === i ? null : i)} style={{
-                width: "100%", padding: "20px 24px", display: "flex",
-                justifyContent: "space-between", alignItems: "center",
-                background: "transparent", border: "none", cursor: "pointer",
-                textAlign: "left", transition: "background 0.15s",
+      {/* ============================================================ */}
+      {/* 5. TARIFS & FAQ */}
+      {/* ============================================================ */}
+      <section id="tarifs" style={{ backgroundColor: "#FAFAFA", padding: "100px 24px" }}>
+        <div style={{ maxWidth: 1000, margin: "0 auto" }}>
+          {/* Section Title */}
+          <div style={{ textAlign: "center", maxWidth: 600, margin: "0 auto 50px" }}>
+            <span style={{ fontSize: 12, fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, color: "#FF5500", textTransform: "uppercase", letterSpacing: 2, display: "block", marginBottom: 10 }}>
+              TARIFICATION CLAIRE
+            </span>
+            <h2
+              className="h2-sans"
+              style={{
+                fontFamily: "'Plus Jakarta Sans', sans-serif",
+                fontWeight: 800,
+                fontSize: 40,
+                color: "#09090B"
               }}
-              onMouseEnter={e => e.currentTarget.style.background = C.bgSection}
-              onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
-                <span style={{ fontSize: 15, fontWeight: 600, color: C.black, paddingRight: 20 }}>{f.q}</span>
-                <span style={{ fontSize: 20, color: C.orange, flexShrink: 0, transition: "transform 0.2s", transform: open === i ? "rotate(45deg)" : "rotate(0)" }}>+</span>
-              </button>
-              {open === i && (
-                <div style={{ padding: "0 24px 20px", animation: "fadeIn 0.2s ease" }}>
-                  <p style={{ fontSize: 14, color: C.gray, lineHeight: 1.75, borderTop: `1px solid ${C.border}`, paddingTop: 16 }}>{f.a}</p>
-                </div>
-              )}
+            >
+              Un tarif fixe. Sans mauvaise surprise.
+            </h2>
+          </div>
+
+          {/* Pricing Card */}
+          <div
+            className="shadow-dribbble"
+            style={{
+              backgroundColor: "#FFFFFF",
+              border: "2px solid #FF5500",
+              borderRadius: 28,
+              padding: 44,
+              maxWidth: 640,
+              margin: "0 auto 80px",
+              textAlign: "center",
+              position: "relative"
+            }}
+          >
+            <div style={{ position: "absolute", top: -14, left: "50%", transform: "translateX(-50%)", backgroundColor: "#FF5500", color: "#FFFFFF", padding: "4px 16px", borderRadius: 100, fontSize: 11, fontWeight: 800, letterSpacing: 1, textTransform: "uppercase" }}>
+              21 JOURS D&apos;ESSAI GRATUIT
             </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
 
-// ── FOOTER FINAL CTA ─────────────────────────────────────────
-function FooterCTA() {
-  return (
-    <section style={{ background: C.black, padding: "80px 40px" }}>
-      <div style={{ maxWidth: 760, margin: "0 auto", textAlign: "center" }}>
-        {/* Segment badges */}
-        <div style={{ display: "flex", justifyContent: "center", gap: 10, marginBottom: 32, flexWrap: "wrap" }}>
-          {["🏃 Run club", "🚶 Walk club", "🏔️ Trail & Rando"].map(s => (
-            <span key={s} style={{
-              fontFamily: "'DM Mono',monospace", fontSize: 11,
-              color: "#888", border: "1px solid #333",
-              padding: "4px 12px", borderRadius: 100
-            }}>{s}</span>
-          ))}
-        </div>
-        <h2 style={{
-          fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontStyle: "italic",
-          fontSize: 72, textTransform: "uppercase", lineHeight: 0.88,
-          color: "#fff", marginBottom: 20,
-        }}>
-          Ton crew mérite<br />
-          <span style={{ color: C.orange }}>mieux que<br />WhatsApp.</span>
-        </h2>
-        <p style={{ color: "#888", fontSize: 16, lineHeight: 1.75, marginBottom: 40, maxWidth: 520, margin: "0 auto 40px" }}>
-          Run club, walk club, groupe de trail — peu importe comment tu l'appelles.
-          <br />21 jours pour voir ce que ça fait de ne plus stresser pour l'admin.
-        </p>
-        <a href="/login?mode=signup" className="btn-main" style={{ padding: "16px 40px", fontFamily: "'Barlow Condensed',sans-serif", fontStyle: "italic", fontSize: 22, fontWeight: 900, textTransform: "uppercase", letterSpacing: 1, display: "inline-flex", justifyContent: "center" }}>
-          Lancer mon crew gratuitement →
-        </a>
-        <p style={{ marginTop: 14, fontSize: 12, color: "#555", fontFamily: "'DM Mono',monospace" }}>
-          Aucune carte bancaire · Annulable en 1 clic
-        </p>
-      </div>
-    </section>
-  );
-}
+            <div style={{ fontSize: 14, fontWeight: 700, color: "#71717A", textTransform: "uppercase", letterSpacing: 1, marginBottom: 12 }}>
+              OFFRE CAPITAINE COMPLÈTE
+            </div>
 
-function Footer() {
-  return (
-    <footer style={{ borderTop: `1px solid ${C.border}`, padding: "28px 40px" }}>
-      <div className="footer-row" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", maxWidth: 1200, margin: "0 auto", flexWrap: "wrap", gap: 12 }}>
-        <div style={{ display: "flex", alignItems: "center" }}>
-          <img src="/logo.png" style={{ height: 28, display: "block" }} alt="Capten" />
-        </div>
-        <p style={{ fontSize: 13, color: C.grayLight }}>
-          © {new Date().getFullYear()} Capten. Tous droits réservés.
-        </p>
-        <div style={{ display: "flex", gap: 24, fontSize: 13, color: C.gray }}>
-          <a href="/mentions-legales" className="nav-link">Mentions Légales</a>
-          <a href="/cgu" className="nav-link">CGU</a>
-          <a href="/rgpd" className="nav-link">RGPD</a>
-        </div>
-      </div>
-    </footer>
-  );
-}
+            <div style={{ display: "flex", alignItems: "baseline", justifyContent: "center", gap: 4, marginBottom: 8 }}>
+              <span style={{ fontSize: 64, fontWeight: 900, color: "#09090B", lineHeight: 1 }}>33</span>
+              <span style={{ fontSize: 24, fontWeight: 800, color: "#09090B" }}>,99 €</span>
+              <span style={{ fontSize: 14, color: "#71717A", fontWeight: 600 }}>/mois</span>
+            </div>
+            <p style={{ fontSize: 13, color: "#FF5500", fontWeight: 700, marginBottom: 32 }}>
+              facturé annuellement (ou 49,99 €/mois sans engagement)
+            </p>
 
-// ── PAGE PRINCIPALE ──────────────────────────────────────────
-export default function LandingPage() {
-  return (
-    <>
-      <style dangerouslySetInnerHTML={{ __html: CSS }} />
-      <div style={{ background: C.bg, color: C.black, minHeight: "100vh", fontFamily: "'DM Sans', sans-serif" }}>
-        <Nav />
-        <Hero />
-        <FearsSection />
-        <ProblemSection />
-        <TemplatesSection />
-        <GPSSection />
-        <PricingSection />
-        <FAQ />
-        <FooterCTA />
-        <Footer />
-      </div>
+            <div style={{ textAlign: "left", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 36, borderTop: "1px solid #F4F4F5", paddingTop: 28 }}>
+              {[
+                "Membres illimités",
+                "Check-in GPS & Registres",
+                "Fiches d'urgence ICE",
+                "Spots & Avantages locaux",
+                "Cagnotte intégrée (0% commission)",
+                "Support prioritaire 24/7"
+              ].map((feat, idx) => (
+                <div key={idx} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, fontWeight: 600, color: "#09090B" }}>
+                  <Check size={16} color="#FF5500" />
+                  <span>{feat}</span>
+                </div>
+              ))}
+            </div>
+
+            <Link href="/login?mode=signup" className="btn-accent" style={{ width: "100%", padding: "16px", fontSize: 16 }}>
+              Lancer mon crew avec 21j gratuits →
+            </Link>
+          </div>
+
+          {/* FAQ Section */}
+          <div style={{ maxWidth: 760, margin: "0 auto" }}>
+            <h3 style={{ fontSize: 24, fontWeight: 800, textTransform: "uppercase", textAlign: "center", marginBottom: 32 }}>
+              Foire aux questions
+            </h3>
+            <div>
+              {faqs.map((faq, idx) => (
+                <div
+                  key={idx}
+                  style={{
+                    backgroundColor: "#FFFFFF",
+                    border: "1px solid #E4E4E7",
+                    borderRadius: 16,
+                    marginBottom: 12,
+                    overflow: "hidden"
+                  }}
+                >
+                  <button
+                    onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
+                    style={{
+                      width: "100%",
+                      padding: "20px 24px",
+                      textAlign: "left",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      backgroundColor: "transparent",
+                      border: "none",
+                      cursor: "pointer",
+                      fontSize: 15,
+                      fontWeight: 700,
+                      color: "#09090B"
+                    }}
+                  >
+                    <span>{faq.q}</span>
+                    {openFaq === idx ? <ChevronUp size={18} color="#FF5500" /> : <ChevronDown size={18} color="#71717A" />}
+                  </button>
+                  {openFaq === idx && (
+                    <div style={{ padding: "0 24px 20px", fontSize: 14, color: "#71717A", lineHeight: 1.6, fontWeight: 500, borderTop: "1px solid #F4F4F5", paddingTop: 14 }}>
+                      {faq.a}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ============================================================ */}
+      {/* 6. FOOTER & CTA FINAL (Fond Sombre #09090B) */}
+      {/* ============================================================ */}
+      <footer style={{ backgroundColor: "#09090B", color: "#FFFFFF", paddingTop: 100, paddingBottom: 50, borderTop: "1px solid rgba(255,255,255,0.08)" }}>
+        <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 24px" }}>
+          {/* Final CTA Box */}
+          <div
+            style={{
+              backgroundColor: "#121215",
+              border: "1px solid rgba(255, 255, 255, 0.1)",
+              borderRadius: 32,
+              padding: "60px 40px",
+              textAlign: "center",
+              marginBottom: 80,
+              position: "relative",
+              overflow: "hidden"
+            }}
+          >
+            <h2
+              className="h2-sans"
+              style={{
+                fontFamily: "'Plus Jakarta Sans', sans-serif",
+                fontWeight: 800,
+                fontSize: 44,
+                color: "#FFFFFF",
+                marginBottom: 16
+              }}
+            >
+              Ton crew mérite mieux que WhatsApp.
+            </h2>
+            <p style={{ fontSize: 16, color: "#A1A1AA", maxWidth: 540, margin: "0 auto 36px", fontWeight: 500 }}>
+              Rejoins les capitaines qui sécurisent et automatisent leurs rassemblements sportifs dès aujourd&apos;hui.
+            </p>
+            <Link href="/login?mode=signup" className="btn-accent" style={{ padding: "18px 38px", fontSize: 17 }}>
+              Rejoindre la Bêta CAPTEN <ArrowRight size={20} />
+            </Link>
+          </div>
+
+          {/* Bottom Footer links */}
+          <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: 20, paddingTop: 40, borderTop: "1px solid rgba(255,255,255,0.08)", fontSize: 13, color: "#A1A1AA" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <img src="/logo.png" alt="CAPTEN" style={{ height: 28, filter: "brightness(0) invert(1)" }} />
+              <span>© 2026 CAPTEN. Tous droits réservés.</span>
+            </div>
+            <div style={{ display: "flex", gap: 24 }}>
+              <Link href="/cgu" className="footer-link">CGU</Link>
+              <Link href="/rgpd" className="footer-link">RGPD &amp; Vie Privée</Link>
+              <Link href="/mentions-legales" className="footer-link">Mentions Légales</Link>
+              <Link href="/support" className="footer-link">Support</Link>
+            </div>
+          </div>
+        </div>
+      </footer>
     </>
   );
 }
