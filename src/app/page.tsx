@@ -11,14 +11,14 @@ import {
 } from "lucide-react";
 
 // ============================================================
-// CAPTEN — LANDING PAGE REDESIGN (Framer / Dribbble SaaS Aesthetic)
-// Product-First SaaS Focus + Strategic Photo-branding Integration
+// CAPTEN — LANDING PAGE SUPREME REDESIGN (Framer / Raycast Quality)
+// World-class UI layout, high-contrast typography, rich product mockups
 // Palette: Base #FAFAFA | Rupture #09090B | Accent #FF5500 (Neon Orange)
-// Typography: H1 Barlow Condensed ONLY | All H2/H3/Body Plus Jakarta Sans
+// Typography: Plus Jakarta Sans (Headings & Body) | JetBrains Mono (Tech)
 // ============================================================
 
 const FONTS = `
-  @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,700;0,800;0,900;1,700;1,900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 `;
 
 const CSS = `
@@ -37,15 +37,11 @@ const CSS = `
   /* Keyframe Animations */
   @keyframes floatSlow {
     0%, 100% { transform: translateY(0px) rotate(0deg); }
-    50% { transform: translateY(-10px) rotate(1deg); }
+    50% { transform: translateY(-8px) rotate(0.5deg); }
   }
   @keyframes floatReverse {
     0%, 100% { transform: translateY(0px) rotate(0deg); }
-    50% { transform: translateY(10px) rotate(-1deg); }
-  }
-  @keyframes pulseGlow {
-    0%, 100% { opacity: 0.6; transform: scale(1); }
-    50% { opacity: 1; transform: scale(1.05); }
+    50% { transform: translateY(8px) rotate(-0.5deg); }
   }
   @keyframes beaconPulse {
     0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 85, 0, 0.7); }
@@ -55,12 +51,11 @@ const CSS = `
 
   .animate-float { animation: floatSlow 5s ease-in-out infinite; }
   .animate-float-del { animation: floatReverse 6s ease-in-out infinite; }
-  .animate-pulse-glow { animation: pulseGlow 3s ease-in-out infinite; }
   .animate-beacon { animation: beaconPulse 2s infinite; }
 
   /* Custom Glows & Shadows */
-  .shadow-dribbble {
-    box-shadow: 0 25px 50px -12px rgba(9, 9, 11, 0.18), 0 0 0 1px rgba(9, 9, 11, 0.05);
+  .shadow-hero-mockup {
+    box-shadow: 0 30px 70px -15px rgba(9, 9, 11, 0.25), 0 0 0 1px rgba(9, 9, 11, 0.08);
   }
   .shadow-dark-card {
     box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.08);
@@ -72,9 +67,9 @@ const CSS = `
     color: #FFFFFF;
     font-weight: 700;
     border: none;
-    border-radius: 12px;
-    padding: 14px 28px;
-    font-size: 15px;
+    border-radius: 14px;
+    padding: 16px 32px;
+    font-size: 16px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -93,39 +88,40 @@ const CSS = `
   }
 
   .btn-outline-dark {
-    background: transparent;
+    background: #FFFFFF;
     color: #09090B;
-    font-weight: 600;
+    font-weight: 700;
     border: 1px solid #E4E4E7;
-    border-radius: 12px;
-    padding: 14px 24px;
-    font-size: 15px;
+    border-radius: 14px;
+    padding: 16px 28px;
+    font-size: 16px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
     cursor: pointer;
     transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
   }
   .btn-outline-dark:hover {
     border-color: #09090B;
-    background-color: #FFFFFF;
     transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(0,0,0,0.08);
   }
 
   /* Bento Grid Card Base */
   .bento-card {
     background: #FFFFFF;
     border: 1px solid #E4E4E7;
-    border-radius: 24px;
-    padding: 32px;
+    border-radius: 28px;
+    padding: 36px;
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     position: relative;
     overflow: hidden;
   }
   .bento-card:hover {
     border-color: rgba(255, 85, 0, 0.3);
-    box-shadow: 0 20px 40px -15px rgba(9, 9, 11, 0.08);
+    box-shadow: 0 20px 45px -15px rgba(9, 9, 11, 0.09);
     transform: translateY(-3px);
   }
 
@@ -145,11 +141,13 @@ const CSS = `
     .bento-card { grid-column: span 12 !important; }
     .vs-grid { grid-template-columns: 1fr !important; }
     .spots-bento-grid { grid-template-columns: 1fr !important; }
+    .gallery-grid { grid-template-columns: 1fr 1fr !important; }
   }
   @media (max-width: 640px) {
-    .h1-display { font-size: 48px !important; }
-    .h2-sans { font-size: 32px !important; }
+    .h1-hero { font-size: 42px !important; }
+    .h2-section { font-size: 30px !important; }
     .nav-items { display: none !important; }
+    .gallery-grid { grid-template-columns: 1fr !important; }
   }
 `;
 
@@ -209,7 +207,7 @@ export default function LandingPage() {
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          backgroundColor: scrolled ? "rgba(250, 250, 250, 0.92)" : "transparent",
+          backgroundColor: scrolled ? "rgba(250, 250, 250, 0.94)" : "transparent",
           backdropFilter: scrolled ? "blur(16px)" : "none",
           borderBottom: scrolled ? "1px solid #E4E4E7" : "1px solid transparent",
           transition: "all 0.3s ease"
@@ -222,9 +220,10 @@ export default function LandingPage() {
           </Link>
 
           {/* Navigation Links */}
-          <nav className="nav-items" style={{ display: "flex", alignItems: "center", gap: 32 }}>
+          <nav className="nav-items" style={{ display: "flex", alignItems: "center", gap: 36 }}>
             <a href="#probleme" style={{ fontSize: 14, fontWeight: 600, color: "#71717A", transition: "color 0.2s" }} onMouseEnter={(e) => e.currentTarget.style.color = "#09090B"} onMouseLeave={(e) => e.currentTarget.style.color = "#71717A"}>Sécurité &amp; Enjeux</a>
-            <a href="#fonctionnalites" style={{ fontSize: 14, fontWeight: 600, color: "#71717A", transition: "color 0.2s" }} onMouseEnter={(e) => e.currentTarget.style.color = "#09090B"} onMouseLeave={(e) => e.currentTarget.style.color = "#71717A"}>Bento Grid</a>
+            <a href="#fonctionnalites" style={{ fontSize: 14, fontWeight: 600, color: "#71717A", transition: "color 0.2s" }} onMouseEnter={(e) => e.currentTarget.style.color = "#09090B"} onMouseLeave={(e) => e.currentTarget.style.color = "#71717A"}>Fonctionnalités</a>
+            <a href="#communaute" style={{ fontSize: 14, fontWeight: 600, color: "#71717A", transition: "color 0.2s" }} onMouseEnter={(e) => e.currentTarget.style.color = "#09090B"} onMouseLeave={(e) => e.currentTarget.style.color = "#71717A"}>Le Terrain</a>
             <a href="#comparatif" style={{ fontSize: 14, fontWeight: 600, color: "#71717A", transition: "color 0.2s" }} onMouseEnter={(e) => e.currentTarget.style.color = "#09090B"} onMouseLeave={(e) => e.currentTarget.style.color = "#71717A"}>vs WhatsApp</a>
             <a href="#tarifs" style={{ fontSize: 14, fontWeight: 600, color: "#71717A", transition: "color 0.2s" }} onMouseEnter={(e) => e.currentTarget.style.color = "#09090B"} onMouseLeave={(e) => e.currentTarget.style.color = "#71717A"}>Tarifs</a>
           </nav>
@@ -242,11 +241,11 @@ export default function LandingPage() {
       </header>
 
       {/* ============================================================ */}
-      {/* 1. HERO SECTION (Fond #FAFAFA avec MOCKUP SMARTPHONE PRODUIT PRINCIPAL) */}
+      {/* 1. HERO SECTION (PERSPECTIVE 3D MOCKUP PRODUIT & PREUVE SOCIALE) */}
       {/* ============================================================ */}
       <section style={{ backgroundColor: "#FAFAFA", paddingTop: 140, paddingBottom: 90, position: "relative", overflow: "hidden" }}>
         {/* Subtle Background Glow Accent */}
-        <div style={{ position: "absolute", top: -100, right: "10%", width: 500, height: 500, borderRadius: "50%", background: "radial-gradient(circle, rgba(255, 85, 0, 0.08) 0%, rgba(250, 250, 250, 0) 70%)", pointerEvents: "none" }} />
+        <div style={{ position: "absolute", top: -100, right: "15%", width: 600, height: 600, borderRadius: "50%", background: "radial-gradient(circle, rgba(255, 85, 0, 0.07) 0%, rgba(250, 250, 250, 0) 70%)", pointerEvents: "none" }} />
 
         <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 24px" }}>
           {/* Sports Pill Selector */}
@@ -281,8 +280,8 @@ export default function LandingPage() {
             ))}
           </div>
 
-          <div className="hero-grid" style={{ display: "grid", gridTemplateColumns: "1.1fr 0.9fr", gap: 60, alignItems: "center" }}>
-            {/* Left Content */}
+          <div className="hero-grid" style={{ display: "grid", gridTemplateColumns: "1.15fr 0.85fr", gap: 60, alignItems: "center" }}>
+            {/* Left Hero Content */}
             <div>
               <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "6px 14px", borderRadius: 100, backgroundColor: "#FFFFFF", border: "1px solid #E4E4E7", marginBottom: 24, boxShadow: "0 2px 8px rgba(0,0,0,0.04)" }}>
                 <span className="animate-beacon" style={{ width: 8, height: 8, borderRadius: "50%", backgroundColor: "#FF5500" }} />
@@ -291,22 +290,20 @@ export default function LandingPage() {
                 </span>
               </div>
 
-              {/* H1 Headline — Barlow Condensed ALL CAPS (SEUL H1 DE LA PAGE) */}
+              {/* H1 Headline — Clean, Modern, Punchy Plus Jakarta Sans 900 */}
               <h1
-                className="h1-display"
+                className="h1-hero"
                 style={{
-                  fontFamily: "'Barlow Condensed', sans-serif",
+                  fontSize: 58,
                   fontWeight: 900,
-                  fontSize: 68,
-                  lineHeight: 0.95,
-                  textTransform: "uppercase",
+                  lineHeight: 1.05,
+                  letterSpacing: "-1.5px",
                   color: "#09090B",
-                  letterSpacing: -0.5,
                   marginBottom: 24
                 }}
               >
-                TU AS LANCÉ CE CREW POUR BOUGER. <br />
-                <span style={{ color: "#FF5500" }}>PAS POUR FAIRE L&apos;ADMIN.</span>
+                Tu as lancé ce crew pour bouger. <br />
+                <span style={{ color: "#FF5500" }}>Pas pour faire l&apos;admin.</span>
               </h1>
 
               {/* Subtitle */}
@@ -320,15 +317,15 @@ export default function LandingPage() {
                   marginBottom: 36
                 }}
               >
-                La plateforme tout-en-un pour gérer vos rassemblements sportifs, sécuriser vos membres avec les fiches ICE d&apos;urgence et valoriser votre communauté.
+                La plateforme tout-en-un pour gérer vos rassemblements sportifs, sécuriser vos membres avec les fiches d&apos;urgence ICE et valoriser votre communauté.
               </p>
 
               {/* CTAs */}
-              <div className="hero-ctas" style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 16, marginBottom: 28 }}>
-                <Link href="/login?mode=signup" className="btn-accent" style={{ fontSize: 16, padding: "16px 32px" }}>
+              <div className="hero-ctas" style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 16, marginBottom: 32 }}>
+                <Link href="/login?mode=signup" className="btn-accent">
                   Tester la Bêta gratuitement <ArrowRight size={18} />
                 </Link>
-                <a href="#probleme" className="btn-outline-dark" style={{ fontSize: 16, padding: "16px 24px" }}>
+                <a href="#probleme" className="btn-outline-dark">
                   Découvrir les enjeux
                 </a>
               </div>
@@ -350,8 +347,8 @@ export default function LandingPage() {
                   <img src="/landing/community-happy-girls.jpg" alt="Communaute CAPTEN" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                 </div>
                 <div>
-                  <div style={{ fontSize: 13, fontWeight: 800, color: "#09090B", display: "flex", alignItems: "center", gap: 6 }}>
-                    <span>« Conçu par des capitaines, pour des communautés vivantes. »</span>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: "#09090B" }}>
+                    « Conçu par des capitaines, pour des communautés vivantes. »
                   </div>
                   <div style={{ fontSize: 11, color: "#71717A", fontWeight: 600 }}>
                     120+ clubs &amp; 4 200+ membres actifs
@@ -360,11 +357,11 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* Right Hero Visual: MOCKUP SMARTPHONE CAPTEN PRODUIT PRINCIPAL */}
+            {/* Right Hero Visual: MOCKUP SMARTPHONE PRODUIT PRINCIPAL + BADGES */}
             <div style={{ position: "relative", display: "flex", justifyContent: "center" }}>
               {/* Smartphone Frame Chassis */}
               <div
-                className="shadow-dribbble"
+                className="shadow-hero-mockup"
                 style={{
                   width: 320,
                   backgroundColor: "#09090B",
@@ -511,16 +508,15 @@ export default function LandingPage() {
               L&apos;ENJEU DE LA RESPONSABILITÉ
             </span>
 
-            {/* H2 Title in Plus Jakarta Sans Bold */}
+            {/* Clean Modern H2 Title in Plus Jakarta Sans 800 */}
             <h2
-              className="h2-sans"
+              className="h2-section"
               style={{
-                fontFamily: "'Plus Jakarta Sans', sans-serif",
+                fontSize: 42,
                 fontWeight: 800,
-                fontSize: 44,
                 lineHeight: 1.15,
                 color: "#FFFFFF",
-                letterSpacing: -0.5,
+                letterSpacing: "-0.8px",
                 marginBottom: 16
               }}
             >
@@ -618,14 +614,13 @@ export default function LandingPage() {
               DESIGNED FOR CAPTAINS
             </span>
             <h2
-              className="h2-sans"
+              className="h2-section"
               style={{
-                fontFamily: "'Plus Jakarta Sans', sans-serif",
+                fontSize: 42,
                 fontWeight: 800,
-                fontSize: 44,
                 lineHeight: 1.15,
                 color: "#09090B",
-                letterSpacing: -0.5,
+                letterSpacing: "-0.8px",
                 marginBottom: 16
               }}
             >
@@ -779,6 +774,68 @@ export default function LandingPage() {
       </section>
 
       {/* ============================================================ */}
+      {/* 3.5. HUMAN COMMUNITY GALLERY ("SUR LE TERRAIN") */}
+      {/* ============================================================ */}
+      <section id="communaute" style={{ backgroundColor: "#FAFAFA", padding: "80px 24px", borderTop: "1px solid #E4E4E7" }}>
+        <div style={{ maxWidth: 1280, margin: "0 auto" }}>
+          <div style={{ textAlign: "center", maxWidth: 720, margin: "0 auto 50px" }}>
+            <span style={{ fontSize: 12, fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, color: "#FF5500", textTransform: "uppercase", letterSpacing: 2, display: "block", marginBottom: 10 }}>
+              LA VRAIE VIE DES CLUBS
+            </span>
+            <h2
+              className="h2-section"
+              style={{
+                fontSize: 40,
+                fontWeight: 800,
+                color: "#09090B",
+                letterSpacing: "-0.8px"
+              }}
+            >
+              Sur le terrain avec plus de 120+ capitaines.
+            </h2>
+            <p style={{ fontSize: 16, color: "#71717A", fontWeight: 500, marginTop: 8 }}>
+              Que ce soit sur la promenade en ville, sur les sentiers de forêt ou sur les marches en côte : CAPTEN est dans la poche des capitaines.
+            </p>
+          </div>
+
+          {/* 4 Photos Mapped Grid */}
+          <div className="gallery-grid" style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 24 }}>
+            {/* Photo 1: Community Happy Girls */}
+            <div style={{ backgroundColor: "#FFFFFF", border: "1px solid #E4E4E7", borderRadius: 24, overflow: "hidden", boxShadow: "0 4px 20px rgba(0,0,0,0.06)" }}>
+              <div style={{ height: 260, position: "relative" }}>
+                <img src="/landing/community-happy-girls.jpg" alt="Ambiance & Communaute" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                <span style={{ position: "absolute", top: 14, left: 14, backgroundColor: "rgba(9,9,11,0.85)", color: "#fff", padding: "4px 10px", borderRadius: 100, fontSize: 10, fontWeight: 700 }}>
+                  🏃 AMBIANCE &amp; COMMUNAUTÉ
+                </span>
+              </div>
+              <div style={{ padding: 20 }}>
+                <h4 style={{ fontSize: 16, fontWeight: 800, color: "#09090B" }}>Social Walkers &amp; Run Crew</h4>
+                <p style={{ fontSize: 13, color: "#71717A", marginTop: 4, fontWeight: 500 }}>
+                  L&apos;énergie positive d&apos;une communauté vivante. Des membres qui partagent l&apos;effort en toute sécurité.
+                </p>
+              </div>
+            </div>
+
+            {/* Photo 2: Trail Ridge Peak */}
+            <div style={{ backgroundColor: "#FFFFFF", border: "1px solid #E4E4E7", borderRadius: 24, overflow: "hidden", boxShadow: "0 4px 20px rgba(0,0,0,0.06)" }}>
+              <div style={{ height: 260, position: "relative" }}>
+                <img src="/landing/trail-ridge-peak.jpg" alt="Trail & Rando Crête" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                <span style={{ position: "absolute", top: 14, left: 14, backgroundColor: "rgba(9,9,11,0.85)", color: "#fff", padding: "4px 10px", borderRadius: 100, fontSize: 10, fontWeight: 700 }}>
+                  🥾 TRAIL &amp; RANDO CRÊTE
+                </span>
+              </div>
+              <div style={{ padding: 20 }}>
+                <h4 style={{ fontSize: 16, fontWeight: 800, color: "#09090B" }}>Peak Hikers · Altitude &amp; D+</h4>
+                <p style={{ fontSize: 13, color: "#71717A", marginTop: 4, fontWeight: 500 }}>
+                  Engagés sur les crêtes de montagne avec fiches médicales ICE accessibles même hors-réseau.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ============================================================ */}
       {/* 4. COMPARATIF "WHATSAPP VS CAPTEN" */}
       {/* ============================================================ */}
       <section id="comparatif" style={{ backgroundColor: "#FAFAFA", padding: "90px 24px", borderTop: "1px solid #E4E4E7" }}>
@@ -788,13 +845,13 @@ export default function LandingPage() {
               LE CHOIX CLAIR
             </span>
             <h2
-              className="h2-sans"
+              className="h2-section"
               style={{
-                fontFamily: "'Plus Jakarta Sans', sans-serif",
-                fontWeight: 800,
                 fontSize: 40,
+                fontWeight: 800,
                 lineHeight: 1.15,
-                color: "#09090B"
+                color: "#09090B",
+                letterSpacing: "-0.8px"
               }}
             >
               Pourquoi remplacer les groupes WhatsApp illisibles ?
@@ -870,12 +927,12 @@ export default function LandingPage() {
               TARIFICATION CLAIRE
             </span>
             <h2
-              className="h2-sans"
+              className="h2-section"
               style={{
-                fontFamily: "'Plus Jakarta Sans', sans-serif",
-                fontWeight: 800,
                 fontSize: 40,
-                color: "#09090B"
+                fontWeight: 800,
+                color: "#09090B",
+                letterSpacing: "-0.8px"
               }}
             >
               Un tarif fixe. Sans mauvaise surprise.
@@ -1002,11 +1059,10 @@ export default function LandingPage() {
             }}
           >
             <h2
-              className="h2-sans"
+              className="h2-section"
               style={{
-                fontFamily: "'Plus Jakarta Sans', sans-serif",
-                fontWeight: 800,
                 fontSize: 44,
+                fontWeight: 800,
                 color: "#FFFFFF",
                 marginBottom: 16
               }}
