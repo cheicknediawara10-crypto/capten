@@ -3,17 +3,19 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import {
-  ShieldCheck, AlertTriangle, MessageSquare, Check, X,
+  ShieldCheck, AlertTriangle, Check, X,
   ChevronDown, ChevronUp, ArrowRight, QrCode, MapPin,
-  Users, HeartPulse, Sparkles, Activity, Coffee, Shield, PhoneCall
+  Users, Sparkles, Coffee, PhoneCall, Shield
 } from "lucide-react";
 
 /* ═══════════════════════════════════════════════════════════════
-   CAPTEN — Landing Page V7 (SaaS Premium 2026)
-   - Palette: #F4F4F5 canvas · #FFFFFF cards (rounded-3xl) · #09090B dark sections · #FF5500 neon accent
-   - Typography: Plus Jakarta Sans (Headings & Body)
-   - Layout: Sticky Glassmorphism Nav, 3D Hero + Overlaid Badges, Ticker Marquee,
-             Dark Problem Section, Bento Grid Solution, Split Comparison, FAQ & Dark Final CTA.
+   CAPTEN — Landing Page (Dribbble 2026 Mobile-First SaaS Standards)
+   - Canvas Background : #F8F9FA (Off-white / Light Slate)
+   - Dark Rupture     : #0F172A (Dark Slate) & bg-slate-900/80
+   - Accent Primary   : #FF5500 (Vibrant Neon Orange - 10% max)
+   - Cards Light      : #FFFFFF + border 1px solid rgba(0,0,0,0.06) + rounded-3xl (24px)
+   - Shadow           : 0 20px 40px -15px rgba(0,0,0,0.05)
+   - Typography       : Plus Jakarta Sans (Headings & Body)
 ═══════════════════════════════════════════════════════════════ */
 
 const CSS = `
@@ -22,8 +24,8 @@ const CSS = `
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-behavior: smooth; }
   body {
-    background-color: #F4F4F5;
-    color: #09090B;
+    background-color: #F8F9FA;
+    color: #0F172A;
     font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -33,52 +35,64 @@ const CSS = `
   a { text-decoration: none; color: inherit; }
 
   /* ── Spacing Container ── */
-  .container-custom {
-    max-width: 1200px;
+  .container-dribbble {
+    max-width: 1180px;
     margin: 0 auto;
     padding: 0 24px;
   }
 
-  /* ── Buttons ── */
-  .btn-orange {
-    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  /* ── Buttons (10% Orange Neon Accent) ── */
+  .btn-orange-pill {
+    display: inline-flex; align-items: center; justify-content: center; gap: 10px;
     padding: 16px 36px; border-radius: 9999px; border: none;
     background: #FF5500; color: #FFFFFF;
     font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 16px;
     cursor: pointer; transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-    box-shadow: 0 10px 25px -5px rgba(255, 85, 0, 0.4);
+    box-shadow: 0 12px 28px -6px rgba(255, 85, 0, 0.4);
   }
-  .btn-orange:hover {
+  .btn-orange-pill:hover {
     background: #E04B00; transform: translateY(-2px);
-    box-shadow: 0 16px 32px -6px rgba(255, 85, 0, 0.5);
+    box-shadow: 0 18px 36px -6px rgba(255, 85, 0, 0.5);
   }
-  .btn-orange-sm {
+  .btn-orange-pill.btn-nav {
     padding: 10px 22px; font-size: 14px; box-shadow: 0 4px 14px rgba(255, 85, 0, 0.25);
   }
 
-  .btn-secondary {
+  .btn-white-secondary {
     display: inline-flex; align-items: center; justify-content: center; gap: 8px;
     padding: 16px 32px; border-radius: 9999px;
-    background: #FFFFFF; color: #09090B;
+    background: #FFFFFF; color: #0F172A;
     font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 600; font-size: 16px;
-    border: 1px solid #E4E4E7; cursor: pointer; transition: all 0.25s ease;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    border: 1px solid rgba(0, 0, 0, 0.08); cursor: pointer; transition: all 0.25s ease;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
   }
-  .btn-secondary:hover {
-    border-color: #A1A1AA; transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+  .btn-white-secondary:hover {
+    border-color: rgba(0, 0, 0, 0.18); transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
   }
 
-  /* ── Card Base ── */
-  .card-premium {
+  /* ── Cards Dribbble 2026 Style ── */
+  .card-dribbble {
     background: #FFFFFF;
-    border: 1px solid #E4E4E7;
+    border: 1px solid rgba(0, 0, 0, 0.06);
     border-radius: 24px;
     box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .card-dribbble:hover {
+    box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.09);
+    border-color: rgba(0, 0, 0, 0.12);
+  }
+
+  .card-dark-slate {
+    background: rgba(15, 23, 42, 0.95);
+    border: 1px solid #1E293B;
+    border-radius: 24px;
+    color: #FFFFFF;
     transition: all 0.3s ease;
   }
-  .card-premium:hover {
-    box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.08);
+  .card-dark-slate:hover {
+    border-color: #334155;
   }
 
   /* ── Float Animation ── */
@@ -93,54 +107,49 @@ const CSS = `
   .animate-float { animation: floatSlow 5s ease-in-out infinite; }
   .animate-float-reverse { animation: floatReverse 6s ease-in-out infinite; }
 
-  /* ── Marquee Ticker ── */
-  @keyframes ticker {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
+  /* ── Typography (Dribbble 2026 Standards) ── */
+  .h1-dribbble {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 3.6rem; font-weight: 800; line-height: 1.1;
+    letter-spacing: -0.035em; color: #0F172A;
   }
-  .ticker-wrap {
-    display: flex; overflow: hidden; user-select: none;
-    mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+  .h2-dribbble {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 2.5rem; font-weight: 800; line-height: 1.18;
+    letter-spacing: -0.025em; color: #0F172A;
   }
-  .ticker-move {
-    display: flex; gap: 48px; flex-shrink: 0;
-    animation: ticker 25s linear infinite;
-    align-items: center;
+  .h2-dribbble-white {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 2.5rem; font-weight: 800; line-height: 1.18;
+    letter-spacing: -0.025em; color: #FFFFFF;
   }
-
-  /* ── Typography Helpers ── */
-  .h1-hero {
-    font-size: 3.5rem; font-weight: 800; line-height: 1.1;
-    letter-spacing: -0.03em; color: #09090B;
+  .sub-dribbble {
+    font-size: 1.15rem; font-weight: 500; color: #64748B; line-height: 1.65;
   }
-  .h2-section {
-    font-size: 2.5rem; font-weight: 800; line-height: 1.15;
-    letter-spacing: -0.02em;
-  }
-  .body-lead {
-    font-size: 1.15rem; font-weight: 500; color: #52525B; line-height: 1.6;
+  .text-body {
+    font-size: 0.975rem; font-weight: 500; color: #4B5563; line-height: 1.6;
   }
 
-  /* ── Bento Grid Responsive ── */
-  .bento-grid {
+  /* ── Bento Grid ── */
+  .bento-grid-2026 {
     display: grid;
     grid-template-columns: repeat(12, 1fr);
     gap: 24px;
   }
-  .col-8 { grid-column: span 8; }
-  .col-4 { grid-column: span 4; }
-  .col-6 { grid-column: span 6; }
+  .bento-col-8 { grid-column: span 8; }
+  .bento-col-4 { grid-column: span 4; }
+  .bento-col-6 { grid-column: span 6; }
 
   @media (max-width: 1024px) {
-    .h1-hero { font-size: 2.75rem; }
-    .h2-section { font-size: 2rem; }
-    .col-8, .col-4, .col-6 { grid-column: span 12; }
-    .bento-grid { grid-template-columns: 1fr; }
+    .h1-dribbble { font-size: 2.75rem; }
+    .h2-dribbble, .h2-dribbble-white { font-size: 2rem; }
+    .bento-col-8, .bento-col-4, .bento-col-6 { grid-column: span 12; }
+    .bento-grid-2026 { grid-template-columns: 1fr; }
   }
   @media (max-width: 640px) {
-    .h1-hero { font-size: 2.15rem; }
-    .h2-section { font-size: 1.65rem; }
-    .nav-links-d { display: none !important; }
+    .h1-dribbble { font-size: 2.15rem; }
+    .h2-dribbble, .h2-dribbble-white { font-size: 1.65rem; }
+    .nav-links-dribbble { display: none !important; }
   }
 `;
 
@@ -150,19 +159,19 @@ export default function LandingPage() {
   const faqs = [
     {
       q: "Est-ce gratuit pendant la phase Bêta ?",
-      a: "Oui ! L'accès à CAPTEN est 100% gratuit pendant toute la période Bêta pour les créateurs et capitaines de club. Vous bénéficiez de 21 jours d'essai complet sans carte bancaire."
+      a: "Oui ! L'accès à CAPTEN est 100% gratuit pendant toute la période Bêta pour les créateurs et capitaines de crew. Vous bénéficiez de 21 jours d'essai complet sans carte bancaire."
     },
     {
       q: "Mes membres doivent-ils télécharger une application ?",
-      a: "Non. C'est l'un des points forts de CAPTEN : vos membres scannent un QR Code au rassemblement ou cliquent sur un lien. La fiche ICE est remplie en 30 secondes directement dans le navigateur."
+      a: "Non. C'est l'une des forces majeures de CAPTEN : vos membres scannent un QR Code au rassemblement ou cliquent sur votre lien unique. Leur fiche ICE est renseignée en 30 secondes dans le navigateur."
     },
     {
       q: "Comment sont protégées les données médicales (ICE) ?",
-      a: "Les fiches ICE sont chiffrées de bout en bout et hébergées conformément au RGPD. Elles ne sont consultables que par le Capitaine lors d'une session active et verrouillée."
+      a: "Les fiches ICE sont chiffrées de bout en bout et conservées en stricte conformité RGPD. Elles ne sont visibles que par le Capitaine lors d'une session active et verrouillée."
     },
     {
-      q: "L'application fonctionne-t-elle sans réseau (hors-ligne) ?",
-      a: "Absolument. Les données de votre session et les fiches d'urgence ICE de vos membres sont sauvegardées localement sur votre téléphone. Utile en rando, trail ou montagne."
+      q: "CAPTEN fonctionne-t-il hors connexion (sans réseau) ?",
+      a: "Absolument. Les données de session et les fiches d'urgence ICE de vos membres sont conservées en cache local sur votre smartphone. Idéal pour les sorties rando, trail et montagne."
     }
   ];
 
@@ -170,12 +179,12 @@ export default function LandingPage() {
     <>
       <style>{CSS}</style>
 
-      {/* ═══════════ 1. NAVIGATION STICKY (Glassmorphism) ═══════════ */}
+      {/* ═══════════ 1. NAVBAR (Floating Glassmorphism) ═══════════ */}
       <div style={{ position: "fixed", top: 20, left: 0, right: 0, zIndex: 100, padding: "0 24px" }}>
-        <nav className="container-custom" style={{
+        <nav className="container-dribbble" style={{
           height: 64, display: "flex", alignItems: "center", justifyContent: "space-between",
-          background: "rgba(255, 255, 255, 0.75)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)",
-          border: "1px solid rgba(228, 228, 231, 0.8)", borderRadius: 9999,
+          background: "rgba(255, 255, 255, 0.8)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)",
+          border: "1px solid rgba(0, 0, 0, 0.06)", borderRadius: 9999,
           padding: "0 24px", boxShadow: "0 10px 30px -10px rgba(0,0,0,0.05)"
         }}>
           {/* Logo */}
@@ -184,46 +193,46 @@ export default function LandingPage() {
           </Link>
 
           {/* Links */}
-          <div className="nav-links-d" style={{ display: "flex", gap: 32, alignItems: "center" }}>
-            {[["Sécurité ICE", "#problem"], ["Fonctionnalités", "#solution"], ["Comparatif", "#comparison"], ["FAQ", "#faq"]].map(([l, h], i) => (
-              <a key={i} href={h} style={{ fontSize: 14, fontWeight: 600, color: "#52525B", transition: "color 0.15s" }}
+          <div className="nav-links-dribbble" style={{ display: "flex", gap: 32, alignItems: "center" }}>
+            {[["Fonctionnalités", "#features"], ["Risque & Sécurité", "#risk"], ["Comparatif", "#comparison"], ["FAQ", "#faq"]].map(([l, h], i) => (
+              <a key={i} href={h} style={{ fontSize: 14, fontWeight: 600, color: "#64748B", transition: "color 0.15s" }}
                 onMouseEnter={e => e.currentTarget.style.color = "#FF5500"}
-                onMouseLeave={e => e.currentTarget.style.color = "#52525B"}>{l}</a>
+                onMouseLeave={e => e.currentTarget.style.color = "#64748B"}>{l}</a>
             ))}
           </div>
 
           {/* CTA */}
-          <Link href="/login?mode=signup" className="btn-orange btn-orange-sm">
+          <Link href="/login?mode=signup" className="btn-orange-pill btn-nav">
             Tester la Bêta
           </Link>
         </nav>
       </div>
 
-      {/* ═══════════ 2. HERO SECTION ═══════════ */}
+      {/* ═══════════ 2. HERO SECTION (Layout Asymétrique Premium) ═══════════ */}
       <header style={{ paddingTop: 140, paddingBottom: 80, position: "relative" }}>
-        <div className="container-custom text-center">
+        <div className="container-dribbble text-center">
           {/* Top Tagline Badge */}
           <div style={{
             display: "inline-flex", alignItems: "center", gap: 8,
             padding: "6px 16px", borderRadius: 9999,
-            background: "#FFFFFF", border: "1px solid #E4E4E7",
-            fontSize: 13, fontWeight: 700, color: "#09090B",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.04)", marginBottom: 20
+            background: "#FFFFFF", border: "1px solid rgba(0,0,0,0.06)",
+            fontSize: 13, fontWeight: 700, color: "#0F172A",
+            boxShadow: "0 2px 10px rgba(0,0,0,0.04)", marginBottom: 20
           }}>
-            <span style={{ color: "#FF5500" }}>⚡</span> La plateforme Bêta pour Capitaines &amp; Organisateurs
+            <span style={{ color: "#FF5500" }}>⚡</span> L&apos;outil de sécurité et check-in des capitaines
           </div>
 
           {/* Multisports Pills */}
           <div style={{ display: "flex", justifyContent: "center", gap: 8, flexWrap: "wrap", marginBottom: 24 }}>
             {[
-              { emoji: "🏃", label: "Run Club" },
+              { emoji: "🏃", label: "Run" },
               { emoji: "🚶", label: "Social Walk" },
               { emoji: "🥾", label: "Trail & Rando" },
               { emoji: "🚴", label: "Cyclisme" }
             ].map((s, i) => (
               <span key={i} style={{
                 background: "rgba(255, 85, 0, 0.08)", color: "#FF5500", border: "1px solid rgba(255, 85, 0, 0.15)",
-                padding: "4px 12px", borderRadius: 9999, fontSize: 12, fontWeight: 700
+                padding: "4px 14px", borderRadius: 9999, fontSize: 13, fontWeight: 700
               }}>
                 {s.emoji} {s.label}
               </span>
@@ -231,30 +240,30 @@ export default function LandingPage() {
           </div>
 
           {/* H1 Heading */}
-          <div style={{ maxWidth: 860, margin: "0 auto 20px" }}>
-            <h1 className="h1-hero">
-              Tu as lancé ce crew pour bouger. <br style={{ display: "none" }} />
+          <div style={{ maxWidth: 880, margin: "0 auto 20px" }}>
+            <h1 className="h1-dribbble">
+              Tu as lancé ce crew pour bouger. <br />
               <span style={{ color: "#FF5500" }}>Pas pour faire l&apos;admin.</span>
             </h1>
           </div>
 
           {/* Subtitle */}
-          <p className="body-lead" style={{ maxWidth: 640, margin: "0 auto 36px" }}>
-            Gère tes rassemblements, protège tes membres avec la fiche ICE et valorise ton impact local. Sans le chaos WhatsApp.
+          <p className="sub-dribbble" style={{ maxWidth: 620, margin: "0 auto 36px" }}>
+            Gère tes rassemblements en 3 secondes, protège tes membres avec la fiche ICE et valorise ton impact local.
           </p>
 
-          {/* CTA Block */}
+          {/* CTA Zone */}
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16, marginBottom: 60 }}>
             <div style={{ display: "flex", gap: 14, flexWrap: "wrap", justifyContent: "center" }}>
-              <Link href="/login?mode=signup" className="btn-orange">
-                Commencer Gratuitement <ArrowRight size={18} />
+              <Link href="/login?mode=signup" className="btn-orange-pill">
+                Rejoindre la Bêta Gratuite <ArrowRight size={18} />
               </Link>
-              <a href="#solution" className="btn-secondary">
+              <a href="#features" className="btn-white-secondary">
                 Voir la démonstration
               </a>
             </div>
 
-            {/* Micro Social Proof */}
+            {/* Micro Reassurance */}
             <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 8 }}>
               <div style={{ display: "flex" }}>
                 {["/landing/urban-runclub.jpg", "/landing/community-happy-girls.jpg", "/landing/trail-ridge-peak.jpg"].map((src, i) => (
@@ -264,37 +273,36 @@ export default function LandingPage() {
                   }} />
                 ))}
               </div>
-              <span style={{ fontSize: 13, fontWeight: 600, color: "#71717A" }}>
-                Utilisé par <strong style={{ color: "#09090B" }}>150+ crews</strong> en France
+              <span style={{ fontSize: 13, fontWeight: 600, color: "#64748B" }}>
+                Adopté par <strong style={{ color: "#0F172A" }}>150+ crews</strong> en France
               </span>
             </div>
           </div>
 
-          {/* 3D Hero Mockup with Overlaid Micro-Widgets */}
+          {/* Visuel Hero iPhone 16 Pro avec Micro-Widgets 3D */}
           <div style={{ position: "relative", maxWidth: 940, margin: "0 auto" }}>
-            {/* Phone Base Image */}
-            <div className="card-premium" style={{ overflow: "hidden", padding: 12, background: "#09090B", borderColor: "#27272A" }}>
-              <img src="/landing/hero-phones.png" alt="CAPTEN App Showcase" style={{ width: "100%", height: "auto", borderRadius: 16, display: "block" }} />
+            <div className="card-dribbble" style={{ overflow: "hidden", padding: 12, background: "#0F172A", borderColor: "#1E293B" }}>
+              <img src="/landing/hero-phones.png" alt="Interface CAPTEN" style={{ width: "100%", height: "auto", borderRadius: 16, display: "block" }} />
             </div>
 
-            {/* Overlaid Micro-Widget 1 (Green - Live Presence) */}
+            {/* Bulle 1 (Verte - Présents) */}
             <div className="animate-float" style={{
               position: "absolute", top: "18%", left: "-4%", zIndex: 10,
-              background: "#FFFFFF", border: "1px solid #E4E4E7", borderRadius: 16,
+              background: "#FFFFFF", border: "1px solid rgba(0,0,0,0.08)", borderRadius: 18,
               padding: "12px 18px", boxShadow: "0 20px 40px -10px rgba(0,0,0,0.12)",
               display: "flex", alignItems: "center", gap: 10
             }}>
               <span style={{ width: 10, height: 10, borderRadius: "50%", background: "#22C55E", boxShadow: "0 0 10px #22C55E" }} />
               <div style={{ textAlign: "left" }}>
-                <div style={{ fontSize: 13, fontWeight: 800, color: "#09090B" }}>🟢 42 présents</div>
-                <div style={{ fontSize: 11, color: "#71717A", fontWeight: 500 }}>RDV République (19h30)</div>
+                <div style={{ fontSize: 13, fontWeight: 800, color: "#0F172A" }}>🟢 42 présents</div>
+                <div style={{ fontSize: 11, color: "#64748B", fontWeight: 500 }}>RDV République (19h30)</div>
               </div>
             </div>
 
-            {/* Overlaid Micro-Widget 2 (Orange - ICE Verified) */}
+            {/* Bulle 2 (Orange - ICE Verification) */}
             <div className="animate-float-reverse" style={{
               position: "absolute", bottom: "14%", right: "-4%", zIndex: 10,
-              background: "#09090B", border: "1px solid #27272A", borderRadius: 16,
+              background: "#0F172A", border: "1px solid #1E293B", borderRadius: 18,
               padding: "12px 18px", boxShadow: "0 20px 40px -10px rgba(0,0,0,0.3)",
               display: "flex", alignItems: "center", gap: 10, color: "#FFFFFF"
             }}>
@@ -302,190 +310,167 @@ export default function LandingPage() {
                 <ShieldCheck size={20} />
               </div>
               <div style={{ textAlign: "left" }}>
-                <div style={{ fontSize: 13, fontWeight: 800, color: "#FFFFFF" }}>🛡️ Fiche ICE vérifiée</div>
-                <div style={{ fontSize: 11, color: "#A1A1AA" }}>Groupe O+ · Contact urgence 1-clic</div>
+                <div style={{ fontSize: 13, fontWeight: 800, color: "#FFFFFF" }}>🛡️ Fiches ICE d&apos;urgence prêtes</div>
+                <div style={{ fontSize: 11, color: "#94A3B8" }}>Groupe O+ · Contact 1-clic</div>
               </div>
             </div>
           </div>
         </div>
       </header>
 
-      {/* ═══════════ 3. BANDEAU DE PROUVES SOCIALES (Ticker) ═══════════ */}
-      <section style={{ padding: "36px 0", background: "#FFFFFF", borderTop: "1px solid #E4E4E7", borderBottom: "1px solid #E4E4E7" }}>
-        <div className="ticker-wrap">
-          <div className="ticker-move">
-            {[
-              "PARIS RUN CLUB", "URBAN WALKERS", "TRAIL SQUAD LYON", "COFFEE RIDE BORDEAUX",
-              "SOCIAL ATHLETICS", "MARSEILLE RANDO", "RUN & CHILL #42", "CAPTEN SPOTS",
-              "PARIS RUN CLUB", "URBAN WALKERS", "TRAIL SQUAD LYON", "COFFEE RIDE BORDEAUX"
-            ].map((name, i) => (
-              <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, opacity: 0.5, fontWeight: 800, fontSize: 14, letterSpacing: 1.5 }}>
-                <span style={{ color: "#FF5500" }}>●</span> {name}
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════════ 4. SECTION PROBLÈME — "LE PIÈGE DU CLUB INFORMEL" (Dark #09090B) ═══════════ */}
-      <section id="problem" style={{ background: "#09090B", color: "#FFFFFF", padding: "100px 0" }}>
-        <div className="container-custom text-center">
+      {/* ═══════════ 3. SECTION 2 — "LE PIÈGE DU CLUB INFORMEL" (Dark Slate #0F172A) ═══════════ */}
+      <section id="risk" style={{ background: "#0F172A", color: "#FFFFFF", padding: "100px 0" }}>
+        <div className="container-dribbble text-center">
           <div style={{
             display: "inline-flex", alignItems: "center", gap: 8,
             padding: "6px 14px", borderRadius: 9999,
-            background: "rgba(239, 68, 68, 0.1)", border: "1px solid rgba(239, 68, 68, 0.2)",
+            background: "rgba(239, 68, 68, 0.12)", border: "1px solid rgba(239, 68, 68, 0.25)",
             fontSize: 12, fontWeight: 700, color: "#EF4444", marginBottom: 16
           }}>
-            <AlertTriangle size={14} /> Le risque invisible
+            <AlertTriangle size={14} /> Le risque de la responsabilité
           </div>
 
-          <h2 className="h2-section" style={{ color: "#FFFFFF", maxWidth: 760, margin: "0 auto 16px" }}>
+          <h2 className="h2-dribbble-white" style={{ maxWidth: 760, margin: "0 auto 16px" }}>
             À 19h30 sur le trottoir, l&apos;amateurisme devient un risque.
           </h2>
-          <p style={{ fontSize: 16, color: "#A1A1AA", maxWidth: 560, margin: "0 auto 56px" }}>
-            Quand vous rassemblez 40 personnes chaque semaine sous le nom de votre club, vous n&apos;êtes plus juste des amis qui courent. Vous devenez responsable.
+          <p style={{ fontSize: 16, color: "#94A3B8", maxWidth: 580, margin: "0 auto 56px" }}>
+            Ce qui sépare une simple sortie entre amis d&apos;un rassemblement sous votre responsabilité.
           </p>
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 24, textAlign: "left" }}>
-            {/* Problem Card 1 */}
-            <div style={{
-              background: "#18181B", border: "1px solid #27272A", borderRadius: 24, padding: 32, textAlign: "left"
-            }}>
-              <div style={{ fontSize: 14, fontWeight: 800, color: "#FF5500", marginBottom: 16 }}>01. LE FLOU JURIDIQUE</div>
-              <h3 style={{ fontSize: 20, fontWeight: 800, color: "#FFFFFF", marginBottom: 12 }}>Rassemblement non déclaré</h3>
-              <p style={{ fontSize: 14, color: "#A1A1AA", lineHeight: 1.6 }}>
-                Réunir 50 personnes sur la voie publique sans registre ni responsable identifié engage directement la responsabilité civile et pénale de l&apos;organisateur en cas d&apos;accident.
+            {/* Card 1 */}
+            <div className="card-dark-slate" style={{ padding: 32 }}>
+              <div style={{ fontSize: 13, fontWeight: 800, color: "#FF5500", marginBottom: 16, letterSpacing: 1 }}>01. FLOU JURIDIQUE</div>
+              <h3 style={{ fontSize: 20, fontWeight: 800, color: "#FFFFFF", marginBottom: 12 }}>40 personnes sans registre</h3>
+              <p className="text-body" style={{ color: "#94A3B8" }}>
+                Rassemblement sur la voie publique sans preuve d&apos;émargement horodatée = responsabilité civile et pénale de l&apos;organisateur engagée en cas de litige.
               </p>
             </div>
 
-            {/* Problem Card 2 */}
-            <div style={{
-              background: "#18181B", border: "1px solid #27272A", borderRadius: 24, padding: 32, textAlign: "left"
-            }}>
-              <div style={{ fontSize: 14, fontWeight: 800, color: "#FF5500", marginBottom: 16 }}>02. L&apos;URGENCE AVEUGLE</div>
-              <h3 style={{ fontSize: 20, fontWeight: 800, color: "#FFFFFF", marginBottom: 12 }}>Aucun antécédent sous la main</h3>
-              <p style={{ fontSize: 14, color: "#A1A1AA", lineHeight: 1.6 }}>
-                Un coureur fait un malaise à 19h30. Les pompiers arrivent et demandent ses allergies et son contact d&apos;urgence. Personne dans le groupe ne sait répondre.
+            {/* Card 2 */}
+            <div className="card-dark-slate" style={{ padding: 32 }}>
+              <div style={{ fontSize: 13, fontWeight: 800, color: "#FF5500", marginBottom: 16, letterSpacing: 1 }}>02. URGENCE MÉDICALE</div>
+              <h3 style={{ fontSize: 20, fontWeight: 800, color: "#FFFFFF", marginBottom: 12 }}>Antécédents inaccessibles</h3>
+              <p className="text-body" style={{ color: "#94A3B8" }}>
+                Un membre chute. Les secours demandent ses allergies et le contact de ses proches : au milieu du groupe, personne ne possède l&apos;information.
               </p>
             </div>
 
-            {/* Problem Card 3 */}
-            <div style={{
-              background: "#18181B", border: "1px solid #27272A", borderRadius: 24, padding: 32, textAlign: "left"
-            }}>
-              <div style={{ fontSize: 14, fontWeight: 800, color: "#FF5500", marginBottom: 16 }}>03. LA NOYADE WHATSAPP</div>
+            {/* Card 3 */}
+            <div className="card-dark-slate" style={{ padding: 32 }}>
+              <div style={{ fontSize: 13, fontWeight: 800, color: "#FF5500", marginBottom: 16, letterSpacing: 1 }}>03. CHAOS WHATSAPP</div>
               <h3 style={{ fontSize: 20, fontWeight: 800, color: "#FFFFFF", marginBottom: 12 }}>80 messages par jour</h3>
-              <p style={{ fontSize: 14, color: "#A1A1AA", lineHeight: 1.6 }}>
-                Les heures de RDV, les parcours et les consignes de sécurité sont constamment noyés au milieu des discussions. L&apos;information critique est toujours perdue.
+              <p className="text-body" style={{ color: "#94A3B8" }}>
+                Les heures de RDV, les tracés GPS et les consignes de sécurité sont constamment noyés. L&apos;information critique finit toujours par être perdue.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ═══════════ 5. SECTION SOLUTION — BENTO GRID DYNAMIQUE (#F4F4F5) ═══════════ */}
-      <section id="solution" style={{ padding: "100px 0" }}>
-        <div className="container-custom text-center">
+      {/* ═══════════ 4. SECTION 3 — BENTO GRID FONCTIONNALITÉS (#F8F9FA) ═══════════ */}
+      <section id="features" style={{ padding: "100px 0" }}>
+        <div className="container-dribbble text-center">
           <div style={{
             display: "inline-flex", alignItems: "center", gap: 8,
             padding: "6px 14px", borderRadius: 9999,
-            background: "#FFFFFF", border: "1px solid #E4E4E7",
+            background: "#FFFFFF", border: "1px solid rgba(0,0,0,0.06)",
             fontSize: 12, fontWeight: 700, color: "#FF5500", marginBottom: 16
           }}>
-            <Sparkles size={14} /> La suite tout-en-un
+            <Sparkles size={14} /> La solution moderne
           </div>
 
-          <h2 className="h2-section" style={{ maxWidth: 700, margin: "0 auto 16px" }}>
-            Tout ce dont ton crew a besoin. <br />Dans une seule interface.
+          <h2 className="h2-dribbble" style={{ maxWidth: 700, margin: "0 auto 16px" }}>
+            Bento Grid Fonctionnalités
           </h2>
-          <p className="body-lead" style={{ maxWidth: 540, margin: "0 auto 56px" }}>
-            Conçu spécifiquement pour les capitaines de communauté sportive. Zéro superflu, 100% efficacité.
+          <p className="sub-dribbble" style={{ maxWidth: 540, margin: "0 auto 56px" }}>
+            Une suite d&apos;outils ultra-clean développée pour offrir une sérénité totale aux organisateurs.
           </p>
 
-          {/* BENTO GRID */}
-          <div className="bento-grid">
-            {/* Card 1: Check-in GPS (2/3 Width = col-8) */}
-            <div className="col-8 card-premium" style={{ padding: 40, textAlign: "left", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+          {/* BENTO GRID ASYMMÉTRIQUE */}
+          <div className="bento-grid-2026">
+            {/* Carte 1 (2/3 Width = bento-col-8) */}
+            <div className="bento-col-8 card-dribbble" style={{ padding: 40, textAlign: "left", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
               <div>
-                <div style={{ display: "inline-block", background: "rgba(255,85,0,0.1)", color: "#FF5500", padding: "4px 12px", borderRadius: 9999, fontSize: 12, fontWeight: 700, marginBottom: 16 }}>
-                  ÉMARGEMENT AUTOMATIQUE
+                <div style={{ display: "inline-block", background: "rgba(255,85,0,0.08)", color: "#FF5500", padding: "4px 12px", borderRadius: 9999, fontSize: 12, fontWeight: 700, marginBottom: 16 }}>
+                  CHECK-IN GPS AUTOMATIQUE
                 </div>
-                <h3 style={{ fontSize: 24, fontWeight: 800, color: "#09090B", marginBottom: 12 }}>
+                <h3 style={{ fontSize: 24, fontWeight: 800, color: "#0F172A", marginBottom: 12 }}>
                   Check-in GPS &amp; Registre Horodaté
                 </h3>
-                <p style={{ fontSize: 15, color: "#52525B", lineHeight: 1.6, maxWidth: 500 }}>
-                  Validation automatique au point de rassemblement. Le registre d&apos;émargement est horodaté et verrouillé automatiquement pour vous fournir une preuve juridique de présence.
+                <p className="text-body" style={{ maxWidth: 520 }}>
+                  Validation automatique dès que le membre se trouve à moins de 50 mètres du point de RDV. Émargement verrouillé conservé comme preuve juridique.
                 </p>
               </div>
-              <div style={{ marginTop: 32, borderRadius: 16, overflow: "hidden", border: "1px solid #E4E4E7", boxShadow: "0 10px 25px rgba(0,0,0,0.04)" }}>
+              <div style={{ marginTop: 32, borderRadius: 18, overflow: "hidden", border: "1px solid rgba(0,0,0,0.06)", boxShadow: "0 10px 30px rgba(0,0,0,0.04)" }}>
                 <img src="/landing/card-step1.png" alt="Check-in GPS" style={{ width: "100%", height: 260, objectFit: "cover", objectPosition: "top" }} />
               </div>
             </div>
 
-            {/* Card 2: Fiche ICE (1/3 Width = col-4 - Medical Dark Style) */}
-            <div className="col-4 card-premium" style={{ background: "#09090B", color: "#FFFFFF", borderColor: "#27272A", padding: 32, textAlign: "left", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+            {/* Carte 2 (1/3 Width = bento-col-4 - Dark Slate Accent) */}
+            <div className="bento-col-4 card-dark-slate" style={{ padding: 32, textAlign: "left", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
               <div>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
                   <span style={{ fontSize: 11, fontWeight: 800, color: "#FF5500", letterSpacing: 1 }}>🛡️ SÉCURITÉ ICE</span>
                   <span style={{ background: "#FF5500", color: "#FFFFFF", padding: "2px 8px", borderRadius: 6, fontSize: 12, fontWeight: 900 }}>O+</span>
                 </div>
 
-                <h3 style={{ fontSize: 22, fontWeight: 800, color: "#FFFFFF", marginBottom: 10 }}>Fiche d&apos;Urgence 1-Clic</h3>
-                <p style={{ fontSize: 13, color: "#A1A1AA", lineHeight: 1.5, marginBottom: 20 }}>
-                  Groupe sanguin, allergies et contact ICE accessibles en 1 tap par le Capitaine.
+                <h3 style={{ fontSize: 22, fontWeight: 800, color: "#FFFFFF", marginBottom: 10 }}>Fiche ICE &amp; Gestes Réflexes</h3>
+                <p style={{ fontSize: 13, color: "#94A3B8", lineHeight: 1.5, marginBottom: 20 }}>
+                  Accédez au groupe sanguin, allergies et contact 1-clic, avec les rappels réflexes.
                 </p>
 
-                {/* Emergency Card Preview Widget */}
-                <div style={{ background: "#18181B", border: "1px solid #27272A", borderRadius: 16, padding: 16, marginBottom: 16 }}>
+                {/* Emergency Card Preview */}
+                <div style={{ background: "#09090B", border: "1px solid #1E293B", borderRadius: 16, padding: 16, marginBottom: 16 }}>
                   <div style={{ fontSize: 14, fontWeight: 800, color: "#FFFFFF" }}>Sarah Jenkins</div>
                   <div style={{ fontSize: 11, color: "#EF4444", fontWeight: 700, marginTop: 4 }}>⚠ Allergie : Pénicilline</div>
-                  <div style={{ fontSize: 11, color: "#A1A1AA", marginTop: 2 }}>ICE : Marc (06 12 34 56 78)</div>
+                  <div style={{ fontSize: 11, color: "#94A3B8", marginTop: 2 }}>ICE : Marc (06 12 34 56 78)</div>
                 </div>
 
-                {/* First Aid Reminders */}
-                <div style={{ background: "rgba(255,255,255,0.05)", borderRadius: 12, padding: 12, fontSize: 11, color: "#D4D4D8", display: "flex", flexDirection: "column", gap: 4 }}>
-                  <div style={{ fontWeight: 700, color: "#56E39F" }}>💡 Rappel Gestes de Secours :</div>
+                {/* Gestes Réflexes */}
+                <div style={{ background: "rgba(255,255,255,0.05)", borderRadius: 12, padding: 12, fontSize: 11, color: "#CBD5E1", display: "flex", flexDirection: "column", gap: 4 }}>
+                  <div style={{ fontWeight: 700, color: "#22C55E" }}>💡 Fiches Réflexes de Secours :</div>
                   <div>• Malaise : PLS (Position Latérale de Sécurité)</div>
                   <div>• Chute de tension : Jambes relevées à 45°</div>
                 </div>
               </div>
 
               <div style={{ marginTop: 24, background: "#FF5500", borderRadius: 12, padding: "10px", textAlign: "center", fontSize: 12, fontWeight: 800, color: "#FFFFFF", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
-                <PhoneCall size={14} /> Contact Urgence Direct
+                <PhoneCall size={14} /> Bouton Appel Urgence (15/18)
               </div>
             </div>
 
-            {/* Card 3: CAPTEN Spots (1/2 Width = col-6) */}
-            <div className="col-6 card-premium" style={{ padding: 36, textAlign: "left" }}>
-              <div style={{ display: "inline-block", background: "rgba(255,85,0,0.1)", color: "#FF5500", padding: "4px 12px", borderRadius: 9999, fontSize: 12, fontWeight: 700, marginBottom: 16 }}>
-                COMMERÇANTS LOCAUX
+            {/* Carte 3 (1/2 Width = bento-col-6) */}
+            <div className="bento-col-6 card-dribbble" style={{ padding: 36, textAlign: "left" }}>
+              <div style={{ display: "inline-block", background: "rgba(255,85,0,0.08)", color: "#FF5500", padding: "4px 12px", borderRadius: 9999, fontSize: 12, fontWeight: 700, marginBottom: 16 }}>
+                ÉCONOMIE LOCALE
               </div>
-              <h3 style={{ fontSize: 22, fontWeight: 800, color: "#09090B", marginBottom: 10 }}>CAPTEN Spots &amp; Avantages</h3>
-              <p style={{ fontSize: 14, color: "#52525B", lineHeight: 1.6, marginBottom: 20 }}>
-                Valorisez la présence de votre club auprès des cafés et shops de votre quartier. Preuve de passage mesurable et remises exclusives.
+              <h3 style={{ fontSize: 22, fontWeight: 800, color: "#0F172A", marginBottom: 10 }}>CAPTEN Spots</h3>
+              <p className="text-body" style={{ marginBottom: 20 }}>
+                Graphiques et badges prouvant l&apos;impact de votre volume de membres auprès des cafés et shops partenaires.
               </p>
-              <div style={{ background: "#F4F4F5", borderRadius: 16, padding: 16, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <div style={{ background: "#F8F9FA", borderRadius: 16, padding: 16, border: "1px solid rgba(0,0,0,0.04)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                   <div style={{ width: 42, height: 42, borderRadius: 12, background: "#FFFFFF", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>☕</div>
                   <div>
-                    <div style={{ fontSize: 14, fontWeight: 800, color: "#09090B" }}>Café du Cycliste</div>
+                    <div style={{ fontSize: 14, fontWeight: 800, color: "#0F172A" }}>Café du Cycliste</div>
                     <div style={{ fontSize: 12, color: "#22C55E", fontWeight: 700 }}>-15% consommations</div>
                   </div>
                 </div>
-                <div style={{ fontSize: 12, fontWeight: 700, color: "#71717A", background: "#FFFFFF", padding: "6px 12px", borderRadius: 9999 }}>
-                  34 cafés offerts ce mois-ci
+                <div style={{ fontSize: 12, fontWeight: 700, color: "#64748B", background: "#FFFFFF", padding: "6px 12px", borderRadius: 9999, border: "1px solid rgba(0,0,0,0.06)" }}>
+                  34 cafés débloqués
                 </div>
               </div>
             </div>
 
-            {/* Card 4: Multisport Native (1/2 Width = col-6) */}
-            <div className="col-6 card-premium" style={{ padding: 36, textAlign: "left", overflow: "hidden", position: "relative" }}>
-              <div style={{ display: "inline-block", background: "rgba(255,85,0,0.1)", color: "#FF5500", padding: "4px 12px", borderRadius: 9999, fontSize: 12, fontWeight: 700, marginBottom: 16 }}>
-                100% POLYVALENT
+            {/* Carte 4 (1/2 Width = bento-col-6) */}
+            <div className="bento-col-6 card-dribbble" style={{ padding: 36, textAlign: "left" }}>
+              <div style={{ display: "inline-block", background: "rgba(255,85,0,0.08)", color: "#FF5500", padding: "4px 12px", borderRadius: 9999, fontSize: 12, fontWeight: 700, marginBottom: 16 }}>
+                UNIFORME &amp; UNIVERSEL
               </div>
-              <h3 style={{ fontSize: 22, fontWeight: 800, color: "#09090B", marginBottom: 10 }}>Multisport Native</h3>
-              <p style={{ fontSize: 14, color: "#52525B", lineHeight: 1.6, marginBottom: 20 }}>
-                Créé pour s&apos;adapter à toutes les disciplines : course à pied, randonnée en montagne, marche urbaine ou cyclisme.
+              <h3 style={{ fontSize: 22, fontWeight: 800, color: "#0F172A", marginBottom: 10 }}>Multisport par Nature</h3>
+              <p className="text-body" style={{ marginBottom: 20 }}>
+                Gestion uniforme conçue aussi bien pour le trail, la randonnée en altitude que les marches sociales en ville.
               </p>
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
@@ -501,56 +486,55 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ═══════════ 6. COMPARATIF "SANS CAPTEN vs AVEC CAPTEN" (Split Cards) ═══════════ */}
+      {/* ═══════════ 5. COMPARATIF "SANS vs AVEC CAPTEN" (Cartes Split) ═══════════ */}
       <section id="comparison" style={{ padding: "80px 0", background: "#FFFFFF" }}>
-        <div className="container-custom text-center">
-          <h2 className="h2-section" style={{ maxWidth: 640, margin: "0 auto 16px" }}>
-            Pourquoi changer vos habitudes ?
+        <div className="container-dribbble text-center">
+          <h2 className="h2-dribbble" style={{ maxWidth: 640, margin: "0 auto 16px" }}>
+            Pourquoi adopter CAPTEN ?
           </h2>
-          <p className="body-lead" style={{ maxWidth: 500, margin: "0 auto 48px" }}>
-            Découvrez la différence entre gérer un groupe à l&apos;instinct et piloter un crew avec CAPTEN.
+          <p className="sub-dribbble" style={{ maxWidth: 500, margin: "0 auto 48px" }}>
+            La différence entre l&apos;improvisation sur WhatsApp et une gestion professionnelle.
           </p>
 
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 32, textAlign: "left" }}>
-            {/* Left: SANS CAPTEN */}
+            {/* Gauche (Style Incomplet) */}
             <div style={{
-              background: "#FAFAFA", border: "1px solid #E4E4E7", borderRadius: 24, padding: 40
+              background: "#F8F9FA", border: "1px solid rgba(0,0,0,0.08)", borderRadius: 24, padding: 40
             }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 16, fontWeight: 800, color: "#EF4444", marginBottom: 24 }}>
-                <X size={22} color="#EF4444" /> SANS CAPTEN (Club Informel)
+                <X size={22} color="#EF4444" /> SANS CAPTEN (WhatsApp)
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
                 {[
-                  "Registre de présence inexistant ou papier volant perdu",
+                  "Zéro registre de présence horodaté en cas de contrôle",
                   "Stress permanent de la responsabilité en cas d'accident",
-                  "Aucune donnée médicale disponible en urgence à 19h30",
-                  "Discussions WhatsApp saturées (80 messages par jour)",
-                  "Zero valeur mesurable à présenter aux cafés ou sponsors"
+                  "Aucune donnée de santé ou contact d'urgence disponible",
+                  "Châtiment WhatsApp : 80 messages/jour pour un lieu de RDV",
+                  "Aucune valeur mesurable à faire valoir auprès des partenaires"
                 ].map((text, i) => (
-                  <div key={i} style={{ display: "flex", gap: 12, fontSize: 14, color: "#71717A", fontWeight: 500 }}>
+                  <div key={i} style={{ display: "flex", gap: 12, fontSize: 14, color: "#64748B", fontWeight: 500 }}>
                     <span style={{ color: "#EF4444", fontWeight: 800 }}>✕</span> {text}
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Right: AVEC CAPTEN */}
-            <div style={{
-              background: "#09090B", color: "#FFFFFF", border: "1px solid #27272A", borderRadius: 24, padding: 40,
-              boxShadow: "0 20px 40px -10px rgba(255,85,0,0.15)"
+            {/* Droite (Style CAPTEN) */}
+            <div className="card-dark-slate" style={{
+              padding: 40, boxShadow: "0 20px 40px -10px rgba(255,85,0,0.15)"
             }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 16, fontWeight: 800, color: "#FF5500", marginBottom: 24 }}>
-                <Check size={22} color="#FF5500" /> AVEC CAPTEN (Capitaine Sérénité)
+                <Check size={22} color="#FF5500" /> AVEC CAPTEN (Sérénité)
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
                 {[
                   "Check-in GPS automatique & registre horodaté verrouillé",
-                  "Tranquillité d'esprit totale et couverture légale claire",
-                  "Fiches d'urgence ICE accessibles en 1 tap hors-ligne",
-                  "Canal d'information structuré sans spam de messages",
-                  "Remises exclusives et impact mesurable chez les commerçants"
+                  "Couverture légale claire et sérénité totale pour l'admin",
+                  "Fiches d'urgence ICE accessibles instantanément hors-ligne",
+                  "Logistique centralisée sans pollution de discussions",
+                  "Remises exclusives et impact commerçant mesuré"
                 ].map((text, i) => (
-                  <div key={i} style={{ display: "flex", gap: 12, fontSize: 14, color: "#E4E4E7", fontWeight: 600 }}>
+                  <div key={i} style={{ display: "flex", gap: 12, fontSize: 14, color: "#E2E8F0", fontWeight: 600 }}>
                     <span style={{ color: "#22C55E", fontWeight: 800 }}>✓</span> {text}
                   </div>
                 ))}
@@ -560,33 +544,33 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ═══════════ 7. FAQ & FOOTER (Dark #09090B) ═══════════ */}
-      <section id="faq" style={{ background: "#09090B", color: "#FFFFFF", paddingTop: 100, paddingBottom: 60 }}>
-        <div className="container-custom">
+      {/* ═══════════ 6. FOOTER MASSIF & CTA FINAL (#0F172A) ═══════════ */}
+      <section id="faq" style={{ background: "#0F172A", color: "#FFFFFF", paddingTop: 100, paddingBottom: 60 }}>
+        <div className="container-dribbble">
           {/* FAQ Header */}
           <div className="text-center" style={{ maxWidth: 640, margin: "0 auto 56px" }}>
-            <h2 className="h2-section" style={{ color: "#FFFFFF", marginBottom: 12 }}>
+            <h2 className="h2-dribbble-white" style={{ marginBottom: 12 }}>
               Questions fréquentes
             </h2>
-            <p style={{ color: "#A1A1AA", fontSize: 16 }}>
-              Tout ce que vous devez savoir avant de lancer votre crew sur CAPTEN.
+            <p style={{ color: "#94A3B8", fontSize: 16 }}>
+              Les réponses essentielles avant de rejoindre la Bêta.
             </p>
           </div>
 
           {/* Accordion */}
           <div style={{ maxWidth: 760, margin: "0 auto 90px" }}>
             {faqs.map((f, i) => (
-              <div key={i} style={{ borderBottom: "1px solid #27272A" }}>
+              <div key={i} style={{ borderBottom: "1px solid #1E293B" }}>
                 <button onClick={() => setOpenFaq(openFaq === i ? null : i)} style={{
                   width: "100%", padding: "24px 0", textAlign: "left", display: "flex", justifyContent: "space-between", alignItems: "center",
                   background: "none", border: "none", cursor: "pointer", fontSize: 16, fontWeight: 700, color: "#FFFFFF",
                   fontFamily: "'Plus Jakarta Sans', sans-serif"
                 }}>
                   {f.q}
-                  {openFaq === i ? <ChevronUp size={18} color="#FF5500" /> : <ChevronDown size={18} color="#71717A" />}
+                  {openFaq === i ? <ChevronUp size={18} color="#FF5500" /> : <ChevronDown size={18} color="#64748B" />}
                 </button>
                 {openFaq === i && (
-                  <div style={{ paddingBottom: 24, fontSize: 14, color: "#A1A1AA", lineHeight: 1.6 }}>
+                  <div style={{ paddingBottom: 24, fontSize: 14, color: "#94A3B8", lineHeight: 1.6 }}>
                     {f.a}
                   </div>
                 )}
@@ -596,38 +580,38 @@ export default function LandingPage() {
 
           {/* Final Call to Action */}
           <div style={{
-            background: "linear-gradient(135deg, #18181B 0%, #09090B 100%)",
-            border: "1px solid #27272A", borderRadius: 32, padding: "64px 32px",
+            background: "linear-gradient(135deg, #1E293B 0%, #0F172A 100%)",
+            border: "1px solid #334155", borderRadius: 32, padding: "64px 32px",
             textAlign: "center", position: "relative", overflow: "hidden"
           }}>
             <div style={{
               position: "absolute", top: "-30%", left: "50%", transform: "translateX(-50%)",
-              width: 500, height: 300, background: "radial-gradient(circle, rgba(255,85,0,0.15) 0%, transparent 70%)",
+              width: 500, height: 300, background: "radial-gradient(circle, rgba(255,85,0,0.18) 0%, transparent 70%)",
               pointerEvents: "none"
             }} />
 
-            <h2 className="h2-section" style={{ color: "#FFFFFF", marginBottom: 16 }}>
+            <h2 className="h2-dribbble-white" style={{ marginBottom: 16 }}>
               Ton crew mérite mieux qu&apos;un fil de discussion.
             </h2>
-            <p style={{ fontSize: 16, color: "#A1A1AA", maxWidth: 480, margin: "0 auto 36px" }}>
-              Rejoins les capitaines qui sécurisent et automatisent leurs rassemblements sportifs dès aujourd&apos;hui.
+            <p style={{ fontSize: 16, color: "#94A3B8", maxWidth: 480, margin: "0 auto 36px" }}>
+              Rejoins les capitaines qui sécurisent et automatisent leurs rassemblements dès aujourd&apos;hui.
             </p>
-            <Link href="/login?mode=signup" className="btn-orange" style={{ fontSize: 17, padding: "18px 44px" }}>
-              Rejoindre la Bêta Gratuite <ArrowRight size={18} />
+            <Link href="/login?mode=signup" className="btn-orange-pill" style={{ fontSize: 17, padding: "18px 44px" }}>
+              Commencer l&apos;expérience CAPTEN <ArrowRight size={18} />
             </Link>
           </div>
 
           {/* Footer */}
-          <footer style={{ marginTop: 80, paddingTop: 40, borderTop: "1px solid #27272A", display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: 16, fontSize: 13, color: "#71717A" }}>
+          <footer style={{ marginTop: 80, paddingTop: 40, borderTop: "1px solid #1E293B", display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: 16, fontSize: 13, color: "#64748B" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
               <img src="/logo.png" alt="CAPTEN" style={{ height: 22, filter: "brightness(0) invert(1)" }} />
               <span>© 2026 CAPTEN. Tous droits réservés.</span>
             </div>
             <div style={{ display: "flex", gap: 24 }}>
               {[["CGU", "/cgu"], ["RGPD", "/rgpd"], ["Mentions Légales", "/mentions-legales"], ["Support", "/support"]].map(([l, h], i) => (
-                <Link key={i} href={h} style={{ color: "#71717A", transition: "color 0.15s" }}
+                <Link key={i} href={h} style={{ color: "#64748B", transition: "color 0.15s" }}
                   onMouseEnter={e => e.currentTarget.style.color = "#FFFFFF"}
-                  onMouseLeave={e => e.currentTarget.style.color = "#71717A"}>{l}</Link>
+                  onMouseLeave={e => e.currentTarget.style.color = "#64748B"}>{l}</Link>
               ))}
             </div>
           </footer>
