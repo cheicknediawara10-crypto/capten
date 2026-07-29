@@ -5,119 +5,120 @@ import Link from "next/link";
 import {
   ShieldCheck, HeartPulse, MapPin, Zap, CheckCircle2,
   XCircle, ChevronDown, ChevronUp, ArrowRight, Check,
-  MessageSquare, AlertCircle, UserCheck, Coffee, ShieldAlert
+  MessageSquare, AlertCircle, UserCheck, Coffee, ShieldAlert,
+  QrCode, Users, Clock, Shield, Smartphone, Star
 } from "lucide-react";
 
-/* ──────────────────────────────────────────────────────────────
-   CAPTEN — Landing Page V3
-   Inspiration : Linear · Vercel · Stripe · Raycast
-   Aesthetic   : Clean centered hero, massive whitespace, 
-                 subtle gradients, zero clutter
-   Palette     : #FAFAFA (base) · #09090B (dark) · #FF5500 (accent 10%)
-   Fonts       : Inter var (body+headings) · JetBrains Mono (mono)
-────────────────────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════
+   CAPTEN — Landing Page V4
+   Style : Runna-inspired fitness SaaS landing
+   Layout : Dark hero + alternating dark/light sections
+          + phone mockups as primary visuals
+          + gradient text accents
+   Palette: #0A0A0A (dark) · #FFFFFF (light) · #FF5500 (accent)
+   Font   : Inter
+═══════════════════════════════════════════════════════════════ */
 
 const CSS = `
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-behavior: smooth; }
   body {
-    background: #FAFAFA;
-    color: #09090B;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #FFFFFF;
+    color: #0A0A0A;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
   }
   a { text-decoration: none; color: inherit; }
 
-  /* ── Animations ── */
-  @keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(20px); }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
     to   { opacity: 1; transform: translateY(0); }
   }
-  @keyframes beacon {
-    0%   { box-shadow: 0 0 0 0 rgba(255,85,0,0.6); }
-    70%  { box-shadow: 0 0 0 10px rgba(255,85,0,0); }
-    100% { box-shadow: 0 0 0 0 rgba(255,85,0,0); }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
   }
-  .fade-in { animation: fadeInUp 0.7s ease-out both; }
-  .fade-in-d1 { animation: fadeInUp 0.7s ease-out 0.1s both; }
-  .fade-in-d2 { animation: fadeInUp 0.7s ease-out 0.2s both; }
-  .fade-in-d3 { animation: fadeInUp 0.7s ease-out 0.3s both; }
-  .beacon { animation: beacon 2s infinite; }
+  .fade-up { animation: fadeUp 0.6s ease-out both; }
+  .fade-up-d1 { animation: fadeUp 0.6s ease-out 0.1s both; }
+  .fade-up-d2 { animation: fadeUp 0.6s ease-out 0.2s both; }
+  .fade-up-d3 { animation: fadeUp 0.6s ease-out 0.35s both; }
+  .float-slow { animation: float 4s ease-in-out infinite; }
 
-  /* ── Utility ── */
+  .gradient-text {
+    background: linear-gradient(135deg, #FF5500, #FF8A50, #FFB088);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
   .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
-  .mono { font-family: 'JetBrains Mono', monospace; }
 
-  /* ── Buttons ── */
   .btn-primary {
     display: inline-flex; align-items: center; gap: 8px;
-    padding: 14px 28px; border-radius: 12px; border: none;
+    padding: 14px 28px; border-radius: 50px; border: none;
     background: #FF5500; color: #fff; font-weight: 700; font-size: 15px;
-    cursor: pointer; transition: all 0.2s;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.05), 0 8px 20px -4px rgba(255,85,0,0.3);
+    cursor: pointer; transition: all 0.25s;
+    box-shadow: 0 4px 16px rgba(255,85,0,0.3);
   }
-  .btn-primary:hover {
-    background: #E84D00; transform: translateY(-1px);
-    box-shadow: 0 1px 2px rgba(0,0,0,0.05), 0 12px 28px -4px rgba(255,85,0,0.4);
-  }
-  .btn-secondary {
+  .btn-primary:hover { background: #E84D00; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(255,85,0,0.4); }
+
+  .btn-white {
     display: inline-flex; align-items: center; gap: 8px;
-    padding: 14px 28px; border-radius: 12px;
-    background: #fff; color: #09090B; font-weight: 700; font-size: 15px;
-    border: 1px solid #E4E4E7; cursor: pointer; transition: all 0.2s;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    padding: 14px 28px; border-radius: 50px;
+    background: #fff; color: #0A0A0A; font-weight: 700; font-size: 15px;
+    border: none; cursor: pointer; transition: all 0.25s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   }
-  .btn-secondary:hover {
-    border-color: #A1A1AA; transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  .btn-white:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
+
+  .btn-outline {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 14px 28px; border-radius: 50px;
+    background: transparent; color: #fff; font-weight: 600; font-size: 15px;
+    border: 1px solid rgba(255,255,255,0.25); cursor: pointer; transition: all 0.25s;
+  }
+  .btn-outline:hover { border-color: #fff; background: rgba(255,255,255,0.05); }
+
+  /* Phone mockup */
+  .phone-frame {
+    width: 280px; background: #1A1A1A; border-radius: 40px;
+    padding: 10px; border: 3px solid #333;
+    box-shadow: 0 30px 60px -15px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05);
+  }
+  .phone-screen {
+    background: #0A0A0A; border-radius: 32px; overflow: hidden;
+    min-height: 500px;
   }
 
-  /* ── Cards ── */
-  .card {
-    background: #fff; border: 1px solid #E4E4E7; border-radius: 20px;
-    padding: 32px; transition: all 0.25s ease;
-  }
-  .card:hover {
-    box-shadow: 0 8px 30px -8px rgba(0,0,0,0.08);
-    border-color: #D4D4D8;
-    transform: translateY(-2px);
-  }
-  .card-dark {
-    background: rgba(18,18,21,0.96); border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 20px; padding: 32px; transition: all 0.25s ease;
-    backdrop-filter: blur(12px);
-  }
-  .card-dark:hover {
-    border-color: rgba(255,255,255,0.15);
-    box-shadow: 0 8px 30px -8px rgba(0,0,0,0.6);
-    transform: translateY(-2px);
-  }
-
-  /* ── Footer Links ── */
-  .ft-link { color: #71717A; transition: color 0.2s; }
-  .ft-link:hover { color: #fff; }
-
-  /* ── Responsive ── */
+  /* Responsive */
   @media (max-width: 1024px) {
-    .hero-grid  { grid-template-columns: 1fr !important; text-align: center; }
-    .hero-ctas  { justify-content: center !important; }
-    .hero-proof { justify-content: center !important; }
-    .bento-2col { grid-template-columns: 1fr !important; }
-    .vs-grid    { grid-template-columns: 1fr !important; }
-    .spots-grid { grid-template-columns: 1fr !important; }
-    .gallery-g  { grid-template-columns: 1fr 1fr !important; }
+    .hero-phones { display: none !important; }
+    .feature-row { flex-direction: column !important; text-align: center; }
+    .feature-row > * { max-width: 100% !important; }
+    .feature-phone { align-self: center !important; }
+    .steps-grid { grid-template-columns: 1fr !important; }
+    .sport-cards { grid-template-columns: 1fr 1fr !important; }
   }
   @media (max-width: 640px) {
-    .hero-title { font-size: 36px !important; letter-spacing: -0.8px !important; }
-    .section-title { font-size: 28px !important; }
+    .hero-title { font-size: 36px !important; }
+    .section-title { font-size: 30px !important; }
     .nav-links { display: none !important; }
-    .gallery-g { grid-template-columns: 1fr !important; }
+    .sport-cards { grid-template-columns: 1fr !important; }
+    .phone-frame { width: 240px; }
   }
 `;
+
+/* ── Phone Mockup Component ── */
+function PhoneMockup({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  return (
+    <div className={`phone-frame ${className}`}>
+      <div className="phone-screen">{children}</div>
+    </div>
+  );
+}
 
 export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
@@ -130,410 +131,471 @@ export default function LandingPage() {
   }, []);
 
   const faqs = [
-    { q: "Mes membres doivent-ils télécharger une application ?", a: "Non. Vos membres scannent un QR Code ou cliquent sur votre lien unique (ex\u00a0: capten.app/r/brc). Tout fonctionne instantanément dans le navigateur." },
-    { q: "Comment sont protégées les données médicales (ICE) ?", a: "Les fiches ICE sont chiffrées et accessibles uniquement par le Capitaine en cas d'urgence terrain. Aucune donnée n'est revendue. Conformité RGPD complète." },
-    { q: "CAPTEN fonctionne-t-il hors connexion ?", a: "Oui. Le registre et les fiches ICE de votre session sont mis en cache localement avant le départ. Consultables hors réseau en montagne ou en forêt." },
-    { q: "Comment fonctionne l'essai de 21 jours ?", a: "Accès complet à toutes les fonctionnalités, sans carte bancaire. Testez sur vos sorties réelles avec votre crew." }
+    { q: "Mes membres doivent-ils télécharger une application ?", a: "Non. Vos membres scannent un QR Code ou cliquent sur votre lien unique. Tout fonctionne dans le navigateur, sans téléchargement." },
+    { q: "Comment sont protégées les données médicales ?", a: "Les fiches ICE sont chiffrées et accessibles uniquement par le Capitaine en cas d'urgence terrain. Conformité RGPD complète." },
+    { q: "CAPTEN fonctionne-t-il hors connexion ?", a: "Oui. Le registre et les fiches ICE sont mis en cache localement. Consultables en montagne ou en forêt, sans réseau." },
+    { q: "Comment fonctionne l'essai de 21 jours ?", a: "Accès complet sans carte bancaire. Testez sur vos sorties réelles avec votre crew pendant 3 semaines." }
   ];
 
   return (
     <>
       <style>{CSS}</style>
 
-      {/* ═══════════════ NAVBAR ═══════════════ */}
+      {/* ═══════════ NAVBAR ═══════════ */}
       <header style={{
         position: "fixed", top: 0, left: 0, right: 0, zIndex: 100,
         height: 64, display: "flex", alignItems: "center",
-        background: scrolled ? "rgba(250,250,250,0.92)" : "transparent",
-        backdropFilter: scrolled ? "blur(12px) saturate(1.4)" : "none",
-        borderBottom: scrolled ? "1px solid #E4E4E7" : "1px solid transparent",
-        transition: "all 0.3s ease"
+        background: scrolled ? "rgba(10,10,10,0.95)" : "transparent",
+        backdropFilter: scrolled ? "blur(12px)" : "none",
+        borderBottom: scrolled ? "1px solid rgba(255,255,255,0.08)" : "none",
+        transition: "all 0.3s"
       }}>
         <div className="container" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%" }}>
           <Link href="/" style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <img src="/logo.png" alt="CAPTEN" style={{ height: 32 }} />
+            <img src="/logo.png" alt="CAPTEN" style={{ height: 30, filter: "brightness(0) invert(1)" }} />
           </Link>
           <nav className="nav-links" style={{ display: "flex", gap: 32 }}>
-            {["Enjeux", "Fonctionnalités", "Tarifs"].map((l, i) => (
-              <a key={i} href={`#${["enjeux","features","tarifs"][i]}`} style={{ fontSize: 14, fontWeight: 500, color: "#71717A", transition: "color 0.15s" }}
-                onMouseEnter={e => e.currentTarget.style.color = "#09090B"} onMouseLeave={e => e.currentTarget.style.color = "#71717A"}>{l}</a>
+            {[["Fonctionnalités", "#features"], ["Comment ça marche", "#how"], ["Tarifs", "#pricing"]].map(([l, h], i) => (
+              <a key={i} href={h} style={{ fontSize: 14, fontWeight: 500, color: "rgba(255,255,255,0.6)", transition: "color 0.15s" }}
+                onMouseEnter={e => e.currentTarget.style.color = "#fff"} onMouseLeave={e => e.currentTarget.style.color = "rgba(255,255,255,0.6)"}>{l}</a>
             ))}
           </nav>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <Link href="/login" style={{ fontSize: 14, fontWeight: 600, color: "#71717A", padding: "8px 12px" }}>Connexion</Link>
-            <Link href="/login?mode=signup" className="btn-primary" style={{ padding: "8px 18px", fontSize: 13, borderRadius: 8 }}>Essai gratuit</Link>
+            <Link href="/login" style={{ fontSize: 14, fontWeight: 600, color: "rgba(255,255,255,0.7)", padding: "8px 12px" }}>Connexion</Link>
+            <Link href="/login?mode=signup" className="btn-primary" style={{ padding: "8px 20px", fontSize: 13, borderRadius: 50 }}>Essai gratuit</Link>
           </div>
         </div>
       </header>
 
-      {/* ═══════════════ HERO ═══════════════ */}
-      <section style={{ paddingTop: 160, paddingBottom: 100, position: "relative", overflow: "hidden" }}>
-        {/* Subtle radial glow */}
-        <div style={{ position: "absolute", top: -200, left: "50%", transform: "translateX(-50%)", width: 900, height: 900, borderRadius: "50%", background: "radial-gradient(circle, rgba(255,85,0,0.05) 0%, transparent 65%)", pointerEvents: "none" }} />
+      {/* ═══════════ HERO — DARK SECTION ═══════════ */}
+      <section style={{
+        background: "linear-gradient(180deg, #0A0A0A 0%, #141414 100%)",
+        color: "#fff", paddingTop: 140, paddingBottom: 100,
+        position: "relative", overflow: "hidden", textAlign: "center"
+      }}>
+        {/* Subtle gradient orb */}
+        <div style={{ position: "absolute", top: "20%", left: "50%", transform: "translateX(-50%)", width: 700, height: 500, borderRadius: "50%", background: "radial-gradient(ellipse, rgba(255,85,0,0.08) 0%, transparent 70%)", pointerEvents: "none" }} />
 
         <div className="container" style={{ position: "relative" }}>
-          {/* Status pill */}
-          <div className="fade-in" style={{ display: "flex", justifyContent: "center", marginBottom: 28 }}>
-            <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "5px 14px", borderRadius: 100, background: "#fff", border: "1px solid #E4E4E7", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
-              <span className="beacon" style={{ width: 7, height: 7, borderRadius: "50%", background: "#FF5500", display: "block" }} />
-              <span className="mono" style={{ fontSize: 11, fontWeight: 600, color: "#71717A", letterSpacing: 0.4 }}>Bêta ouverte · 21 jours offerts</span>
-            </div>
-          </div>
-
-          {/* Headline — centered, massive, clean */}
-          <h1 className="fade-in-d1 hero-title" style={{ textAlign: "center", fontSize: 56, fontWeight: 800, lineHeight: 1.08, letterSpacing: "-1.5px", color: "#09090B", maxWidth: 780, margin: "0 auto 20px" }}>
-            Gère ton crew.<br />
-            <span style={{ color: "#FF5500" }}>Pas la paperasse.</span>
+          <h1 className="fade-up hero-title" style={{ fontSize: 56, fontWeight: 900, lineHeight: 1.08, letterSpacing: "-2px", marginBottom: 24, maxWidth: 700, margin: "0 auto 24px" }}>
+            Gérer ton crew en toute <span className="gradient-text">simplicité.</span>
           </h1>
 
-          <p className="fade-in-d2" style={{ textAlign: "center", fontSize: 18, lineHeight: 1.6, color: "#71717A", fontWeight: 500, maxWidth: 560, margin: "0 auto 40px" }}>
-            Check-in GPS, fiches d&apos;urgence ICE, registre horodaté et avantages partenaires — tout ce qu&apos;il faut pour piloter une communauté sportive. Sans rien télécharger.
+          <p className="fade-up-d1" style={{ fontSize: 18, color: "rgba(255,255,255,0.6)", fontWeight: 400, lineHeight: 1.6, maxWidth: 520, margin: "0 auto 40px" }}>
+            Check-in GPS, fiches d&apos;urgence ICE, registre horodaté et avantages partenaires. Tout pour piloter une communauté sportive.
           </p>
 
-          {/* CTAs */}
-          <div className="fade-in-d3 hero-ctas" style={{ display: "flex", justifyContent: "center", gap: 12, marginBottom: 48 }}>
-            <Link href="/login?mode=signup" className="btn-primary">Créer mon crew <ArrowRight size={16} /></Link>
-            <a href="#enjeux" className="btn-secondary">Découvrir</a>
+          <div className="fade-up-d2" style={{ display: "flex", justifyContent: "center", gap: 12, marginBottom: 64 }}>
+            <Link href="/login?mode=signup" className="btn-primary" style={{ padding: "16px 32px", fontSize: 16 }}>
+              Commencer gratuitement <ArrowRight size={16} />
+            </Link>
+            <a href="#features" className="btn-outline" style={{ padding: "16px 28px", fontSize: 16 }}>
+              En savoir plus
+            </a>
           </div>
 
-          {/* Social proof */}
-          <div className="fade-in-d3 hero-proof" style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 24, flexWrap: "wrap" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <div style={{ width: 36, height: 36, borderRadius: "50%", overflow: "hidden", border: "2px solid #FF5500", flexShrink: 0 }}>
-                <img src="/landing/community-happy-girls.jpg" alt="Community" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-              </div>
-              <span style={{ fontSize: 13, fontWeight: 600, color: "#71717A" }}>120+ clubs actifs</span>
+          {/* Phone mockups — 3 phones in perspective */}
+          <div className="fade-up-d3 hero-phones" style={{ display: "flex", justifyContent: "center", alignItems: "flex-end", gap: 24, position: "relative" }}>
+            {/* Left phone (tilted) */}
+            <div style={{ transform: "perspective(1000px) rotateY(8deg) scale(0.9)", opacity: 0.7 }}>
+              <PhoneMockup>
+                <div style={{ padding: 16 }}>
+                  <div style={{ background: "#1A1A1A", borderRadius: 16, padding: 14, marginBottom: 10 }}>
+                    <div style={{ fontSize: 10, color: "#FF5500", fontWeight: 700, marginBottom: 8 }}>🛡️ FICHE ICE</div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>Sophie Martin</div>
+                    <div style={{ fontSize: 11, color: "#888", marginTop: 4 }}>Groupe sanguin : O+</div>
+                    <div style={{ fontSize: 11, color: "#888" }}>Contact : 06 12 34 56 78</div>
+                    <div style={{ fontSize: 10, color: "#EF4444", fontWeight: 600, marginTop: 8, background: "rgba(239,68,68,0.1)", padding: "4px 8px", borderRadius: 6 }}>⚠ Allergie : Pénicilline</div>
+                  </div>
+                  <div style={{ background: "#1A1A1A", borderRadius: 16, padding: 14 }}>
+                    <div style={{ fontSize: 10, color: "#888", fontWeight: 600, marginBottom: 6 }}>CONTACT D&apos;URGENCE</div>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: "#fff" }}>Marc Martin (Époux)</div>
+                    <div style={{ background: "#FF5500", borderRadius: 10, padding: "8px", textAlign: "center", fontSize: 12, fontWeight: 700, color: "#fff", marginTop: 10 }}>📞 Appeler</div>
+                  </div>
+                </div>
+              </PhoneMockup>
             </div>
-            <span style={{ width: 1, height: 16, background: "#E4E4E7" }} />
-            <span style={{ fontSize: 13, fontWeight: 600, color: "#71717A" }}>4 200+ membres sécurisés</span>
-            <span style={{ width: 1, height: 16, background: "#E4E4E7" }} />
-            <span style={{ fontSize: 13, fontWeight: 600, color: "#71717A" }}>0 incident non couvert</span>
+
+            {/* Center phone (main — larger) */}
+            <div className="float-slow" style={{ zIndex: 2 }}>
+              <PhoneMockup>
+                {/* App header */}
+                <div style={{ background: "linear-gradient(180deg, #FF5500, #CC4400)", padding: "24px 18px 18px" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+                    <div>
+                      <div style={{ fontSize: 11, color: "rgba(255,255,255,0.7)", fontWeight: 500 }}>Session en cours</div>
+                      <div style={{ fontSize: 18, fontWeight: 800, color: "#fff" }}>Run &amp; Chill #42</div>
+                    </div>
+                    <div style={{ background: "rgba(255,255,255,0.2)", padding: "4px 10px", borderRadius: 100, fontSize: 10, fontWeight: 700, color: "#fff" }}>● LIVE</div>
+                  </div>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    {[{ n: "42/45", l: "Présents" }, { n: "100%", l: "ICE" }, { n: "19:32", l: "Heure" }].map((s, i) => (
+                      <div key={i} style={{ flex: 1, background: "rgba(0,0,0,0.2)", borderRadius: 12, padding: "10px 8px", textAlign: "center" }}>
+                        <div style={{ fontSize: 16, fontWeight: 800, color: "#fff" }}>{s.n}</div>
+                        <div style={{ fontSize: 9, color: "rgba(255,255,255,0.7)", fontWeight: 500 }}>{s.l}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                {/* Members list */}
+                <div style={{ padding: "12px 14px" }}>
+                  {[
+                    { name: "Sophie Martin", status: "Validé", badge: "O+" },
+                    { name: "Thomas Dubois", status: "Validé", badge: "A-" },
+                    { name: "Camille L.", status: "En route", badge: "B+" },
+                    { name: "Alexandre V.", status: "Validé", badge: "AB+" },
+                  ].map((m, i) => (
+                    <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 0", borderBottom: i < 3 ? "1px solid #1A1A1A" : "none" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        <div style={{ width: 32, height: 32, borderRadius: "50%", background: "#1A1A1A", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: "#fff" }}>{m.name[0]}</div>
+                        <div>
+                          <div style={{ fontSize: 13, fontWeight: 600, color: "#fff" }}>{m.name}</div>
+                          <div style={{ fontSize: 10, color: m.status === "En route" ? "#FBBF24" : "#56E39F" }}>{m.status}</div>
+                        </div>
+                      </div>
+                      <span style={{ fontSize: 9, fontWeight: 700, background: "#1A1A1A", color: "#FF5500", padding: "3px 6px", borderRadius: 4 }}>{m.badge}</span>
+                    </div>
+                  ))}
+                  <div style={{ background: "#FF5500", borderRadius: 14, padding: 12, textAlign: "center", fontSize: 13, fontWeight: 700, color: "#fff", marginTop: 12, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+                    <QrCode size={16} /> Scanner un membre
+                  </div>
+                </div>
+              </PhoneMockup>
+            </div>
+
+            {/* Right phone (tilted) */}
+            <div style={{ transform: "perspective(1000px) rotateY(-8deg) scale(0.9)", opacity: 0.7 }}>
+              <PhoneMockup>
+                <div style={{ padding: 16 }}>
+                  <div style={{ fontSize: 11, color: "#FF5500", fontWeight: 700, marginBottom: 12 }}>☕ CAPTEN SPOTS</div>
+                  {[
+                    { name: "Café du Cycliste", offer: "-15% consommations", members: "142 visites" },
+                    { name: "Sport Corner", offer: "-20% équipement", members: "89 visites" },
+                    { name: "Le Comptoir Bio", offer: "-10% smoothies", members: "203 visites" },
+                  ].map((s, i) => (
+                    <div key={i} style={{ background: "#1A1A1A", borderRadius: 14, padding: 14, marginBottom: 8 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <div>
+                          <div style={{ fontSize: 13, fontWeight: 700, color: "#fff" }}>{s.name}</div>
+                          <div style={{ fontSize: 11, color: "#56E39F", fontWeight: 500 }}>{s.offer}</div>
+                        </div>
+                        <div style={{ fontSize: 10, color: "#888" }}>{s.members}</div>
+                      </div>
+                    </div>
+                  ))}
+                  <div style={{ background: "rgba(255,85,0,0.1)", border: "1px solid rgba(255,85,0,0.2)", borderRadius: 12, padding: 12, textAlign: "center", marginTop: 8 }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: "#FF5500" }}>Ajouter un partenaire →</div>
+                  </div>
+                </div>
+              </PhoneMockup>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* ═══════════════ PRODUCT SHOWCASE (Faux browser frame — style Linear) ═══════════════ */}
-      <section style={{ paddingBottom: 120 }}>
-        <div className="container">
-          <div style={{ background: "#09090B", borderRadius: 20, border: "1px solid #27272A", overflow: "hidden", boxShadow: "0 40px 80px -20px rgba(9,9,11,0.3)", maxWidth: 1000, margin: "0 auto" }}>
-            {/* Browser chrome dots */}
-            <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "12px 16px", borderBottom: "1px solid #27272A" }}>
-              <span style={{ width: 10, height: 10, borderRadius: "50%", background: "#3B3B3F" }} />
-              <span style={{ width: 10, height: 10, borderRadius: "50%", background: "#3B3B3F" }} />
-              <span style={{ width: 10, height: 10, borderRadius: "50%", background: "#3B3B3F" }} />
-              <div style={{ flex: 1, display: "flex", justifyContent: "center" }}>
-                <span className="mono" style={{ fontSize: 11, color: "#52525B", background: "#18181B", padding: "3px 16px", borderRadius: 6 }}>capten.app/dashboard</span>
-              </div>
-            </div>
+      {/* ═══════════ "QUE PROPOSONS-NOUS ?" — LIGHT SECTION ═══════════ */}
+      <section style={{ background: "#FFFFFF", padding: "120px 0" }}>
+        <div className="container" style={{ textAlign: "center", maxWidth: 640, marginBottom: 0 }}>
+          <p style={{ fontSize: 14, fontWeight: 600, color: "#FF5500", textTransform: "uppercase", letterSpacing: 2, marginBottom: 12 }}>Que proposons-nous ?</p>
+          <h2 className="section-title" style={{ fontSize: 40, fontWeight: 800, lineHeight: 1.12, letterSpacing: "-1px", color: "#0A0A0A" }}>
+            Pilotez votre communauté sportive avec <span className="gradient-text">confiance.</span>
+          </h2>
+          <p style={{ fontSize: 16, color: "#666", lineHeight: 1.6, marginTop: 16 }}>
+            CAPTEN remplace les tableurs, les groupes WhatsApp et les papiers volants par une plateforme unique construite pour les capitaines de clubs sportifs.
+          </p>
+        </div>
+      </section>
 
-            {/* App screen content */}
-            <div style={{ padding: "28px 28px 0", display: "grid", gridTemplateColumns: "200px 1fr", gap: 0 }}>
-              {/* Sidebar */}
-              <div style={{ borderRight: "1px solid #27272A", paddingRight: 20, paddingBottom: 28 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 24 }}>
-                  <div style={{ width: 28, height: 28, borderRadius: 8, background: "#FF5500", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <span style={{ color: "#fff", fontSize: 12, fontWeight: 800 }}>RC</span>
-                  </div>
-                  <span style={{ fontSize: 13, fontWeight: 700, color: "#fff" }}>Run &amp; Chill</span>
+      {/* ═══════════ FEATURE 1 — ALTERNATING (Image left, Text right) ═══════════ */}
+      <section id="features" style={{ background: "#FFFFFF", padding: "0 0 120px" }}>
+        <div className="container">
+          {/* Feature 1: Check-in GPS */}
+          <div className="feature-row" style={{ display: "flex", alignItems: "center", gap: 80, marginBottom: 120 }}>
+            <div className="feature-phone" style={{ flexShrink: 0 }}>
+              <PhoneMockup>
+                <div style={{ background: "linear-gradient(180deg, #FF5500, #CC4400)", padding: "20px 16px 16px" }}>
+                  <div style={{ fontSize: 10, color: "rgba(255,255,255,0.7)", fontWeight: 600 }}>CHECK-IN GPS</div>
+                  <div style={{ fontSize: 16, fontWeight: 800, color: "#fff", marginTop: 2 }}>Point de Rassemblement</div>
                 </div>
-                {[
-                  { icon: "📊", label: "Dashboard", active: false },
-                  { icon: "🏃", label: "Sorties", active: true },
-                  { icon: "👥", label: "Membres", active: false },
-                  { icon: "🛡️", label: "Sécurité", active: false },
-                  { icon: "☕", label: "Spots", active: false },
-                  { icon: "💬", label: "Messages", active: false },
-                ].map((item, i) => (
-                  <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", borderRadius: 8, marginBottom: 2, background: item.active ? "rgba(255,85,0,0.12)" : "transparent", color: item.active ? "#FF5500" : "#71717A", fontSize: 13, fontWeight: item.active ? 600 : 500, cursor: "pointer" }}>
-                    <span style={{ fontSize: 14 }}>{item.icon}</span> {item.label}
+                <div style={{ padding: 16 }}>
+                  <div style={{ background: "#F4F4F5", borderRadius: 14, height: 120, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 12, position: "relative" }}>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: "#333" }}>📍 République, Paris</span>
+                    <span style={{ position: "absolute", top: "30%", left: "55%", width: 14, height: 14, background: "#FF5500", borderRadius: "50%", border: "3px solid #fff", boxShadow: "0 0 10px rgba(255,85,0,0.5)" }} />
+                  </div>
+                  <div style={{ background: "#0A0A0A", borderRadius: 14, padding: 16, color: "#fff" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
+                      <span style={{ fontSize: 11, color: "#888" }}>Émargement</span>
+                      <span style={{ fontSize: 10, color: "#56E39F", fontWeight: 700 }}>● LIVE</span>
+                    </div>
+                    <div style={{ fontSize: 32, fontWeight: 900 }}>47 <span style={{ fontSize: 14, color: "#888", fontWeight: 500 }}>/ 47</span></div>
+                    <div style={{ fontSize: 11, color: "#56E39F", fontWeight: 600, marginTop: 6 }}>✓ Registre horodaté verrouillé</div>
+                  </div>
+                </div>
+              </PhoneMockup>
+            </div>
+            <div style={{ flex: 1, maxWidth: 480 }}>
+              <p style={{ fontSize: 13, fontWeight: 600, color: "#FF5500", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 10 }}>Fonctionnalité #1</p>
+              <h2 className="section-title" style={{ fontSize: 36, fontWeight: 800, lineHeight: 1.15, letterSpacing: "-0.8px", color: "#0A0A0A", marginBottom: 16 }}>
+                Validez la présence de chaque membre en <span className="gradient-text">1 seconde.</span>
+              </h2>
+              <p style={{ fontSize: 16, color: "#666", lineHeight: 1.7 }}>
+                Le check-in GPS automatique valide la présence de vos membres dès qu&apos;ils arrivent au point de rassemblement. Le registre d&apos;émargement horodaté est conservé automatiquement comme preuve juridique.
+              </p>
+              <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 24 }}>
+                {["Validation automatique au GPS", "Registre horodaté verrouillé", "Export PDF pour assurances"].map((t, i) => (
+                  <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 14, fontWeight: 500, color: "#333" }}>
+                    <CheckCircle2 size={18} color="#FF5500" /> {t}
                   </div>
                 ))}
               </div>
+            </div>
+          </div>
 
-              {/* Main content */}
-              <div style={{ paddingLeft: 24, paddingBottom: 28 }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-                  <div>
-                    <span className="mono" style={{ fontSize: 10, color: "#FF5500", fontWeight: 600, letterSpacing: 1 }}>SESSION EN COURS</span>
-                    <h3 style={{ fontSize: 18, fontWeight: 700, color: "#fff", marginTop: 2 }}>Sortie #42 — République</h3>
-                  </div>
-                  <div style={{ display: "flex", gap: 8 }}>
-                    <span style={{ background: "rgba(86,227,159,0.15)", color: "#56E39F", padding: "4px 10px", borderRadius: 6, fontSize: 11, fontWeight: 700 }}>● LIVE</span>
-                    <span style={{ background: "#27272A", color: "#fff", padding: "4px 10px", borderRadius: 6, fontSize: 11, fontWeight: 600 }}>19:30 Paris</span>
-                  </div>
-                </div>
-
-                {/* Stats row */}
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12, marginBottom: 20 }}>
-                  {[
-                    { label: "Présents", value: "42 / 45", color: "#56E39F" },
-                    { label: "Fiches ICE", value: "100%", color: "#FF5500" },
-                    { label: "Registre", value: "Verrouillé", color: "#818CF8" },
-                  ].map((s, i) => (
-                    <div key={i} style={{ background: "#18181B", borderRadius: 12, padding: "14px 16px", border: "1px solid #27272A" }}>
-                      <div style={{ fontSize: 11, color: "#71717A", fontWeight: 500, marginBottom: 6 }}>{s.label}</div>
-                      <div style={{ fontSize: 18, fontWeight: 800, color: s.color }}>{s.value}</div>
+          {/* Feature 2: Fiches ICE (Text left, Image right) */}
+          <div className="feature-row" style={{ display: "flex", flexDirection: "row-reverse", alignItems: "center", gap: 80, marginBottom: 120 }}>
+            <div className="feature-phone" style={{ flexShrink: 0 }}>
+              <PhoneMockup>
+                <div style={{ padding: 16 }}>
+                  <div style={{ background: "#1A1A1A", border: "1px solid rgba(255,85,0,0.3)", borderRadius: 18, padding: 18, marginBottom: 12 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", borderBottom: "1px solid #2A2A2A", paddingBottom: 10, marginBottom: 12 }}>
+                      <span style={{ fontSize: 11, fontWeight: 800, color: "#FF5500" }}>🛡️ FICHE ICE URGENCE</span>
+                      <span style={{ fontSize: 12, fontWeight: 900, background: "#FF5500", color: "#fff", padding: "1px 8px", borderRadius: 4 }}>O+</span>
                     </div>
-                  ))}
-                </div>
-
-                {/* Members list */}
-                <div style={{ borderRadius: 12, border: "1px solid #27272A", overflow: "hidden" }}>
-                  {[
-                    { name: "Sophie Martin", status: "Validé GPS", blood: "O+", color: "#56E39F" },
-                    { name: "Thomas Dubois", status: "Validé GPS", blood: "A-", color: "#56E39F" },
-                    { name: "Alexandre V.", status: "En route…", blood: "B+", color: "#FBBF24" },
-                  ].map((m, i) => (
-                    <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 14px", borderBottom: i < 2 ? "1px solid #27272A" : "none" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                        <span style={{ width: 7, height: 7, borderRadius: "50%", background: m.color }} />
-                        <div>
-                          <div style={{ fontSize: 13, fontWeight: 600, color: "#fff" }}>{m.name}</div>
-                          <div style={{ fontSize: 11, color: "#71717A" }}>{m.status}</div>
-                        </div>
-                      </div>
-                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                        <span style={{ fontSize: 10, fontWeight: 700, color: "#A1A1AA", background: "#27272A", padding: "2px 6px", borderRadius: 4 }}>ICE {m.blood}</span>
-                        <ShieldCheck size={14} color="#FF5500" />
-                      </div>
+                    <div style={{ fontSize: 16, fontWeight: 800, color: "#fff" }}>Camille Laurent</div>
+                    <div style={{ fontSize: 12, color: "#888", marginTop: 4 }}>Née le 12/03/1992</div>
+                    <div style={{ fontSize: 12, color: "#888", marginTop: 2 }}>ICE : Marc Laurent · 06 12 34 56 78</div>
+                    <div style={{ fontSize: 11, color: "#EF4444", fontWeight: 700, marginTop: 12, background: "rgba(239,68,68,0.1)", padding: "8px 10px", borderRadius: 8 }}>
+                      ⚠ Allergie : Pénicilline
                     </div>
-                  ))}
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginTop: 12 }}>
+                      <div style={{ background: "rgba(255,255,255,0.06)", borderRadius: 10, padding: 10, textAlign: "center", fontSize: 11, fontWeight: 700, color: "#fff" }}>📞 Contact ICE</div>
+                      <div style={{ background: "#FF5500", borderRadius: 10, padding: 10, textAlign: "center", fontSize: 11, fontWeight: 700, color: "#fff" }}>🚨 Appeler 112</div>
+                    </div>
+                  </div>
+                  <div style={{ background: "#1A1A1A", borderRadius: 14, padding: 14 }}>
+                    <div style={{ fontSize: 10, color: "#888", marginBottom: 6 }}>ANTÉCÉDENTS</div>
+                    <div style={{ fontSize: 12, color: "#ccc" }}>Asthme léger · Entorse cheville G (2023)</div>
+                  </div>
                 </div>
+              </PhoneMockup>
+            </div>
+            <div style={{ flex: 1, maxWidth: 480 }}>
+              <p style={{ fontSize: 13, fontWeight: 600, color: "#FF5500", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 10 }}>Fonctionnalité #2</p>
+              <h2 className="section-title" style={{ fontSize: 36, fontWeight: 800, lineHeight: 1.15, letterSpacing: "-0.8px", color: "#0A0A0A", marginBottom: 16 }}>
+                Accédez aux <span className="gradient-text">fiches d&apos;urgence</span> en 1 tap.
+              </h2>
+              <p style={{ fontSize: 16, color: "#666", lineHeight: 1.7 }}>
+                Groupe sanguin, allergies, antécédents médicaux et contact d&apos;urgence ICE — tout est centralisé et accessible instantanément par le capitaine en cas de besoin terrain.
+              </p>
+              <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 24 }}>
+                {["Groupe sanguin & allergies", "Contact ICE en 1 tap", "Accessible hors-ligne"].map((t, i) => (
+                  <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 14, fontWeight: 500, color: "#333" }}>
+                    <CheckCircle2 size={18} color="#FF5500" /> {t}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Feature 3: CAPTEN Spots (Image left, Text right) */}
+          <div className="feature-row" style={{ display: "flex", alignItems: "center", gap: 80 }}>
+            <div className="feature-phone" style={{ flexShrink: 0 }}>
+              <PhoneMockup>
+                <div style={{ padding: 16 }}>
+                  <div style={{ fontSize: 11, color: "#FF5500", fontWeight: 700, marginBottom: 14 }}>☕ CAPTEN SPOTS</div>
+                  <div style={{ background: "#1A1A1A", borderRadius: 16, padding: 16, marginBottom: 10 }}>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>Café du Cycliste</div>
+                    <div style={{ fontSize: 11, color: "#888", marginTop: 2 }}>Social Spot · Partenaire actif</div>
+                    <div style={{ display: "flex", justifyContent: "space-between", marginTop: 12 }}>
+                      <div style={{ textAlign: "center" }}><div style={{ fontSize: 18, fontWeight: 800, color: "#FF5500" }}>142</div><div style={{ fontSize: 9, color: "#888" }}>Membres</div></div>
+                      <div style={{ textAlign: "center" }}><div style={{ fontSize: 18, fontWeight: 800, color: "#56E39F" }}>380€</div><div style={{ fontSize: 9, color: "#888" }}>Remises</div></div>
+                      <div style={{ textAlign: "center" }}><div style={{ fontSize: 18, fontWeight: 800, color: "#818CF8" }}>4.8★</div><div style={{ fontSize: 9, color: "#888" }}>Note</div></div>
+                    </div>
+                  </div>
+                  <div style={{ background: "#56E39F", borderRadius: 14, padding: 14, textAlign: "center" }}>
+                    <div style={{ fontSize: 13, fontWeight: 800, color: "#0A0A0A" }}>☕ -15% Validé !</div>
+                    <div style={{ fontSize: 10, color: "rgba(0,0,0,0.5)", marginTop: 2 }}>Offre utilisée il y a 5 min</div>
+                  </div>
+                </div>
+              </PhoneMockup>
+            </div>
+            <div style={{ flex: 1, maxWidth: 480 }}>
+              <p style={{ fontSize: 13, fontWeight: 600, color: "#FF5500", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 10 }}>Fonctionnalité #3</p>
+              <h2 className="section-title" style={{ fontSize: 36, fontWeight: 800, lineHeight: 1.15, letterSpacing: "-0.8px", color: "#0A0A0A", marginBottom: 16 }}>
+                La troisième mi-temps avec des <span className="gradient-text">avantages.</span>
+              </h2>
+              <p style={{ fontSize: 16, color: "#666", lineHeight: 1.7 }}>
+                Transformez la pause café d&apos;après-sortie en avantages exclusifs. Vos membres scannent un QR Code chez les commerces partenaires pour débloquer leurs remises.
+              </p>
+              <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 24 }}>
+                {["Remises exclusives partenaires", "QR Code validation 1-clic", "Tableau de bord commerçant"].map((t, i) => (
+                  <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 14, fontWeight: 500, color: "#333" }}>
+                    <CheckCircle2 size={18} color="#FF5500" /> {t}
+                  </div>
+                ))}
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ═══════════════ SECTION ENJEUX (Dark) ═══════════════ */}
-      <section id="enjeux" style={{ background: "#09090B", color: "#fff", padding: "120px 0", position: "relative", overflow: "hidden" }}>
-        <div style={{ position: "absolute", inset: 0, backgroundImage: "url('/landing/urban-dusk-crew.jpg')", backgroundSize: "cover", backgroundPosition: "center", opacity: 0.1, pointerEvents: "none" }} />
-        <div className="container" style={{ position: "relative" }}>
-          <div style={{ textAlign: "center", maxWidth: 640, margin: "0 auto 72px" }}>
-            <span className="mono" style={{ fontSize: 12, fontWeight: 600, color: "#FF5500", letterSpacing: 1.5, textTransform: "uppercase", display: "block", marginBottom: 12 }}>Pourquoi c&apos;est critique</span>
-            <h2 className="section-title" style={{ fontSize: 40, fontWeight: 800, lineHeight: 1.12, letterSpacing: "-1px" }}>Le piège du club informel</h2>
-            <p style={{ fontSize: 16, color: "#A1A1AA", marginTop: 14, lineHeight: 1.6 }}>
-              &ldquo;On est juste un groupe de potes.&rdquo; L&apos;argument qui laisse les capitaines à découvert face à leur responsabilité civile.
-            </p>
-          </div>
+      {/* ═══════════ SPORTS CARDS — DARK SECTION (like "5K / 10K / 13.1 / 26.2") ═══════════ */}
+      <section style={{ background: "#0A0A0A", color: "#fff", padding: "120px 0" }}>
+        <div className="container" style={{ textAlign: "center" }}>
+          <h2 className="section-title" style={{ fontSize: 40, fontWeight: 800, letterSpacing: "-1px", marginBottom: 12 }}>
+            Conçu pour <span className="gradient-text">tous les terrains.</span>
+          </h2>
+          <p style={{ fontSize: 16, color: "#888", maxWidth: 480, margin: "0 auto 56px" }}>
+            Que vous pilotiez un Run Club, un Social Walk, un Trail ou du Cyclisme — CAPTEN s&apos;adapte.
+          </p>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 20 }}>
+          <div className="sport-cards" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
             {[
-              { icon: <ShieldAlert size={24} />, color: "#EF4444", bg: "rgba(239,68,68,0.1)", title: "Responsabilité civile", desc: "40 personnes sur la voie publique sans registre officiel. En cas d'accident, c'est le capitaine qui est personnellement exposé." },
-              { icon: <HeartPulse size={24} />, color: "#FF5500", bg: "rgba(255,85,0,0.12)", title: "Urgence médicale", desc: "Un malaise à 19h30. Impossible de communiquer le groupe sanguin, les allergies ou le contact ICE du membre aux secours." },
-              { icon: <MessageSquare size={24} />, color: "#A1A1AA", bg: "rgba(161,161,170,0.12)", title: "Le chaos WhatsApp", desc: "60 messages par jour. Les infos de sécurité sont noyées entre les memes et les « c'est où le rdv ? » répétitifs." },
-            ].map((c, i) => (
-              <div key={i} className="card-dark">
-                <div style={{ width: 44, height: 44, borderRadius: 12, background: c.bg, display: "flex", alignItems: "center", justifyContent: "center", color: c.color, marginBottom: 20 }}>{c.icon}</div>
-                <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 10 }}>{c.title}</h3>
-                <p style={{ fontSize: 14, color: "#A1A1AA", lineHeight: 1.6 }}>{c.desc}</p>
+              { emoji: "🏃", sport: "Run Club", desc: "Courses urbaines & afterwork", img: "/landing/urban-runclub.jpg" },
+              { emoji: "🚶", sport: "Social Walk", desc: "Marches conviviales & bien-être", img: "/landing/community-happy-girls.jpg" },
+              { emoji: "🥾", sport: "Trail & Rando", desc: "Sentiers & altitude", img: "/landing/trail-ridge-peak.jpg" },
+              { emoji: "🚴", sport: "Cyclisme", desc: "Bientôt disponible", img: "/landing/cyclist-grass-phone.jpg" },
+            ].map((s, i) => (
+              <div key={i} style={{ borderRadius: 20, overflow: "hidden", position: "relative", aspectRatio: "3/4", cursor: "pointer", transition: "transform 0.3s", border: "1px solid rgba(255,255,255,0.08)" }}
+                onMouseEnter={e => e.currentTarget.style.transform = "translateY(-4px)"} onMouseLeave={e => e.currentTarget.style.transform = "translateY(0)"}>
+                <img src={s.img} alt={s.sport} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.1) 60%)" }} />
+                <div style={{ position: "absolute", bottom: 20, left: 20, right: 20 }}>
+                  <div style={{ fontSize: 28, marginBottom: 4 }}>{s.emoji}</div>
+                  <div style={{ fontSize: 18, fontWeight: 800 }}>{s.sport}</div>
+                  <div style={{ fontSize: 12, color: "rgba(255,255,255,0.6)", marginTop: 2 }}>{s.desc}</div>
+                </div>
+                {i === 3 && <div style={{ position: "absolute", top: 14, right: 14, background: "rgba(255,255,255,0.1)", padding: "3px 10px", borderRadius: 100, fontSize: 10, fontWeight: 600, color: "#fff", backdropFilter: "blur(8px)" }}>Bientôt</div>}
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ═══════════════ FEATURES — Bento Grid ═══════════════ */}
-      <section id="features" style={{ padding: "120px 0" }}>
+      {/* ═══════════ HOW IT WORKS — LIGHT SECTION ═══════════ */}
+      <section id="how" style={{ background: "#FFFFFF", padding: "120px 0" }}>
         <div className="container">
-          <div style={{ textAlign: "center", maxWidth: 640, margin: "0 auto 64px" }}>
-            <span className="mono" style={{ fontSize: 12, fontWeight: 600, color: "#FF5500", letterSpacing: 1.5, textTransform: "uppercase", display: "block", marginBottom: 12 }}>Fonctionnalités</span>
-            <h2 className="section-title" style={{ fontSize: 40, fontWeight: 800, lineHeight: 1.12, letterSpacing: "-1px", color: "#09090B" }}>Tout ce qu&apos;il faut pour piloter un crew</h2>
+          <div style={{ textAlign: "center", maxWidth: 560, margin: "0 auto 64px" }}>
+            <p style={{ fontSize: 14, fontWeight: 600, color: "#FF5500", textTransform: "uppercase", letterSpacing: 2, marginBottom: 12 }}>Comment ça marche ?</p>
+            <h2 className="section-title" style={{ fontSize: 40, fontWeight: 800, letterSpacing: "-1px", color: "#0A0A0A" }}>
+              Opérationnel en <span className="gradient-text">3 minutes.</span>
+            </h2>
           </div>
 
-          <div className="bento-2col" style={{ display: "grid", gridTemplateColumns: "7fr 5fr", gap: 20, marginBottom: 20 }}>
-            {/* Feature 1 — Check-in & Registre */}
-            <div className="card" style={{ display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-              <div style={{ marginBottom: 24 }}>
-                <span className="mono" style={{ fontSize: 11, fontWeight: 600, color: "#FF5500", letterSpacing: 1 }}>01</span>
-                <h3 style={{ fontSize: 22, fontWeight: 800, color: "#09090B", marginTop: 4 }}>Check-in GPS &amp; Registre Horodaté</h3>
-                <p style={{ fontSize: 14, color: "#71717A", marginTop: 6, lineHeight: 1.6, maxWidth: 420 }}>Validation automatique au point de RDV. Registre d&apos;émargement conservé en cas de contrôle.</p>
-              </div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, borderRadius: 16, overflow: "hidden", border: "1px solid #E4E4E7" }}>
-                <div style={{ background: "#fff", padding: 20 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 12 }}>
-                    <MapPin size={16} color="#FF5500" />
-                    <span style={{ fontSize: 12, fontWeight: 700 }}>Point GPS</span>
-                  </div>
-                  <div style={{ background: "#F4F4F5", borderRadius: 10, height: 80, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: "#71717A", fontWeight: 600 }}>📍 République, Paris</div>
-                </div>
-                <div style={{ background: "#09090B", color: "#fff", padding: 20 }}>
-                  <div style={{ fontSize: 11, color: "#71717A", marginBottom: 8 }}>Émargement</div>
-                  <div style={{ fontSize: 32, fontWeight: 900 }}>47<span style={{ fontSize: 16, color: "#71717A" }}>/47</span></div>
-                  <div style={{ fontSize: 11, color: "#56E39F", fontWeight: 600, marginTop: 6, display: "flex", alignItems: "center", gap: 4 }}><CheckCircle2 size={12} /> Verrouillé</div>
-                </div>
-              </div>
-            </div>
-
-            {/* Feature 2 — Fiches ICE */}
-            <div className="card" style={{ background: "#09090B", color: "#fff", border: "1px solid #27272A", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-              <div style={{ marginBottom: 24 }}>
-                <span className="mono" style={{ fontSize: 11, fontWeight: 600, color: "#FF5500", letterSpacing: 1 }}>02</span>
-                <h3 style={{ fontSize: 22, fontWeight: 800, marginTop: 4 }}>Fiches d&apos;urgence ICE</h3>
-                <p style={{ fontSize: 14, color: "#A1A1AA", marginTop: 6, lineHeight: 1.6 }}>Groupe sanguin, allergies, contact d&apos;urgence — accessibles en 1 tap par le capitaine.</p>
-              </div>
-              <div style={{ background: "#18181B", border: "1px solid rgba(255,85,0,0.25)", borderRadius: 16, padding: 18 }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #27272A", paddingBottom: 10, marginBottom: 12 }}>
-                  <span style={{ fontSize: 11, fontWeight: 700, color: "#FF5500", display: "flex", alignItems: "center", gap: 4 }}><ShieldCheck size={14} /> FICHE ICE</span>
-                  <span style={{ fontSize: 12, fontWeight: 900, background: "#FF5500", color: "#fff", padding: "1px 8px", borderRadius: 4 }}>O+</span>
-                </div>
-                <div style={{ fontSize: 15, fontWeight: 700 }}>Camille Laurent</div>
-                <div style={{ fontSize: 12, color: "#A1A1AA", marginTop: 3 }}>ICE : 06 12 34 56 78 (Époux)</div>
-                <div style={{ fontSize: 12, color: "#EF4444", fontWeight: 600, marginTop: 10, background: "rgba(239,68,68,0.1)", padding: "5px 10px", borderRadius: 6, display: "flex", alignItems: "center", gap: 4 }}>
-                  <AlertCircle size={12} /> Allergie : Pénicilline
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Feature 3 — CAPTEN Spots (full width) */}
-          <div className="card" style={{ padding: 0, overflow: "hidden" }}>
-            <div className="spots-grid" style={{ display: "grid", gridTemplateColumns: "1.1fr 0.9fr", alignItems: "stretch" }}>
-              <div style={{ padding: 40 }}>
-                <span className="mono" style={{ fontSize: 11, fontWeight: 600, color: "#FF5500", letterSpacing: 1 }}>03</span>
-                <h3 style={{ fontSize: 22, fontWeight: 800, color: "#09090B", marginTop: 4, marginBottom: 8 }}>CAPTEN Spots — Avantages partenaires</h3>
-                <p style={{ fontSize: 14, color: "#71717A", lineHeight: 1.6, marginBottom: 24 }}>
-                  Transformez la pause café d&apos;après-sortie en avantages exclusifs. Vos membres valident une remise en scannant un QR Code chez les commerces partenaires.
-                </p>
-                <div style={{ display: "flex", alignItems: "center", gap: 12, background: "#F4F4F5", borderRadius: 14, padding: 14, border: "1px solid #E4E4E7" }}>
-                  <div style={{ width: 40, height: 40, borderRadius: 10, background: "#09090B", color: "#FF5500", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}><Coffee size={20} /></div>
-                  <div>
-                    <div style={{ fontSize: 13, fontWeight: 700 }}>Café du Cycliste</div>
-                    <div style={{ fontSize: 11, color: "#71717A" }}>-15% sur les consommations</div>
-                  </div>
-                </div>
-              </div>
-              <div style={{ position: "relative", minHeight: 280 }}>
-                <img src="/landing/cyclist-grass-phone.jpg" alt="Spots lifestyle" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-                <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(255,255,255,0.8) 0%, transparent 40%)" }} />
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════════════ COMMUNITY GALLERY ═══════════════ */}
-      <section style={{ padding: "0 0 120px" }}>
-        <div className="container">
-          <div className="gallery-g" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
+          <div className="steps-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 32 }}>
             {[
-              { src: "/landing/community-happy-girls.jpg", label: "Ambiance & Communauté" },
-              { src: "/landing/trail-ridge-peak.jpg", label: "Trail & Altitude" },
-              { src: "/landing/urban-runclub.jpg", label: "Run Club Urbain" },
-              { src: "/landing/trail-forest.jpg", label: "Forêt & Sentiers" },
-            ].map((p, i) => (
-              <div key={i} style={{ borderRadius: 16, overflow: "hidden", position: "relative", aspectRatio: "4/3" }}>
-                <img src={p.src} alt={p.label} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-                <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "24px 14px 12px", background: "linear-gradient(to top, rgba(9,9,11,0.7) 0%, transparent 100%)" }}>
-                  <span style={{ fontSize: 11, fontWeight: 700, color: "#fff" }}>{p.label}</span>
-                </div>
+              { step: "01", icon: <Smartphone size={24} />, title: "Créez votre club", desc: "Renseignez le nom de votre crew, choisissez votre sport et invitez vos premiers membres via un lien unique." },
+              { step: "02", icon: <QrCode size={24} />, title: "Vos membres s'inscrivent", desc: "Un scan QR Code ou un clic sur votre lien. Pas d'app à télécharger. Fiche ICE remplie en 30 secondes." },
+              { step: "03", icon: <ShieldCheck size={24} />, title: "Pilotez en sécurité", desc: "Check-in GPS au RDV, registre horodaté automatique, fiches d'urgence accessibles en 1 tap. Vous êtes couvert." },
+            ].map((s, i) => (
+              <div key={i} style={{ textAlign: "center", padding: "32px 24px" }}>
+                <div style={{ width: 56, height: 56, borderRadius: 16, background: "rgba(255,85,0,0.08)", display: "flex", alignItems: "center", justifyContent: "center", color: "#FF5500", margin: "0 auto 20px" }}>{s.icon}</div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: "#FF5500", marginBottom: 8 }}>ÉTAPE {s.step}</div>
+                <h3 style={{ fontSize: 20, fontWeight: 800, color: "#0A0A0A", marginBottom: 10 }}>{s.title}</h3>
+                <p style={{ fontSize: 14, color: "#666", lineHeight: 1.6 }}>{s.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ═══════════════ COMPARATIF ═══════════════ */}
-      <section id="comparatif" style={{ padding: "80px 0 120px", borderTop: "1px solid #E4E4E7" }}>
-        <div className="container" style={{ maxWidth: 960 }}>
-          <div style={{ textAlign: "center", maxWidth: 560, margin: "0 auto 56px" }}>
-            <span className="mono" style={{ fontSize: 12, fontWeight: 600, color: "#FF5500", letterSpacing: 1.5, textTransform: "uppercase", display: "block", marginBottom: 12 }}>Comparaison</span>
-            <h2 className="section-title" style={{ fontSize: 38, fontWeight: 800, letterSpacing: "-1px", color: "#09090B" }}>WhatsApp seul vs CAPTEN</h2>
-          </div>
-
-          <div className="vs-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
-            <div className="card">
-              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 20 }}>
-                <XCircle size={20} color="#EF4444" />
-                <span style={{ fontSize: 16, fontWeight: 700 }}>Groupe WhatsApp</span>
+      {/* ═══════════ SOCIAL PROOF — DARK SECTION ═══════════ */}
+      <section style={{ background: "#0A0A0A", color: "#fff", padding: "80px 0" }}>
+        <div className="container">
+          <div style={{ display: "flex", justifyContent: "center", flexWrap: "wrap", gap: 48 }}>
+            {[
+              { value: "120+", label: "Clubs actifs" },
+              { value: "4 200+", label: "Membres sécurisés" },
+              { value: "0", label: "Incident non couvert" },
+              { value: "< 3s", label: "Temps de check-in" },
+            ].map((s, i) => (
+              <div key={i} style={{ textAlign: "center" }}>
+                <div style={{ fontSize: 40, fontWeight: 900, color: "#FF5500" }}>{s.value}</div>
+                <div style={{ fontSize: 13, color: "#888", fontWeight: 500, marginTop: 4 }}>{s.label}</div>
               </div>
-              {["60 messages/jour noyés", "Aucun registre de présences", "0 fiche de santé ni ICE", "Gestion manuelle épuisante", "Risque juridique personnel"].map((t, i) => (
-                <div key={i} style={{ display: "flex", gap: 10, fontSize: 14, color: "#71717A", marginBottom: 10 }}>
-                  <XCircle size={16} color="#EF4444" style={{ flexShrink: 0, marginTop: 2 }} /> {t}
-                </div>
-              ))}
-            </div>
-            <div className="card" style={{ background: "#09090B", color: "#fff", border: "1px solid #27272A" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 20 }}>
-                <ShieldCheck size={20} color="#FF5500" />
-                <span style={{ fontSize: 16, fontWeight: 700 }}>Avec CAPTEN</span>
-              </div>
-              {["Check-in GPS automatique", "Fiches ICE centralisées", "Validation en 3 secondes", "Automatisation complète", "Protection RGPD 1-clic"].map((t, i) => (
-                <div key={i} style={{ display: "flex", gap: 10, fontSize: 14, color: "#E4E4E7", fontWeight: 500, marginBottom: 10 }}>
-                  <CheckCircle2 size={16} color="#56E39F" style={{ flexShrink: 0, marginTop: 2 }} /> {t}
-                </div>
-              ))}
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* ═══════════════ TARIFS ═══════════════ */}
-      <section id="tarifs" style={{ padding: "80px 0 120px" }}>
+      {/* ═══════════ PRICING — LIGHT SECTION ═══════════ */}
+      <section id="pricing" style={{ background: "#FFFFFF", padding: "120px 0" }}>
         <div className="container" style={{ maxWidth: 640 }}>
           <div style={{ textAlign: "center", marginBottom: 48 }}>
-            <span className="mono" style={{ fontSize: 12, fontWeight: 600, color: "#FF5500", letterSpacing: 1.5, textTransform: "uppercase", display: "block", marginBottom: 12 }}>Tarification</span>
-            <h2 className="section-title" style={{ fontSize: 38, fontWeight: 800, letterSpacing: "-1px", color: "#09090B" }}>Un prix. Tout inclus.</h2>
+            <p style={{ fontSize: 14, fontWeight: 600, color: "#FF5500", textTransform: "uppercase", letterSpacing: 2, marginBottom: 12 }}>Tarification</p>
+            <h2 className="section-title" style={{ fontSize: 40, fontWeight: 800, letterSpacing: "-1px", color: "#0A0A0A" }}>
+              Un prix. <span className="gradient-text">Tout inclus.</span>
+            </h2>
           </div>
 
-          <div style={{ background: "#fff", border: "2px solid #FF5500", borderRadius: 24, padding: "44px 40px", textAlign: "center", position: "relative", boxShadow: "0 20px 50px -15px rgba(255,85,0,0.15)" }}>
-            <div style={{ position: "absolute", top: -13, left: "50%", transform: "translateX(-50%)", background: "#FF5500", color: "#fff", padding: "3px 14px", borderRadius: 100, fontSize: 11, fontWeight: 700, letterSpacing: 0.5 }}>21 JOURS GRATUITS</div>
-            <div style={{ fontSize: 13, fontWeight: 600, color: "#71717A", textTransform: "uppercase", letterSpacing: 1, marginBottom: 12 }}>Offre Capitaine</div>
+          <div style={{ background: "#fff", border: "2px solid #FF5500", borderRadius: 28, padding: "44px 36px", textAlign: "center", position: "relative", boxShadow: "0 20px 60px rgba(255,85,0,0.1)" }}>
+            <div style={{ position: "absolute", top: -13, left: "50%", transform: "translateX(-50%)", background: "#FF5500", color: "#fff", padding: "4px 16px", borderRadius: 100, fontSize: 11, fontWeight: 700, letterSpacing: 0.5 }}>21 JOURS GRATUITS</div>
+            <div style={{ fontSize: 13, fontWeight: 600, color: "#888", textTransform: "uppercase", letterSpacing: 1, marginBottom: 14 }}>Offre Capitaine Complète</div>
             <div style={{ display: "flex", alignItems: "baseline", justifyContent: "center", gap: 2, marginBottom: 6 }}>
-              <span style={{ fontSize: 56, fontWeight: 900, color: "#09090B", lineHeight: 1 }}>33</span>
-              <span style={{ fontSize: 20, fontWeight: 800, color: "#09090B" }}>,99 €</span>
-              <span style={{ fontSize: 14, color: "#71717A", fontWeight: 500, marginLeft: 2 }}>/mois</span>
+              <span style={{ fontSize: 60, fontWeight: 900, color: "#0A0A0A", lineHeight: 1 }}>33</span>
+              <span style={{ fontSize: 22, fontWeight: 800, color: "#0A0A0A" }}>,99 €</span>
+              <span style={{ fontSize: 14, color: "#888", fontWeight: 500, marginLeft: 4 }}>/mois</span>
             </div>
             <p style={{ fontSize: 13, color: "#FF5500", fontWeight: 600, marginBottom: 28 }}>facturé annuellement · ou 49,99 €/mois</p>
-
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, textAlign: "left", marginBottom: 32, borderTop: "1px solid #F4F4F5", paddingTop: 24 }}>
-              {["Membres illimités", "Check-in GPS", "Fiches ICE", "Spots partenaires", "Cagnotte (0% frais)", "Support 24/7"].map((f, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 600 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, textAlign: "left", marginBottom: 32, borderTop: "1px solid #F0F0F0", paddingTop: 24 }}>
+              {["Membres illimités", "Check-in GPS", "Fiches ICE d'urgence", "Spots partenaires", "Cagnotte (0% frais)", "Support prioritaire"].map((f, i) => (
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 600, color: "#333" }}>
                   <Check size={14} color="#FF5500" /> {f}
                 </div>
               ))}
             </div>
-            <Link href="/login?mode=signup" className="btn-primary" style={{ width: "100%", justifyContent: "center" }}>Démarrer l&apos;essai gratuit</Link>
+            <Link href="/login?mode=signup" className="btn-primary" style={{ width: "100%", justifyContent: "center", borderRadius: 14 }}>
+              Démarrer mon essai gratuit
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* ═══════════════ FAQ ═══════════════ */}
-      <section style={{ padding: "0 0 120px" }}>
+      {/* ═══════════ FAQ — LIGHT SECTION ═══════════ */}
+      <section style={{ background: "#F8F8F8", padding: "100px 0" }}>
         <div className="container" style={{ maxWidth: 720 }}>
-          <h3 style={{ fontSize: 24, fontWeight: 800, textAlign: "center", marginBottom: 32 }}>Questions fréquentes</h3>
+          <h3 style={{ fontSize: 32, fontWeight: 800, textAlign: "center", marginBottom: 40, letterSpacing: "-0.5px" }}>Questions fréquentes</h3>
           {faqs.map((f, i) => (
-            <div key={i} style={{ background: "#fff", border: "1px solid #E4E4E7", borderRadius: 14, marginBottom: 10, overflow: "hidden" }}>
-              <button onClick={() => setOpenFaq(openFaq === i ? null : i)} style={{ width: "100%", padding: "18px 20px", textAlign: "left", display: "flex", justifyContent: "space-between", alignItems: "center", background: "none", border: "none", cursor: "pointer", fontSize: 15, fontWeight: 600, color: "#09090B" }}>
+            <div key={i} style={{ background: "#fff", border: "1px solid #E8E8E8", borderRadius: 16, marginBottom: 10, overflow: "hidden" }}>
+              <button onClick={() => setOpenFaq(openFaq === i ? null : i)} style={{ width: "100%", padding: "20px 24px", textAlign: "left", display: "flex", justifyContent: "space-between", alignItems: "center", background: "none", border: "none", cursor: "pointer", fontSize: 15, fontWeight: 600, color: "#0A0A0A" }}>
                 {f.q}
-                {openFaq === i ? <ChevronUp size={16} color="#FF5500" /> : <ChevronDown size={16} color="#A1A1AA" />}
+                {openFaq === i ? <ChevronUp size={16} color="#FF5500" /> : <ChevronDown size={16} color="#AAA" />}
               </button>
-              {openFaq === i && <div style={{ padding: "0 20px 18px", fontSize: 14, color: "#71717A", lineHeight: 1.6, borderTop: "1px solid #F4F4F5", paddingTop: 12 }}>{f.a}</div>}
+              {openFaq === i && <div style={{ padding: "0 24px 20px", fontSize: 14, color: "#666", lineHeight: 1.6, borderTop: "1px solid #F0F0F0", paddingTop: 14 }}>{f.a}</div>}
             </div>
           ))}
         </div>
       </section>
 
-      {/* ═══════════════ FOOTER CTA ═══════════════ */}
-      <footer style={{ background: "#09090B", color: "#fff", padding: "100px 0 48px" }}>
+      {/* ═══════════ FINAL CTA — DARK SECTION WITH PHONES ═══════════ */}
+      <section style={{ background: "linear-gradient(180deg, #0A0A0A 0%, #141414 100%)", color: "#fff", padding: "120px 0", textAlign: "center" }}>
         <div className="container">
-          <div style={{ background: "#18181B", border: "1px solid #27272A", borderRadius: 24, padding: "64px 40px", textAlign: "center", marginBottom: 72 }}>
-            <h2 style={{ fontSize: 36, fontWeight: 800, letterSpacing: "-0.8px", marginBottom: 14 }}>Ton crew mérite mieux que WhatsApp.</h2>
-            <p style={{ fontSize: 15, color: "#A1A1AA", maxWidth: 440, margin: "0 auto 32px" }}>Rejoins les capitaines qui sécurisent leurs rassemblements sportifs.</p>
-            <Link href="/login?mode=signup" className="btn-primary" style={{ padding: "16px 36px", fontSize: 16 }}>Rejoindre la Bêta <ArrowRight size={18} /></Link>
+          <h2 style={{ fontSize: 40, fontWeight: 800, letterSpacing: "-1px", marginBottom: 14 }}>
+            Prêt à piloter ton crew avec <span className="gradient-text">CAPTEN</span> ?
+          </h2>
+          <p style={{ fontSize: 16, color: "#888", maxWidth: 480, margin: "0 auto 40px" }}>
+            Rejoins les capitaines qui sécurisent et automatisent leurs rassemblements sportifs. 21 jours d&apos;essai gratuit, sans carte bancaire.
+          </p>
+          <div style={{ display: "flex", justifyContent: "center", gap: 12 }}>
+            <Link href="/login?mode=signup" className="btn-primary" style={{ padding: "16px 36px", fontSize: 16 }}>
+              Commencer gratuitement <ArrowRight size={16} />
+            </Link>
           </div>
+        </div>
+      </section>
 
-          <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: 16, borderTop: "1px solid #27272A", paddingTop: 32, fontSize: 13, color: "#52525B" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <img src="/logo.png" alt="CAPTEN" style={{ height: 24, filter: "brightness(0) invert(1)" }} />
-              <span>© 2026 CAPTEN</span>
-            </div>
-            <div style={{ display: "flex", gap: 20 }}>
-              <Link href="/cgu" className="ft-link">CGU</Link>
-              <Link href="/rgpd" className="ft-link">RGPD</Link>
-              <Link href="/mentions-legales" className="ft-link">Mentions Légales</Link>
-              <Link href="/support" className="ft-link">Support</Link>
-            </div>
+      {/* ═══════════ FOOTER ═══════════ */}
+      <footer style={{ background: "#0A0A0A", color: "#fff", padding: "48px 0", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+        <div className="container" style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: 16, fontSize: 13, color: "#555" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <img src="/logo.png" alt="CAPTEN" style={{ height: 22, filter: "brightness(0) invert(1)" }} />
+            <span>© 2026 CAPTEN. Tous droits réservés.</span>
+          </div>
+          <div style={{ display: "flex", gap: 20 }}>
+            {[["CGU", "/cgu"], ["RGPD", "/rgpd"], ["Mentions Légales", "/mentions-legales"], ["Support", "/support"]].map(([l, h], i) => (
+              <Link key={i} href={h} style={{ color: "#555", transition: "color 0.15s" }}
+                onMouseEnter={e => e.currentTarget.style.color = "#fff"} onMouseLeave={e => e.currentTarget.style.color = "#555"}>{l}</Link>
+            ))}
           </div>
         </div>
       </footer>
