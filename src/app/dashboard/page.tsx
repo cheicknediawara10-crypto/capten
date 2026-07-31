@@ -454,6 +454,46 @@ export default function DashboardPage() {
     fetchWeather();
   }, [latestRun?.id, latestRun?.location]);
 
+  const handleEnableDemoMode = () => {
+    const mockRuns = [
+      {
+        id: "run-demo-1",
+        title: "Session Run & Chill #42 — République",
+        location: "Place de la République, Paris",
+        date_start: new Date().toISOString(),
+        max_slots: 50,
+        slots_taken: 48,
+        status: "scheduled"
+      },
+      {
+        id: "run-demo-2",
+        title: "Morning Run Canal Saint-Martin",
+        location: "Canal Saint-Martin, Paris",
+        date_start: new Date(Date.now() + 86400000 * 2).toISOString(),
+        max_slots: 30,
+        slots_taken: 28,
+        status: "scheduled"
+      }
+    ];
+
+    const mockAthletes = [
+      { id: "a1", name: "Thomas Lefebvre", phone: "06 14 22 89 10", blood: "A+", emergencyName: "Marie", emergencyPhone: "06 88 12 34 56", allergy: "Aucune", status: "checked_in", distance: 12, streak: 14, waiverStatus: "SIGNÉE" },
+      { id: "a2", name: "Sarah Marchand", phone: "06 98 77 12 34", blood: "O+", emergencyName: "Jean", emergencyPhone: "06 11 22 33 44", allergy: "Allergie Pénicilline", status: "checked_in", distance: 8, streak: 22, waiverStatus: "SIGNÉE" },
+      { id: "a3", name: "Alexandre Bernard", phone: "06 45 11 22 33", blood: "B-", emergencyName: "Clara", emergencyPhone: "06 77 88 99 00", allergy: "Asthme léger", status: "checked_in", distance: 24, streak: 8, waiverStatus: "SIGNÉE" },
+      { id: "a4", name: "Élodie Petit", phone: "06 33 22 11 00", blood: "AB+", emergencyName: "Lucas", emergencyPhone: "06 55 44 33 22", allergy: "Aucune", status: "checked_in", distance: 18, streak: 31, waiverStatus: "SIGNÉE" },
+      { id: "a5", name: "Julien Rochedieu", phone: "06 78 90 12 34", blood: "O-", emergencyName: "Chantal", emergencyPhone: "06 99 88 77 66", allergy: "Allergie Fruits à coque", status: "checked_in", distance: 15, streak: 19, waiverStatus: "SIGNÉE" }
+    ];
+
+    setRuns(mockRuns);
+    setAthletes(mockAthletes);
+    setSkipOnboarding(true);
+    setClubName("PARIS RUN CLUB");
+    localStorage.setItem('capten_runs_v3', JSON.stringify(mockRuns));
+    localStorage.setItem('capten_athletes_v3', JSON.stringify(mockAthletes));
+    localStorage.setItem('capten_onboarding_skipped', 'true');
+    localStorage.setItem('capten_club_name', 'PARIS RUN CLUB');
+  };
+
   const handleCancelRun = async (runId: string) => {
     if (window.confirm("Voulez-vous vraiment annuler ce run ?")) {
       if (isMock) {
@@ -633,6 +673,12 @@ export default function DashboardPage() {
                   <span className="opacity-0">00:00 · lun. 1 janv.</span>
                 )}
               </time>
+              <button
+                onClick={handleEnableDemoMode}
+                className="bg-white border border-[#FF5C00] text-[#FF5C00] px-3.5 py-2.5 rounded-control text-[10px] sm:text-[11px] font-black uppercase tracking-wider flex items-center justify-center gap-1.5 hover:bg-[#FFF0E8] transition-all shadow-sm active:scale-95 cursor-pointer"
+              >
+                ⚡ Démo (Données d'exemple)
+              </button>
               <Link href="/runs?openPlanifier=true" className="flex-1 sm:flex-initial bg-[#FF5C00] text-white px-4 sm:px-5 py-2.5 rounded-control text-[10px] sm:text-[11px] font-black uppercase tracking-wider flex items-center justify-center gap-2 hover:bg-black transition-all shadow-sm active:scale-95">
                 <Plus size={14} /> {L.launch_session_cap} +
               </Link>
