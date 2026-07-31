@@ -27,6 +27,10 @@ export default function AppLayoutWrapper({ children }: AppLayoutWrapperProps) {
     cleanPath === "/cgu" ||
     cleanPath === "/mentions-legales" ||
     cleanPath === "/rgpd" ||
+    cleanPath === "/demo-showcase" ||
+    cleanPath === "/demo" ||
+    cleanPath === "/preview" ||
+    cleanPath === "/mockup" ||
     cleanPath.includes("/checkin") ||
     cleanPath.startsWith("/runners/manage") ||
     cleanPath.startsWith("/securite/signaler") ||
