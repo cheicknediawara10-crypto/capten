@@ -37,24 +37,27 @@ import {
   RotateCcw,
   Eye,
   HelpCircle,
-  ChevronLeft
+  ChevronLeft,
+  MessageCircle,
+  Volume2
 } from "lucide-react";
 
 /* ═══════════════════════════════════════════════════════════════
-   CAPTEN 2026 — Landing Page avec Popups Interactifs Guidés
-   Concept : Popups / Infobulles explicatives ultra-simples (Style Enfant 12 ans)
+   CAPTEN 2026 — Landing Page avec VRAI Popup Modal Flottant
+   Un vrai modal popup interactif s'ouvre au premier plan avec sombre backdrop
 ═══════════════════════════════════════════════════════════════ */
 
 export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
-  const [popupStep, setPopupStep] = useState<number>(1);
+  const [showPopupModal, setShowPopupModal] = useState<boolean>(false);
+  const [activeStep, setActiveStep] = useState<number>(1);
   const [activeFaq, setActiveFaq] = useState<number | null>(0);
   const [membersCount, setMembersCount] = useState<number>(45);
 
-  // Demo States for Popup Interaction
-  const [checkedInState, setCheckedInState] = useState(false);
-  const [iceUnlockedState, setIceUnlockedState] = useState(false);
-  const [spotScannedState, setSpotScannedState] = useState(false);
+  // Interactive Demo States inside Popup Modal
+  const [modalGpsDone, setModalGpsDone] = useState(false);
+  const [modalIceUnlocked, setModalIceUnlocked] = useState(false);
+  const [modalSpotScanned, setModalSpotScanned] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -62,38 +65,38 @@ export default function LandingPage() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const popups = [
+  const popupData = [
     {
       step: 1,
-      badge: "🎯 Étape 1 / 4 • Le Pointage GPS",
+      tag: "🎯 POPUP 1 SUR 4 • LE POINTAGE GPS",
       title: "Comment savoir qui est là au rendez-vous ?",
-      desc: "Quand tes coureurs arrivent sur place, leur téléphone vérifie tout seul s'ils sont à moins de 100 mètres. Plus besoin de compter les têtes avec les doigts !",
-      actionText: "Tester le pointage d'un coureur"
+      desc: "C'est super simple ! Quand tes coureurs arrivent sur le lieu de rendez-vous, leur téléphone vérifie tout seul s'ils sont à moins de 100 mètres. Plus besoin de compter les têtes avec les doigts !",
+      icon: MapPin
     },
     {
       step: 2,
-      badge: "🩹 Étape 2 / 4 • La Fiche d'Urgence ICE",
-      title: "En cas de chute ou de petit bobo",
-      desc: "Si un membre se tord la cheville, tu touches son nom et tu vois son groupe sanguin et le téléphone de son papa ou sa maman en 1 seconde !",
-      actionText: "Déverrouiller le contact d'urgence"
+      tag: "🩹 POPUP 2 SUR 4 • LA FICHE D'URGENCE ICE",
+      title: "En cas de petite chute ou de bobo ?",
+      desc: "Si un membre se tord la cheville, tu n'as pas besoin de paniquer. Tu touches son prénom sur ton écran et tu vois son groupe sanguin et le numéro de sa famille en 1 seconde !",
+      icon: HeartPulse
     },
     {
       step: 3,
-      badge: "📑 Étape 3 / 4 • Le Registre Officiel",
-      title: "Le document magique pour être tranquille",
-      desc: "À la fin de la sortie, CAPTEN fabrique une liste officielle avec l'heure exacte. Tu es protégé à 100% sans aucun papier à remplir !",
-      actionText: "Voir le registre fabriqué"
+      tag: "📑 POPUP 3 SUR 4 • LE REGISTRE MAGIQUE",
+      title: "Le document certifié pour être tranquille",
+      desc: "À la fin de la sortie, CAPTEN fabrique une liste officielle imprimable avec l'heure exacte. Tu es 100% protégé auprès des assurances sans aucun papier !",
+      icon: FileCheck
     },
     {
       step: 4,
-      badge: "☕ Étape 4 / 4 • Le Café du coin",
+      tag: "☕ POPUP 4 SUR 4 • LE CAFÉ / CHOCOLAT CHAUD",
       title: "La récompense après l'effort !",
-      desc: "Après avoir bien couru ou marché, tous tes membres reçoivent un petit code réduction (-15%) pour boire un café ensemble chez le commerçant du quartier !",
-      actionText: "Débloquer la promo café -15%"
+      desc: "Après avoir bien couru ou marché, tous tes membres reçoivent un petit code sur leur téléphone pour avoir une réduction (-15%) sur leur café chez le commerçant du quartier !",
+      icon: Coffee
     }
   ];
 
-  const currentPopup = popups.find(p => p.step === popupStep) || popups[0];
+  const currentPopupData = popupData.find(p => p.step === activeStep) || popupData[0];
 
   return (
     <div className="min-h-screen bg-[#070709] text-white font-sans antialiased selection:bg-[#FF5500]/30 selection:text-[#FF5500] overflow-x-hidden">
@@ -111,7 +114,7 @@ export default function LandingPage() {
       {/* ──────────────────────────────────────────────────────────────
          1. FLOATING GLASS NAVBAR
       ────────────────────────────────────────────────────────────── */}
-      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "py-3 bg-[#070709]/80 backdrop-blur-2xl border-b border-white/[0.08]" : "py-6 bg-transparent"}`}>
+      <header className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${scrolled ? "py-3 bg-[#070709]/80 backdrop-blur-2xl border-b border-white/[0.08]" : "py-6 bg-transparent"}`}>
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
           
           {/* Logo */}
@@ -129,7 +132,9 @@ export default function LandingPage() {
 
           {/* Navigation Links */}
           <nav className="hidden md:flex items-center gap-8 text-sm font-semibold text-zinc-400">
-            <a href="#popup-demo" className="hover:text-white transition-colors">Démo à Popups</a>
+            <button onClick={() => { setShowPopupModal(true); setActiveStep(1); }} className="hover:text-white transition-colors cursor-pointer text-[#FF5500] font-bold flex items-center gap-1.5">
+              <Sparkles className="w-4 h-4" /> Lancer les Popups
+            </button>
             <a href="#features" className="hover:text-white transition-colors">Fonctionnalités</a>
             <a href="#calculator" className="hover:text-white transition-colors">Calculateur</a>
             <a href="#faq" className="hover:text-white transition-colors">FAQ</a>
@@ -200,19 +205,19 @@ export default function LandingPage() {
               transition={{ duration: 0.6, delay: 0.3 }}
               className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2"
             >
+              <button
+                onClick={() => { setShowPopupModal(true); setActiveStep(1); }}
+                className="w-full sm:w-auto px-8 py-4 rounded-full bg-[#FF5500] text-white font-extrabold text-sm shadow-xl shadow-[#FF5500]/40 hover:bg-orange-600 hover:scale-105 transition-all flex items-center justify-center gap-2 group cursor-pointer"
+              >
+                <Sparkles className="w-5 h-5" />
+                Ouvrir la Démo à Popups (Visite Guidée)
+              </button>
               <Link
                 href="/login?mode=signup"
-                className="w-full sm:w-auto px-8 py-4 rounded-full bg-[#FF5500] text-white font-extrabold text-sm shadow-xl shadow-[#FF5500]/30 hover:bg-orange-600 hover:scale-105 transition-all flex items-center justify-center gap-2 group"
-              >
-                Commencer gratuitement
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </Link>
-              <a
-                href="#popup-demo"
                 className="w-full sm:w-auto px-8 py-4 rounded-full bg-white/[0.05] border border-white/10 text-white font-extrabold text-sm hover:bg-white/[0.1] transition-all flex items-center justify-center gap-2"
               >
-                💬 Lancer la démo à popups ↓
-              </a>
+                Créer un compte gratuit →
+              </Link>
             </motion.div>
 
           </div>
@@ -222,7 +227,8 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.5 }}
-            className="mt-14 max-w-5xl mx-auto relative group"
+            className="mt-14 max-w-5xl mx-auto relative group cursor-pointer"
+            onClick={() => { setShowPopupModal(true); setActiveStep(1); }}
           >
             <div className="relative rounded-3xl bg-gradient-to-b from-white/10 to-white/[0.02] p-1.5 border border-white/10 shadow-[0_32px_96px_rgba(0,0,0,0.8)] backdrop-blur-2xl overflow-hidden">
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -231,6 +237,13 @@ export default function LandingPage() {
                 alt="Aperçu du Tableau de Bord CAPTEN"
                 className="w-full h-auto rounded-[20px] shadow-2xl transition-transform duration-500 group-hover:scale-[1.01]"
               />
+              
+              {/* Overlay Prompt to Click */}
+              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                <div className="bg-[#FF5500] text-white font-extrabold text-sm px-6 py-3 rounded-full shadow-2xl flex items-center gap-2">
+                  <Sparkles className="w-4 h-4" /> Cliquez pour lancer les popups interactifs !
+                </div>
+              </div>
             </div>
           </motion.div>
 
@@ -238,236 +251,190 @@ export default function LandingPage() {
       </section>
 
       {/* ──────────────────────────────────────────────────────────────
-         3. DÉMO INTERACTIVE À POPUPS (Infobulles guidées)
+         3. VRAI POPUP MODAL INTERACTIF (FLOATING OVERLAY WITH BACKDROP)
       ────────────────────────────────────────────────────────────── */}
-      <section id="popup-demo" className="py-24 bg-gradient-to-b from-[#070709] via-[#0D0D14] to-[#070709] border-y border-white/[0.08] relative z-10">
-        <div className="max-w-6xl mx-auto px-6 space-y-12">
-          
-          <div className="max-w-3xl mx-auto text-center space-y-4">
-            <span className="text-xs font-extrabold tracking-widest text-[#FF5500] uppercase bg-[#FF5500]/10 px-3.5 py-1.5 rounded-full border border-[#FF5500]/20 inline-flex items-center gap-2">
-              <Sparkles className="w-3.5 h-3.5 text-[#FF5500]" /> DÉMO INTERACTIVE AVEC POPUPS
-            </span>
-            <h2 className="font-syne text-3xl sm:text-5xl font-extrabold tracking-tight text-white">
-              Laisse-toi guider par les popups !
-            </h2>
-            <p className="text-sm sm:text-base text-zinc-400 font-medium max-w-xl mx-auto">
-              Clique sur les boutons dans chaque popup pour tester l'application en direct.
-            </p>
-          </div>
-
-          {/* Step Progress Buttons */}
-          <div className="flex justify-center items-center gap-2 max-w-xl mx-auto">
-            {[1, 2, 3, 4].map(s => (
-              <button
-                key={s}
-                onClick={() => setPopupStep(s)}
-                className={`flex-1 py-2.5 rounded-2xl text-xs font-extrabold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
-                  popupStep === s
-                    ? "bg-[#FF5500] text-white shadow-lg shadow-[#FF5500]/30 scale-[1.03]"
-                    : s < popupStep
-                    ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
-                    : "bg-white/5 text-zinc-500 border border-white/10 hover:text-white"
-                }`}
-              >
-                {s < popupStep ? <Check className="w-3.5 h-3.5" /> : null}
-                <span>Popup {s}</span>
-              </button>
-            ))}
-          </div>
-
-          {/* MAIN DEMO CONTAINER WITH FLOATING POPUP OVERLAY */}
-          <div className="max-w-4xl mx-auto relative bg-[#09090E] border border-white/10 rounded-3xl p-6 sm:p-10 shadow-2xl overflow-hidden min-h-[460px] flex flex-col justify-between">
+      <AnimatePresence>
+        {showPopupModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
             
-            {/* FLOATING POPUP TOOLTIP OVERLAY */}
+            {/* DARK BACKDROP */}
             <motion.div
-              key={popupStep}
-              initial={{ scale: 0.94, opacity: 0, y: -15 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowPopupModal(false)}
+              className="absolute inset-0 bg-black/80 backdrop-blur-md cursor-pointer"
+            />
+
+            {/* FLOATING POPUP WINDOW */}
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-              className="bg-white text-black p-6 sm:p-8 rounded-3xl shadow-2xl border-4 border-[#FF5500] relative z-30 space-y-4"
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="relative z-10 bg-white text-black rounded-3xl max-w-xl w-full p-6 sm:p-8 shadow-[0_32px_96px_rgba(0,0,0,0.9)] border-4 border-[#FF5500] space-y-6 overflow-hidden"
             >
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-black uppercase tracking-wider text-[#FF5500] bg-orange-50 px-3 py-1 rounded-md">
-                  {currentPopup.badge}
-                </span>
-                
+              {/* Top Bar inside Popup */}
+              <div className="flex items-center justify-between border-b border-zinc-100 pb-4">
                 <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-xl bg-[#FF5500] text-white flex items-center justify-center shadow-md">
+                    <Sparkles className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-black uppercase tracking-wider text-[#FF5500] block">
+                      {currentPopupData.tag}
+                    </span>
+                    <span className="text-xs font-bold text-zinc-500 font-mono">
+                      Visite Guidée Organisateurs
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-extrabold text-zinc-400 font-mono bg-zinc-100 px-2.5 py-1 rounded-lg">
+                    {activeStep} / 4
+                  </span>
                   <button
-                    disabled={popupStep === 1}
-                    onClick={() => setPopupStep(prev => Math.max(1, prev - 1))}
-                    className="p-1.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-zinc-700 disabled:opacity-30 cursor-pointer"
+                    onClick={() => setShowPopupModal(false)}
+                    className="p-1.5 rounded-full bg-zinc-100 hover:bg-zinc-200 text-zinc-700 transition-colors cursor-pointer"
                   >
-                    <ChevronLeft className="w-4 h-4" />
-                  </button>
-                  <span className="text-xs font-mono font-bold text-zinc-500">{popupStep} / 4</span>
-                  <button
-                    disabled={popupStep === 4}
-                    onClick={() => setPopupStep(prev => Math.min(4, prev + 1))}
-                    className="p-1.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-zinc-700 disabled:opacity-30 cursor-pointer"
-                  >
-                    <ChevronRight className="w-4 h-4" />
+                    <X className="w-4 h-4" />
                   </button>
                 </div>
               </div>
 
-              <div className="space-y-1">
-                <h3 className="font-syne text-xl sm:text-2xl font-bold text-black leading-tight">
-                  {currentPopup.title}
+              {/* Popup Title & Child-Friendly Explanation */}
+              <div className="space-y-2">
+                <h3 className="font-syne text-xl sm:text-2xl font-black text-black leading-tight flex items-center gap-2">
+                  <currentPopupData.icon className="w-6 h-6 text-[#FF5500] shrink-0" />
+                  {currentPopupData.title}
                 </h3>
                 <p className="text-xs sm:text-sm text-zinc-600 font-medium leading-relaxed">
-                  {currentPopup.desc}
+                  {currentPopupData.desc}
                 </p>
               </div>
 
-              {/* Popup Interactive Controls */}
-              <div className="pt-3 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-zinc-100">
+              {/* POPUP INTERACTIVE SANDBOX DEMO */}
+              <div className="bg-zinc-900 text-white rounded-2xl p-5 border border-zinc-800 space-y-3">
                 
-                {popupStep === 1 && (
-                  <button
-                    onClick={() => setCheckedInState(!checkedInState)}
-                    className="w-full sm:w-auto px-6 py-3 rounded-xl bg-[#FF5500] hover:bg-orange-600 text-white font-extrabold text-xs shadow-lg shadow-[#FF5500]/30 transition-all cursor-pointer flex items-center justify-center gap-2"
-                  >
-                    <MapPin className="w-4 h-4" />
-                    {checkedInState ? "✓ Présence Validée ! (Cliquer pour réinitialiser)" : "🎯 Appuie ici pour simuler le pointage →"}
-                  </button>
-                )}
+                {activeStep === 1 && (
+                  <div className="space-y-3">
+                    <div className="text-xs font-bold text-zinc-300 flex justify-between">
+                      <span>Lieu : Place de la République</span>
+                      <span className="text-[#FF5500] font-mono">Précision : 100m</span>
+                    </div>
 
-                {popupStep === 2 && (
-                  <button
-                    onClick={() => setIceUnlockedState(!iceUnlockedState)}
-                    className="w-full sm:w-auto px-6 py-3 rounded-xl bg-rose-500 hover:bg-rose-600 text-white font-extrabold text-xs shadow-lg transition-all cursor-pointer flex items-center justify-center gap-2"
-                  >
-                    <HeartPulse className="w-4 h-4" />
-                    {iceUnlockedState ? "✓ Contact affiché ! (Cliquer pour masquer)" : "🩹 Appuie ici pour voir le contact d'urgence →"}
-                  </button>
-                )}
-
-                {popupStep === 3 && (
-                  <div className="text-xs font-bold text-emerald-700 bg-emerald-50 px-4 py-2.5 rounded-xl border border-emerald-200 flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                    <span>Le registre officiel PDF est créé automatiquement !</span>
+                    {modalGpsDone ? (
+                      <div className="p-3 bg-emerald-500/20 border border-emerald-500/40 rounded-xl text-center space-y-1">
+                        <div className="text-xs font-extrabold text-emerald-400 flex items-center justify-center gap-1">
+                          <CheckCircle2 className="w-4 h-4" /> Thomas Lefebvre est Émargé ! (14m du RDV)
+                        </div>
+                        <div className="text-[10px] text-zinc-300">Horodatage : 19:28:14 • Signal GPS Fort</div>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => setModalGpsDone(true)}
+                        className="w-full py-3 rounded-xl bg-[#FF5500] hover:bg-orange-600 text-white font-extrabold text-xs shadow-lg transition-all cursor-pointer flex items-center justify-center gap-2"
+                      >
+                        <MapPin className="w-4 h-4" />
+                        Appuie ici pour simuler l'arrivée d'un coureur →
+                      </button>
+                    )}
                   </div>
                 )}
 
-                {popupStep === 4 && (
-                  <button
-                    onClick={() => setSpotScannedState(!spotScannedState)}
-                    className="w-full sm:w-auto px-6 py-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-black font-extrabold text-xs shadow-lg transition-all cursor-pointer flex items-center justify-center gap-2"
-                  >
-                    <Coffee className="w-4 h-4" />
-                    {spotScannedState ? "✓ Code -15% Débloqué !" : "☕ Appuie ici pour débloquer la promo café →"}
-                  </button>
+                {activeStep === 2 && (
+                  <div className="space-y-3">
+                    <div className="text-xs font-bold text-white flex justify-between">
+                      <span>Profil Coureur : Sarah Marchand</span>
+                      <span className="bg-rose-500 text-white px-2 py-0.5 rounded text-[10px] font-extrabold">O+</span>
+                    </div>
+
+                    {modalIceUnlocked ? (
+                      <div className="p-3 bg-rose-500/20 border border-rose-500/40 rounded-xl space-y-1 text-xs">
+                        <div className="font-bold text-white">📞 Contact Urgence : 06 11 22 33 44 (Papa)</div>
+                        <div className="text-amber-300 font-bold text-[11px]">⚠️ Allergie : Pénicilline</div>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => setModalIceUnlocked(true)}
+                        className="w-full py-3 rounded-xl bg-rose-500 hover:bg-rose-600 text-white font-extrabold text-xs shadow-lg transition-all cursor-pointer flex items-center justify-center gap-2"
+                      >
+                        <HeartPulse className="w-4 h-4" />
+                        Appuie ici pour voir le numéro du Papa/Maman →
+                      </button>
+                    )}
+                  </div>
                 )}
 
-                {popupStep < 4 && (
+                {activeStep === 3 && (
+                  <div className="bg-white text-black p-4 rounded-xl text-xs font-mono space-y-1 border border-zinc-200">
+                    <div className="font-bold text-emerald-700 flex items-center gap-1">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600" /> REGISTRE DE PRÉSENCE CERTIFIÉ #2026-42
+                    </div>
+                    <div className="text-[11px] text-zinc-600">
+                      • 48 membres valides sous 100m • Horodatage satellite imprimable en 1-clic.
+                    </div>
+                  </div>
+                )}
+
+                {activeStep === 4 && (
+                  <div className="space-y-3">
+                    <div className="text-xs font-bold text-amber-400 flex justify-between">
+                      <span>Café du Cycliste Paris</span>
+                      <span>-15% après le run</span>
+                    </div>
+
+                    {modalSpotScanned ? (
+                      <div className="p-3 bg-amber-500/20 border border-amber-500/40 rounded-xl text-center text-xs font-mono font-bold text-amber-300">
+                        CODE SCANNE : PROMO-15-OK
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => setModalSpotScanned(true)}
+                        className="w-full py-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-black font-extrabold text-xs shadow-lg transition-all cursor-pointer flex items-center justify-center gap-2"
+                      >
+                        <Coffee className="w-4 h-4" />
+                        Appuie ici pour débloquer le code café →
+                      </button>
+                    )}
+                  </div>
+                )}
+
+              </div>
+
+              {/* Bottom Navigation Buttons inside Popup */}
+              <div className="flex items-center justify-between pt-2">
+                <button
+                  disabled={activeStep === 1}
+                  onClick={() => setActiveStep(prev => Math.max(1, prev - 1))}
+                  className="px-4 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-700 font-extrabold text-xs disabled:opacity-30 cursor-pointer flex items-center gap-1"
+                >
+                  <ChevronLeft className="w-4 h-4" /> Précédent
+                </button>
+
+                {activeStep < 4 ? (
                   <button
-                    onClick={() => setPopupStep(prev => prev + 1)}
-                    className="text-xs font-extrabold text-black hover:text-[#FF5500] flex items-center gap-1 cursor-pointer"
+                    onClick={() => setActiveStep(prev => prev + 1)}
+                    className="px-6 py-2.5 rounded-xl bg-[#FF5500] hover:bg-orange-600 text-white font-extrabold text-xs shadow-lg shadow-[#FF5500]/30 transition-all cursor-pointer flex items-center gap-1"
                   >
-                    Popup suivant <ArrowRight className="w-3.5 h-3.5" />
+                    Popup Suivant (Étape {activeStep + 1}) <ChevronRight className="w-4 h-4" />
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => setShowPopupModal(false)}
+                    className="px-6 py-2.5 rounded-xl bg-black hover:bg-zinc-800 text-white font-extrabold text-xs transition-all cursor-pointer flex items-center gap-1"
+                  >
+                    Terminer la visite ✓
                   </button>
                 )}
               </div>
 
             </motion.div>
 
-            {/* SCREEN SIMULATION BACKDROP UNDER THE POPUP */}
-            <div className="pt-6 relative z-10 opacity-90">
-              
-              {/* STEP 1: GPS SCREEN */}
-              {popupStep === 1 && (
-                <div className="bg-[#070709] border border-white/10 rounded-2xl p-6 space-y-4">
-                  <div className="flex justify-between items-center text-xs font-bold text-zinc-400">
-                    <span>Point de Rendez-vous : République, Paris</span>
-                    <span className="text-[#FF5500] font-mono">Rayon : 100m</span>
-                  </div>
-
-                  <div className="p-4 bg-white/5 rounded-xl border border-white/5 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center font-bold text-xs text-white">
-                        TL
-                      </div>
-                      <div>
-                        <div className="text-xs font-bold text-white">Thomas Lefebvre</div>
-                        <div className="text-[10px] text-zinc-400">Distance au point : 14 mètres</div>
-                      </div>
-                    </div>
-
-                    {checkedInState ? (
-                      <span className="text-xs font-extrabold text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20 flex items-center gap-1">
-                        <CheckCircle2 className="w-3.5 h-3.5" /> Émargé à 19:28
-                      </span>
-                    ) : (
-                      <span className="text-xs font-bold text-amber-400 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">
-                        En attente d'arrivée
-                      </span>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* STEP 2: ICE SCREEN */}
-              {popupStep === 2 && (
-                <div className="bg-gradient-to-r from-rose-950/20 to-zinc-900 border border-rose-500/20 rounded-2xl p-6 space-y-3">
-                  <div className="flex justify-between items-center text-xs font-bold text-white">
-                    <span>Fiche d'Urgence Coureur : Sarah Marchand</span>
-                    <span className="bg-rose-500 text-white px-2 py-0.5 rounded text-[10px] font-extrabold">O+</span>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                    <div className="bg-white/5 p-3 rounded-xl">
-                      <span className="text-[10px] text-zinc-400 font-bold block">CONTACT FAMILLE :</span>
-                      <span className="font-mono text-white font-bold">
-                        {iceUnlockedState ? "06 11 22 33 44 (Papa)" : "06 •• •• •• •• (Masqué)"}
-                      </span>
-                    </div>
-
-                    <div className="bg-amber-500/10 p-3 rounded-xl text-amber-300 font-bold">
-                      ⚠️ ALLERGIE : Pénicilline
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* STEP 3: PDF SCREEN */}
-              {popupStep === 3 && (
-                <div className="bg-white text-black p-5 rounded-2xl text-xs font-mono space-y-2 border border-zinc-200">
-                  <div className="flex justify-between items-center font-bold border-b border-zinc-200 pb-2">
-                    <span>REGISTRE DE PRÉSENCE OFFICIEL #2026-42</span>
-                    <span className="text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded text-[10px]">CERTIFIÉ OK</span>
-                  </div>
-                  <div className="text-[11px] text-zinc-600">
-                    • 48 coureurs émargés sous 100m • Horodatage satellite conforme assurances
-                  </div>
-                </div>
-              )}
-
-              {/* STEP 4: SPOTS SCREEN */}
-              {popupStep === 4 && (
-                <div className="bg-white/5 border border-white/10 p-5 rounded-2xl flex items-center justify-between text-xs">
-                  <div>
-                    <div className="font-bold text-white text-sm">Café du Cycliste Paris</div>
-                    <div className="text-zinc-400 mt-0.5">-15% sur toutes les boissons après la sortie</div>
-                  </div>
-
-                  {spotScannedState ? (
-                    <span className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-3 py-1.5 rounded-xl font-mono font-bold">
-                      PROMO-15-OK
-                    </span>
-                  ) : (
-                    <span className="bg-amber-500/20 text-amber-300 border border-amber-500/30 px-3 py-1.5 rounded-xl font-bold">
-                      -15% Disponible
-                    </span>
-                  )}
-                </div>
-              )}
-
-            </div>
-
           </div>
-
-        </div>
-      </section>
+        )}
+      </AnimatePresence>
 
       {/* ──────────────────────────────────────────────────────────────
          4. BENTO GRID FEATURES
