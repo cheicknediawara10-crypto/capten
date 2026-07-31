@@ -61,7 +61,7 @@ export default function DemoShowcasePage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-card-outer border border-black/5 shadow-sm">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-black italic uppercase tracking-tight text-black">
+            <h1 className="text-xl font-extrabold uppercase tracking-tight text-black">
               Tableau de Bord Capitaine
             </h1>
             <span className="bg-[#FF5C00]/10 text-[#FF5C00] text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
@@ -147,7 +147,7 @@ export default function DemoShowcasePage() {
             {/* Table Controls */}
             <div className="p-6 border-b border-neutral-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <h3 className="text-base font-black uppercase text-black">Registre des Présences & Fiches ICE</h3>
+                <h3 className="text-sm font-extrabold uppercase text-black">Registre des Présences & Fiches ICE</h3>
                 <p className="text-xs text-neutral-400 font-semibold">Pointage satellite horodaté et contacts d'urgence</p>
               </div>
 
@@ -173,20 +173,20 @@ export default function DemoShowcasePage() {
               <table className="w-full text-left text-xs text-neutral-700">
                 <thead className="bg-neutral-50 text-[10px] font-mono font-black text-neutral-400 uppercase tracking-wider border-b border-neutral-100">
                   <tr>
-                    <th className="px-6 py-3.5">Membre</th>
-                    <th className="px-4 py-3.5">Téléphone</th>
-                    <th className="px-4 py-3.5">Groupe Sanguin</th>
-                    <th className="px-4 py-3.5">Allergie / Risque</th>
-                    <th className="px-4 py-3.5">Statut GPS</th>
-                    <th className="px-6 py-3.5 text-right">Assiduité</th>
+                    <th className="px-6 py-3.5 whitespace-nowrap">Membre</th>
+                    <th className="px-4 py-3.5 whitespace-nowrap">Téléphone</th>
+                    <th className="px-4 py-3.5 whitespace-nowrap">Groupe Sanguin</th>
+                    <th className="px-4 py-3.5 whitespace-nowrap">Allergie / Risque</th>
+                    <th className="px-4 py-3.5 whitespace-nowrap">Statut GPS</th>
+                    <th className="px-6 py-3.5 text-right whitespace-nowrap">Assiduité</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-neutral-100 font-semibold">
                   {filteredRunners.map(r => (
                     <tr key={r.id} className="hover:bg-neutral-50/80 transition-colors">
-                      <td className="px-6 py-4">
+                      <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-neutral-900 text-white flex items-center justify-center font-bold text-xs">
+                          <div className="w-8 h-8 rounded-full bg-neutral-900 text-white flex items-center justify-center font-bold text-xs shrink-0">
                             {r.name.split(' ').map(n => n[0]).join('')}
                           </div>
                           <div>
@@ -195,36 +195,36 @@ export default function DemoShowcasePage() {
                           </div>
                         </div>
                       </td>
-                      <td className="px-4 py-4 font-mono text-neutral-500">{r.phone}</td>
-                      <td className="px-4 py-4">
+                      <td className="px-4 py-4 font-mono text-neutral-500 whitespace-nowrap">{r.phone}</td>
+                      <td className="px-4 py-4 whitespace-nowrap">
                         <span className={`px-2 py-0.5 rounded text-[10px] font-extrabold ${r.blood.includes('+') ? 'bg-rose-50 text-rose-600 border border-rose-100' : 'bg-blue-50 text-blue-600 border border-blue-100'}`}>
                           {r.blood}
                         </span>
                       </td>
-                      <td className="px-4 py-4">
+                      <td className="px-4 py-4 whitespace-nowrap">
                         {r.allergy !== "Aucune" ? (
                           <span className="text-amber-700 flex items-center gap-1 font-bold bg-amber-50 px-2 py-0.5 rounded text-[11px] border border-amber-100">
-                            <AlertTriangle className="w-3 h-3 text-amber-600" /> {r.allergy}
+                            <AlertTriangle className="w-3 h-3 text-amber-600 shrink-0" /> {r.allergy}
                           </span>
                         ) : (
                           <span className="text-neutral-400 text-[11px]">Aucun risque</span>
                         )}
                       </td>
-                      <td className="px-4 py-4">
+                      <td className="px-4 py-4 whitespace-nowrap">
                         {r.status === "checked_in" ? (
                           <div>
                             <span className="text-emerald-600 font-bold flex items-center gap-1">
-                              <CheckCircle2 className="w-3.5 h-3.5" /> Émargé ({r.distance}m)
+                              <CheckCircle2 className="w-3.5 h-3.5 shrink-0" /> Émargé ({r.distance}m)
                             </span>
                             <div className="text-[9px] text-neutral-400 font-mono mt-0.5">{r.time}</div>
                           </div>
                         ) : (
                           <span className="text-amber-600 font-bold flex items-center gap-1">
-                            <Clock className="w-3.5 h-3.5 animate-spin" /> En attente
+                            <Clock className="w-3.5 h-3.5 animate-spin shrink-0" /> En attente
                           </span>
                         )}
                       </td>
-                      <td className="px-6 py-4 text-right">
+                      <td className="px-6 py-4 text-right whitespace-nowrap">
                         <span className="inline-flex items-center gap-1 text-neutral-700 bg-neutral-100 px-2.5 py-1 rounded-full font-bold">
                           <Award className="w-3 h-3 text-[#FF5C00]" /> {r.streak} runs
                         </span>
