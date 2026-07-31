@@ -458,18 +458,26 @@ export default function DashboardPage() {
     const mockRuns = [
       {
         id: "run-demo-1",
-        title: "Session Run & Chill #42 — République",
+        name: "SESSION RUN & CHILL #42 — RÉPUBLIQUE",
+        title: "Session Run & Chill #42 — Place de la République",
+        date: "Ce soir",
+        time: "19h30",
         location: "Place de la République, Paris",
-        date_start: new Date().toISOString(),
+        distance: "10 km",
+        pace: "5'30\"/km",
         max_slots: 50,
         slots_taken: 48,
         status: "scheduled"
       },
       {
         id: "run-demo-2",
+        name: "MORNING RUN CANAL SAINT-MARTIN",
         title: "Morning Run Canal Saint-Martin",
+        date: "Samedi",
+        time: "09h00",
         location: "Canal Saint-Martin, Paris",
-        date_start: new Date(Date.now() + 86400000 * 2).toISOString(),
+        distance: "8 km",
+        pace: "5'45\"/km",
         max_slots: 30,
         slots_taken: 28,
         status: "scheduled"
@@ -477,19 +485,35 @@ export default function DashboardPage() {
     ];
 
     const mockAthletes = [
-      { id: "a1", name: "Thomas Lefebvre", phone: "06 14 22 89 10", blood: "A+", emergencyName: "Marie", emergencyPhone: "06 88 12 34 56", allergy: "Aucune", status: "checked_in", distance: 12, streak: 14, waiverStatus: "SIGNÉE" },
-      { id: "a2", name: "Sarah Marchand", phone: "06 98 77 12 34", blood: "O+", emergencyName: "Jean", emergencyPhone: "06 11 22 33 44", allergy: "Allergie Pénicilline", status: "checked_in", distance: 8, streak: 22, waiverStatus: "SIGNÉE" },
-      { id: "a3", name: "Alexandre Bernard", phone: "06 45 11 22 33", blood: "B-", emergencyName: "Clara", emergencyPhone: "06 77 88 99 00", allergy: "Asthme léger", status: "checked_in", distance: 24, streak: 8, waiverStatus: "SIGNÉE" },
-      { id: "a4", name: "Élodie Petit", phone: "06 33 22 11 00", blood: "AB+", emergencyName: "Lucas", emergencyPhone: "06 55 44 33 22", allergy: "Aucune", status: "checked_in", distance: 18, streak: 31, waiverStatus: "SIGNÉE" },
-      { id: "a5", name: "Julien Rochedieu", phone: "06 78 90 12 34", blood: "O-", emergencyName: "Chantal", emergencyPhone: "06 99 88 77 66", allergy: "Allergie Fruits à coque", status: "checked_in", distance: 15, streak: 19, waiverStatus: "SIGNÉE" }
+      { id: "a1", name: "Thomas Lefebvre", phone: "06 14 22 89 10", blood: "A+", emergencyName: "Marie (Épouse)", emergencyPhone: "06 88 12 34 56", allergy: "Aucune", status: "checked_in", distance: 12, streak: 14, waiverStatus: "SIGNÉE", reliability: 98, runsCount: 14 },
+      { id: "a2", name: "Sarah Marchand", phone: "06 98 77 12 34", blood: "O+", emergencyName: "Jean (Père)", emergencyPhone: "06 11 22 33 44", allergy: "Allergie Pénicilline", status: "checked_in", distance: 8, streak: 22, waiverStatus: "SIGNÉE", reliability: 95, runsCount: 22 },
+      { id: "a3", name: "Alexandre Bernard", phone: "06 45 11 22 33", blood: "B-", emergencyName: "Clara (Sœur)", emergencyPhone: "06 77 88 99 00", allergy: "Asthme léger", status: "checked_in", distance: 24, streak: 8, waiverStatus: "SIGNÉE", reliability: 92, runsCount: 8 },
+      { id: "a4", name: "Élodie Petit", phone: "06 33 22 11 00", blood: "AB+", emergencyName: "Lucas (Frère)", emergencyPhone: "06 55 44 33 22", allergy: "Aucune", status: "checked_in", distance: 18, streak: 31, waiverStatus: "SIGNÉE", reliability: 100, runsCount: 31 },
+      { id: "a5", name: "Julien Rochedieu", phone: "06 78 90 12 34", blood: "O-", emergencyName: "Chantal (Mère)", emergencyPhone: "06 99 88 77 66", allergy: "Allergie Fruits à coque", status: "checked_in", distance: 15, streak: 19, waiverStatus: "SIGNÉE", reliability: 94, runsCount: 19 },
+      { id: "a6", name: "Camille Rousseau", phone: "06 12 34 56 78", blood: "A-", emergencyName: "David (Conjoint)", emergencyPhone: "06 44 33 22 11", allergy: "Aucune", status: "checked_in", distance: 11, streak: 5, waiverStatus: "SIGNÉE", reliability: 90, runsCount: 5 },
+      { id: "a7", name: "Maxime Fournier", phone: "06 87 65 43 21", blood: "B+", emergencyName: "Antoine (Ami)", emergencyPhone: "06 22 11 00 99", allergy: "Aucune", status: "checked_in", distance: 31, streak: 12, waiverStatus: "SIGNÉE", reliability: 96, runsCount: 12 }
+    ];
+
+    const mockNotifs = [
+      { id: 'n1', type: 'registration', message: "Thomas Lefebvre a validé son émargement GPS (12m du RDV)", timestamp: "À l'instant" },
+      { id: 'n2', type: 'waiver', message: "Sarah Marchand a signé sa décharge de responsabilité", timestamp: "Il y a 5 min" },
+      { id: 'n3', type: 'cagnotte', message: "Contribution de 25,00 € reçue de Alexandre Bernard", timestamp: "Il y a 12 min" },
+      { id: 'n4', type: 'registration', message: "Élodie Petit s'est inscrite au run SESSION RUN & CHILL #42", timestamp: "Il y a 30 min" },
+      { id: 'n5', type: 'waiver', message: "Julien Rochedieu a mis à jour sa fiche médicale d'urgence ICE", timestamp: "Il y a 1h" }
     ];
 
     setRuns(mockRuns);
     setAthletes(mockAthletes);
+    setNotifications(mockNotifs);
     setSkipOnboarding(true);
     setClubName("PARIS RUN CLUB");
+    setCagnotteUrl("https://lydia-app.com/pots?id=capten-paris");
+
     localStorage.setItem('capten_runs_v3', JSON.stringify(mockRuns));
     localStorage.setItem('capten_athletes_v3', JSON.stringify(mockAthletes));
+    localStorage.setItem('capten_inapp_notifications', JSON.stringify(mockNotifs));
+    localStorage.setItem('capten_solde_v3', '1840');
+    localStorage.setItem('capten_cagnotte_url', 'https://lydia-app.com/pots?id=capten-paris');
     localStorage.setItem('capten_onboarding_skipped', 'true');
     localStorage.setItem('capten_club_name', 'PARIS RUN CLUB');
   };
