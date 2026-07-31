@@ -26,20 +26,32 @@ import {
   Compass,
   Star,
   Activity,
-  UserCheck
+  UserCheck,
+  Radio,
+  FileCheck,
+  Sliders,
+  TrendingUp,
+  ShieldCheck,
+  Globe,
+  BellRing
 } from "lucide-react";
 
 /* ═══════════════════════════════════════════════════════════════
-   CAPTEN V13 — Ultra-Modern 2026 SaaS Landing Page
-   Inspired by Linear.app, Fitframe & Raycast.com
-   Tech: Tailwind CSS + Framer Motion + Lucide SVG Icons
+   CAPTEN 2026 — Masterpiece Landing Page (Carte Blanche Vision)
+   Art Direction: Dark Mode Luxe (Linear / Apple Fitness / Vercel)
+   Canvas       : Deep Anthracite #070709
+   Signature    : Neon Orange #FF5500 • Emerald #10B981 • Cyan #06B6D4
 ═══════════════════════════════════════════════════════════════ */
 
 export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
-  const [activeTab, setActiveTab] = useState<"captain" | "member">("captain");
-  const [simulatedCheckin, setSimulatedCheckin] = useState(false);
+  const [activeFeatureTab, setActiveFeatureTab] = useState<"checkin" | "ice" | "spots">("checkin");
+  const [simulatedDistance, setSimulatedDistance] = useState<number>(14);
+  const [isCheckedIn, setIsCheckedIn] = useState<boolean>(false);
   const [activeFaq, setActiveFaq] = useState<number | null>(0);
+
+  // Calculator State
+  const [membersCount, setMembersCount] = useState<number>(45);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -48,80 +60,93 @@ export default function LandingPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#FAFAFC] text-[#09090B] font-sans antialiased selection:bg-[#FF5C00]/20 selection:text-[#FF5C00] overflow-x-hidden">
+    <div className="min-h-screen bg-[#070709] text-white font-sans antialiased selection:bg-[#FF5500]/30 selection:text-[#FF5500] overflow-x-hidden">
+      
       {/* ── Google Fonts Import ── */}
       <style jsx global>{`
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
-        body { font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; }
+        @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .font-syne { font-family: 'Syne', sans-serif; }
       `}</style>
 
-      {/* ── Background Radial Glow Halos ── */}
-      <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-gradient-to-b from-[#FF5C00]/10 via-[#FF5C00]/5 to-transparent blur-[120px] pointer-events-none z-0" />
+      {/* ── Background Glow Meshes ── */}
+      <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[1200px] h-[600px] bg-gradient-to-b from-[#FF5500]/15 via-orange-600/5 to-transparent blur-[140px] pointer-events-none z-0" />
+      <div className="fixed top-[600px] right-0 w-[500px] h-[500px] bg-emerald-500/5 blur-[150px] pointer-events-none z-0" />
 
       {/* ──────────────────────────────────────────────────────────────
-         1. NAVIGATION BAR (Glassmorphism Pill)
+         1. FLOATING GLASS NAVBAR
       ────────────────────────────────────────────────────────────── */}
-      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "py-3 bg-white/80 backdrop-blur-xl border-b border-black/[0.06] shadow-sm" : "py-5 bg-transparent"}`}>
-        <div className="max-w-6xl mx-auto px-6 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-9 h-9 rounded-xl bg-black flex items-center justify-center text-white shadow-md group-hover:scale-105 transition-transform">
-              <Zap className="w-5 h-5 text-[#FF5C00] fill-[#FF5C00]" />
+      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "py-3 bg-[#070709]/80 backdrop-blur-2xl border-b border-white/[0.08]" : "py-6 bg-transparent"}`}>
+        <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
+          
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-2.5 group">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#FF5500] to-orange-600 flex items-center justify-center text-white shadow-lg shadow-[#FF5500]/25 group-hover:scale-105 transition-transform">
+              <Zap className="w-5 h-5 fill-white" />
             </div>
-            <span className="font-extrabold text-xl tracking-tight text-black">
-              CAPTEN<span className="text-[#FF5C00]">.</span>
-            </span>
+            <div className="flex flex-col">
+              <span className="font-syne font-extrabold text-xl tracking-tight text-white leading-none">
+                CAPTEN<span className="text-[#FF5500]">.</span>
+              </span>
+              <span className="text-[9px] font-bold tracking-widest text-zinc-500 uppercase">CREW OS</span>
+            </div>
           </Link>
 
-          <nav className="hidden md:flex items-center gap-8 text-sm font-semibold text-zinc-600">
-            <a href="#features" className="hover:text-black transition-colors">Fonctionnalités</a>
-            <a href="#how" className="hover:text-black transition-colors">Comment ça marche</a>
-            <a href="#comparison" className="hover:text-black transition-colors">Comparatif</a>
-            <a href="#faq" className="hover:text-black transition-colors">FAQ</a>
+          {/* Navigation Links */}
+          <nav className="hidden md:flex items-center gap-8 text-sm font-semibold text-zinc-400">
+            <a href="#features" className="hover:text-white transition-colors">Fonctionnalités</a>
+            <a href="#how" className="hover:text-black transition-colors hover:text-white">Comment ça marche</a>
+            <a href="#calculator" className="hover:text-white transition-colors">Calculateur</a>
+            <a href="#faq" className="hover:text-white transition-colors">FAQ</a>
           </nav>
 
-          <div className="flex items-center gap-3">
-            <Link href="/login" className="px-4 py-2 text-sm font-bold text-zinc-700 hover:text-black transition-colors">
+          {/* CTA Group */}
+          <div className="flex items-center gap-4">
+            <Link href="/login" className="hidden sm:block text-xs font-bold text-zinc-400 hover:text-white transition-colors">
               Connexion
             </Link>
-            <Link href="/login?mode=signup" className="relative group overflow-hidden px-5 py-2.5 rounded-full bg-black text-white text-sm font-bold shadow-lg shadow-black/10 hover:shadow-black/20 transition-all">
-              <span className="relative z-10 flex items-center gap-2">
-                Rejoindre la Bêta <ArrowRight className="w-4 h-4 text-[#FF5C00] group-hover:translate-x-1 transition-transform" />
-              </span>
+            <Link href="/login?mode=signup" className="relative group px-5 py-2.5 rounded-full bg-white text-black text-xs font-extrabold shadow-xl hover:bg-[#FF5500] hover:text-white transition-all duration-200 flex items-center gap-2">
+              <span>Rejoindre la Bêta</span>
+              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
             </Link>
           </div>
+
         </div>
       </header>
 
       {/* ──────────────────────────────────────────────────────────────
-         2. HERO SECTION
+         2. HERO SECTION (High Impact)
       ────────────────────────────────────────────────────────────── */}
-      <section className="relative pt-36 pb-20 md:pt-44 md:pb-32 z-10">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="max-w-3xl mx-auto text-center space-y-6">
+      <section className="relative pt-36 pb-20 md:pt-48 md:pb-32 z-10">
+        <div className="max-w-7xl mx-auto px-6">
+          
+          <div className="max-w-4xl mx-auto text-center space-y-8">
             
-            {/* Pill Badge */}
+            {/* Top Pill */}
             <motion.div
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
-              className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white border border-black/[0.08] shadow-sm text-xs font-bold text-zinc-800"
+              className="inline-flex items-center gap-3 px-4 py-1.5 rounded-full bg-white/[0.04] border border-white/10 backdrop-blur-md text-xs font-bold text-zinc-300 shadow-2xl"
             >
-              <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>Bêta Ouverte 2026</span>
-              <span className="text-zinc-300">•</span>
-              <span className="text-[#FF5C00]">Accès 100% Gratuit</span>
+              <span className="flex h-2 w-2 rounded-full bg-[#FF5500] animate-ping" />
+              <span className="text-white">CAPTEN 2.4 Release</span>
+              <span className="text-zinc-600">•</span>
+              <span className="text-[#FF5500] flex items-center gap-1">
+                <Sparkles className="w-3 h-3" /> Gratuit pendant la Bêta
+              </span>
             </motion.div>
 
-            {/* Main Headline */}
+            {/* Headline */}
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
-              className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-black leading-[1.08]"
+              className="font-syne text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold tracking-tight text-white leading-[1.02]"
             >
-              Gère ton crew.<br />
-              <span className="bg-gradient-to-r from-[#FF5C00] via-orange-500 to-amber-500 bg-clip-text text-transparent">
-                En toute sécurité.
+              Le système d'exploitation<br />
+              <span className="bg-gradient-to-r from-[#FF5500] via-orange-400 to-amber-400 bg-clip-text text-transparent">
+                des crews sportifs.
               </span>
             </motion.h1>
 
@@ -130,185 +155,179 @@ export default function LandingPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="text-lg sm:text-xl text-zinc-600 font-medium max-w-2xl mx-auto leading-relaxed"
+              className="text-base sm:text-xl text-zinc-400 font-medium max-w-2xl mx-auto leading-relaxed"
             >
-              Check-in GPS horodaté, fiches médicales ICE d'urgence et avantages partenaires local. L'application tout-en-un pour les créateurs de crews sportifs.
+              Check-in GPS satellite, fiches d'urgence médicales ICE chiffrées et réductions partenaires. Automatise tes rassemblements Run, Trail, Walk & Bike.
             </motion.p>
 
-            {/* CTAs */}
+            {/* Buttons */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4"
+              className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2"
             >
-              <Link href="/login?mode=signup" className="w-full sm:w-auto px-8 py-4 rounded-full bg-black text-white font-bold text-base shadow-xl shadow-black/10 hover:bg-[#FF5C00] hover:shadow-[#FF5C00]/25 transition-all flex items-center justify-center gap-2 group">
-                Commencer gratuitement
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              <Link
+                href="/login?mode=signup"
+                className="w-full sm:w-auto px-8 py-4 rounded-full bg-[#FF5500] text-white font-extrabold text-sm shadow-xl shadow-[#FF5500]/30 hover:bg-orange-600 hover:scale-105 transition-all flex items-center justify-center gap-2 group"
+              >
+                Créer ton club gratuitement
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Link>
-              <a href="#how" className="w-full sm:w-auto px-8 py-4 rounded-full bg-white border border-black/10 text-zinc-800 font-bold text-base shadow-sm hover:bg-zinc-50 hover:border-black/20 transition-all flex items-center justify-center gap-2">
-                Découvrir l'application
+              <a
+                href="#features"
+                className="w-full sm:w-auto px-8 py-4 rounded-full bg-white/[0.05] border border-white/10 text-white font-extrabold text-sm hover:bg-white/[0.1] transition-all flex items-center justify-center gap-2"
+              >
+                Voir les fonctionnalités
               </a>
             </motion.div>
 
-            {/* Social Proof Avatars */}
+            {/* Live Stats Pill */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.8, delay: 0.4 }}
-              className="pt-8 flex items-center justify-center gap-3 text-xs font-semibold text-zinc-500"
+              className="pt-6 flex flex-wrap items-center justify-center gap-8 text-xs font-bold text-zinc-500"
             >
-              <div className="flex -space-x-2">
-                {[
-                  "bg-gradient-to-tr from-orange-400 to-amber-300",
-                  "bg-gradient-to-tr from-emerald-400 to-teal-300",
-                  "bg-gradient-to-tr from-blue-400 to-indigo-300",
-                  "bg-gradient-to-tr from-purple-400 to-pink-300"
-                ].map((bg, i) => (
-                  <div key={i} className={`w-8 h-8 rounded-full border-2 border-white ${bg} flex items-center justify-center text-[10px] font-bold text-white shadow-sm`}>
-                    {["RC", "SW", "TS", "CR"][i]}
-                  </div>
-                ))}
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                <span>100% Conforme RGPD</span>
               </div>
-              <span>Rejoint par <strong>+2 800 capitaines & coureurs</strong> en France</span>
+              <div className="flex items-center gap-2">
+                <Radio className="w-4 h-4 text-[#FF5500]" />
+                <span>Pointage GPS sous 100m</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Globe className="w-4 h-4 text-cyan-400" />
+                <span>Zéro téléchargement d'app</span>
+              </div>
             </motion.div>
+
           </div>
 
-          {/* ── Interactive Hero Showcase Widget ── */}
+          {/* ── HERO INTERACTIVE DEMO (RADAR & CHECKIN) ── */}
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.5 }}
-            className="mt-16 relative max-w-5xl mx-auto"
+            className="mt-16 max-w-5xl mx-auto relative"
           >
-            <div className="relative rounded-3xl bg-white border border-black/[0.08] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] p-4 sm:p-8 overflow-hidden">
-              
-              {/* Top Bar Control */}
-              <div className="flex items-center justify-between pb-6 border-b border-zinc-100 mb-6">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-rose-400" />
-                  <div className="w-3 h-3 rounded-full bg-amber-400" />
-                  <div className="w-3 h-3 rounded-full bg-emerald-400" />
-                  <span className="ml-2 text-xs font-bold text-zinc-400">CAPTEN OS v2.4</span>
-                </div>
+            <div className="relative rounded-3xl bg-gradient-to-b from-white/[0.08] to-white/[0.02] p-1 border border-white/10 shadow-[0_32px_96px_rgba(0,0,0,0.8)] backdrop-blur-2xl overflow-hidden">
+              <div className="bg-[#0B0B0F] rounded-[22px] p-6 sm:p-10 space-y-8">
                 
-                {/* Switcher Tab */}
-                <div className="flex bg-zinc-100 p-1 rounded-xl text-xs font-bold">
-                  <button
-                    onClick={() => setActiveTab("captain")}
-                    className={`px-4 py-1.5 rounded-lg transition-all ${activeTab === "captain" ? "bg-white text-black shadow-sm" : "text-zinc-500 hover:text-black"}`}
-                  >
-                    Vue Capitaine
-                  </button>
-                  <button
-                    onClick={() => setActiveTab("member")}
-                    className={`px-4 py-1.5 rounded-lg transition-all ${activeTab === "member" ? "bg-white text-black shadow-sm" : "text-zinc-500 hover:text-black"}`}
-                  >
-                    Vue Membre
-                  </button>
-                </div>
-              </div>
-
-              {/* Dynamic Content preview */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
-                
-                {/* Left Card: Session Info */}
-                <div className="space-y-4 bg-zinc-50 rounded-2xl p-6 border border-zinc-100">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-extrabold uppercase tracking-wider text-[#FF5C00] bg-[#FF5C00]/10 px-2.5 py-1 rounded-md">
-                      SESSION CE SOIR
-                    </span>
-                    <span className="flex items-center gap-1 text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Live
-                    </span>
-                  </div>
+                {/* Demo Header */}
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-white/5 pb-6">
                   <div>
-                    <h3 className="font-extrabold text-lg text-black">Session Run & Chill #42</h3>
-                    <p className="text-xs text-zinc-500 font-semibold flex items-center gap-1 mt-1">
-                      <MapPin className="w-3.5 h-3.5 text-zinc-400" /> République, Paris • 19h30
-                    </p>
+                    <div className="flex items-center gap-2 text-xs font-extrabold text-[#FF5500] uppercase tracking-wider">
+                      <Radio className="w-4 h-4 animate-pulse" /> SATELLITE LIVE RADAR
+                    </div>
+                    <h3 className="font-syne text-xl font-bold text-white mt-1">Session Run & Chill #42 — République</h3>
                   </div>
 
-                  <div className="pt-2 space-y-2">
-                    <div className="flex justify-between text-xs font-bold text-zinc-600">
-                      <span>Présences enregistrées</span>
-                      <span className="text-black font-extrabold">47 / 50</span>
-                    </div>
-                    <div className="w-full bg-zinc-200 h-2 rounded-full overflow-hidden">
-                      <div className="bg-[#FF5C00] h-full rounded-full w-[94%]" />
+                  <div className="flex items-center gap-3">
+                    <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" /> 47 Présents
                     </div>
                   </div>
                 </div>
 
-                {/* Center Card: Interactive Check-in Simulator */}
-                <div className="bg-black text-white rounded-2xl p-6 shadow-xl relative overflow-hidden flex flex-col items-center text-center justify-center min-h-[220px]">
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-[#FF5C00]/20 blur-2xl pointer-events-none" />
+                {/* Radar Grid Visual */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   
-                  {simulatedCheckin ? (
-                    <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="space-y-3">
-                      <div className="w-14 h-14 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center mx-auto border border-emerald-500/30">
-                        <CheckCircle2 className="w-8 h-8" />
-                      </div>
-                      <h4 className="font-bold text-base text-white">Check-in Validé !</h4>
-                      <p className="text-xs text-zinc-400">Position vérifiée à 12m du RDV • Fiche ICE active</p>
-                      <button onClick={() => setSimulatedCheckin(false)} className="text-[11px] font-bold text-zinc-500 hover:text-white underline mt-2">
-                        Réinitialiser la démo
-                      </button>
-                    </motion.div>
-                  ) : (
-                    <div className="space-y-4 w-full">
-                      <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center mx-auto border border-white/10">
-                        <QrCode className="w-6 h-6 text-[#FF5C00]" />
-                      </div>
-                      <div>
-                        <h4 className="font-bold text-sm text-white">Scanner / Pointer GPS</h4>
-                        <p className="text-xs text-zinc-400 mt-1">Testez le check-in en 1 clic</p>
-                      </div>
-                      <button
-                        onClick={() => setSimulatedCheckin(true)}
-                        className="w-full py-2.5 rounded-xl bg-[#FF5C00] text-white text-xs font-bold hover:bg-orange-600 transition-all shadow-lg shadow-[#FF5C00]/30"
-                      >
-                        Simuler le Check-in →
-                      </button>
+                  {/* Radar Circle */}
+                  <div className="md:col-span-2 bg-[#070709] rounded-2xl p-6 border border-white/5 relative overflow-hidden flex flex-col justify-between min-h-[280px]">
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
+                      <div className="w-64 h-64 border border-[#FF5500] rounded-full animate-ping" style={{ animationDuration: '4s' }} />
+                      <div className="w-44 h-44 border border-white/30 rounded-full" />
+                      <div className="w-24 h-24 border border-white/20 rounded-full" />
                     </div>
-                  )}
-                </div>
 
-                {/* Right Card: Security & ICE Badge */}
-                <div className="space-y-3 bg-rose-50/50 border border-rose-100 rounded-2xl p-6">
-                  <div className="flex items-center gap-2 text-rose-600 font-extrabold text-xs tracking-wider uppercase">
-                    <Shield className="w-4 h-4" /> Fiche Urgence ICE
-                  </div>
-                  <div className="bg-white rounded-xl p-3 border border-rose-100 shadow-sm space-y-1.5">
-                    <div className="flex justify-between items-center text-xs font-bold text-black">
-                      <span>Sarah M.</span>
-                      <span className="bg-rose-500 text-white font-extrabold px-1.5 py-0.5 rounded text-[10px]">O+</span>
+                    <div className="flex justify-between items-center relative z-10">
+                      <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Rayon d'émargement : 100m</span>
+                      <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">Signal GPS Fort (±8m)</span>
                     </div>
-                    <p className="text-[11px] text-rose-600 font-semibold">Allergie : Pénicilline</p>
-                    <p className="text-[10px] text-zinc-400">Contact Urgence : 06 12 ••• ••</p>
-                  </div>
-                  <p className="text-[11px] text-zinc-500 font-medium leading-normal">
-                    Accessible en 3 secondes par le Capitaine en cas de pépin sur le parcours.
-                  </p>
-                </div>
 
+                    {/* Interactive Distance Simulator */}
+                    <div className="relative z-10 my-8 space-y-4 text-center">
+                      <div className="text-3xl font-extrabold font-syne text-white">
+                        {simulatedDistance} <span className="text-sm font-sans font-bold text-zinc-500">mètres du RDV</span>
+                      </div>
+                      
+                      {isCheckedIn ? (
+                        <div className="inline-flex items-center gap-2 bg-emerald-500 text-black px-4 py-2 rounded-full text-xs font-extrabold">
+                          <CheckCircle2 className="w-4 h-4" /> Émargement Réussi ! Fiche ICE active.
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => setIsCheckedIn(true)}
+                          className="px-6 py-2.5 rounded-full bg-[#FF5500] text-white text-xs font-extrabold hover:bg-orange-600 transition-all shadow-lg shadow-[#FF5500]/30"
+                        >
+                          Simuler le Pointage GPS →
+                        </button>
+                      )}
+                    </div>
+
+                    <div className="flex justify-between items-center text-[11px] text-zinc-500 font-semibold relative z-10 border-t border-white/5 pt-3">
+                      <span>Latitude : 48.8661° N</span>
+                      <span>Longitude : 2.3643° E</span>
+                    </div>
+                  </div>
+
+                  {/* Sidebar ICE Live Profile */}
+                  <div className="bg-white/[0.03] rounded-2xl p-6 border border-white/5 space-y-4 flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center gap-2 text-xs font-extrabold text-rose-400 uppercase tracking-wider mb-3">
+                        <HeartPulse className="w-4 h-4" /> FICHE ICE ACTIVE
+                      </div>
+                      
+                      <div className="space-y-2 text-xs">
+                        <div className="flex justify-between text-zinc-400 font-medium">
+                          <span>Coureur :</span>
+                          <span className="text-white font-bold">Thomas L.</span>
+                        </div>
+                        <div className="flex justify-between text-zinc-400 font-medium">
+                          <span>Groupe Sanguin :</span>
+                          <span className="text-rose-400 font-extrabold bg-rose-500/10 px-2 py-0.5 rounded">A+</span>
+                        </div>
+                        <div className="flex justify-between text-zinc-400 font-medium">
+                          <span>Urgence :</span>
+                          <span className="text-white font-bold">06 14 •• •• 89</span>
+                        </div>
+                        <div className="pt-2 text-[11px] text-zinc-500">
+                          Accessible en 1-clic uniquement pendant la durée du run.
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="pt-4 border-t border-white/5">
+                      <div className="flex items-center justify-between text-[11px] text-zinc-400">
+                        <span>Registre PDF :</span>
+                        <span className="text-emerald-400 font-bold flex items-center gap-1">
+                          <FileCheck className="w-3.5 h-3.5" /> Généré
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
               </div>
             </div>
           </motion.div>
+
         </div>
       </section>
 
       {/* ──────────────────────────────────────────────────────────────
-         3. LOGO TICKER (Social Proof)
+         3. LOGO STRIP (Partenaires & Clubs)
       ────────────────────────────────────────────────────────────── */}
-      <section className="py-10 border-y border-black/[0.06] bg-white">
-        <div className="max-w-6xl mx-auto px-6 text-center">
-          <p className="text-xs font-bold tracking-widest text-zinc-400 uppercase mb-6">
-            Utilisé par les meilleurs crews sportifs
+      <section className="py-12 border-y border-white/[0.06] bg-[#070709]">
+        <div className="max-w-7xl mx-auto px-6 text-center space-y-6">
+          <p className="text-xs font-bold tracking-widest text-zinc-500 uppercase">
+            Utilisé par les capitaines des plus grands clubs outdoor
           </p>
-          <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16 opacity-60 grayscale hover:grayscale-0 transition-all">
-            {["Paris Run Club", "Urban Walkers", "Trail Squad Lyon", "Coffee Ride BDX", "Marseille Rando"].map((name, i) => (
-              <span key={i} className="text-sm md:text-base font-extrabold tracking-wider text-black uppercase">
+          <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16 opacity-50 grayscale hover:grayscale-0 transition-all font-syne">
+            {["Paris Run Club", "Urban Walkers", "Trail Squad Lyon", "Coffee Ride BDX", "Marseille Rando", "Social Athletics"].map((name, i) => (
+              <span key={i} className="text-sm md:text-base font-extrabold text-white tracking-wider uppercase">
                 {name}
               </span>
             ))}
@@ -317,251 +336,245 @@ export default function LandingPage() {
       </section>
 
       {/* ──────────────────────────────────────────────────────────────
-         4. BENTO GRID FEATURES SECTION
+         4. BENTO GRID FEATURES (Interactive 3-Tab Showcase)
       ────────────────────────────────────────────────────────────── */}
-      <section id="features" className="py-24 md:py-32 bg-[#FAFAFC]">
-        <div className="max-w-6xl mx-auto px-6 space-y-16">
+      <section id="features" className="py-24 md:py-36 relative z-10">
+        <div className="max-w-7xl mx-auto px-6 space-y-20">
           
-          <div className="max-w-2xl mx-auto text-center space-y-4">
-            <span className="text-xs font-extrabold tracking-widest text-[#FF5C00] uppercase bg-[#FF5C00]/10 px-3 py-1 rounded-full">
+          <div className="max-w-3xl mx-auto text-center space-y-4">
+            <span className="text-xs font-extrabold tracking-widest text-[#FF5500] uppercase bg-[#FF5500]/10 px-3.5 py-1.5 rounded-full border border-[#FF5500]/20">
               Fonctionnalités Clés
             </span>
-            <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-black">
-              Tout ce dont ton crew a besoin. En un seul endroit.
+            <h2 className="font-syne text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-white">
+              Conçu pour la sécurité,<br />la simplicité et l'impact.
             </h2>
-            <p className="text-base text-zinc-600 font-medium">
-              Fini le désordre des groupes WhatsApp et des fichiers Excel éparpillés.
+            <p className="text-base text-zinc-400 font-medium max-w-xl mx-auto">
+              Chaque outil répond à un problème concret rencontré sur le terrain par les organisateurs.
             </p>
           </div>
 
-          {/* Bento Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            
-            {/* Card 1: GPS Check-in (Tall, Dark Card) */}
-            <motion.div
-              whileHover={{ y: -4 }}
-              transition={{ duration: 0.2 }}
-              className="md:col-span-1 md:row-span-2 bg-[#09090B] text-white rounded-3xl p-8 border border-white/10 flex flex-col justify-between relative overflow-hidden shadow-xl"
-            >
-              <div className="space-y-6 relative z-10">
-                <div className="w-12 h-12 rounded-2xl bg-[#FF5C00]/20 text-[#FF5C00] flex items-center justify-center border border-[#FF5C00]/30">
-                  <MapPin className="w-6 h-6" />
-                </div>
-                <div>
-                  <span className="text-xs font-bold text-[#FF5C00] tracking-wider uppercase">Vérification Automatique</span>
-                  <h3 className="text-2xl font-extrabold text-white mt-1">Check-in GPS Horodaté</h3>
-                </div>
-                <p className="text-sm text-zinc-400 font-medium leading-relaxed">
-                  Validation instantanée dès que le coureur arrive au point de rendez-vous. Génération automatique du registre de présence légal.
-                </p>
-
-                <div className="space-y-3 pt-4">
-                  {[
-                    "Précision GPS sous les 100 mètres",
-                    "Export PDF horodaté conforme",
-                    "QR Code de secours pour hors-ligne",
-                    "Détection d'assiduité (Streak)"
-                  ].map((item, i) => (
-                    <div key={i} className="flex items-center gap-3 text-xs font-semibold text-zinc-300">
-                      <div className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
-                        <Check className="w-3 h-3" />
-                      </div>
-                      <span>{item}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Bottom Visual Mockup inside Card */}
-              <div className="mt-8 pt-6 border-t border-white/10 relative z-10">
-                <div className="bg-white/5 backdrop-blur-md rounded-2xl p-4 border border-white/10 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <Activity className="w-5 h-5 text-emerald-400" />
-                    <div>
-                      <div className="text-xs font-bold text-white">Registre Officiel</div>
-                      <div className="text-[10px] text-zinc-400">47 présents valides</div>
-                    </div>
-                  </div>
-                  <span className="text-[11px] font-extrabold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full">PDF OK</span>
-                </div>
-              </div>
-            </motion.div>
-
-            {/* Card 2: Medical ICE Card */}
-            <motion.div
-              whileHover={{ y: -4 }}
-              transition={{ duration: 0.2 }}
-              className="bg-white rounded-3xl p-8 border border-black/[0.08] shadow-sm flex flex-col justify-between space-y-6"
-            >
-              <div className="space-y-4">
-                <div className="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center border border-rose-100">
-                  <HeartPulse className="w-6 h-6" />
-                </div>
-                <h3 className="text-xl font-extrabold text-black">Fiche Médicale ICE</h3>
-                <p className="text-sm text-zinc-600 font-medium leading-relaxed">
-                  Groupe sanguin, allergies et contact d'urgence accessibles en 1 clic par le capitaine en cas de besoin.
-                </p>
-              </div>
-
-              <div className="bg-rose-50/60 border border-rose-100 rounded-2xl p-4 space-y-2">
-                <div className="flex justify-between items-center text-xs font-bold text-black">
-                  <span>Informations Urgence</span>
-                  <span className="text-rose-600 bg-rose-100 px-2 py-0.5 rounded font-extrabold text-[10px]">RGPD Chiffré</span>
-                </div>
-                <div className="text-xs text-zinc-600 font-semibold space-y-1">
-                  <div>• Contact : Proche 1er rang</div>
-                  <div>• Allergies & Pathologies en clair</div>
-                </div>
-              </div>
-            </motion.div>
-
-            {/* Card 3: CAPTEN Spots (Partner Discounts) */}
-            <motion.div
-              whileHover={{ y: -4 }}
-              transition={{ duration: 0.2 }}
-              className="bg-white rounded-3xl p-8 border border-black/[0.08] shadow-sm flex flex-col justify-between space-y-6"
-            >
-              <div className="space-y-4">
-                <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center border border-amber-100">
-                  <Coffee className="w-6 h-6" />
-                </div>
-                <h3 className="text-xl font-extrabold text-black">CAPTEN Spots</h3>
-                <p className="text-sm text-zinc-600 font-medium leading-relaxed">
-                  Avantages exclusifs et réductions chez vos cafés, magasins de sport et partenaires locaux préférés.
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                {[
-                  { name: "Café du Cycliste", discount: "-15%", color: "text-[#FF5C00] bg-orange-50" },
-                  { name: "Le Traileur Shop", discount: "-20%", color: "text-emerald-600 bg-emerald-50" }
-                ].map((spot, i) => (
-                  <div key={i} className="flex items-center justify-between p-3 bg-zinc-50 rounded-xl border border-zinc-100 text-xs font-bold">
-                    <span className="text-zinc-800">{spot.name}</span>
-                    <span className={`px-2.5 py-1 rounded-full font-extrabold ${spot.color}`}>{spot.discount}</span>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-
-            {/* Card 4: Multi-sport Support (Wide Card) */}
-            <motion.div
-              whileHover={{ y: -4 }}
-              transition={{ duration: 0.2 }}
-              className="md:col-span-2 bg-white rounded-3xl p-8 border border-black/[0.08] shadow-sm flex flex-col sm:flex-row items-center justify-between gap-6"
-            >
-              <div className="space-y-3 max-w-md">
-                <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100">
-                  <Flame className="w-6 h-6" />
-                </div>
-                <h3 className="text-xl font-extrabold text-black">Adapté à tous les sports outdoor</h3>
-                <p className="text-sm text-zinc-600 font-medium leading-relaxed">
-                  Run Club, Social Walk, Trail & Rando, Cyclisme. L'interface s'adapte spécifiquement aux besoins de chaque discipline.
-                </p>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3 w-full sm:w-auto shrink-0">
-                {[
-                  { label: "Run Club", count: "1 400+ runs" },
-                  { label: "Social Walk", count: "650+ walks" },
-                  { label: "Trail & Rando", count: "420+ sorties" },
-                  { label: "Cyclisme", count: "380+ rides" }
-                ].map((item, i) => (
-                  <div key={i} className="bg-zinc-50 border border-zinc-100 rounded-2xl p-3 text-center min-w-[120px]">
-                    <div className="text-xs font-extrabold text-black">{item.label}</div>
-                    <div className="text-[10px] text-zinc-400 font-semibold mt-0.5">{item.count}</div>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-
-          </div>
-        </div>
-      </section>
-
-      {/* ──────────────────────────────────────────────────────────────
-         5. HOW IT WORKS (3 Simple Steps)
-      ────────────────────────────────────────────────────────────── */}
-      <section id="how" className="py-24 bg-white border-y border-black/[0.06]">
-        <div className="max-w-6xl mx-auto px-6 space-y-16">
-          
-          <div className="max-w-2xl mx-auto text-center space-y-4">
-            <span className="text-xs font-extrabold tracking-widest text-[#FF5C00] uppercase bg-[#FF5C00]/10 px-3 py-1 rounded-full">
-              Simplicité Totale
-            </span>
-            <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-black">
-              Prêt en 3 minutes chrono.
-            </h2>
-            <p className="text-base text-zinc-600 font-medium">
-              Aucune configuration complexe. Tout se passe directement dans votre navigateur mobile.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
+          {/* Interactive Feature Tabs */}
+          <div className="flex justify-center gap-2 bg-white/[0.03] p-1.5 rounded-2xl border border-white/10 max-w-md mx-auto">
             {[
-              {
-                step: "01",
-                title: "Crée ton événement",
-                desc: "Renseigne le lieu de RDV, la date, l'heure et le type de sport en 60 secondes.",
-                icon: Sparkles
-              },
-              {
-                step: "02",
-                title: "Partage le lien unique",
-                desc: "Tes coureurs s'inscrivent et remplissent leur fiche ICE en 30 secondes sans télécharger d'application.",
-                icon: Smartphone
-              },
-              {
-                step: "03",
-                title: "Check-in GPS automatique",
-                desc: "Le jour J, le registre horodaté se remplit tout seul à l'arrivée des membres au point de RDV.",
-                icon: CheckCircle2
-              }
-            ].map((s, i) => (
-              <div key={i} className="bg-[#FAFAFC] rounded-3xl p-8 border border-black/[0.06] space-y-4 relative">
-                <div className="flex items-center justify-between">
-                  <span className="text-3xl font-extrabold text-[#FF5C00] tracking-tight">{s.step}</span>
-                  <div className="w-10 h-10 rounded-xl bg-white text-black flex items-center justify-center border border-black/5 shadow-sm">
-                    <s.icon className="w-5 h-5" />
-                  </div>
-                </div>
-                <h3 className="text-xl font-extrabold text-black">{s.title}</h3>
-                <p className="text-sm text-zinc-600 font-medium leading-relaxed">{s.desc}</p>
-              </div>
+              { id: "checkin", label: "Check-in GPS", icon: MapPin },
+              { id: "ice", label: "Fiche ICE Urgence", icon: HeartPulse },
+              { id: "spots", label: "CAPTEN Spots", icon: Coffee },
+            ].map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveFeatureTab(tab.id as any)}
+                className={`flex-1 py-2.5 px-4 rounded-xl text-xs font-extrabold flex items-center justify-center gap-2 transition-all ${
+                  activeFeatureTab === tab.id
+                    ? "bg-[#FF5500] text-white shadow-lg shadow-[#FF5500]/30"
+                    : "text-zinc-400 hover:text-white"
+                }`}
+              >
+                <tab.icon className="w-4 h-4" />
+                {tab.label}
+              </button>
             ))}
           </div>
+
+          {/* Dynamic Tab Content Display */}
+          <div className="max-w-4xl mx-auto">
+            <AnimatePresence mode="wait">
+              
+              {activeFeatureTab === "checkin" && (
+                <motion.div
+                  key="checkin"
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -15 }}
+                  transition={{ duration: 0.3 }}
+                  className="bg-white/[0.02] border border-white/10 rounded-3xl p-8 sm:p-12 space-y-6"
+                >
+                  <div className="w-12 h-12 rounded-2xl bg-[#FF5500]/20 text-[#FF5500] flex items-center justify-center border border-[#FF5500]/30">
+                    <Radio className="w-6 h-6" />
+                  </div>
+                  <h3 className="font-syne text-2xl sm:text-3xl font-bold text-white">
+                    Pointage Satellite GPS sous 100m
+                  </h3>
+                  <p className="text-zinc-400 text-sm sm:text-base leading-relaxed">
+                    Le serveur valide l'émargement uniquement si le membre se trouve physiquement sur le lieu de rendez-vous grâce à la formule mathématique d'Haversine. Un registre horodaté est généré automatiquement.
+                  </p>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4">
+                    {[
+                      "Aucune installation d'application requise",
+                      "Export PDF conforme pour les assurances",
+                      "Délai de pointage restreint (-15m/+3h)",
+                      "Compteur d'assiduité (Streak) automatique"
+                    ].map((f, i) => (
+                      <div key={i} className="flex items-center gap-3 text-xs font-semibold text-zinc-300">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                        <span>{f}</span>
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+
+              {activeFeatureTab === "ice" && (
+                <motion.div
+                  key="ice"
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -15 }}
+                  transition={{ duration: 0.3 }}
+                  className="bg-white/[0.02] border border-white/10 rounded-3xl p-8 sm:p-12 space-y-6"
+                >
+                  <div className="w-12 h-12 rounded-2xl bg-rose-500/20 text-rose-400 flex items-center justify-center border border-rose-500/30">
+                    <HeartPulse className="w-6 h-6" />
+                  </div>
+                  <h3 className="font-syne text-2xl sm:text-3xl font-bold text-white">
+                    Fiche Médicale d'Urgence (In Case of Emergency)
+                  </h3>
+                  <p className="text-zinc-400 text-sm sm:text-base leading-relaxed">
+                    En cas de malaise ou de chute, le capitaine accède instantanément au groupe sanguin, aux allergies et au contact d'urgence du membre. Les données sont chiffrées au repos et protégées RGPD.
+                  </p>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4">
+                    {[
+                      "Accès réservé au Capitaine en session",
+                      "Fonctionne hors réseau dans les zones blanches",
+                      "Bouton d'appel d'urgence 1-clic",
+                      "Données chiffrées en base de données"
+                    ].map((f, i) => (
+                      <div key={i} className="flex items-center gap-3 text-xs font-semibold text-zinc-300">
+                        <CheckCircle2 className="w-4 h-4 text-rose-400 shrink-0" />
+                        <span>{f}</span>
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+
+              {activeFeatureTab === "spots" && (
+                <motion.div
+                  key="spots"
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -15 }}
+                  transition={{ duration: 0.3 }}
+                  className="bg-white/[0.02] border border-white/10 rounded-3xl p-8 sm:p-12 space-y-6"
+                >
+                  <div className="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center border border-amber-500/30">
+                    <Coffee className="w-6 h-6" />
+                  </div>
+                  <h3 className="font-syne text-2xl sm:text-3xl font-bold text-white">
+                    CAPTEN Spots & Avantages Locaux
+                  </h3>
+                  <p className="text-zinc-400 text-sm sm:text-base leading-relaxed">
+                    Offrez des réductions exclusives à vos membres chez les cafés, magasins de sport et partenaires locaux après les sorties. Valorisez l'impact économique de votre communauté.
+                  </p>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4">
+                    {[
+                      "Réductions automatiques après check-in",
+                      "Partenariats commerçants de quartier",
+                      "Valorisation du club auprès des sponsors",
+                      "Statistiques de fréquentation"
+                    ].map((f, i) => (
+                      <div key={i} className="flex items-center gap-3 text-xs font-semibold text-zinc-300">
+                        <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
+                        <span>{f}</span>
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+
+            </AnimatePresence>
+          </div>
+
         </div>
       </section>
 
       {/* ──────────────────────────────────────────────────────────────
-         6. COMPARISON SECTION (WhatsApp vs CAPTEN)
+         5. TIME SAVINGS CALCULATOR (Interactive Tool)
       ────────────────────────────────────────────────────────────── */}
-      <section id="comparison" className="py-24 bg-[#FAFAFC]">
+      <section id="calculator" className="py-24 bg-white/[0.01] border-y border-white/[0.06]">
+        <div className="max-w-5xl mx-auto px-6 space-y-12">
+          
+          <div className="text-center space-y-4">
+            <span className="text-xs font-extrabold tracking-widest text-[#FF5500] uppercase bg-[#FF5500]/10 px-3.5 py-1.5 rounded-full border border-[#FF5500]/20">
+              Calculateur d'Impact
+            </span>
+            <h2 className="font-syne text-3xl sm:text-5xl font-extrabold tracking-tight text-white">
+              Combien de temps vas-tu économiser ?
+            </h2>
+          </div>
+
+          <div className="bg-white/[0.03] border border-white/10 rounded-3xl p-8 sm:p-12 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            
+            {/* Slider input */}
+            <div className="space-y-6">
+              <label className="text-sm font-bold text-zinc-300 block">
+                Nombre de membres dans ton crew : <span className="text-[#FF5500] font-syne text-xl">{membersCount}</span>
+              </label>
+              
+              <input
+                type="range"
+                min="10"
+                max="200"
+                value={membersCount}
+                onChange={e => setMembersCount(Number(e.target.value))}
+                className="w-full h-2 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-[#FF5500]"
+              />
+
+              <div className="flex justify-between text-xs text-zinc-500 font-semibold">
+                <span>10 membres</span>
+                <span>100 membres</span>
+                <span>200+ membres</span>
+              </div>
+            </div>
+
+            {/* Impact Calculation */}
+            <div className="space-y-4 bg-[#070709] p-6 rounded-2xl border border-white/5 text-center sm:text-left">
+              <div className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Gain estimé par mois</div>
+              
+              <div className="text-4xl sm:text-5xl font-extrabold font-syne text-[#FF5500]">
+                {Math.round(membersCount * 0.25)} heures <span className="text-sm font-sans font-bold text-white">économisées</span>
+              </div>
+
+              <p className="text-xs text-zinc-400 leading-relaxed font-medium">
+                Moins de messages relances sur WhatsApp, aucun pointage manuel sur papier, et zéro stress administratif.
+              </p>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* ──────────────────────────────────────────────────────────────
+         6. COMPARISON MATRIX
+      ────────────────────────────────────────────────────────────── */}
+      <section className="py-24 md:py-36 relative z-10">
         <div className="max-w-5xl mx-auto px-6 space-y-16">
           
           <div className="text-center space-y-4">
-            <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-black">
-              Pourquoi quitter les fils WhatsApp ?
+            <h2 className="font-syne text-3xl sm:text-5xl font-extrabold tracking-tight text-white">
+              Le chaos WhatsApp vs La clarté CAPTEN.
             </h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             
             {/* Sans CAPTEN */}
-            <div className="bg-white rounded-3xl p-8 border border-rose-100 shadow-sm space-y-6">
-              <div className="flex items-center gap-3 text-rose-600 font-extrabold text-sm uppercase tracking-wider">
-                <div className="w-8 h-8 rounded-full bg-rose-50 flex items-center justify-center">
-                  <X className="w-4 h-4" />
+            <div className="bg-white/[0.02] border border-rose-500/20 rounded-3xl p-8 space-y-6">
+              <div className="flex items-center gap-3 text-rose-400 font-extrabold text-xs uppercase tracking-wider">
+                <div className="w-7 h-7 rounded-full bg-rose-500/10 flex items-center justify-center">
+                  <X className="w-4 h-4 text-rose-400" />
                 </div>
-                Sans CAPTEN (WhatsApp / Excel)
+                Groupe WhatsApp & Fichiers Excel
               </div>
-              <ul className="space-y-4 text-sm text-zinc-600 font-medium">
+              <ul className="space-y-4 text-xs sm:text-sm text-zinc-400 font-medium">
                 {[
-                  "Aucun registre de présence légal en cas de contrôle",
-                  "Données médicales introuvables en cas d'accident",
-                  "Message important noyé sous 150 discussions",
-                  "Responsabilité juridique floue pour l'organisateur",
-                  "Impossible de mesurer l'assiduité réelle des coureurs"
+                  "Aucune preuve juridique d'émargement",
+                  "Fiches médicales introuvables en urgence",
+                  "Messages importants noyés sous 200 notifications",
+                  "Responsabilité pénale floue pour le capitaine",
+                  "Aucun avantage ou réduction chez les commerçants"
                 ].map((item, i) => (
                   <li key={i} className="flex items-start gap-3">
                     <X className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
@@ -572,20 +585,20 @@ export default function LandingPage() {
             </div>
 
             {/* Avec CAPTEN */}
-            <div className="bg-black text-white rounded-3xl p-8 border border-white/10 shadow-xl space-y-6">
-              <div className="flex items-center gap-3 text-[#FF5C00] font-extrabold text-sm uppercase tracking-wider">
-                <div className="w-8 h-8 rounded-full bg-[#FF5C00]/20 flex items-center justify-center">
-                  <Check className="w-4 h-4 text-[#FF5C00]" />
+            <div className="bg-gradient-to-b from-[#FF5500]/15 to-transparent border border-[#FF5500]/30 rounded-3xl p-8 space-y-6 shadow-2xl">
+              <div className="flex items-center gap-3 text-[#FF5500] font-extrabold text-xs uppercase tracking-wider">
+                <div className="w-7 h-7 rounded-full bg-[#FF5500]/20 flex items-center justify-center">
+                  <Check className="w-4 h-4 text-[#FF5500]" />
                 </div>
-                Avec CAPTEN
+                Avec l'application CAPTEN
               </div>
-              <ul className="space-y-4 text-sm text-zinc-300 font-medium">
+              <ul className="space-y-4 text-xs sm:text-sm text-white font-medium">
                 {[
-                  "Registre horodaté officiel et exportable en PDF",
-                  "Fiche ICE d'urgence consultable en 1 clic",
-                  "Canal d'information clair et structuré sans bruit",
-                  "Couverture juridique complète avec décharge numérique",
-                  "Dashboard d'assiduité + réductions chez les partenaires"
+                  "Registre horodaté officiel conforme assurances",
+                  "Fiche ICE d'urgence consultable en 1-clic",
+                  "Canal d'information structuré sans bruit",
+                  "Protection juridique complète avec décharge numérique",
+                  "Dashboard d'assiduité + réductions partenaires"
                 ].map((item, i) => (
                   <li key={i} className="flex items-start gap-3">
                     <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
@@ -600,16 +613,16 @@ export default function LandingPage() {
       </section>
 
       {/* ──────────────────────────────────────────────────────────────
-         7. FAQ ACCORDION SECTION
+         7. FAQ ACCORDION
       ────────────────────────────────────────────────────────────── */}
-      <section id="faq" className="py-24 bg-white border-t border-black/[0.06]">
+      <section id="faq" className="py-24 border-t border-white/[0.06] relative z-10">
         <div className="max-w-4xl mx-auto px-6 space-y-12">
           
           <div className="text-center space-y-4">
-            <span className="text-xs font-extrabold tracking-widest text-[#FF5C00] uppercase bg-[#FF5C00]/10 px-3 py-1 rounded-full">
+            <span className="text-xs font-extrabold tracking-widest text-[#FF5500] uppercase bg-[#FF5500]/10 px-3.5 py-1.5 rounded-full border border-[#FF5500]/20">
               FAQ
             </span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-black">
+            <h2 className="font-syne text-3xl sm:text-5xl font-extrabold tracking-tight text-white">
               Questions Fréquentes
             </h2>
           </div>
@@ -633,14 +646,14 @@ export default function LandingPage() {
                 a: "CAPTEN intègre un mode hors-ligne avec QR Code de secours pour valider les présentations même en zone blanche (trail, rando)."
               }
             ].map((faq, i) => (
-              <div key={i} className="border border-black/[0.08] rounded-2xl overflow-hidden transition-all">
+              <div key={i} className="border border-white/10 rounded-2xl overflow-hidden bg-white/[0.02]">
                 <button
                   onClick={() => setActiveFaq(activeFaq === i ? null : i)}
-                  className="w-full p-6 text-left font-bold text-base text-black flex items-center justify-between gap-4 hover:bg-zinc-50 transition-colors"
+                  className="w-full p-6 text-left font-bold text-base text-white flex items-center justify-between gap-4 hover:bg-white/[0.04] transition-colors"
                 >
                   <span>{faq.q}</span>
-                  <div className="w-8 h-8 rounded-full bg-zinc-100 flex items-center justify-center shrink-0">
-                    {activeFaq === i ? <Minus className="w-4 h-4 text-black" /> : <Plus className="w-4 h-4 text-black" />}
+                  <div className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center shrink-0 text-white">
+                    {activeFaq === i ? <Minus className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
                   </div>
                 </button>
                 <AnimatePresence>
@@ -650,7 +663,7 @@ export default function LandingPage() {
                       animate={{ height: "auto", opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
                       transition={{ duration: 0.3 }}
-                      className="px-6 pb-6 text-sm text-zinc-600 font-medium leading-relaxed"
+                      className="px-6 pb-6 text-sm text-zinc-400 font-medium leading-relaxed border-t border-white/5 pt-4"
                     >
                       {faq.a}
                     </motion.div>
@@ -665,34 +678,38 @@ export default function LandingPage() {
       {/* ──────────────────────────────────────────────────────────────
          8. FINAL CTA & FOOTER
       ────────────────────────────────────────────────────────────── */}
-      <section className="py-24 bg-black text-white relative overflow-hidden">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-[#FF5C00]/15 blur-[140px] pointer-events-none" />
+      <section className="py-28 bg-[#070709] relative overflow-hidden border-t border-white/[0.06]">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-[#FF5500]/20 blur-[150px] pointer-events-none" />
 
         <div className="max-w-4xl mx-auto px-6 text-center space-y-8 relative z-10">
-          <h2 className="text-4xl sm:text-6xl font-extrabold tracking-tight text-white leading-tight">
-            Prêt à faire passer ton crew au niveau supérieur ?
+          <h2 className="font-syne text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-white leading-tight">
+            Prêt à structurer ton crew ?
           </h2>
-          <p className="text-lg text-zinc-400 font-medium max-w-xl mx-auto">
+          <p className="text-base sm:text-lg text-zinc-400 font-medium max-w-xl mx-auto">
             Rejoins les capitaines qui sécurisent et automatisent leurs rassemblements sportifs dès aujourd'hui.
           </p>
           <div className="pt-4">
-            <Link href="/login?mode=signup" className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-[#FF5C00] text-white font-extrabold text-base shadow-xl shadow-[#FF5C00]/30 hover:bg-orange-600 hover:scale-105 transition-all">
+            <Link
+              href="/login?mode=signup"
+              className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-[#FF5500] text-white font-extrabold text-base shadow-xl shadow-[#FF5500]/40 hover:bg-orange-600 hover:scale-105 transition-all"
+            >
               Rejoindre la Bêta Gratuitement
               <ArrowRight className="w-5 h-5" />
             </Link>
           </div>
         </div>
 
-        {/* Footer info */}
-        <div className="max-w-6xl mx-auto px-6 pt-20 mt-20 border-t border-white/10 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-zinc-500 font-semibold">
+        {/* Footer */}
+        <div className="max-w-7xl mx-auto px-6 pt-24 mt-20 border-t border-white/10 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-zinc-500 font-semibold">
           <div className="flex items-center gap-2">
-            <Zap className="w-4 h-4 text-[#FF5C00]" />
-            <span className="text-white font-bold">CAPTEN © 2026</span>
+            <Zap className="w-4 h-4 text-[#FF5500]" />
+            <span className="text-white font-bold">CAPTEN OS © 2026</span>
           </div>
           <div className="flex gap-6">
             <Link href="/cgu" className="hover:text-white transition-colors">CGU</Link>
             <Link href="/rgpd" className="hover:text-white transition-colors">RGPD</Link>
             <Link href="/mentions-legales" className="hover:text-white transition-colors">Mentions Légales</Link>
+            <Link href="/support" className="hover:text-white transition-colors">Support</Link>
           </div>
         </div>
       </section>
