@@ -37,32 +37,63 @@ import {
   RotateCcw,
   Eye,
   HelpCircle,
-  ChevronLeft,
-  PhoneCall,
-  Sparkle
+  ChevronLeft
 } from "lucide-react";
 
 /* ═══════════════════════════════════════════════════════════════
-   CAPTEN 2026 — Ultimate Interactive iPhone 15 Pro Product Tour
-   Simulateur iPhone 15 Pro interactif en direct sur la Landing Page
+   CAPTEN 2026 — Landing Page avec Popups Interactifs Guidés
+   Concept : Popups / Infobulles explicatives ultra-simples (Style Enfant 12 ans)
 ═══════════════════════════════════════════════════════════════ */
 
 export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
-  const [phoneScreen, setPhoneScreen] = useState<"checkin" | "ice" | "spots">("checkin");
+  const [popupStep, setPopupStep] = useState<number>(1);
   const [activeFaq, setActiveFaq] = useState<number | null>(0);
   const [membersCount, setMembersCount] = useState<number>(45);
 
-  // Phone Simulation States
-  const [phoneCheckinDone, setPhoneCheckinDone] = useState(false);
-  const [phoneIceUnlocked, setPhoneIceUnlocked] = useState(false);
-  const [phoneSpotScanned, setPhoneSpotScanned] = useState(false);
+  // Demo States for Popup Interaction
+  const [checkedInState, setCheckedInState] = useState(false);
+  const [iceUnlockedState, setIceUnlockedState] = useState(false);
+  const [spotScannedState, setSpotScannedState] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const popups = [
+    {
+      step: 1,
+      badge: "🎯 Étape 1 / 4 • Le Pointage GPS",
+      title: "Comment savoir qui est là au rendez-vous ?",
+      desc: "Quand tes coureurs arrivent sur place, leur téléphone vérifie tout seul s'ils sont à moins de 100 mètres. Plus besoin de compter les têtes avec les doigts !",
+      actionText: "Tester le pointage d'un coureur"
+    },
+    {
+      step: 2,
+      badge: "🩹 Étape 2 / 4 • La Fiche d'Urgence ICE",
+      title: "En cas de chute ou de petit bobo",
+      desc: "Si un membre se tord la cheville, tu touches son nom et tu vois son groupe sanguin et le téléphone de son papa ou sa maman en 1 seconde !",
+      actionText: "Déverrouiller le contact d'urgence"
+    },
+    {
+      step: 3,
+      badge: "📑 Étape 3 / 4 • Le Registre Officiel",
+      title: "Le document magique pour être tranquille",
+      desc: "À la fin de la sortie, CAPTEN fabrique une liste officielle avec l'heure exacte. Tu es protégé à 100% sans aucun papier à remplir !",
+      actionText: "Voir le registre fabriqué"
+    },
+    {
+      step: 4,
+      badge: "☕ Étape 4 / 4 • Le Café du coin",
+      title: "La récompense après l'effort !",
+      desc: "Après avoir bien couru ou marché, tous tes membres reçoivent un petit code réduction (-15%) pour boire un café ensemble chez le commerçant du quartier !",
+      actionText: "Débloquer la promo café -15%"
+    }
+  ];
+
+  const currentPopup = popups.find(p => p.step === popupStep) || popups[0];
 
   return (
     <div className="min-h-screen bg-[#070709] text-white font-sans antialiased selection:bg-[#FF5500]/30 selection:text-[#FF5500] overflow-x-hidden">
@@ -76,7 +107,6 @@ export default function LandingPage() {
 
       {/* ── Background Glow Meshes ── */}
       <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[1200px] h-[600px] bg-gradient-to-b from-[#FF5500]/15 via-orange-600/5 to-transparent blur-[140px] pointer-events-none z-0" />
-      <div className="fixed top-[600px] right-0 w-[500px] h-[500px] bg-emerald-500/5 blur-[150px] pointer-events-none z-0" />
 
       {/* ──────────────────────────────────────────────────────────────
          1. FLOATING GLASS NAVBAR
@@ -99,7 +129,7 @@ export default function LandingPage() {
 
           {/* Navigation Links */}
           <nav className="hidden md:flex items-center gap-8 text-sm font-semibold text-zinc-400">
-            <a href="#phone-simulator" className="hover:text-white transition-colors">Démo iPhone Live</a>
+            <a href="#popup-demo" className="hover:text-white transition-colors">Démo à Popups</a>
             <a href="#features" className="hover:text-white transition-colors">Fonctionnalités</a>
             <a href="#calculator" className="hover:text-white transition-colors">Calculateur</a>
             <a href="#faq" className="hover:text-white transition-colors">FAQ</a>
@@ -178,10 +208,10 @@ export default function LandingPage() {
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Link>
               <a
-                href="#phone-simulator"
+                href="#popup-demo"
                 className="w-full sm:w-auto px-8 py-4 rounded-full bg-white/[0.05] border border-white/10 text-white font-extrabold text-sm hover:bg-white/[0.1] transition-all flex items-center justify-center gap-2"
               >
-                📱 Tester l'application sur iPhone ↓
+                💬 Lancer la démo à popups ↓
               </a>
             </motion.div>
 
@@ -208,259 +238,230 @@ export default function LandingPage() {
       </section>
 
       {/* ──────────────────────────────────────────────────────────────
-         3. SIMULATEUR IPHONE 15 PRO INTERACTIF EN DIRECT
+         3. DÉMO INTERACTIVE À POPUPS (Infobulles guidées)
       ────────────────────────────────────────────────────────────── */}
-      <section id="phone-simulator" className="py-24 bg-gradient-to-b from-[#070709] via-[#0C0C14] to-[#070709] border-y border-white/[0.08] relative z-10">
-        <div className="max-w-6xl mx-auto px-6 space-y-16">
+      <section id="popup-demo" className="py-24 bg-gradient-to-b from-[#070709] via-[#0D0D14] to-[#070709] border-y border-white/[0.08] relative z-10">
+        <div className="max-w-6xl mx-auto px-6 space-y-12">
           
           <div className="max-w-3xl mx-auto text-center space-y-4">
             <span className="text-xs font-extrabold tracking-widest text-[#FF5500] uppercase bg-[#FF5500]/10 px-3.5 py-1.5 rounded-full border border-[#FF5500]/20 inline-flex items-center gap-2">
-              <Smartphone className="w-4 h-4 text-[#FF5500]" /> SIMULATEUR IPHONE LIVE
+              <Sparkles className="w-3.5 h-3.5 text-[#FF5500]" /> DÉMO INTERACTIVE AVEC POPUPS
             </span>
             <h2 className="font-syne text-3xl sm:text-5xl font-extrabold tracking-tight text-white">
-              Essayez CAPTEN directement sur iPhone !
+              Laisse-toi guider par les popups !
             </h2>
             <p className="text-sm sm:text-base text-zinc-400 font-medium max-w-xl mx-auto">
-              Touchez les boutons de l'écran iPhone ci-dessous pour tester l'application mobile en temps réel.
+              Clique sur les boutons dans chaque popup pour tester l'application en direct.
             </p>
           </div>
 
-          {/* Phone Screen Selector Tabs */}
-          <div className="flex justify-center gap-2 bg-white/[0.03] p-1.5 rounded-2xl border border-white/10 max-w-md mx-auto">
-            {[
-              { id: "checkin", label: "1. Pointage GPS", icon: MapPin },
-              { id: "ice", label: "2. Fiche ICE", icon: HeartPulse },
-              { id: "spots", label: "3. Code Café", icon: Coffee },
-            ].map(tab => (
+          {/* Step Progress Buttons */}
+          <div className="flex justify-center items-center gap-2 max-w-xl mx-auto">
+            {[1, 2, 3, 4].map(s => (
               <button
-                key={tab.id}
-                onClick={() => setPhoneScreen(tab.id as any)}
-                className={`flex-1 py-2.5 px-3 rounded-xl text-xs font-extrabold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
-                  phoneScreen === tab.id
-                    ? "bg-[#FF5500] text-white shadow-lg shadow-[#FF5500]/30"
-                    : "text-zinc-400 hover:text-white"
+                key={s}
+                onClick={() => setPopupStep(s)}
+                className={`flex-1 py-2.5 rounded-2xl text-xs font-extrabold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                  popupStep === s
+                    ? "bg-[#FF5500] text-white shadow-lg shadow-[#FF5500]/30 scale-[1.03]"
+                    : s < popupStep
+                    ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+                    : "bg-white/5 text-zinc-500 border border-white/10 hover:text-white"
                 }`}
               >
-                <tab.icon className="w-3.5 h-3.5" />
-                {tab.label}
+                {s < popupStep ? <Check className="w-3.5 h-3.5" /> : null}
+                <span>Popup {s}</span>
               </button>
             ))}
           </div>
 
-          {/* REALISTIC IPHONE 15 PRO FRAME MOCKUP */}
-          <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+          {/* MAIN DEMO CONTAINER WITH FLOATING POPUP OVERLAY */}
+          <div className="max-w-4xl mx-auto relative bg-[#09090E] border border-white/10 rounded-3xl p-6 sm:p-10 shadow-2xl overflow-hidden min-h-[460px] flex flex-col justify-between">
             
-            {/* LEFT COLUMN: GUIDANCE BUBBLES FOR ORGANIZER (12-year-old style) */}
-            <div className="space-y-6">
-              <AnimatePresence mode="wait">
+            {/* FLOATING POPUP TOOLTIP OVERLAY */}
+            <motion.div
+              key={popupStep}
+              initial={{ scale: 0.94, opacity: 0, y: -15 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+              className="bg-white text-black p-6 sm:p-8 rounded-3xl shadow-2xl border-4 border-[#FF5500] relative z-30 space-y-4"
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-black uppercase tracking-wider text-[#FF5500] bg-orange-50 px-3 py-1 rounded-md">
+                  {currentPopup.badge}
+                </span>
                 
-                {phoneScreen === "checkin" && (
-                  <motion.div
-                    key="checkin-bubble"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 20 }}
-                    transition={{ duration: 0.3 }}
-                    className="space-y-4 bg-white text-black p-6 rounded-3xl shadow-2xl border-2 border-[#FF5500]"
+                <div className="flex items-center gap-2">
+                  <button
+                    disabled={popupStep === 1}
+                    onClick={() => setPopupStep(prev => Math.max(1, prev - 1))}
+                    className="p-1.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-zinc-700 disabled:opacity-30 cursor-pointer"
                   >
-                    <div className="flex items-center gap-2 text-xs font-black uppercase text-[#FF5500] bg-orange-50 px-2.5 py-1 rounded-md w-fit">
-                      🎯 Étape 1 : Le Pointage Automatique
-                    </div>
-                    <h3 className="font-syne text-xl font-bold text-black">
-                      Comment savoir qui est présent au rendez-vous ?
-                    </h3>
-                    <p className="text-xs sm:text-sm text-zinc-600 font-medium leading-relaxed">
-                      Quand tes coureurs arrivent sur place, ils appuient sur le bouton orange sur leur écran. Le satellite vérifie qu'ils sont bien là (à moins de 100m) et les coche tout seul !
-                    </p>
-                    <div className="pt-2 text-xs font-bold text-[#FF5500] flex items-center gap-1">
-                      👉 Touche le bouton orange sur l'écran de l'iPhone !
-                    </div>
-                  </motion.div>
-                )}
-
-                {phoneScreen === "ice" && (
-                  <motion.div
-                    key="ice-bubble"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 20 }}
-                    transition={{ duration: 0.3 }}
-                    className="space-y-4 bg-white text-black p-6 rounded-3xl shadow-2xl border-2 border-rose-500"
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+                  <span className="text-xs font-mono font-bold text-zinc-500">{popupStep} / 4</span>
+                  <button
+                    disabled={popupStep === 4}
+                    onClick={() => setPopupStep(prev => Math.min(4, prev + 1))}
+                    className="p-1.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-zinc-700 disabled:opacity-30 cursor-pointer"
                   >
-                    <div className="flex items-center gap-2 text-xs font-black uppercase text-rose-600 bg-rose-50 px-2.5 py-1 rounded-md w-fit">
-                      🩹 Étape 2 : La Fiche d'Urgence ICE
-                    </div>
-                    <h3 className="font-syne text-xl font-bold text-black">
-                      Si quelqu'un tombe ou se fait mal ?
-                    </h3>
-                    <p className="text-xs sm:text-sm text-zinc-600 font-medium leading-relaxed">
-                      Tu n'as pas besoin de paniquer. Tu touches le prénom du coureur sur ton écran et tu vois tout de suite le téléphone de ses proches et ses allergies !
-                    </p>
-                    <div className="pt-2 text-xs font-bold text-rose-600 flex items-center gap-1">
-                      👉 Touche le profil de Sarah sur l'iPhone !
-                    </div>
-                  </motion.div>
-                )}
-
-                {phoneScreen === "spots" && (
-                  <motion.div
-                    key="spots-bubble"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 20 }}
-                    transition={{ duration: 0.3 }}
-                    className="space-y-4 bg-white text-black p-6 rounded-3xl shadow-2xl border-2 border-amber-500"
-                  >
-                    <div className="flex items-center gap-2 text-xs font-black uppercase text-amber-700 bg-amber-50 px-2.5 py-1 rounded-md w-fit">
-                      ☕ Étape 3 : Le Café après la course !
-                    </div>
-                    <h3 className="font-syne text-xl font-bold text-black">
-                      Offre un petit cadeau à tes membres !
-                    </h3>
-                    <p className="text-xs sm:text-sm text-zinc-600 font-medium leading-relaxed">
-                      Une fois l'entraînement fini, le téléphone débloque un code réduction (-15%) pour boire un café ou un jus d'orange ensemble chez votre commerçant préféré !
-                    </p>
-                    <div className="pt-2 text-xs font-bold text-amber-700 flex items-center gap-1">
-                      👉 Touche "Scanner le Code" sur l'iPhone !
-                    </div>
-                  </motion.div>
-                )}
-
-              </AnimatePresence>
-
-              <div className="bg-white/5 border border-white/10 p-4 rounded-2xl text-xs text-zinc-400 font-semibold space-y-1">
-                <div>✓ Fonctionne sans télécharger d'application</div>
-                <div>✓ Compatible iPhone & Android en 30 secondes</div>
-              </div>
-            </div>
-
-            {/* RIGHT COLUMN: THE INTERACTIVE IPHONE 15 MOCKUP */}
-            <div className="flex justify-center">
-              <div className="w-[300px] sm:w-[320px] h-[580px] bg-[#000000] rounded-[50px] p-3 border-4 border-zinc-700 shadow-[0_25px_60px_rgba(0,0,0,0.9)] relative overflow-hidden flex flex-col justify-between">
-                
-                {/* Dynamic Island Notch */}
-                <div className="absolute top-5 left-1/2 -translate-x-1/2 w-24 h-5 bg-black rounded-full z-40 flex items-center justify-end px-2">
-                  <div className="w-2.5 h-2.5 rounded-full bg-blue-900/50" />
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
                 </div>
+              </div>
 
-                {/* iPhone Screen Container */}
-                <div className="bg-[#09090D] w-full h-full rounded-[40px] pt-8 px-4 pb-4 text-white font-sans flex flex-col justify-between relative overflow-hidden border border-white/10">
-                  
-                  {/* App Header Bar */}
-                  <div className="flex items-center justify-between pb-3 border-b border-white/10 pt-2">
-                    <div className="flex items-center gap-1.5">
-                      <Zap className="w-3.5 h-3.5 text-[#FF5C00] fill-[#FF5C00]" />
-                      <span className="font-syne text-xs font-bold text-white">CAPTEN</span>
+              <div className="space-y-1">
+                <h3 className="font-syne text-xl sm:text-2xl font-bold text-black leading-tight">
+                  {currentPopup.title}
+                </h3>
+                <p className="text-xs sm:text-sm text-zinc-600 font-medium leading-relaxed">
+                  {currentPopup.desc}
+                </p>
+              </div>
+
+              {/* Popup Interactive Controls */}
+              <div className="pt-3 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-zinc-100">
+                
+                {popupStep === 1 && (
+                  <button
+                    onClick={() => setCheckedInState(!checkedInState)}
+                    className="w-full sm:w-auto px-6 py-3 rounded-xl bg-[#FF5500] hover:bg-orange-600 text-white font-extrabold text-xs shadow-lg shadow-[#FF5500]/30 transition-all cursor-pointer flex items-center justify-center gap-2"
+                  >
+                    <MapPin className="w-4 h-4" />
+                    {checkedInState ? "✓ Présence Validée ! (Cliquer pour réinitialiser)" : "🎯 Appuie ici pour simuler le pointage →"}
+                  </button>
+                )}
+
+                {popupStep === 2 && (
+                  <button
+                    onClick={() => setIceUnlockedState(!iceUnlockedState)}
+                    className="w-full sm:w-auto px-6 py-3 rounded-xl bg-rose-500 hover:bg-rose-600 text-white font-extrabold text-xs shadow-lg transition-all cursor-pointer flex items-center justify-center gap-2"
+                  >
+                    <HeartPulse className="w-4 h-4" />
+                    {iceUnlockedState ? "✓ Contact affiché ! (Cliquer pour masquer)" : "🩹 Appuie ici pour voir le contact d'urgence →"}
+                  </button>
+                )}
+
+                {popupStep === 3 && (
+                  <div className="text-xs font-bold text-emerald-700 bg-emerald-50 px-4 py-2.5 rounded-xl border border-emerald-200 flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                    <span>Le registre officiel PDF est créé automatiquement !</span>
+                  </div>
+                )}
+
+                {popupStep === 4 && (
+                  <button
+                    onClick={() => setSpotScannedState(!spotScannedState)}
+                    className="w-full sm:w-auto px-6 py-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-black font-extrabold text-xs shadow-lg transition-all cursor-pointer flex items-center justify-center gap-2"
+                  >
+                    <Coffee className="w-4 h-4" />
+                    {spotScannedState ? "✓ Code -15% Débloqué !" : "☕ Appuie ici pour débloquer la promo café →"}
+                  </button>
+                )}
+
+                {popupStep < 4 && (
+                  <button
+                    onClick={() => setPopupStep(prev => prev + 1)}
+                    className="text-xs font-extrabold text-black hover:text-[#FF5500] flex items-center gap-1 cursor-pointer"
+                  >
+                    Popup suivant <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+
+            </motion.div>
+
+            {/* SCREEN SIMULATION BACKDROP UNDER THE POPUP */}
+            <div className="pt-6 relative z-10 opacity-90">
+              
+              {/* STEP 1: GPS SCREEN */}
+              {popupStep === 1 && (
+                <div className="bg-[#070709] border border-white/10 rounded-2xl p-6 space-y-4">
+                  <div className="flex justify-between items-center text-xs font-bold text-zinc-400">
+                    <span>Point de Rendez-vous : République, Paris</span>
+                    <span className="text-[#FF5500] font-mono">Rayon : 100m</span>
+                  </div>
+
+                  <div className="p-4 bg-white/5 rounded-xl border border-white/5 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center font-bold text-xs text-white">
+                        TL
+                      </div>
+                      <div>
+                        <div className="text-xs font-bold text-white">Thomas Lefebvre</div>
+                        <div className="text-[10px] text-zinc-400">Distance au point : 14 mètres</div>
+                      </div>
                     </div>
-                    <span className="text-[9px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">
-                      ● Live Session
+
+                    {checkedInState ? (
+                      <span className="text-xs font-extrabold text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20 flex items-center gap-1">
+                        <CheckCircle2 className="w-3.5 h-3.5" /> Émargé à 19:28
+                      </span>
+                    ) : (
+                      <span className="text-xs font-bold text-amber-400 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">
+                        En attente d'arrivée
+                      </span>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* STEP 2: ICE SCREEN */}
+              {popupStep === 2 && (
+                <div className="bg-gradient-to-r from-rose-950/20 to-zinc-900 border border-rose-500/20 rounded-2xl p-6 space-y-3">
+                  <div className="flex justify-between items-center text-xs font-bold text-white">
+                    <span>Fiche d'Urgence Coureur : Sarah Marchand</span>
+                    <span className="bg-rose-500 text-white px-2 py-0.5 rounded text-[10px] font-extrabold">O+</span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                    <div className="bg-white/5 p-3 rounded-xl">
+                      <span className="text-[10px] text-zinc-400 font-bold block">CONTACT FAMILLE :</span>
+                      <span className="font-mono text-white font-bold">
+                        {iceUnlockedState ? "06 11 22 33 44 (Papa)" : "06 •• •• •• •• (Masqué)"}
+                      </span>
+                    </div>
+
+                    <div className="bg-amber-500/10 p-3 rounded-xl text-amber-300 font-bold">
+                      ⚠️ ALLERGIE : Pénicilline
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* STEP 3: PDF SCREEN */}
+              {popupStep === 3 && (
+                <div className="bg-white text-black p-5 rounded-2xl text-xs font-mono space-y-2 border border-zinc-200">
+                  <div className="flex justify-between items-center font-bold border-b border-zinc-200 pb-2">
+                    <span>REGISTRE DE PRÉSENCE OFFICIEL #2026-42</span>
+                    <span className="text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded text-[10px]">CERTIFIÉ OK</span>
+                  </div>
+                  <div className="text-[11px] text-zinc-600">
+                    • 48 coureurs émargés sous 100m • Horodatage satellite conforme assurances
+                  </div>
+                </div>
+              )}
+
+              {/* STEP 4: SPOTS SCREEN */}
+              {popupStep === 4 && (
+                <div className="bg-white/5 border border-white/10 p-5 rounded-2xl flex items-center justify-between text-xs">
+                  <div>
+                    <div className="font-bold text-white text-sm">Café du Cycliste Paris</div>
+                    <div className="text-zinc-400 mt-0.5">-15% sur toutes les boissons après la sortie</div>
+                  </div>
+
+                  {spotScannedState ? (
+                    <span className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-3 py-1.5 rounded-xl font-mono font-bold">
+                      PROMO-15-OK
                     </span>
-                  </div>
-
-                  {/* PHONE SCREEN CONTENT */}
-                  <div className="my-auto space-y-4 text-center">
-                    
-                    {phoneScreen === "checkin" && (
-                      <div className="space-y-4">
-                        <div className="text-xs font-bold text-zinc-300">
-                          Session Run & Chill #42
-                        </div>
-                        <div className="text-[10px] text-zinc-500">
-                          Place de la République • Paris
-                        </div>
-
-                        {phoneCheckinDone ? (
-                          <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }} className="space-y-2 bg-emerald-500/20 border border-emerald-500/40 p-4 rounded-2xl">
-                            <CheckCircle2 className="w-8 h-8 text-emerald-400 mx-auto" />
-                            <div className="text-xs font-bold text-emerald-400">POSITION VALIDÉE</div>
-                            <div className="text-[9px] text-zinc-300">Distance : 12m • Émargé à 19:28</div>
-                            <button
-                              onClick={() => setPhoneCheckinDone(false)}
-                              className="text-[9px] text-zinc-500 underline hover:text-white cursor-pointer mt-1"
-                            >
-                              Réinitialiser
-                            </button>
-                          </motion.div>
-                        ) : (
-                          <div className="space-y-3">
-                            <div className="w-20 h-20 bg-gradient-to-br from-[#FF5C00] to-orange-600 rounded-full flex items-center justify-center mx-auto shadow-lg shadow-[#FF5C00]/40 animate-pulse">
-                              <MapPin className="w-8 h-8 text-white" />
-                            </div>
-                            <button
-                              onClick={() => setPhoneCheckinDone(true)}
-                              className="w-full py-3 rounded-xl bg-[#FF5C00] hover:bg-orange-600 text-white font-extrabold text-xs shadow-lg transition-all cursor-pointer"
-                            >
-                              POINTAGE SATELLITE →
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    )}
-
-                    {phoneScreen === "ice" && (
-                      <div className="space-y-3 text-left">
-                        <div className="text-xs font-bold text-white text-center">
-                          Fiche Urgence Médicale ICE
-                        </div>
-
-                        <div className="bg-white/5 border border-white/10 p-3 rounded-2xl space-y-2 text-xs">
-                          <div className="flex justify-between items-center font-bold">
-                            <span>Sarah Marchand</span>
-                            <span className="bg-rose-500 text-white text-[9px] px-1.5 py-0.5 rounded font-extrabold">O+</span>
-                          </div>
-                          
-                          {phoneIceUnlocked ? (
-                            <div className="space-y-1 text-[10px]">
-                              <div className="text-emerald-400 font-bold">Contact : 06 11 22 33 44 (Papa)</div>
-                              <div className="text-amber-300 font-bold">⚠️ Allergie Pénicilline</div>
-                              <a href="tel:0611223344" className="block text-center py-1.5 bg-rose-500 text-white rounded-lg font-bold mt-2 text-[10px]">
-                                📞 Appeler la famille
-                              </a>
-                            </div>
-                          ) : (
-                            <button
-                              onClick={() => setPhoneIceUnlocked(true)}
-                              className="w-full py-2 bg-white/10 hover:bg-white/20 text-white text-[10px] font-bold rounded-lg cursor-pointer"
-                            >
-                              🔓 Déverrouiller les urgences
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    )}
-
-                    {phoneScreen === "spots" && (
-                      <div className="space-y-3">
-                        <div className="text-xs font-bold text-white">
-                          CAPTEN Spot Réduction
-                        </div>
-
-                        <div className="bg-white/5 border border-white/10 p-4 rounded-2xl space-y-3">
-                          <div className="text-xs font-bold text-amber-400">Café du Cycliste</div>
-                          <div className="text-[10px] text-zinc-300">-15% après le run</div>
-
-                          {phoneSpotScanned ? (
-                            <div className="p-2 bg-emerald-500/20 text-emerald-400 font-mono text-[10px] font-bold rounded-lg border border-emerald-500/30">
-                              CAPTEN-15-OK
-                            </div>
-                          ) : (
-                            <button
-                              onClick={() => setPhoneSpotScanned(true)}
-                              className="w-full py-2.5 bg-amber-500 hover:bg-amber-600 text-black font-extrabold text-[10px] rounded-xl cursor-pointer"
-                            >
-                              SCANNER LE CODE PROMO →
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    )}
-
-                  </div>
-
-                  {/* Phone Home Bar */}
-                  <div className="w-28 h-1 bg-white/30 rounded-full mx-auto" />
+                  ) : (
+                    <span className="bg-amber-500/20 text-amber-300 border border-amber-500/30 px-3 py-1.5 rounded-xl font-bold">
+                      -15% Disponible
+                    </span>
+                  )}
                 </div>
-              </div>
+              )}
+
             </div>
 
           </div>
