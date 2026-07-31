@@ -37,20 +37,14 @@ import {
 } from "lucide-react";
 
 /* ═══════════════════════════════════════════════════════════════
-   CAPTEN 2026 — Masterpiece Landing Page (Carte Blanche Vision)
-   Art Direction: Dark Mode Luxe (Linear / Apple Fitness / Vercel)
-   Canvas       : Deep Anthracite #070709
-   Signature    : Neon Orange #FF5500 • Emerald #10B981 • Cyan #06B6D4
+   CAPTEN 2026 — Masterpiece Landing Page
+   Featured Product Mockup Image: /dashboard-preview.png
 ═══════════════════════════════════════════════════════════════ */
 
 export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
   const [activeFeatureTab, setActiveFeatureTab] = useState<"checkin" | "ice" | "spots">("checkin");
-  const [simulatedDistance, setSimulatedDistance] = useState<number>(14);
-  const [isCheckedIn, setIsCheckedIn] = useState<boolean>(false);
   const [activeFaq, setActiveFaq] = useState<number | null>(0);
-
-  // Calculator State
   const [membersCount, setMembersCount] = useState<number>(45);
 
   useEffect(() => {
@@ -95,7 +89,7 @@ export default function LandingPage() {
           {/* Navigation Links */}
           <nav className="hidden md:flex items-center gap-8 text-sm font-semibold text-zinc-400">
             <a href="#features" className="hover:text-white transition-colors">Fonctionnalités</a>
-            <a href="#how" className="hover:text-black transition-colors hover:text-white">Comment ça marche</a>
+            <a href="#how" className="hover:text-white transition-colors">Comment ça marche</a>
             <a href="#calculator" className="hover:text-white transition-colors">Calculateur</a>
             <a href="#faq" className="hover:text-white transition-colors">FAQ</a>
           </nav>
@@ -115,7 +109,7 @@ export default function LandingPage() {
       </header>
 
       {/* ──────────────────────────────────────────────────────────────
-         2. HERO SECTION (High Impact)
+         2. HERO SECTION
       ────────────────────────────────────────────────────────────── */}
       <section className="relative pt-36 pb-20 md:pt-48 md:pb-32 z-10">
         <div className="max-w-7xl mx-auto px-6">
@@ -205,112 +199,20 @@ export default function LandingPage() {
 
           </div>
 
-          {/* ── HERO INTERACTIVE DEMO (RADAR & CHECKIN) ── */}
+          {/* ── HERO SHOWCASE MOCKUP IMAGE (Original CAPTEN Dashboard) ── */}
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.5 }}
-            className="mt-16 max-w-5xl mx-auto relative"
+            className="mt-16 max-w-5xl mx-auto relative group"
           >
-            <div className="relative rounded-3xl bg-gradient-to-b from-white/[0.08] to-white/[0.02] p-1 border border-white/10 shadow-[0_32px_96px_rgba(0,0,0,0.8)] backdrop-blur-2xl overflow-hidden">
-              <div className="bg-[#0B0B0F] rounded-[22px] p-6 sm:p-10 space-y-8">
-                
-                {/* Demo Header */}
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-white/5 pb-6">
-                  <div>
-                    <div className="flex items-center gap-2 text-xs font-extrabold text-[#FF5500] uppercase tracking-wider">
-                      <Radio className="w-4 h-4 animate-pulse" /> SATELLITE LIVE RADAR
-                    </div>
-                    <h3 className="font-syne text-xl font-bold text-white mt-1">Session Run & Chill #42 — République</h3>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" /> 47 Présents
-                    </div>
-                  </div>
-                </div>
-
-                {/* Radar Grid Visual */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  
-                  {/* Radar Circle */}
-                  <div className="md:col-span-2 bg-[#070709] rounded-2xl p-6 border border-white/5 relative overflow-hidden flex flex-col justify-between min-h-[280px]">
-                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
-                      <div className="w-64 h-64 border border-[#FF5500] rounded-full animate-ping" style={{ animationDuration: '4s' }} />
-                      <div className="w-44 h-44 border border-white/30 rounded-full" />
-                      <div className="w-24 h-24 border border-white/20 rounded-full" />
-                    </div>
-
-                    <div className="flex justify-between items-center relative z-10">
-                      <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Rayon d'émargement : 100m</span>
-                      <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">Signal GPS Fort (±8m)</span>
-                    </div>
-
-                    {/* Interactive Distance Simulator */}
-                    <div className="relative z-10 my-8 space-y-4 text-center">
-                      <div className="text-3xl font-extrabold font-syne text-white">
-                        {simulatedDistance} <span className="text-sm font-sans font-bold text-zinc-500">mètres du RDV</span>
-                      </div>
-                      
-                      {isCheckedIn ? (
-                        <div className="inline-flex items-center gap-2 bg-emerald-500 text-black px-4 py-2 rounded-full text-xs font-extrabold">
-                          <CheckCircle2 className="w-4 h-4" /> Émargement Réussi ! Fiche ICE active.
-                        </div>
-                      ) : (
-                        <button
-                          onClick={() => setIsCheckedIn(true)}
-                          className="px-6 py-2.5 rounded-full bg-[#FF5500] text-white text-xs font-extrabold hover:bg-orange-600 transition-all shadow-lg shadow-[#FF5500]/30"
-                        >
-                          Simuler le Pointage GPS →
-                        </button>
-                      )}
-                    </div>
-
-                    <div className="flex justify-between items-center text-[11px] text-zinc-500 font-semibold relative z-10 border-t border-white/5 pt-3">
-                      <span>Latitude : 48.8661° N</span>
-                      <span>Longitude : 2.3643° E</span>
-                    </div>
-                  </div>
-
-                  {/* Sidebar ICE Live Profile */}
-                  <div className="bg-white/[0.03] rounded-2xl p-6 border border-white/5 space-y-4 flex flex-col justify-between">
-                    <div>
-                      <div className="flex items-center gap-2 text-xs font-extrabold text-rose-400 uppercase tracking-wider mb-3">
-                        <HeartPulse className="w-4 h-4" /> FICHE ICE ACTIVE
-                      </div>
-                      
-                      <div className="space-y-2 text-xs">
-                        <div className="flex justify-between text-zinc-400 font-medium">
-                          <span>Coureur :</span>
-                          <span className="text-white font-bold">Thomas L.</span>
-                        </div>
-                        <div className="flex justify-between text-zinc-400 font-medium">
-                          <span>Groupe Sanguin :</span>
-                          <span className="text-rose-400 font-extrabold bg-rose-500/10 px-2 py-0.5 rounded">A+</span>
-                        </div>
-                        <div className="flex justify-between text-zinc-400 font-medium">
-                          <span>Urgence :</span>
-                          <span className="text-white font-bold">06 14 •• •• 89</span>
-                        </div>
-                        <div className="pt-2 text-[11px] text-zinc-500">
-                          Accessible en 1-clic uniquement pendant la durée du run.
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="pt-4 border-t border-white/5">
-                      <div className="flex items-center justify-between text-[11px] text-zinc-400">
-                        <span>Registre PDF :</span>
-                        <span className="text-emerald-400 font-bold flex items-center gap-1">
-                          <FileCheck className="w-3.5 h-3.5" /> Généré
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                </div>
-              </div>
+            <div className="relative rounded-3xl bg-gradient-to-b from-white/10 to-white/[0.02] p-1.5 border border-white/10 shadow-[0_32px_96px_rgba(0,0,0,0.8)] backdrop-blur-2xl overflow-hidden">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/dashboard-preview.png"
+                alt="Aperçu du Tableau de Bord CAPTEN Original"
+                className="w-full h-auto rounded-[20px] shadow-2xl transition-transform duration-500 group-hover:scale-[1.01]"
+              />
             </div>
           </motion.div>
 
@@ -336,7 +238,7 @@ export default function LandingPage() {
       </section>
 
       {/* ──────────────────────────────────────────────────────────────
-         4. BENTO GRID FEATURES (Interactive 3-Tab Showcase)
+         4. BENTO GRID FEATURES
       ────────────────────────────────────────────────────────────── */}
       <section id="features" className="py-24 md:py-36 relative z-10">
         <div className="max-w-7xl mx-auto px-6 space-y-20">
