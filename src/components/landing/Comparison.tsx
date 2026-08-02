@@ -28,18 +28,18 @@ export function Comparison() {
   ];
 
   return (
-    <section id="comparison" className="py-20 md:py-32">
+    <section id="comparison" className="py-24 md:py-36">
       <Container>
         
         {/* Soft Beige Section Background Container (#F5F3EE / #EFEFE9) */}
-        <div className="bg-[#F5F3EE] rounded-[32px] p-6 sm:p-12 border border-[#ECECEC] space-y-10 relative">
+        <div className="bg-[#F5F3EE] rounded-[32px] p-6 sm:p-12 border border-[#ECECEC] space-y-10 relative shadow-sm">
           
           {/* Section Header */}
           <div className="text-center space-y-3 max-w-2xl mx-auto">
             <h2 className="font-extrabold text-3xl sm:text-5xl text-[#1D1D1D] tracking-tight">
               Pourquoi CAPTEN
             </h2>
-            <p className="text-xs sm:text-sm text-[#6E6E6E] font-medium leading-relaxed">
+            <p className="text-sm sm:text-base text-[#6E6E6E] font-medium leading-relaxed">
               CAPTEN est le premier logiciel supersportif spécialement pensé pour la gestion des crews. Il remplace WhatsApp pour la logistique et centralise tout ce qui est vraiment utile pour vos membres.
             </p>
           </div>
@@ -67,17 +67,27 @@ export function Comparison() {
               ))}
             </div>
 
-            {/* CENTRAL FLOATING DARK GLASS CARD (#1D1D1D) */}
+            {/* CENTRAL FLOATING DARK GLASS CARD (#1D1D1D) WITH DISCRETE FLOATING ANIMATION */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
-              className="w-full md:w-[320px] lg:w-[360px] md:absolute md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 mt-6 md:mt-0 bg-[#1D1D1D] text-white rounded-[24px] p-6 sm:p-8 space-y-6 shadow-[0_25px_60px_rgba(0,0,0,0.5)] border border-white/10 z-20 backdrop-blur-md"
+              animate={{ y: [0, -6, 0] }}
+              /* Smooth floating micro-interaction */
+              /* @ts-ignore */
+              transition={{
+                y: {
+                  repeat: Infinity,
+                  duration: 5,
+                  ease: "easeInOut"
+                }
+              }}
+              className="w-full md:w-[320px] lg:w-[360px] md:absolute md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 mt-6 md:mt-0 bg-gradient-to-b from-[#282725] to-[#1D1D1D] text-white rounded-[24px] p-6 sm:p-8 space-y-6 shadow-[0_32px_80px_rgba(0,0,0,0.45)] border border-white/15 z-20 backdrop-blur-md"
             >
               {/* Card Header Logo */}
               <div className="flex items-center gap-2.5 pb-3 border-b border-white/10">
-                <div className="w-7 h-7 rounded-lg bg-[#FF5B14] flex items-center justify-center">
+                <div className="w-7 h-7 rounded-lg bg-[#FF5B14] flex items-center justify-center shadow-md shadow-[#FF5B14]/30">
                   <Zap className="w-4 h-4 fill-white" />
                 </div>
                 <span className="font-extrabold text-sm text-white tracking-wider">
