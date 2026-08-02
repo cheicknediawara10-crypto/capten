@@ -36,12 +36,11 @@ export function Navbar() {
         
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 group">
-          <div className="w-8 h-8 rounded-lg bg-[#FF5500] flex items-center justify-center text-white shadow-sm shadow-[#FF5500]/20 group-hover:scale-105 transition-transform duration-200">
-            <Zap className="w-4 h-4 fill-white" />
-          </div>
-          <span className="font-extrabold text-xl text-[#1A1918] tracking-tight">
-            CAPTEN
-          </span>
+          <img
+            src="/logo.png"
+            alt="CAPTEN"
+            className="h-8 w-auto object-contain group-hover:scale-105 transition-transform duration-200"
+          />
         </Link>
 
         {/* Desktop Navigation Links */}

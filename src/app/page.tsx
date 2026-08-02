@@ -9,7 +9,6 @@ import { Features } from "@/components/landing/Features";
 import { Comparison } from "@/components/landing/Comparison";
 import { FAQ } from "@/components/landing/FAQ";
 import { Footer } from "@/components/landing/Footer";
-import { FramerBadge } from "@/components/landing/FramerBadge";
 
 /* ═══════════════════════════════════════════════════════════════
    CAPTEN 2026 — Official Landing Page
@@ -45,9 +44,6 @@ export default function LandingPage() {
 
       {/* 7. Footer */}
       <Footer />
-
-      {/* 8. Fixed Floating Badge */}
-      <FramerBadge />
     </div>
   );
 }

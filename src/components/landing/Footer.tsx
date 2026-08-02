@@ -32,12 +32,13 @@ export function Footer() {
         <div className="flex flex-col sm:flex-row justify-between items-center gap-6 pt-8 border-t border-[#ECECEC] text-xs font-bold text-[#6E6E6E]">
           
           {/* Logo Left */}
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-lg bg-[#FF5B14] flex items-center justify-center text-white text-[10px]">
-              <Zap className="w-3.5 h-3.5 fill-white" />
-            </div>
-            <span className="text-[#1D1D1D] font-extrabold">CAPTEN</span>
-          </div>
+          <Link href="/" className="flex items-center gap-2">
+            <img
+              src="/logo.png"
+              alt="CAPTEN"
+              className="h-7 w-auto object-contain"
+            />
+          </Link>
 
           {/* Social & Legal Links */}
           <div className="flex flex-wrap items-center justify-center gap-8">
