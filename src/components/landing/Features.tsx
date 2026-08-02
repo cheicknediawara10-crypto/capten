@@ -9,63 +9,43 @@ export function Features() {
   const featuresList = [
     {
       icon: Coffee,
-      iconColor: "text-[#FF5B14]",
-      iconBg: "bg-[#FF5B14]/10",
-      num: "01",
-      title: "10% de commission automatiquement",
-      desc: "Touche de la commission automatiquement quand tes membres vont consommer chez les cafés partenaires."
+      title: "10 % de commission Automatiquement",
+      desc: "10 % de commission reversés à ton crew sur chaque conso payée chez vos partenaires."
     },
     {
       icon: MapPin,
-      iconColor: "text-[#FF5B14]",
-      iconBg: "bg-[#FF5B14]/10",
-      num: "02",
       title: "Check-in GPS instantané",
-      desc: "Valide la présence de tes membres au point de RDV via leur position géolocalisée quand ils sont sous un rayon paramétrable."
+      desc: "Valide les présences réelles au point de rendez-vous et mesure l'engagement de ton crew sortie après sortie."
     },
     {
       icon: HeartPulse,
-      iconColor: "text-[#FF5B14]",
-      iconBg: "bg-[#FF5B14]/10",
-      num: "03",
-      title: "Fiche Santé / ICE",
-      desc: "Chaque membre enregistre son groupe sanguin et son contact d'urgence disponible 1-clic pendant les sessions."
+      title: "Fiche Santé",
+      desc: "Chaque membre renseigne son contact prioritaire et ses infos médicales en 30 secondes."
     }
   ];
 
   return (
-    <section id="features" className="py-20 md:py-28 bg-[#FFFFFF]">
-      <Container>
-        
-        {/* Unboxed 3 columns feature grid without heavy card borders */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+    <section id="features" className="pb-20 md:pb-28">
+      <Container className="max-w-5xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
           {featuresList.map((f, idx) => (
             <motion.div
               key={idx}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: idx * 0.15 }}
-              className="space-y-4 text-left p-6 rounded-[24px] hover:bg-[#FAFAF8] transition-colors duration-300"
+              transition={{ duration: 0.4, delay: idx * 0.1 }}
+              className="space-y-3 p-6 rounded-[24px]"
             >
-              <div className="flex items-center justify-between">
-                <div className={`w-12 h-12 rounded-2xl ${f.iconBg} ${f.iconColor} flex items-center justify-center`}>
-                  <f.icon className="w-6 h-6" />
-                </div>
-                <span className="font-mono text-xs font-bold text-[#6E6E6E]">{f.num}</span>
-              </div>
-
-              <h3 className="font-extrabold text-xl text-[#1D1D1D] tracking-tight">
+              <h4 className="font-extrabold text-lg text-[#25261D] tracking-tight leading-snug">
                 {f.title}
-              </h3>
-
-              <p className="text-sm text-[#6E6E6E] font-medium leading-relaxed">
+              </h4>
+              <p className="text-xs sm:text-sm text-[#6B6A6A] font-medium leading-relaxed">
                 {f.desc}
               </p>
             </motion.div>
           ))}
         </div>
-
       </Container>
     </section>
   );

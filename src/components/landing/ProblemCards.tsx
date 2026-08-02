@@ -25,7 +25,7 @@ export function ProblemCards() {
             />
             
             {/* Dark Gradient Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10 group-hover:from-black/95 transition-colors duration-500" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#25261D]/90 via-[#25261D]/40 to-transparent group-hover:from-black/95 transition-colors duration-500" />
 
             {/* Top Badge Icon */}
             <div className="relative z-10 w-9 h-9 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center font-bold text-xs shadow-sm">
@@ -38,7 +38,7 @@ export function ProblemCards() {
                 Le cauchemar logistique
               </h3>
               <p className="text-xs sm:text-sm text-neutral-200 leading-relaxed font-medium">
-                Les minutes précieuses perdues au départ à compter les têtes, les relances manuelles sur WhatsApp et l'absence de fiches d'urgence médicales quand un coureur fait une mauvaise chute.
+                Un malaise survient, tu perds de précieuses minutes car tu n'as aucun accès centralisé aux dossiers médicaux ou contacts d'urgence de tes coureurs.
               </p>
             </div>
           </motion.div>
@@ -58,7 +58,7 @@ export function ProblemCards() {
             />
             
             {/* Dark Gradient Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10 group-hover:from-black/95 transition-colors duration-500" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#25261D]/90 via-[#25261D]/40 to-transparent group-hover:from-black/95 transition-colors duration-500" />
 
             {/* Top Badge Icon */}
             <div className="relative z-10 w-9 h-9 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center font-bold text-xs shadow-sm">
@@ -71,7 +71,7 @@ export function ProblemCards() {
                 Le risque juridique
               </h3>
               <p className="text-xs sm:text-sm text-neutral-200 leading-relaxed font-medium">
-                Organiser un groupe sur la voie publique implique votre responsabilité en cas d'accident. Sans registre d'émargement officiel ni décharge, vous restez sans protection légale.
+                Déplacer 40 personnes sur la voie publique sans liste d'émargement engage ta responsabilité. Ton crew a besoin d'un cadre officiel.
               </p>
             </div>
           </motion.div>
