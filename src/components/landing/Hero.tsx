@@ -29,7 +29,10 @@ export function Hero() {
           transition={{ duration: 0.5, delay: 0.1 }}
           className="font-extrabold text-4xl sm:text-6xl md:text-[62px] text-[#25261D] leading-[1.08] tracking-tight max-w-4xl mx-auto"
         >
-          Tu as créé ce crew pour partager une passion. Pas pour jouer les secrétaires.
+          Tu as créé ce crew pour<br />
+          partager une passion.<br />
+          <span className="text-[#FF5500]">Pas pour jouer les</span><br />
+          <span className="text-[#FF5500]">secrétaires.</span>
         </motion.h1>
 
         {/* Dual Pill Buttons */}
