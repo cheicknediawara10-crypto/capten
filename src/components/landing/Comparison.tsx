@@ -72,11 +72,10 @@ export function Comparison() {
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
               animate={{ y: [0, -6, 0] }}
-              /* Smooth floating micro-interaction */
-              /* @ts-ignore */
               transition={{
+                duration: 0.6,
+                /* Smooth floating micro-interaction */
                 y: {
                   repeat: Infinity,
                   duration: 5,
