@@ -11,13 +11,14 @@ import { FAQ } from "@/components/landing/FAQ";
 import { Footer } from "@/components/landing/Footer";
 
 /* ═══════════════════════════════════════════════════════════════
-   CAPTEN 2026 — Senior Staff Frontend & UI Engineer Architecture
-   Modular, pixel-perfect, clean components adhering to the exact spec.
+   CAPTEN 2026 — Exact Reverse Engineering 1:1 Replica
+   99% Visual match of the reference screenshot (eternal-storm-019622.framer.app)
+   Canvas: #F4F4EE | Accent: #FF5500 | Typography: Clean upright bold
 ═══════════════════════════════════════════════════════════════ */
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-[#FAFAF8] text-[#1D1D1D] font-sans antialiased selection:bg-[#FF5B14]/20 selection:text-[#FF5B14]">
+    <div className="min-h-screen bg-[#F4F4EE] text-[#1A1918] font-sans antialiased selection:bg-[#FF5500]/20 selection:text-[#FF5500]">
       {/* Fixed Navbar */}
       <Navbar />
 

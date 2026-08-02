@@ -12,7 +12,7 @@ export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20);
+    const handleScroll = () => setScrolled(window.scrollY > 15);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -20,62 +20,55 @@ export function Navbar() {
   const navLinks = [
     { label: "Fonctionnalités", href: "#features" },
     { label: "Sécurité", href: "#impact" },
-    { label: "Pourquoi CAPTEN", href: "#comparison" },
-    { label: "FAQ", href: "#faq" }
+    { label: "Spots", href: "#features" },
+    { label: "Tarifs", href: "#comparison" }
   ];
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
-          ? "bg-[#FAFAF8]/85 backdrop-blur-xl py-3.5 border-b border-[#ECECEC] shadow-[0_4px_20px_rgba(0,0,0,0.03)]"
-          : "bg-transparent py-6"
+          ? "bg-[#F4F4EE]/90 backdrop-blur-md py-3.5 border-b border-black/5 shadow-sm"
+          : "bg-transparent py-5"
       }`}
     >
-      <Container className="flex items-center justify-between">
+      <Container className="max-w-[1200px] flex items-center justify-between">
         
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="w-8.5 h-8.5 rounded-xl bg-[#FF5B14] flex items-center justify-center text-white shadow-md shadow-[#FF5B14]/20 group-hover:scale-105 transition-transform duration-300">
-            <Zap className="w-4.5 h-4.5 fill-white" />
+        <Link href="/" className="flex items-center gap-2 group">
+          <div className="w-8 h-8 rounded-lg bg-[#FF5500] flex items-center justify-center text-white shadow-sm shadow-[#FF5500]/20 group-hover:scale-105 transition-transform duration-200">
+            <Zap className="w-4 h-4 fill-white" />
           </div>
-          <span className="font-black text-xl text-[#1D1D1D] tracking-tight">
+          <span className="font-extrabold text-xl text-[#1A1918] tracking-tight">
             CAPTEN
           </span>
         </Link>
 
-        {/* Desktop Menu with Orange Hover Underline */}
-        <nav className="hidden md:flex items-center gap-8 text-xs font-bold text-[#6E6E6E]">
+        {/* Desktop Navigation Links */}
+        <nav className="hidden md:flex items-center gap-8 text-xs font-bold text-[#666562]">
           {navLinks.map((link, idx) => (
             <a
               key={idx}
               href={link.href}
-              className="relative py-1 hover:text-[#1D1D1D] transition-colors duration-200 group"
+              className="hover:text-[#1A1918] transition-colors duration-200"
             >
-              <span>{link.label}</span>
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#FF5B14] rounded-full group-hover:w-full transition-all duration-300 ease-out" />
+              {link.label}
             </a>
           ))}
         </nav>
 
-        {/* Desktop Right CTA */}
-        <div className="hidden sm:flex items-center gap-5">
-          <Link
-            href="/login"
-            className="text-xs font-bold text-[#6E6E6E] hover:text-[#1D1D1D] transition-colors duration-200"
-          >
-            Connexion
-          </Link>
+        {/* Desktop CTA Button */}
+        <div className="hidden sm:flex items-center gap-4">
           <Button href="/login?mode=signup" variant="primary" size="sm">
-            Lancer mon crew
+            LANCER UN RUN +
           </Button>
         </div>
 
         {/* Mobile Hamburger Button */}
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="sm:hidden p-2 text-[#1D1D1D] focus:outline-none cursor-pointer rounded-lg hover:bg-black/5"
-          aria-label="Toggle Navigation Menu"
+          className="sm:hidden p-2 text-[#1A1918] focus:outline-none cursor-pointer rounded-lg hover:bg-black/5"
+          aria-label="Toggle Menu"
         >
           {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
@@ -89,32 +82,25 @@ export function Navbar() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="sm:hidden bg-[#FAFAF8] border-b border-[#ECECEC] px-6 py-6 space-y-4 shadow-xl"
+            transition={{ duration: 0.2 }}
+            className="sm:hidden bg-[#F4F4EE] border-b border-black/5 px-6 py-6 space-y-4 shadow-xl"
           >
-            <nav className="flex flex-col gap-4 text-sm font-bold text-[#6E6E6E]">
+            <nav className="flex flex-col gap-4 text-sm font-bold text-[#666562]">
               {navLinks.map((link, idx) => (
                 <a
                   key={idx}
                   href={link.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className="hover:text-[#1D1D1D] py-1 border-b border-neutral-100"
+                  className="hover:text-[#1A1918] py-1 border-b border-black/5"
                 >
                   {link.label}
                 </a>
               ))}
             </nav>
-            <div className="pt-2 flex flex-col gap-3">
+            <div className="pt-2">
               <Button href="/login?mode=signup" variant="primary" size="md" fullWidth>
-                Lancer mon crew
+                LANCER UN RUN +
               </Button>
-              <Link
-                href="/login"
-                onClick={() => setMobileMenuOpen(false)}
-                className="text-center text-xs font-bold text-[#6E6E6E] py-1"
-              >
-                Connexion
-              </Link>
             </div>
           </motion.div>
         )}
