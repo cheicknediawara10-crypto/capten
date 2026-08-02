@@ -22,7 +22,7 @@ export function Hero() {
           <span className="text-[#FF5500] font-bold">100 % Web</span>
         </motion.div>
 
-        {/* Hero H1 Headline - Exact Text from Framer DOM */}
+        {/* Hero H1 Headline */}
         <motion.h1
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}

@@ -11,8 +11,7 @@ import { FAQ } from "@/components/landing/FAQ";
 import { Footer } from "@/components/landing/Footer";
 
 /* ═══════════════════════════════════════════════════════════════
-   CAPTEN 2026 — Exact Reverse Engineering 1:1 Replica
-   99% Visual match of the reference screenshot (eternal-storm-019622.framer.app)
+   CAPTEN 2026 — Official Landing Page
    Canvas: #F4F4EE | Accent: #FF5500 | Typography: Clean upright bold
 ═══════════════════════════════════════════════════════════════ */
 
