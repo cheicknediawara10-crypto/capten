@@ -41,9 +41,15 @@ export function Footer() {
 
           {/* Social & Legal Links */}
           <div className="flex flex-wrap items-center justify-center gap-8">
-            <div className="space-x-3">
+            <div className="space-x-4">
               <span className="text-[#1D1D1D] font-extrabold">CONTACT</span>
-              <a href="https://instagram.com" target="_blank" rel="noreferrer" className="hover:text-[#1D1D1D] transition-colors">
+              <Link href="/support" className="hover:text-[#1D1D1D] transition-colors">
+                Support
+              </Link>
+              <a href="mailto:contact@capten.app" className="hover:text-[#1D1D1D] transition-colors">
+                Contact
+              </a>
+              <a href="https://instagram.com/capten.app" target="_blank" rel="noreferrer" className="hover:text-[#1D1D1D] transition-colors">
                 Instagram
               </a>
             </div>
@@ -51,10 +57,13 @@ export function Footer() {
             <div className="space-x-4">
               <span className="text-[#1D1D1D] font-extrabold">LÉGAL</span>
               <Link href="/rgpd" className="hover:text-[#1D1D1D] transition-colors">
-                Politique de confidentialité
+                Confidentialité
               </Link>
               <Link href="/cgu" className="hover:text-[#1D1D1D] transition-colors">
-                Conditions d'utilisation
+                CGU
+              </Link>
+              <Link href="/mentions-legales" className="hover:text-[#1D1D1D] transition-colors">
+                Mentions Légales
               </Link>
             </div>
           </div>
