@@ -37,6 +37,9 @@ export function Features() {
               transition={{ duration: 0.4, delay: idx * 0.1 }}
               className="space-y-3 p-6 rounded-[24px]"
             >
+              <div className="w-12 h-12 mx-auto mb-3 rounded-2xl bg-[#E1E3D3] border border-black/5 flex items-center justify-center text-[#FF5500]">
+                <f.icon className="w-5 h-5 stroke-[2.5]" />
+              </div>
               <h4 className="font-extrabold text-lg text-[#25261D] tracking-tight leading-snug">
                 {f.title}
               </h4>

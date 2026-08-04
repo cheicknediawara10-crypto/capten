@@ -36,6 +36,17 @@ export function Explanation() {
           Automatise ton registre de présence, centralise les fiches d’urgence de tes coureurs et pilote tes revenus. Zéro friction : tes membres n’ont rien à installer, tu gères tout depuis ton espace.
         </p>
 
+        {/* High Impact Dashboard Mockup Showcase */}
+        <div className="pt-6">
+          <div className="relative mx-auto max-w-5xl rounded-[28px] overflow-hidden border border-black/10 shadow-[0_25px_65px_rgba(0,0,0,0.12)] bg-white">
+            <img
+              src="/dashboard-preview.png"
+              alt="CAPTEN SaaS Hub & Dashboard Preview"
+              className="w-full h-auto object-cover rounded-[28px]"
+            />
+          </div>
+        </div>
+
       </Container>
     </section>
   );
