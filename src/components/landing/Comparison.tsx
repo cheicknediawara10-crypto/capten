@@ -70,12 +70,11 @@ export function Comparison() {
             >
               {/* Header Logo */}
               <div className="flex items-center gap-2 pb-3 border-b border-white/10">
-                <div className="w-6 h-6 rounded-lg bg-[#FF5500] flex items-center justify-center">
-                  <Zap className="w-3.5 h-3.5 fill-white" />
-                </div>
-                <span className="font-extrabold text-sm text-white tracking-wider">
-                  CAPTEN
-                </span>
+                <img
+                  src="/logo.png"
+                  alt="CAPTEN"
+                  className="h-5 w-auto object-contain brightness-0 invert"
+                />
               </div>
 
               {/* 7 Checkmark Items */}

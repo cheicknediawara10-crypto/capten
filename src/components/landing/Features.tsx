@@ -3,29 +3,29 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { Container } from "./Container";
-import { Coffee, MapPin, HeartPulse } from "lucide-react";
+import { Smartphone, MapPin, FileCheck } from "lucide-react";
 
 export function Features() {
   const featuresList = [
     {
-      icon: Coffee,
-      title: "10 % de commission Automatiquement",
-      desc: "10 % de commission reversés à ton crew sur chaque conso payée chez vos partenaires."
+      icon: Smartphone,
+      title: "100% Web, 0 app requise",
+      desc: "Tes membres n'ont rien à télécharger. Ils s'inscrivent et scannent leur présence en 2 secondes."
     },
     {
       icon: MapPin,
       title: "Check-in GPS instantané",
-      desc: "Valide les présences réelles au point de rendez-vous et mesure l'engagement de ton crew sortie après sortie."
+      desc: "Sur le lieu de rendez-vous, l'inscription est validée instantanément. Mesure la réelle présence."
     },
     {
-      icon: HeartPulse,
-      title: "Fiche Santé",
-      desc: "Chaque membre renseigne son contact prioritaire et ses infos médicales en 30 secondes."
+      icon: FileCheck,
+      title: "Registre horodaté d'urgence",
+      desc: "Conserve l'historique officiel de chaque sortie avec l'ensemble des présences en cas de contrôle ou d'incident."
     }
   ];
 
   return (
-    <section id="features" className="pb-20 md:pb-28">
+    <section id="features" className="py-12 md:py-16">
       <Container className="max-w-5xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
           {featuresList.map((f, idx) => (
@@ -35,15 +35,16 @@ export function Features() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: idx * 0.1 }}
-              className="space-y-3 p-6 rounded-[24px]"
+              className="space-y-4 p-6 rounded-[24px]"
             >
-              <div className="w-12 h-12 mx-auto mb-3 rounded-2xl bg-[#E1E3D3] border border-black/5 flex items-center justify-center text-[#FF5500]">
-                <f.icon className="w-5 h-5 stroke-[2.5]" />
+              {/* Dark Square Icon Pill */}
+              <div className="w-10 h-10 mx-auto rounded-xl bg-[#1A1918] text-white flex items-center justify-center shadow-sm">
+                <f.icon className="w-5 h-5 stroke-[2]" />
               </div>
-              <h4 className="font-extrabold text-lg text-[#25261D] tracking-tight leading-snug">
+              <h3 className="font-extrabold text-base sm:text-lg text-[#1A1918] tracking-tight leading-snug">
                 {f.title}
-              </h4>
-              <p className="text-xs sm:text-sm text-[#6B6A6A] font-medium leading-relaxed">
+              </h3>
+              <p className="text-xs sm:text-sm text-[#666562] font-medium leading-relaxed">
                 {f.desc}
               </p>
             </motion.div>
