@@ -52,24 +52,23 @@ export default function Sidebar() {
       title: "PILOTAGE",
       items: [
         { name: "Tableau de bord", icon: <LayoutDashboard size={18} strokeWidth={1.5} />, href: "/dashboard" },
-        { name: "Le Crew", icon: <Users size={18} strokeWidth={1.5} />, href: "/athletes" },
-        { name: sessionMenuLabel, icon: <Map size={18} strokeWidth={1.5} />, href: "/runs" },
-        { name: "Messages", icon: <MessageSquare size={18} strokeWidth={1.5} />, href: "/messages" },
+        { name: "Membres", icon: <Users size={18} strokeWidth={1.5} />, href: "/dashboard/members" },
+        { name: sessionMenuLabel, icon: <Map size={18} strokeWidth={1.5} />, href: "/dashboard/events" },
+        { name: "Statistiques", icon: <BarChart3 size={18} strokeWidth={1.5} />, href: "/dashboard/stats" },
       ]
     },
     {
       title: "TERRAIN",
       items: [
-        { name: "Spots", icon: <Store size={18} strokeWidth={1.5} />, href: "/spots/explorer" },
-        { name: "Cagnotte", icon: <Wallet size={18} strokeWidth={1.5} />, href: "/cagnotte" },
+        { name: "CAPTEN Spots", icon: <Store size={18} strokeWidth={1.5} />, href: "/dashboard/spots" },
         { name: "Protection", icon: <ShieldCheck size={18} strokeWidth={1.5} />, href: "/securite" },
       ]
     },
     {
       title: "COMPTE",
       items: [
+        { name: "Mon Club", icon: <Settings size={18} strokeWidth={1.5} />, href: "/dashboard/club" },
         { name: "Abonnement", icon: <CreditCard size={18} strokeWidth={1.5} />, href: "/plan" },
-        { name: "Réglages", icon: <Settings size={18} strokeWidth={1.5} />, href: "/settings" },
         { name: "Support & Aide", icon: <HelpCircle size={18} strokeWidth={1.5} />, href: "/support" },
       ]
     }
@@ -89,7 +88,10 @@ export default function Sidebar() {
             <p className="text-[10px] text-[#D1D1D1] font-black uppercase tracking-[0.3em] mb-4 px-8 italic">{section.title}</p>
             <div className="space-y-0.5">
               {section.items.map((item: any) => {
-                const isActive = pathname === item.href || (item.href === '/spots/explorer' && pathname.startsWith('/spots'));
+                const isActive =
+                  pathname === item.href ||
+                  (item.href !== "/dashboard" && pathname.startsWith(item.href + "/")) ||
+                  (item.href !== "/dashboard" && pathname === item.href);
                 const isStaticOrExternal = item.href.endsWith(".html") || item.href.startsWith("http");
                 
                 const content = (

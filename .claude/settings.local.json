@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(/Users/cd/.gemini/antigravity-backup/scratch/node-v22.15.0-darwin-arm64/bin/node /Users/cd/.gemini/antigravity-backup/scratch/node-v22.15.0-darwin-arm64/lib/node_modules/npm/bin/npm --version)",
+      "Bash(/Users/cd/.gemini/antigravity-backup/scratch/node-v22.15.0-darwin-arm64/bin/node /Users/cd/.gemini/antigravity-backup/scratch/node-v22.15.0-darwin-arm64/lib/node_modules/npm/bin/npm-cli.js --version)",
+      "Read(//Users/cd/.gemini/antigravity/scratch/capten/**)",
+      "Bash(/Users/cd/.gemini/antigravity-backup/scratch/node-v22.15.0-darwin-arm64/bin/node /Users/cd/.gemini/antigravity-backup/scratch/node-v22.15.0-darwin-arm64/lib/node_modules/npm/bin/npm-cli.js install recharts date-fns sonner leaflet react-leaflet qrcode.react canvas-confetti zustand react-hook-form zod @hookform/resolvers --legacy-peer-deps)",
+      "Bash(/Users/cd/.gemini/antigravity-backup/scratch/node-v22.15.0-darwin-arm64/bin/node /Users/cd/.gemini/antigravity-backup/scratch/node-v22.15.0-darwin-arm64/lib/node_modules/npm/bin/npm-cli.js install --save-dev @types/leaflet @types/canvas-confetti)",
+      "Bash(/Users/cd/.gemini/antigravity-backup/scratch/node-v22.15.0-darwin-arm64/bin/node /Users/cd/.gemini/antigravity-backup/scratch/node-v22.15.0-darwin-arm64/lib/node_modules/npm/bin/npm-cli.js install --save-dev @types/leaflet @types/canvas-confetti --legacy-peer-deps)",
+      "Bash(mkdir -p \"/Users/cd/.gemini/antigravity/scratch/capten/src/app/dashboard/events/new\" \"/Users/cd/.gemini/antigravity/scratch/capten/src/app/dashboard/events/[id]\" \"/Users/cd/.gemini/antigravity/scratch/capten/src/app/dashboard/members/[id]\" \"/Users/cd/.gemini/antigravity/scratch/capten/src/app/dashboard/spots\" \"/Users/cd/.gemini/antigravity/scratch/capten/src/app/dashboard/stats\" \"/Users/cd/.gemini/antigravity/scratch/capten/src/app/dashboard/club\" \"/Users/cd/.gemini/antigravity/scratch/capten/src/app/dashboard/settings\" \"/Users/cd/.gemini/antigravity/scratch/capten/src/app/join/[slug]\" \"/Users/cd/.gemini/antigravity/scratch/capten/src/app/event/[id]\" \"/Users/cd/.gemini/antigravity/scratch/capten/src/app/checkin/[id]\" \"/Users/cd/.gemini/antigravity/scratch/capten/src/app/p/[token]\" \"/Users/cd/.gemini/antigravity/scratch/capten/src/app/waiver/[club_id]\" && echo \"dirs created\")",
+      "Bash(/Users/cd/.gemini/antigravity-backup/scratch/node-v22.15.0-darwin-arm64/bin/node /Users/cd/.gemini/antigravity-backup/scratch/node-v22.15.0-darwin-arm64/lib/node_modules/npm/bin/npm-cli.js run build)",
+      "Bash(export NODE_PATH=/Users/cd/.gemini/antigravity-backup/scratch/node-v22.15.0-darwin-arm64/lib/node_modules)",
+      "Bash(/Users/cd/.gemini/antigravity-backup/scratch/node-v22.15.0-darwin-arm64/bin/node /Users/cd/.gemini/antigravity-backup/scratch/node-v22.15.0-darwin-arm64/lib/node_modules/npm/bin/npm-cli.js run build --prefix /Users/cd/.gemini/antigravity/scratch/capten)"
+    ]
+  }
+}

@@ -2,6 +2,7 @@
 
 import React from "react";
 import { usePathname } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
 import Sidebar from "@/components/layout/Sidebar";
 import MobileHeader from "@/components/layout/MobileHeader";
 import MobileNav from "@/components/layout/MobileNav";
@@ -32,9 +33,13 @@ export default function AppLayoutWrapper({ children }: AppLayoutWrapperProps) {
     cleanPath.startsWith("/securite/signaler") ||
     cleanPath.startsWith("/cagnotte/contribuer") ||
     cleanPath.startsWith("/cagnotte/sponsor") ||
-    (cleanPath.startsWith("/spots") && 
-     !cleanPath.startsWith("/spots/explorer") && 
-     !cleanPath.startsWith("/spots/events") && 
+    // Nouvelles pages membres publiques (specs Phase D)
+    cleanPath.startsWith("/join/") ||
+    cleanPath.startsWith("/event/") ||
+    cleanPath.startsWith("/p/") ||
+    (cleanPath.startsWith("/spots") &&
+     !cleanPath.startsWith("/spots/explorer") &&
+     !cleanPath.startsWith("/spots/events") &&
      !cleanPath.startsWith("/spots/scan"));
 
   if (isPublicPage) {
@@ -57,9 +62,17 @@ export default function AppLayoutWrapper({ children }: AppLayoutWrapperProps) {
         <MobileHeader />
 
         <div className="p-4 sm:p-6 lg:p-10 max-w-page-wide mx-auto">
-          <div className="page-transition">
-            {children}
-          </div>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={cleanPath}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.18, ease: "easeOut" }}
+            >
+              {children}
+            </motion.div>
+          </AnimatePresence>
         </div>
 
         {/* Mobile Navigation Bar (Bottom) */}
