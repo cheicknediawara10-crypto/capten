@@ -1,140 +1,92 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-
-const ITEMS = [
-  {
-    q: "Mes membres doivent-ils créer un compte ou télécharger une appli ?",
-    a: "Non, aucun compte ni appli. Tes membres cliquent sur le lien d'invitation, renseignent leur fiche ICE, signent la décharge numérique — et c'est terminé. Tout se passe dans leur navigateur, en 30 secondes.",
-  },
-  {
-    q: "Comment fonctionnent les fiches ICE (In Case of Emergency) ?",
-    a: "Lors de l'onboarding, chaque membre renseigne son contact d'urgence, son groupe sanguin, ses allergies et ses traitements. Ces données sont chiffrées côté serveur et accessibles uniquement par toi, l'organisateur, en session active — en 1 clic depuis le dashboard.",
-  },
-  {
-    q: "Qu'est-ce qui se passe si un membre n'a pas de réseau sur le trail ?",
-    a: "Chaque sortie a un QR Code téléchargeable à l'avance. Si le réseau est coupé, le membre scanne le QR depuis l'app. Et en dernier recours, tu as une validation manuelle 1-clic depuis ton dashboard pour valider un coureur.",
-  },
-  {
-    q: "Comment fonctionne CAPTEN Spots et comment je touche l'argent ?",
-    a: "Tes membres consomment chez nos partenaires locaux (cafés, sport, nutrition) via leur lien CAPTEN Spots. 10% de chaque transaction est automatiquement crédité à la cagnotte de ton club. Le solde est visible en temps réel, et versé mensuellement sur ton compte.",
-  },
-  {
-    q: "Puis-je personnaliser le rayon du check-in GPS ?",
-    a: "Oui. Par défaut, le rayon est de 200m. Pour chaque sortie, tu peux l'ajuster de 50m à 500m depuis l'écran de création de sortie — utile pour un parc ouvert ou un départ en stade.",
-  },
-  {
-    q: "Qu'est-ce qui se passe en cas d'incident — qui est responsable ?",
-    a: "CAPTEN génère un registre d'émargement horodaté et une décharge de responsabilité numérique signée par chaque membre, attestant qu'ils participent sous leur propre responsabilité civile. Tu disposes d'une trace légale complète pour chaque sortie.",
-  },
-  {
-    q: "Puis-je exporter mes données ou quitter CAPTEN à tout moment ?",
-    a: "Oui, à tout moment et sans frais. Tu peux exporter tes listes de membres, l'historique des sorties et des check-ins en CSV depuis ton dashboard. Tes données t'appartiennent.",
-  },
-];
+import { Container } from "./Container";
+import { SectionTitle } from "./SectionTitle";
+import { ChevronDown } from "lucide-react";
 
 export function FAQ() {
-  const [open, setOpen] = useState<number | null>(0);
+  const [openIndex, setOpenIndex] = useState<number | null>(0);
+
+  const faqItems = [
+    {
+      q: "Est-ce que mes membres doivent créer un compte sur le logiciel ?",
+      a: "Non. Vos membres n'ont aucun compte à créer ni application à télécharger. Ils scannent le QR code du run ou cliquent sur le lien WhatsApp pour renseigner leur fiche et émarger en 30 secondes."
+    },
+    {
+      q: "Comment fonctionne la collecte des fiches d'urgence ?",
+      a: "Lors de leur première inscription à un run, le membre saisit son contact ICE (Emergency) et ses informations médicales. Ces données sont chiffrées et consultables uniquement par le Capitaine en session active."
+    },
+    {
+      q: "Comment suivre l'argent généré par CAPTEN Spots ?",
+      a: "Votre dashboard affiche en temps réel les commissions générées par vos membres chez les commerçants partenaires. Les fonds sont versés chaque mois sur votre compte ou cagnotte de club."
+    },
+    {
+      q: "Si un membre a un problème de réseau ou plus de batterie au RDV, ça bloque son registre ?",
+      a: "Non. Le Capitaine dispose d'une fonction d'émargement manuel 1-clic depuis son propre dashboard pour valider un coureur en cas d'imprévu."
+    },
+    {
+      q: "L'agrément, qui est responsable en cas d'accident, passion ou run ?",
+      a: "CAPTEN génère un registre d'émargement certifié et une décharge de responsabilité numérique signée par chaque membre, attestant qu'il participe sous sa propre responsabilité civile."
+    }
+  ];
 
   return (
-    <section id="faq" className="bg-[#F4F4EE] py-24 md:py-32">
-      <div className="max-w-[1280px] mx-auto px-6 lg:px-8">
-        <div className="grid lg:grid-cols-[340px_1fr] gap-16 lg:gap-24 items-start">
-          {/* Left */}
-          <div className="lg:sticky lg:top-24">
-            <motion.p
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-80px" }}
-              className="text-[11px] font-mono uppercase tracking-[0.2em] text-[#FF5500] mb-4"
-            >
-              FAQ
-            </motion.p>
-            <motion.h2
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-80px" }}
-              transition={{ delay: 0.05 }}
-              className="font-display text-[clamp(36px,4.5vw,56px)] italic font-black uppercase text-[#1A1918] leading-[0.95] tracking-tighter mb-6"
-            >
-              TES<br />
-              QUESTIONS.
-            </motion.h2>
-            <motion.p
-              initial={{ opacity: 0, y: 12 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-80px" }}
-              transition={{ delay: 0.1 }}
-              className="text-[14px] text-[#1A1918]/50 font-medium leading-relaxed mb-8"
-            >
-              Tout ce que tu dois savoir avant de te lancer. D&apos;autres questions ?
-            </motion.p>
-            <motion.a
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.15 }}
-              href="mailto:hello@capten.app"
-              className="inline-flex items-center gap-2 text-[13px] font-bold text-[#FF5500] hover:text-[#1A1918] transition-colors"
-            >
-              hello@capten.app
-              <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
-                <path d="M2 9L9 2M9 2H3.5M9 2V7.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </motion.a>
+    <section id="faq" className="py-20 md:py-28 bg-[#FFFFFF] border-y border-[#ECECEC]">
+      <Container>
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-12 items-start">
+          
+          {/* Left 5 cols */}
+          <div className="md:col-span-5 space-y-4">
+            <SectionTitle
+              badge="FAITES LE PREMIER PAS"
+              title="Des réponses simples à toutes vos questions"
+              subtitle="Les réponses aux questions les plus fréquentes proposées par les capitaines."
+              align="left"
+            />
           </div>
 
-          {/* Right — Accordion */}
-          <div className="space-y-2">
-            {ITEMS.map((item, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 12 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-40px" }}
-                transition={{ duration: 0.4, delay: i * 0.05 }}
-                className="border border-[#1A1918]/8 rounded-[16px] overflow-hidden bg-white"
+          {/* Right 7 cols Accordion */}
+          <div className="md:col-span-7 space-y-3">
+            {faqItems.map((faq, idx) => (
+              <div
+                key={idx}
+                className="bg-[#F5F3EE] rounded-[18px] overflow-hidden border border-[#ECECEC]"
               >
                 <button
-                  onClick={() => setOpen(open === i ? null : i)}
-                  className="w-full flex items-center justify-between gap-4 px-6 py-5 text-left hover:bg-[#1A1918]/2 transition-colors"
+                  onClick={() => setOpenIndex(openIndex === idx ? null : idx)}
+                  className="w-full p-5 text-left font-bold text-sm sm:text-base text-[#1D1D1D] flex items-center justify-between gap-4 hover:bg-[#EBE8E1] transition-colors cursor-pointer"
                 >
-                  <span className="text-[14px] font-bold text-[#1A1918] leading-snug">{item.q}</span>
-                  <div className="shrink-0 w-7 h-7 rounded-full bg-[#1A1918]/6 flex items-center justify-center">
-                    <motion.svg
-                      width="12"
-                      height="12"
-                      viewBox="0 0 12 12"
-                      fill="none"
-                      animate={{ rotate: open === i ? 45 : 0 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      <path d="M6 2V10M2 6H10" stroke="#1A1918" strokeWidth="1.5" strokeLinecap="round"/>
-                    </motion.svg>
-                  </div>
+                  <span>{faq.q}</span>
+                  <motion.div
+                    animate={{ rotate: openIndex === idx ? 180 : 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="w-7 h-7 rounded-full bg-white flex items-center justify-center shrink-0 text-[#1D1D1D] shadow-sm"
+                  >
+                    <ChevronDown className="w-4 h-4" />
+                  </motion.div>
                 </button>
 
                 <AnimatePresence>
-                  {open === i && (
+                  {openIndex === idx && (
                     <motion.div
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: "auto", opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.22, ease: [0.25, 0, 0, 1] }}
-                      className="overflow-hidden"
+                      transition={{ duration: 0.25 }}
+                      className="px-5 pb-5 text-xs sm:text-sm text-[#6E6E6E] font-medium leading-relaxed border-t border-[#ECECEC] pt-3"
                     >
-                      <p className="px-6 pb-5 pt-1 text-[13px] text-[#1A1918]/55 leading-relaxed font-medium border-t border-[#1A1918]/6">
-                        {item.a}
-                      </p>
+                      {faq.a}
                     </motion.div>
                   )}
                 </AnimatePresence>
-              </motion.div>
+              </div>
             ))}
           </div>
+
         </div>
-      </div>
+      </Container>
     </section>
   );
 }

@@ -106,12 +106,3 @@ html {
   to { transform: scale(1); opacity: 1; }
 }
 
-@keyframes marquee-slide {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
-
-.animate-marquee {
-  animation: marquee-slide 24s linear infinite;
-}
-

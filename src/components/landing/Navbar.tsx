@@ -1,134 +1,109 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { Zap, Menu, X } from "lucide-react";
+import { Button } from "./Button";
+import { Container } from "./Container";
 import { motion, AnimatePresence } from "framer-motion";
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    const handler = () => setScrolled(window.scrollY > 40);
-    window.addEventListener("scroll", handler, { passive: true });
-    return () => window.removeEventListener("scroll", handler);
+    const handleScroll = () => setScrolled(window.scrollY > 15);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const links = [
+  const navLinks = [
     { label: "Fonctionnalités", href: "#features" },
-    { label: "Comment ça marche", href: "#how" },
-    { label: "Tarifs", href: "#pricing" },
-    { label: "FAQ", href: "#faq" },
+    { label: "Sécurité", href: "#impact" },
+    { label: "Spots", href: "#features" },
+    { label: "Tarifs", href: "#comparison" }
   ];
 
   return (
-    <motion.header
-      initial={{ opacity: 0, y: -16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: [0.25, 0, 0, 1] }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+    <header
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
-          ? "bg-[#0C0C0C]/92 backdrop-blur-2xl border-b border-white/8 shadow-[0_1px_0_rgba(255,255,255,0.05)]"
-          : "bg-transparent"
+          ? "bg-[#F4F4EE]/90 backdrop-blur-md py-3.5 border-b border-black/5 shadow-sm"
+          : "bg-transparent py-5"
       }`}
     >
-      <div className="max-w-[1280px] mx-auto px-6 lg:px-8 h-16 flex items-center justify-between">
+      <Container className="max-w-[1200px] flex items-center justify-between">
+        
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="w-7 h-7 bg-[#FF5500] rounded-[7px] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-            <span className="font-display italic font-black text-black text-[11px] leading-none">C</span>
-          </div>
-          <span className="font-display italic font-black text-white text-[17px] tracking-tighter leading-none uppercase">
-            CAPTEN
-          </span>
+        <Link href="/" className="flex items-center gap-2 group">
+          <img
+            src="/logo.png"
+            alt="CAPTEN"
+            className="h-8 w-auto object-contain group-hover:scale-105 transition-transform duration-200"
+          />
         </Link>
 
-        {/* Desktop nav */}
-        <nav className="hidden md:flex items-center gap-7">
-          {links.map((l) => (
+        {/* Desktop Navigation Links */}
+        <nav className="hidden md:flex items-center gap-8 text-xs font-bold text-[#666562]">
+          {navLinks.map((link, idx) => (
             <a
-              key={l.href}
-              href={l.href}
-              className="text-[13px] text-white/50 hover:text-white/90 transition-colors duration-200 font-medium"
+              key={idx}
+              href={link.href}
+              className="hover:text-[#1A1918] transition-colors duration-200"
             >
-              {l.label}
+              {link.label}
             </a>
           ))}
         </nav>
 
-        {/* CTAs */}
-        <div className="hidden md:flex items-center gap-2">
-          <Link
-            href="/login"
-            className="text-[13px] text-white/50 hover:text-white transition-colors px-4 py-2 font-medium"
-          >
-            Connexion
-          </Link>
-          <Link
-            href="/login"
-            className="inline-flex items-center gap-1.5 bg-[#FF5500] hover:bg-[#FF5500]/90 text-black text-[12px] font-black uppercase tracking-wide rounded-[9px] px-4 py-2.5 transition-all hover:scale-[1.02]"
-          >
-            Démarrer — gratuit
-            <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-              <path d="M2 8L8 2M8 2H3M8 2V7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </Link>
+        {/* Desktop CTA Button */}
+        <div className="hidden sm:flex items-center gap-4">
+          <Button href="/login?mode=signup" variant="primary" size="sm">
+            LANCER UN RUN +
+          </Button>
         </div>
 
-        {/* Hamburger */}
+        {/* Mobile Hamburger Button */}
         <button
-          onClick={() => setMenuOpen(!menuOpen)}
-          className="md:hidden text-white/70 hover:text-white w-8 h-8 flex items-center justify-center"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          className="sm:hidden p-2 text-[#1A1918] focus:outline-none cursor-pointer rounded-lg hover:bg-black/5"
+          aria-label="Toggle Menu"
         >
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-            {menuOpen ? (
-              <path d="M4 4L16 16M16 4L4 16" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-            ) : (
-              <>
-                <line x1="3" y1="6.5" x2="17" y2="6.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-                <line x1="3" y1="13.5" x2="17" y2="13.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-              </>
-            )}
-          </svg>
+          {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
-      </div>
 
-      {/* Mobile menu */}
+      </Container>
+
+      {/* Mobile Animated Dropdown Menu */}
       <AnimatePresence>
-        {menuOpen && (
+        {mobileMenuOpen && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.25 }}
-            className="md:hidden overflow-hidden bg-[#0C0C0C]/95 backdrop-blur-2xl border-t border-white/8"
+            transition={{ duration: 0.2 }}
+            className="sm:hidden bg-[#F4F4EE] border-b border-black/5 px-6 py-6 space-y-4 shadow-xl"
           >
-            <div className="px-6 py-6 space-y-4">
-              {links.map((l) => (
+            <nav className="flex flex-col gap-4 text-sm font-bold text-[#666562]">
+              {navLinks.map((link, idx) => (
                 <a
-                  key={l.href}
-                  href={l.href}
-                  onClick={() => setMenuOpen(false)}
-                  className="block text-[15px] text-white/70 hover:text-white py-2 border-b border-white/6 transition-colors"
+                  key={idx}
+                  href={link.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="hover:text-[#1A1918] py-1 border-b border-black/5"
                 >
-                  {l.label}
+                  {link.label}
                 </a>
               ))}
-              <div className="pt-4 space-y-3">
-                <Link href="/login" className="block text-center text-[14px] text-white/50 py-2">
-                  Connexion
-                </Link>
-                <Link
-                  href="/login"
-                  className="block text-center bg-[#FF5500] text-black text-[14px] font-black uppercase rounded-[9px] px-5 py-3 tracking-wide"
-                >
-                  Démarrer — gratuit →
-                </Link>
-              </div>
+            </nav>
+            <div className="pt-2">
+              <Button href="/login?mode=signup" variant="primary" size="md" fullWidth>
+                LANCER UN RUN +
+              </Button>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
-    </motion.header>
+    </header>
   );
 }
