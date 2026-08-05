@@ -1,85 +1,41 @@
 "use client";
 
-import React from "react";
 import Link from "next/link";
-import { Container } from "./Container";
-import { Button } from "./Button";
-import { Zap } from "lucide-react";
 
 export function Footer() {
   return (
-    <footer className="py-20 md:py-28 bg-[#FAFAF8]">
-      <Container className="space-y-16">
-        
-        {/* Dark Banner Box (#1D1D1D) */}
-        <div className="bg-[#1D1D1D] text-white rounded-[24px] p-8 sm:p-14 text-center space-y-6 shadow-[0_20px_60px_rgba(0,0,0,0.08)] relative overflow-hidden">
-          <div className="max-w-2xl mx-auto space-y-4 relative z-10">
-            <h2 className="font-extrabold text-3xl sm:text-5xl text-white leading-tight tracking-tight">
-              TON CREW MÉRITE MIEUX QU'UN SIMPLE FIL WHATSAPP.
-            </h2>
-            <p className="text-sm text-neutral-300 font-medium leading-relaxed">
-              Automatise la gestion de tes sorties dès aujourd'hui et offre une vraie expérience professionnelle à tes membres.
-            </p>
-            <div className="pt-4">
-              <Button href="/login?mode=signup" variant="primary" size="lg">
-                Créer mon espace organisateur →
-              </Button>
-            </div>
-          </div>
-        </div>
-
-        {/* Minimal Bottom Bar */}
-        <div className="flex flex-col sm:flex-row justify-between items-center gap-6 pt-8 border-t border-[#ECECEC] text-xs font-bold text-[#6E6E6E]">
-          
-          {/* Logo Left */}
-          <Link href="/" className="flex items-center gap-2">
-            <img
-              src="/logo.png"
-              alt="CAPTEN"
-              className="h-7 w-auto object-contain"
-            />
-          </Link>
-
-          {/* Social & Legal Links */}
-          <div className="flex flex-wrap items-center justify-center gap-8">
-            <div className="space-x-4">
-              <span className="text-[#1D1D1D] font-extrabold">CONTACT</span>
-              <Link href="/support" className="hover:text-[#1D1D1D] transition-colors">
-                Support
-              </Link>
-              <a href="mailto:contact@capten.app" className="hover:text-[#1D1D1D] transition-colors">
-                Contact
-              </a>
-              <a href="https://instagram.com/capten.app" target="_blank" rel="noreferrer" className="hover:text-[#1D1D1D] transition-colors">
-                Instagram
-              </a>
-            </div>
-
-            <div className="space-x-4">
-              <span className="text-[#1D1D1D] font-extrabold">LÉGAL</span>
-              <Link href="/rgpd" className="hover:text-[#1D1D1D] transition-colors">
-                Confidentialité
-              </Link>
-              <Link href="/cgu" className="hover:text-[#1D1D1D] transition-colors">
-                CGU
-              </Link>
-              <Link href="/mentions-legales" className="hover:text-[#1D1D1D] transition-colors">
-                Mentions Légales
-              </Link>
-            </div>
-          </div>
-
-          {/* Copyright & Made in France Badge */}
+    <footer className="bg-[#F4F4EE] border-t border-[#1A1918]/8">
+      <div className="max-w-[1280px] mx-auto px-6 lg:px-8 py-12">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
+          {/* Logo + tagline */}
           <div className="flex items-center gap-3">
-            <span>© 2026 CAPTEN</span>
-            <span className="px-2.5 py-1 rounded-full bg-[#F5F3EE] text-[10px] font-extrabold text-[#1D1D1D] border border-[#ECECEC]">
-              Made in France 🇫🇷
-            </span>
+            <div className="w-7 h-7 bg-[#FF5500] rounded-[7px] flex items-center justify-center shrink-0">
+              <span className="font-display italic font-black text-black text-[11px] leading-none">C</span>
+            </div>
+            <div>
+              <span className="font-display italic font-black text-[#1A1918] text-[15px] tracking-tighter uppercase">CAPTEN</span>
+              <p className="text-[10px] text-[#1A1918]/35 font-medium mt-0.5">Made in France 🇫🇷</p>
+            </div>
           </div>
 
-        </div>
+          {/* Links */}
+          <nav className="flex flex-wrap gap-x-8 gap-y-3 text-[12px] font-medium text-[#1A1918]/45">
+            <a href="#features" className="hover:text-[#1A1918] transition-colors">Fonctionnalités</a>
+            <a href="#pricing" className="hover:text-[#1A1918] transition-colors">Tarifs</a>
+            <a href="#faq" className="hover:text-[#1A1918] transition-colors">FAQ</a>
+            <a href="mailto:hello@capten.app" className="hover:text-[#1A1918] transition-colors">Contact</a>
+            <a href="https://instagram.com/capten.app" target="_blank" rel="noreferrer" className="hover:text-[#1A1918] transition-colors">Instagram</a>
+          </nav>
 
-      </Container>
+          {/* Legal + copyright */}
+          <div className="flex flex-wrap gap-x-6 gap-y-2 text-[11px] text-[#1A1918]/30 font-medium">
+            <Link href="/rgpd" className="hover:text-[#1A1918]/60 transition-colors">Confidentialité</Link>
+            <Link href="/cgu" className="hover:text-[#1A1918]/60 transition-colors">CGU</Link>
+            <Link href="/mentions-legales" className="hover:text-[#1A1918]/60 transition-colors">Mentions légales</Link>
+            <span>© 2026 CAPTEN</span>
+          </div>
+        </div>
+      </div>
     </footer>
   );
 }
