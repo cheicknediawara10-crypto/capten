@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_OTHER",
+  "summary": "Master instructions document for Claude Code to build the entire CAPTEN SaaS from scratch. Contains the orchestration prompt, reading order, phased implementation plan, coding standards, and verification checklist.",
+  "updatedAt": "2026-08-05T13:15:35.338387Z"
+}
