@@ -28,7 +28,9 @@ Tu as **toute la liberté** pour améliorer et optimiser la landing page et les 
 ### Côté Membre (B2C)
 - 100% Web, zéro app
 - Accès à sa page membre depuis un lien sur la landing page ou un lien direct (/mon-espace)
-- Identification par **Nom + Prénom + Date de naissance** (pas de mot de passe, pas de token)
+- Identification par **Nom + Date de naissance + Code PIN 4 chiffres**
+- Le PIN est choisi par le membre lors de sa première inscription à un club (/join/[slug])
+- Le PIN est stocké en base sous forme de hash (jamais en clair)
 - Page membre dédiée (statut, historique, prochains runs, décharges, fiche ICE modifiable)
 - Check-in GPS ou QR
 - Fiche ICE et décharge numérique horodatée
@@ -85,9 +87,10 @@ Interdictions : Bootstrap, Material UI, Chakra UI, Prisma, Drizzle, Express, Fas
 
 ### Phase A : Fondations
 - Initialisation Next.js 15 + TailwindCSS + Supabase
-- Tables V1 : profiles, clubs, club_members, events, event_registrations, checkins, ice_contacts, waivers, spots, spot_transactions, subscriptions, withdrawal_requests
+- Tables V1 : profiles (avec colonne pin_hash et date_of_birth), clubs, club_members, events, event_registrations, checkins, ice_contacts, waivers, spots, spot_transactions, subscriptions, withdrawal_requests
 - PAS de tables badges, member_badges, member_tokens
-- Auth Supabase email/password (organisateurs) + OTP/SMS (membres)
+- Auth Supabase email/password (organisateurs uniquement)
+- Membres : PAS de Supabase Auth, identification par Nom + Date de naissance + PIN 4 chiffres (hash côté serveur)
 - Middleware pour protéger /dashboard/*
 
 ### Phase B : Landing Page et Auth UI
@@ -106,16 +109,23 @@ Interdictions : Bootstrap, Material UI, Chakra UI, Prisma, Drizzle, Express, Fas
 - Statistiques : graphiques Recharts (fréquentation, croissance, ICE, top 10)
 
 ### Phase D : Expérience Membre (Pages Publiques)
-- Rejoindre un Club (/join/[slug]) : mobile-first, OTP, formulaire ICE, décharge, confirmation. PAS de reconnaissance cross-club.
+- Rejoindre un Club (/join/[slug]) :
+  - Mobile-first, formulaire : Nom, Prénom, Date de naissance, Téléphone
+  - **Choix du Code PIN 4 chiffres** (avec confirmation) : le membre choisit son PIN à ce moment
+  - Puis formulaire ICE, signature décharge, confirmation
+  - PAS de reconnaissance cross-club
 - Page Événement (/event/[id]) : détails, carte, inscription
 - Check-in (/checkin/[id]) : GPS (200m) + QR. Animation de succès SANS badges.
 - **Page d'accès membre (/mon-espace)** :
-  - Accessible depuis un bouton/lien sur la landing page (navbar ou section dédiée) et depuis un lien direct
-  - Formulaire d'identification simple : Nom + Prénom + Date de naissance
-  - PAS de mot de passe, PAS de token dans l'URL
-  - Si le triplet correspond à un membre existant en base : affiche sa page dédiée
-  - Si non trouvé : message d'erreur clair ("Aucun membre trouvé. Vérifie tes informations.")
+  - Accessible depuis un bouton/lien dans la navbar de la landing page et depuis un lien direct
+  - Formulaire d'identification : Nom + Date de naissance + Code PIN 4 chiffres
+  - PAS de mot de passe classique, PAS de token dans l'URL
+  - Le PIN est comparé au hash stocké en base
+  - Si match : affiche sa page membre dédiée
+  - Si non trouvé ou PIN incorrect : message d'erreur ("Informations incorrectes. Vérifie ton nom, ta date de naissance et ton code PIN.")
+  - Après 5 tentatives échouées : bloquer l'accès pendant 15 minutes (rate limiting)
   - Page membre dédiée affiche : statut, historique des participations, prochains runs inscrits, fiche ICE modifiable, décharges signées. PAS de badges.
+  - Option "PIN oublié ?" : saisir son numéro de téléphone → recevoir un SMS avec un lien de réinitialisation du PIN
 - Décharge (/waiver/[club_id]) : texte légal, checkboxes, signature, horodatage SHA256
 
 ### Phase E : Facturation Stripe
