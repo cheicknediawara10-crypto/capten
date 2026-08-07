@@ -26,8 +26,10 @@ Tu as **toute la liberté** pour améliorer et optimiser la landing page et les 
 - CAPTEN Spots (commerces partenaires, cagnotte, compteur, retrait IBAN)
 
 ### Côté Membre (B2C)
-- 100% Web, zéro app (lien magique / code SMS)
-- Carte membre digitale (statut, historique, prochains runs, décharges, fiche ICE)
+- 100% Web, zéro app
+- Accès à sa page membre depuis un lien sur la landing page ou un lien direct (/mon-espace)
+- Identification par **Nom + Prénom + Date de naissance** (pas de mot de passe, pas de token)
+- Page membre dédiée (statut, historique, prochains runs, décharges, fiche ICE modifiable)
 - Check-in GPS ou QR
 - Fiche ICE et décharge numérique horodatée
 
@@ -107,7 +109,13 @@ Interdictions : Bootstrap, Material UI, Chakra UI, Prisma, Drizzle, Express, Fas
 - Rejoindre un Club (/join/[slug]) : mobile-first, OTP, formulaire ICE, décharge, confirmation. PAS de reconnaissance cross-club.
 - Page Événement (/event/[id]) : détails, carte, inscription
 - Check-in (/checkin/[id]) : GPS (200m) + QR. Animation de succès SANS badges.
-- Carte Membre Digitale (/p/[token]) : nom, date, participations, prochains runs, fiche ICE modifiable, décharges. PAS de badges.
+- **Page d'accès membre (/mon-espace)** :
+  - Accessible depuis un bouton/lien sur la landing page (navbar ou section dédiée) et depuis un lien direct
+  - Formulaire d'identification simple : Nom + Prénom + Date de naissance
+  - PAS de mot de passe, PAS de token dans l'URL
+  - Si le triplet correspond à un membre existant en base : affiche sa page dédiée
+  - Si non trouvé : message d'erreur clair ("Aucun membre trouvé. Vérifie tes informations.")
+  - Page membre dédiée affiche : statut, historique des participations, prochains runs inscrits, fiche ICE modifiable, décharges signées. PAS de badges.
 - Décharge (/waiver/[club_id]) : texte légal, checkboxes, signature, horodatage SHA256
 
 ### Phase E : Facturation Stripe
@@ -193,7 +201,7 @@ Quand un membre consomme 100 euros chez un Spot partenaire :
 - CAPTEN Spots avec split 85/10/5
 - Demande de retrait IBAN
 - Statistiques avec graphiques Recharts
-- Carte membre digitale accessible via token SANS badges
+- Page membre accessible via Nom + Prénom + Date de naissance SANS badges
 - Supabase Realtime sur les check-ins
 - Stripe Checkout + Webhooks + gestion abonnements
 - Hard Paywall au Aha Moment
