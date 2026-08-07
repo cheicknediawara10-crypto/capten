@@ -119,13 +119,12 @@ Interdictions : Bootstrap, Material UI, Chakra UI, Prisma, Drizzle, Express, Fas
 - **Page d'accès membre (/mon-espace)** :
   - Accessible depuis un bouton/lien dans la navbar de la landing page et depuis un lien direct
   - Formulaire d'identification : Nom + Date de naissance + Code PIN 4 chiffres
-  - PAS de mot de passe classique, PAS de token dans l'URL
   - Le PIN est comparé au hash stocké en base
   - Si match : affiche sa page membre dédiée
   - Si non trouvé ou PIN incorrect : message d'erreur ("Informations incorrectes. Vérifie ton nom, ta date de naissance et ton code PIN.")
   - Après 5 tentatives échouées : bloquer l'accès pendant 15 minutes (rate limiting)
   - Page membre dédiée affiche : statut, historique des participations, prochains runs inscrits, fiche ICE modifiable, décharges signées. PAS de badges.
-  - Option "PIN oublié ?" : saisir son numéro de téléphone → recevoir un SMS avec un lien de réinitialisation du PIN
+  - **Option "PIN oublié ?"** : Le membre saisit son adresse e-mail ➔ Envoi d'un e-mail gratuit (Resend / Supabase Mail) avec un lien magique sécurisé à durée limitée (15 min) ➔ Clic sur le lien ➔ Redirection vers la page de choix d'un nouveau PIN 4 chiffres. 100% automatique, 100% sécurisé, 0 € de coût SMS.
 - Décharge (/waiver/[club_id]) : texte légal, checkboxes, signature, horodatage SHA256
 
 ### Phase E : Facturation Stripe
