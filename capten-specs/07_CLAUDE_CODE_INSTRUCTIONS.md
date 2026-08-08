@@ -23,7 +23,7 @@ Tu as **toute la liberté** pour améliorer et optimiser la landing page et les 
 - Gestion des membres et fiches ICE
 - Check-in QR et GPS (geofencing 200m)
 - Registre horodaté légal (export PDF/CSV)
-- CAPTEN Spots (commerces partenaires, cagnotte, compteur, retrait IBAN)
+- Les Spots du Crew (gestion des adresses recommandées par le club : cafés, shops running, kinés, avec avantages membres optionnels ex: -10%, sans gestion financière ni commission)
 
 ### Côté Membre (B2C)
 - 100% Web, zéro app
@@ -38,7 +38,7 @@ Tu as **toute la liberté** pour améliorer et optimiser la landing page et les 
 ### Facturation
 - Plan **Découverte** (0 euros) : 1 session/mois, 20 membres max, sans GPS
 - Plan **Captain Pro** (29 euros/mois) : tout illimité, Hard Paywall au Aha Moment
-- CAPTEN Spots : **85% commerce** / **10% club** / **5% CAPTEN**
+- Les Spots du Crew : **Gratuit et illimité**, zéro commission, zéro transaction financière, pur affichage d'adresses et avantages membres.
 
 ---
 
@@ -105,7 +105,7 @@ Interdictions : Bootstrap, Material UI, Chakra UI, Prisma, Drizzle, Express, Fas
 - Gestion du Club : formulaire édition, upload logo, lien public
 - Gestion des Sorties : CRUD complet, carte Leaflet, QR code, lien partage, vue live check-ins Realtime, export registre PDF/CSV
 - Gestion des Membres : tableau, recherche, filtres, détail avec profil + historique + fiche ICE (appel 1 clic) + décharge
-- CAPTEN Spots : liste spots, ajout spot, enregistrement transaction (split 85/10/5), cagnotte, historique, bouton retrait IBAN
+- Les Spots du Crew (/dashboard/spots) : liste des adresses recommandées, formulaire d'ajout d'un spot (nom, catégorie [Café, Shop, Kiné, Ostéo, Autre], adresse, note du fondateur "pourquoi ce spot", avantage membre optionnel ex: "-10% sur présentation de la carte"). PAS de transactions, PAS de cagnotte, PAS de retrait IBAN.
 - Statistiques : graphiques Recharts (fréquentation, croissance, ICE, top 10)
 
 ### Phase D : Expérience Membre (Pages Publiques)
@@ -123,7 +123,7 @@ Interdictions : Bootstrap, Material UI, Chakra UI, Prisma, Drizzle, Express, Fas
   - Si match : affiche sa page membre dédiée
   - Si non trouvé ou PIN incorrect : message d'erreur ("Informations incorrectes. Vérifie ton nom, ta date de naissance et ton code PIN.")
   - Après 5 tentatives échouées : bloquer l'accès pendant 15 minutes (rate limiting)
-  - Page membre dédiée affiche : statut, historique des participations, prochains runs inscrits, fiche ICE modifiable, décharges signées. PAS de badges.
+  - Page membre dédiée affiche : statut, historique des participations, prochains runs inscrits, fiche ICE modifiable, décharges signées, **section "Les Spots du Crew"** (adresses et réductions recommandées par le club). PAS de badges.
   - **Option "PIN oublié ?"** : Le membre saisit son adresse e-mail ➔ Envoi d'un e-mail gratuit (Resend / Supabase Mail) avec un lien magique sécurisé à durée limitée (15 min) ➔ Clic sur le lien ➔ Redirection vers la page de choix d'un nouveau PIN 4 chiffres. 100% automatique, 100% sécurisé, 0 € de coût SMS.
 - Décharge (/waiver/[club_id]) : texte légal, checkboxes, signature, horodatage SHA256
 
