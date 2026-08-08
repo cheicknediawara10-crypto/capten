@@ -49,44 +49,14 @@ export default function SettingsPage() {
     }, 2500);
   };
 
+  // L'automatisation WhatsApp arrive en V2 — pas d'endpoint côté serveur pour l'instant.
   const fetchWhatsappStatus = async () => {
-    try {
-      const res = await fetch('/api/broadcast/whatsapp-status');
-      const data = await res.json();
-      if (data.success) {
-        setWhatsappStatus(data.status);
-        setIsDemoMode(!!data.demoMode);
-        if (data.status === 'connected') {
-          setWhatsappPhone(data.phone);
-        } else {
-          setWhatsappQr(data.qr);
-        }
-      } else {
-        setWhatsappStatus('disconnected');
-      }
-    } catch (err) {
-      console.error(err);
-      setWhatsappStatus('disconnected');
-    }
+    setWhatsappStatus('disconnected');
   };
 
   const handleDisconnectWhatsapp = async () => {
-    if (confirm("Voulez-vous vraiment déconnecter votre compte WhatsApp de CAPTEN ? Les notifications automatiques ne seront plus envoyées.")) {
-      try {
-        const res = await fetch('/api/broadcast/whatsapp-status', { method: 'POST' });
-        const data = await res.json();
-        if (data.success) {
-          showToast("WHATSAPP DÉCONNECTÉ !");
-          setWhatsappStatus('disconnected');
-          setWhatsappPhone(null);
-          fetchWhatsappStatus();
-        } else {
-          showToast("Erreur lors de la déconnexion.");
-        }
-      } catch (err) {
-        showToast("Erreur réseau.");
-      }
-    }
+    setWhatsappStatus('disconnected');
+    setWhatsappPhone(null);
   };
 
   // Sync settings with current club context
