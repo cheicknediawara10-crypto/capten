@@ -54,7 +54,7 @@ export default function PlanPage() {
   }, []);
 
   const handleCancelSubscription = async () => {
-    const confirmMessage = "Voulez-vous vraiment résilier votre abonnement CAPTEN ? Vous perdrez l'accès immédiat aux fonctionnalités avancées (Copilote, Cagnotte, Messages auto) et repasserez en formule gratuite.";
+    const confirmMessage = "Voulez-vous vraiment résilier votre abonnement CAPTEN ? Vous perdrez l'accès immédiat aux fonctionnalités avancées (check-in GPS, membres illimités, registre légal) et repasserez en formule gratuite.";
 
     if (confirm(confirmMessage)) {
       setIsProcessing(true);
@@ -293,10 +293,10 @@ export default function PlanPage() {
         { t: "Page publique du crew", d: "Inscriptions rapides en 1 lien partagé.", included: true },
         { t: "1 sortie active à la fois", d: "Planification standard.", included: true },
         { t: "Fiche d'urgence de base", d: "Sécurité et contacts d'urgence.", included: true },
-        { t: "Jusqu'à 25 membres actifs", d: "Membres ayant participé aux 60 derniers jours.", included: true },
-        { t: "Messages auto WhatsApp", d: "Modèles de messages intelligents verrouillés.", included: false },
-        { t: "Cagnotte de Squad", d: "Soutien et after-runs verrouillés.", included: false },
-        { t: "Le Copilote IA", d: "Assistant d'entraînement personnel verrouillé.", included: false },
+        { t: "Jusqu'à 20 membres", d: "Idéal pour démarrer ton crew.", included: true },
+        { t: "Les Spots du Crew", d: "Tes bonnes adresses, dispo sur tous les plans.", included: true },
+        { t: "Check-in GPS", d: "Validation de présence géolocalisée verrouillée.", included: false },
+        { t: "Registre légal horodaté", d: "Export PDF/CSV des présences verrouillé.", included: false },
         { t: "Sorties illimitées", d: "Historiques et planifications multiples verrouillés.", included: false }
       ],
       button: currentPlan === "GRATUIT" ? "PLAN ACTUEL" : "COMMENCER GRATUITEMENT",
@@ -316,11 +316,12 @@ export default function PlanPage() {
       features: [
         { t: "Page publique du crew", d: "Inscriptions rapides en 1 lien partagé.", included: true },
         { t: "Sorties illimitées", d: "Planifie autant de sorties simultanées que tu veux.", included: true },
-        { t: "Fiche d'urgence de base", d: "Sécurité et contacts d'urgence.", included: true },
-        { t: "Membres actifs illimités", d: "Aucune limite de croissance pour ton club.", included: true },
-        { t: "Messages auto WhatsApp", d: "Génère des templates de diffusion parfaits en 1 clic.", included: true },
-        { t: "Cagnotte de Squad", d: "Collecte de dons sans commission (Sumeria, PayPal...).", included: true },
-        { t: "Le Copilote IA", d: "Briefing crew météo/présence quotidien + création de séances.", included: true }
+        { t: "Membres illimités", d: "Aucune limite de croissance pour ton crew.", included: true },
+        { t: "Check-in GPS natif", d: "Valide les présences réelles au point de RDV.", included: true },
+        { t: "Fiches ICE + liste d'attente", d: "Sécurité et gestion des places.", included: true },
+        { t: "Registre légal horodaté", d: "Export PDF/CSV, preuve légale de présence.", included: true },
+        { t: "Les Spots du Crew", d: "Tes adresses recommandées et avantages négociés.", included: true },
+        { t: "Anti-fantôme + support prioritaire", d: "Responsabilise ton crew, réponses rapides.", included: true }
       ],
       button: currentPlan === "CAPTEN" ? "PLAN ACTUEL" : (
         billingInterval === 'yearly' 

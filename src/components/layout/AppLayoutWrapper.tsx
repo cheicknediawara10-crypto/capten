@@ -6,8 +6,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import Sidebar from "@/components/layout/Sidebar";
 import MobileHeader from "@/components/layout/MobileHeader";
 import MobileNav from "@/components/layout/MobileNav";
-import CopilotBubble from "@/components/copilot/CopilotBubble";
-import CopilotDrawer from "@/components/copilot/CopilotDrawer";
 
 interface AppLayoutWrapperProps {
   children: React.ReactNode;
@@ -21,7 +19,6 @@ export default function AppLayoutWrapper({ children }: AppLayoutWrapperProps) {
   // Pages publiques sans sidebar ni header mobile admin
   const isPublicPage =
     cleanPath === "/" ||
-    cleanPath === "/login" ||
     cleanPath.startsWith("/login") ||
     cleanPath.startsWith("/reset-password") ||
     cleanPath.startsWith("/waiver") ||
@@ -29,20 +26,13 @@ export default function AppLayoutWrapper({ children }: AppLayoutWrapperProps) {
     cleanPath === "/mentions-legales" ||
     cleanPath === "/rgpd" ||
     cleanPath.includes("/checkin") ||
-    cleanPath.startsWith("/runners/manage") ||
     cleanPath.startsWith("/securite/signaler") ||
-    cleanPath.startsWith("/cagnotte/contribuer") ||
-    cleanPath.startsWith("/cagnotte/sponsor") ||
     // Espace membre (auth PIN — système séparé de l'auth organisateur)
     cleanPath.startsWith("/mon-espace") ||
-    // Nouvelles pages membres publiques (specs Phase D)
+    // Pages membres publiques
     cleanPath.startsWith("/join/") ||
     cleanPath.startsWith("/event/") ||
-    cleanPath.startsWith("/p/") ||
-    (cleanPath.startsWith("/spots") &&
-     !cleanPath.startsWith("/spots/explorer") &&
-     !cleanPath.startsWith("/spots/events") &&
-     !cleanPath.startsWith("/spots/scan"));
+    cleanPath.startsWith("/p/");
 
   if (isPublicPage) {
     return (
@@ -80,10 +70,6 @@ export default function AppLayoutWrapper({ children }: AppLayoutWrapperProps) {
         {/* Mobile Navigation Bar (Bottom) */}
         <MobileNav />
       </main>
-
-      {/* Copilote Persistant */}
-      <CopilotBubble />
-      <CopilotDrawer />
     </div>
   );
 }

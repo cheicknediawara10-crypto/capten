@@ -1119,62 +1119,14 @@ export default function MessagesPage() {
   // Fetch runs list (Supabase with localStorage fallback)
   useEffect(() => {
     async function loadRuns() {
+      // Les templates fonctionnent en autonomie : la liste des sorties (optionnelle,
+      // pour pré-remplir le simulateur) est lue depuis le cache local si présente.
       let loadedRuns: any[] = [];
-      try {
-        const res = await fetch('/api/runs');
-        if (res.ok) {
-          const data = await res.json();
-          if (Array.isArray(data) && data.length > 0) {
-            loadedRuns = data.map((r: any) => {
-              const dateObj = new Date(r.date_start);
-              const days = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
-              const months = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sept', 'Oct', 'Nov', 'Déc'];
-              const formattedDate = dateObj.toString() !== 'Invalid Date'
-                ? `${days[dateObj.getDay()]} ${dateObj.getDate()} ${months[dateObj.getMonth()]}`
-                : r.date_start;
-              
-              const formattedTime = dateObj.toString() !== 'Invalid Date'
-                ? `${String(dateObj.getHours()).padStart(2, '0')}:${String(dateObj.getMinutes()).padStart(2, '0')}`
-                : '';
-
-              return {
-                id: r.id,
-                status: r.status === 'scheduled' ? 'upcoming' : r.status,
-                name: r.title,
-                location: r.location_start,
-                date: formattedDate,
-                time: formattedTime,
-                distance: r.distance || '8 KM',
-                duration: r.duration || '50 min',
-                temp: '19°C',
-                weather: 'sun',
-                registered: r.slots_taken || 0,
-                checkedIn: r.status === 'completed' ? r.slots_taken : 0,
-                noShow: 0,
-                is_paid: r.is_paid,
-                price_cents: r.price_cents,
-                max_slots: r.max_slots,
-                slots_taken: r.slots_taken || 0,
-                vibe: r.vibe || 'Social & Chill',
-                coach: r.coach || 'Moi (Propriétaire)',
-                description: r.description || '',
-                participants: [],
-                date_start_raw: r.date_start
-              };
-            });
-          }
-        }
-      } catch (err) {
-        console.warn("Could not fetch runs from API in messages:", err);
-      }
-
-      if (loadedRuns.length === 0) {
-        const stored = localStorage.getItem('capten_runs_v3');
-        if (stored) {
-          try {
-            loadedRuns = JSON.parse(stored);
-          } catch (e) {}
-        }
+      const stored = localStorage.getItem('capten_runs_v3');
+      if (stored) {
+        try {
+          loadedRuns = JSON.parse(stored);
+        } catch (e) {}
       }
 
       loadedRuns.sort((a, b) => {

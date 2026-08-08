@@ -3,9 +3,9 @@
 import React, { useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { 
-  LayoutDashboard, Users, Map, Sparkles, 
-  MessageSquare, Ticket, Wallet, Store, ShieldCheck, CreditCard, Settings, HelpCircle, Lock 
+import {
+  LayoutDashboard, Users, Map, MapPin, BarChart3,
+  MessageSquare, ShieldCheck, CreditCard, Settings, HelpCircle
 } from "lucide-react";
 
 export default function MobileNav() {
@@ -35,15 +35,15 @@ export default function MobileNav() {
 
   const items = [
     { name: "Tableau de bord", icon: <LayoutDashboard size={18} strokeWidth={1.5} />, href: "/dashboard" },
-    { name: "Le Crew", icon: <Users size={18} strokeWidth={1.5} />, href: "/athletes" },
-    { name: sessionMenuLabel, icon: <Map size={18} strokeWidth={1.5} />, href: "/runs" },
+    { name: "Membres", icon: <Users size={18} strokeWidth={1.5} />, href: "/dashboard/members" },
+    { name: sessionMenuLabel, icon: <Map size={18} strokeWidth={1.5} />, href: "/dashboard/events" },
+    { name: "Stats", icon: <BarChart3 size={18} strokeWidth={1.5} />, href: "/dashboard/stats" },
+    { name: "Les Spots", icon: <MapPin size={18} strokeWidth={1.5} />, href: "/dashboard/spots" },
     { name: "Messages", icon: <MessageSquare size={18} strokeWidth={1.5} />, href: "/messages" },
-    { name: "Cagnotte", icon: <Wallet size={18} strokeWidth={1.5} />, href: "/cagnotte" },
-    { name: "Spots", icon: <Store size={18} strokeWidth={1.5} />, href: "/spots/explorer" },
     { name: "Protection", icon: <ShieldCheck size={18} strokeWidth={1.5} />, href: "/securite" },
-    { name: "Support", icon: <HelpCircle size={18} strokeWidth={1.5} />, href: "/support" },
     { name: "Abonnement", icon: <CreditCard size={18} strokeWidth={1.5} />, href: "/plan" },
     { name: "Réglages", icon: <Settings size={18} strokeWidth={1.5} />, href: "/settings" },
+    { name: "Support", icon: <HelpCircle size={18} strokeWidth={1.5} />, href: "/support" },
   ];
 
   // Auto-scroll active item into the viewport center
@@ -84,7 +84,7 @@ export default function MobileNav() {
         className="flex items-center gap-6 overflow-x-auto scroll-smooth py-3 px-8 no-scrollbar w-full"
       >
         {items.map((item) => {
-          const isActive = pathname === item.href || (item.href === '/spots/explorer' && pathname.startsWith('/spots'));
+          const isActive = pathname === item.href;
           
           return (
             <Link 

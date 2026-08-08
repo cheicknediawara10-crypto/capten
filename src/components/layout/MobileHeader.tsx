@@ -3,10 +3,9 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { 
-  Menu, X, LayoutDashboard, Users, Map, Sparkles, 
-  MessageSquare, Ticket, Wallet, Store, ShieldCheck, CreditCard, Settings, LogOut, Globe, PlayCircle,
-  Calendar, TrendingUp
+import {
+  Menu, X, LayoutDashboard, Users, Map, BarChart3, MapPin,
+  MessageSquare, ShieldCheck, CreditCard, Settings, LogOut, HelpCircle
 } from "lucide-react";
 import { logout } from "@/app/login/actions";
 
@@ -38,26 +37,25 @@ export default function MobileHeader() {
       title: "Pilotage",
       items: [
         { name: "Dashboard", icon: <LayoutDashboard size={18} strokeWidth={1.5} />, href: "/dashboard" },
-        { name: "Le Crew", icon: <Users size={18} strokeWidth={1.5} />, href: "/athletes" },
-        { name: "Les Runs", icon: <Map size={18} strokeWidth={1.5} />, href: "/runs" },
+        { name: "Membres", icon: <Users size={18} strokeWidth={1.5} />, href: "/dashboard/members" },
+        { name: "Les Sorties", icon: <Map size={18} strokeWidth={1.5} />, href: "/dashboard/events" },
+        { name: "Statistiques", icon: <BarChart3 size={18} strokeWidth={1.5} />, href: "/dashboard/stats" },
         { name: "Messages", icon: <MessageSquare size={18} strokeWidth={1.5} />, href: "/messages" },
       ]
     },
     {
       title: "Terrain",
       items: [
-        { name: "Cagnotte", icon: <Wallet size={18} strokeWidth={1.5} />, href: "/cagnotte" },
-        { name: "Spots (Explorer)", icon: <Store size={18} strokeWidth={1.5} />, href: "/spots/explorer" },
-        { name: "Spots (Événements)", icon: <Calendar size={18} strokeWidth={1.5} />, href: "/spots/events" },
-        { name: "Le Compteur", icon: <TrendingUp size={18} strokeWidth={1.5} />, href: "/spots/compteur" },
+        { name: "Les Spots", icon: <MapPin size={18} strokeWidth={1.5} />, href: "/dashboard/spots" },
         { name: "Protection", icon: <ShieldCheck size={18} strokeWidth={1.5} />, href: "/securite" },
       ]
     },
     {
       title: "Compte",
       items: [
+        { name: "Mon Club", icon: <Settings size={18} strokeWidth={1.5} />, href: "/dashboard/club" },
         { name: "Abonnement", icon: <CreditCard size={18} strokeWidth={1.5} />, href: "/plan" },
-        { name: "Réglages", icon: <Settings size={18} strokeWidth={1.5} />, href: "/settings" },
+        { name: "Support", icon: <HelpCircle size={18} strokeWidth={1.5} />, href: "/support" },
       ]
     }
   ];

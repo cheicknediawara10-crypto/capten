@@ -2,1428 +2,209 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { LayoutDashboard, Users, MapPin, Wallet, Zap, MessageSquare, ArrowRight, Plus, Trophy, Activity, Globe, Heart, Flame, CheckCircle2, RefreshCw, Store } from 'lucide-react';
-import { getSupabase, formatPrice } from '@/lib/supabase';
+import {
+  Users, MapPin, BarChart3, MessageSquare, ArrowRight, Plus,
+  Calendar, Copy, Check, ShieldCheck, CreditCard, Loader2,
+} from 'lucide-react';
+import { getSupabase } from '@/lib/supabase';
 import { useAuth } from '@/context/AuthContext';
 import { getAppUrl } from '@/lib/domain';
-import CopilotBanner from '@/components/copilot/CopilotBanner';
-import VictoryChecklist from '@/components/VictoryChecklist';
-import UpgradeBanner from '@/components/UpgradeBanner';
-import { COMMUNITY_OPTIONS, CommunityType, getCommunityLabels } from '@/lib/community-labels';
+import { getCommunityLabels } from '@/lib/community-labels';
 
-// === HELPERS MÉTÉO ===
-function getCoordinates(location: string): { latitude: number; longitude: number } {
-  const loc = (location || '').toLowerCase();
-  if (loc.includes('paris')) return { latitude: 48.8566, longitude: 2.3522 };
-  if (loc.includes('lyon')) return { latitude: 45.7640, longitude: 4.8357 };
-  if (loc.includes('marseille')) return { latitude: 43.2965, longitude: 5.3698 };
-  if (loc.includes('bordeaux')) return { latitude: 44.8378, longitude: -0.5792 };
-  if (loc.includes('strasbourg')) return { latitude: 48.5734, longitude: 7.7521 };
-  if (loc.includes('lille')) return { latitude: 50.6292, longitude: 3.0573 };
-  if (loc.includes('nice')) return { latitude: 43.7102, longitude: 7.2620 };
-  if (loc.includes('toulouse')) return { latitude: 43.6047, longitude: 1.4442 };
-  if (loc.includes('nantes')) return { latitude: 47.2184, longitude: -1.5536 };
-  if (loc.includes('montpellier')) return { latitude: 43.6108, longitude: 3.8767 };
-  return { latitude: 48.8566, longitude: 2.3522 }; // Paris par défaut
+interface UpcomingEvent {
+  id: string;
+  title: string;
+  event_date: string;
+  meeting_point_address: string | null;
 }
 
-function getWeatherDesc(code: number): { emoji: string; desc: string; isStorm: boolean } {
-  if (code === 0) return { emoji: '☀️', desc: 'Ciel dégagé', isStorm: false };
-  if (code <= 2) return { emoji: '🌤️', desc: 'Partiellement nuageux', isStorm: false };
-  if (code === 3) return { emoji: '☁️', desc: 'Couvert', isStorm: false };
-  if (code <= 49) return { emoji: '🌫️', desc: 'Brouillard', isStorm: false };
-  if (code <= 59) return { emoji: '🌦️', desc: 'Bruine', isStorm: false };
-  if (code <= 65) return { emoji: '🌧️', desc: 'Pluie', isStorm: false };
-  if (code <= 77) return { emoji: '❄️', desc: 'Neige', isStorm: false };
-  if (code <= 82) return { emoji: '🌧️', desc: 'Averses', isStorm: false };
-  if (code <= 99) return { emoji: '⛈️', desc: 'Orage', isStorm: true };
-  return { emoji: '🌡️', desc: 'Inconnu', isStorm: false };
-}
-// === FIN HELPERS MÉTÉO ===
-
-const getInitials = (name: string) => {
-  if (!name) return "";
-  const parts = name.trim().split(/\s+/);
-  if (parts.length >= 2) {
-    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-  }
-  return name.slice(0, 2).toUpperCase();
-};
+const fmtDate = (iso: string) =>
+  new Date(iso).toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
 
 export default function DashboardPage() {
-  const { user, club, isMock, refreshClub } = useAuth();
+  const { user, club, isMock } = useAuth();
   const L = getCommunityLabels(club?.community_type, club?.community_type_custom);
-  const [quotaExceeded, setQuotaExceeded] = useState(false);
-  const [time, setTime] = useState<Date | null>(null);
+
+  const [loading, setLoading] = useState(true);
+  const [memberCount, setMemberCount] = useState(0);
+  const [sessionCount, setSessionCount] = useState(0);
+  const [checkinCount, setCheckinCount] = useState(0);
+  const [upcoming, setUpcoming] = useState<UpcomingEvent[]>([]);
+  const [slug, setSlug] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    setTime(new Date());
-    const interval = setInterval(() => {
-      setTime(new Date());
-    }, 1000);
-    return () => clearInterval(interval);
-  }, []);
+    async function load() {
+      const supabase = getSupabase();
+      if (!supabase || !club || isMock) { setLoading(false); return; }
 
-  // Victory Checklist & Onboarding Demo States
-  const [clubName, setClubName] = useState('');
-  const [hasLogo, setHasLogo] = useState(false);
-  const [hasRuns, setHasRuns] = useState(false);
-  const [instagramCopied, setInstagramCopied] = useState(false);
-  const [checklistCollapsed, setChecklistCollapsed] = useState(false);
-  const [isChecklistVisible, setIsChecklistVisible] = useState(true);
-  const [cagnotteUrl, setCagnotteUrl] = useState<string | null>(null);
-  const [spotName, setSpotName] = useState<string | null>(null);
-  const [athletes, setAthletes] = useState<any[]>([]);
-  const [runs, setRuns] = useState<any[]>([]);
-  const [latestSpotEvent, setLatestSpotEvent] = useState<any | null>(null);
-  const [firstName, setFirstName] = useState('');
-  const [notifications, setNotifications] = useState<any[]>([]);
-  const [weatherInfo, setWeatherInfo] = useState<{ emoji: string; temp: number; desc: string; windspeed: number; isStorm: boolean; isExtreme: boolean } | null>(null);
+      const [
+        { count: members },
+        { data: clubRow },
+        { data: events },
+        { count: sessions },
+      ] = await Promise.all([
+        supabase.from('club_members').select('*', { count: 'exact', head: true }).eq('club_id', club.id).eq('is_active', true),
+        supabase.from('clubs').select('slug').eq('id', club.id).single(),
+        supabase.from('events').select('id, title, event_date, meeting_point_address')
+          .eq('club_id', club.id).eq('status', 'published')
+          .gte('event_date', new Date().toISOString()).order('event_date').limit(5),
+        supabase.from('events').select('*', { count: 'exact', head: true }).eq('club_id', club.id),
+      ]);
 
-  // Onboarding States
-  const [onboardingStep, setOnboardingStep] = useState(1);
-  const [onboardingClubName, setOnboardingClubName] = useState('');
-  const [onboardingCommunityType, setOnboardingCommunityType] = useState<CommunityType>('run_club');
-  const [onboardingCommunityCustom, setOnboardingCommunityCustom] = useState('');
-  const [skipOnboarding, setSkipOnboarding] = useState(false);
+      setMemberCount(members || 0);
+      setSlug((clubRow as any)?.slug ?? null);
+      setUpcoming((events as UpcomingEvent[]) || []);
+      setSessionCount(sessions || 0);
 
-  useEffect(() => {
-    if (!isMock && club) {
-      const branding = (club.branding || {}) as any;
-      setOnboardingStep(branding.onboarding_step || 1);
-      setSkipOnboarding(branding.onboarding_skipped === true);
-      setClubName(club.name || '');
-      setOnboardingClubName(club.name || '');
-      setHasLogo(!!branding.logo);
-      setInstagramCopied(branding.instagram_copied === true);
-      setChecklistCollapsed(branding.checklist_collapsed === true);
-      setIsChecklistVisible(branding.checklist_hidden !== true);
-      setCagnotteUrl(club.cagnotte_url || null);
-      setSpotName(club.spot_name || null);
-
-      // Fetch runs, athletes and spot events from Supabase B2B endpoints
-      const fetchServerData = async () => {
-        try {
-          const [runsRes, runnersRes, spotEventsRes] = await Promise.all([
-            fetch('/api/runs'),
-            fetch('/api/runners'),
-            fetch('/api/spot-events')
-          ]);
-          if (runsRes.ok) {
-            const runsData = await runsRes.json();
-            if (Array.isArray(runsData)) {
-              setRuns(runsData);
-              setHasRuns(runsData.length > 0);
-            }
-          }
-          if (runnersRes.ok) {
-            const runnersData = await runnersRes.json();
-            if (Array.isArray(runnersData)) {
-              setAthletes(runnersData);
-            }
-          }
-          if (spotEventsRes.ok) {
-            const eventsData = await spotEventsRes.json();
-            if (Array.isArray(eventsData) && eventsData.length > 0) {
-              const latest = eventsData.find(e => ['completed', 'on_sale'].includes(e.status));
-              if (latest) setLatestSpotEvent(latest);
-            }
-          }
-        } catch (e) {
-          console.error("Error fetching dashboard server data:", e);
-        }
-      };
-      fetchServerData();
-    } else if (isMock) {
-      // Load Onboarding States from LocalStorage (Mock Fallback)
-      const savedStep = localStorage.getItem('capten_onboarding_step');
-      if (savedStep) setOnboardingStep(parseInt(savedStep));
-
-      const skipped = localStorage.getItem('capten_onboarding_skipped') === 'true';
-      setSkipOnboarding(skipped);
-
-      // No hardcoded mock spot event
-      setLatestSpotEvent(null);
-
-      // Load Brand Setup Status
-      const savedName = localStorage.getItem('capten_club_name') || localStorage.getItem('capten_onboarding_s2_name') || '';
-      setClubName(savedName);
-      if (savedName) setOnboardingClubName(savedName);
-      
-      const savedLogo = localStorage.getItem('capten_logo') || '';
-      setHasLogo(!!savedLogo);
-
-      // Load Plan Run Status
-      const storedRuns = localStorage.getItem('capten_runs_v3');
-      if (storedRuns) {
-        try {
-          const parsed = JSON.parse(storedRuns);
-          if (Array.isArray(parsed)) {
-            setRuns(parsed);
-            setHasRuns(parsed.length > 0);
-            if (parsed.length > 0 && !localStorage.getItem('capten_first_run_created_at')) {
-              localStorage.setItem('capten_first_run_created_at', new Date().toISOString());
-            }
-          }
-        } catch (e) {
-          setHasRuns(false);
-        }
+      // Check-ins validés sur les sorties du crew
+      const { data: evIds } = await supabase.from('events').select('id').eq('club_id', club.id);
+      const ids = (evIds || []).map((e: any) => e.id);
+      if (ids.length) {
+        const { count: ci } = await supabase.from('checkins')
+          .select('*', { count: 'exact', head: true }).in('event_id', ids).eq('is_valid', true);
+        setCheckinCount(ci || 0);
       }
-
-      // Load Instagram Status
-      const isInstaCopied = localStorage.getItem('capten_onboarding_instagram_copied') === 'true';
-      setInstagramCopied(isInstaCopied);
-
-      // Load collapse state
-      const collapsed = localStorage.getItem('capten_onboarding_collapsed') === 'true';
-      setChecklistCollapsed(collapsed);
-
-      // Load hidden state
-      const hidden = localStorage.getItem('capten_onboarding_hidden') === 'true';
-      setIsChecklistVisible(!hidden);
-
-      // Load Local Storage values for cagnotte, spot and athletes
-      const savedCagnotte = localStorage.getItem('capten_cagnotte_url');
-      if (savedCagnotte) setCagnotteUrl(savedCagnotte);
-      const savedSpot = localStorage.getItem('capten_spot_name');
-      if (savedSpot) setSpotName(savedSpot);
-      const storedAthletes = localStorage.getItem('capten_athletes_v3');
-      if (storedAthletes) {
-        try {
-          setAthletes(JSON.parse(storedAthletes));
-        } catch (e) {}
-      }
+      setLoading(false);
     }
+    load();
   }, [club, isMock]);
 
-  useEffect(() => {
-    // Load notifications
-    if (isMock) {
-      const savedNotifs = localStorage.getItem('capten_inapp_notifications');
-      if (savedNotifs) {
-        try {
-          setNotifications(JSON.parse(savedNotifs));
-        } catch (e) {}
-      } else {
-        const defaultNotifs = [
-          {
-            id: 'n1',
-            type: 'registration',
-            message: "Chloë Simonet s'est inscrite au run MORNING VIBES",
-            timestamp: "Il y a 5 min"
-          },
-          {
-            id: 'n2',
-            type: 'waiver',
-            message: "Léa Masson a signé sa décharge de responsabilité",
-            timestamp: "Il y a 12 min"
-          },
-          {
-            id: 'n3',
-            type: 'cagnotte',
-            message: "Contribution de 15,00 € reçue de Alexandre Dupont",
-            timestamp: "Il y a 45 min"
-          },
-          {
-            id: 'n4',
-            type: 'registration',
-            message: "Théo Bernard s'est inscrit au run MORNING VIBES",
-            timestamp: "Il y a 2h"
-          },
-          {
-            id: 'n5',
-            type: 'waiver',
-            message: "Marc Dupond a signé sa décharge de responsabilité",
-            timestamp: "Il y a 3h"
-          }
-        ];
-        setNotifications(defaultNotifs);
-        localStorage.setItem('capten_inapp_notifications', JSON.stringify(defaultNotifs));
-      }
-    } else {
-      // Production mode: build notifications list dynamically from the real athletes list!
-      if (athletes && athletes.length > 0) {
-        const formatRelativeTime = (d: Date): string => {
-          const diffMs = new Date().getTime() - d.getTime();
-          const diffMins = Math.floor(diffMs / 60000);
-          if (diffMins < 1) return "À l'instant";
-          if (diffMins < 60) return `Il y a ${diffMins} min`;
-          const diffHours = Math.floor(diffMins / 60);
-          if (diffHours < 24) return `Il y a ${diffHours}h`;
-          const diffDays = Math.floor(diffHours / 24);
-          return `Il y a ${diffDays}j`;
-        };
+  const firstName = (user?.email?.split('@')[0] || 'Captain').replace(/[^a-zA-ZÀ-ÿ]/g, ' ').trim().split(' ')[0];
+  const joinUrl = slug ? `${getAppUrl()}/join/${slug}` : null;
+  const isPro = club?.plan === 'pro' || club?.stripe_subscription_status === 'active';
 
-        const dynamicNotifs: any[] = [];
-        athletes.forEach((athlete) => {
-          const joinDate = athlete.created_at ? new Date(athlete.created_at) : new Date();
-          
-          // Join notification
-          dynamicNotifs.push({
-            id: `reg-${athlete.id}`,
-            type: 'registration',
-            message: `${athlete.name} a rejoint le crew`,
-            date: joinDate,
-            timestamp: formatRelativeTime(joinDate)
-          });
-
-          // Waiver notification
-          if (athlete.waiver_status === 'SIGNÉE') {
-            dynamicNotifs.push({
-              id: `waiver-${athlete.id}`,
-              type: 'waiver',
-              message: `${athlete.name} a signé sa décharge de responsabilité`,
-              date: joinDate,
-              timestamp: formatRelativeTime(joinDate)
-            });
-          }
-        });
-
-        // Sort by date descending (most recent first)
-        dynamicNotifs.sort((a, b) => b.date.getTime() - a.date.getTime());
-        
-        // Remove the date field before setting state
-        const cleanedNotifs = dynamicNotifs.map(({ date, ...rest }) => rest);
-        setNotifications(cleanedNotifs);
-      } else {
-        setNotifications([]);
-      }
-    }
-  }, [athletes, isMock]);
-
-  const handleCopyClubLink = async () => {
-    const clubUrl = `${getAppUrl()}/${generateSlug(clubName)}`;
-    await navigator.clipboard.writeText(clubUrl);
-    setInstagramCopied(true);
-
-    if (isMock) {
-      localStorage.setItem('capten_onboarding_instagram_copied', 'true');
-    } else {
-      try {
-        await fetch('/api/club/settings', {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            branding: {
-              ...club?.branding,
-              instagram_copied: true
-            }
-          })
-        });
-        await refreshClub();
-      } catch (e) {
-        console.error(e);
-      }
-    }
-    alert("Lien du club copié ! Collez-le dans votre bio Instagram.");
+  const copyJoin = () => {
+    if (!joinUrl) return;
+    navigator.clipboard.writeText(joinUrl);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1800);
   };
 
-  const handleSimulateNotification = () => {
-    const names = ["Chloë Simonet", "Léa Masson", "Alexandre Dupont", "Théo Bernard", "Marc Dupond", "Sophie Lemaire", "Noah Petit"];
-    const runsList = ["Morning Vibes", "Tempo Thursday", "Afterwork Canal", "Session République"];
-    const randomName = names[Math.floor(Math.random() * names.length)];
-    
-    const types: Array<'registration' | 'waiver' | 'cagnotte'> = ['registration', 'waiver', 'cagnotte'];
-    const randomType = types[Math.floor(Math.random() * types.length)];
-    
-    let message = "";
-    if (randomType === 'registration') {
-      const randomRun = runsList[Math.floor(Math.random() * runsList.length)];
-      message = `${randomName} s'est inscrit(e) au run ${randomRun.toUpperCase()}`;
-    } else if (randomType === 'waiver') {
-      message = `${randomName} a signé sa décharge de responsabilité`;
-    } else {
-      const amount = (Math.floor(Math.random() * 4) + 1) * 5;
-      message = `Contribution de ${amount},00 € reçue de ${randomName}`;
-    }
-    
-    const newNotif = {
-      id: `n-${Date.now()}`,
-      type: randomType,
-      message,
-      timestamp: "À l'instant"
-    };
-    
-    setNotifications(prev => {
-      const updated = [newNotif, ...prev];
-      localStorage.setItem('capten_inapp_notifications', JSON.stringify(updated));
-      return updated;
-    });
-  };
+  const STATS = [
+    { label: 'Membres', value: memberCount, icon: <Users size={18} />, href: '/dashboard/members' },
+    { label: L.session_plural_cap, value: sessionCount, icon: <Calendar size={18} />, href: '/dashboard/events' },
+    { label: 'Check-ins', value: checkinCount, icon: <Check size={18} />, href: '/dashboard/stats' },
+  ];
 
-  const handleClearNotifications = () => {
-    setNotifications([]);
-    localStorage.setItem('capten_inapp_notifications', JSON.stringify([]));
-  };
-
-  const isMission1Complete = (clubName && clubName.trim().toUpperCase() !== "MON RUN CLUB") || hasLogo;
-  const isMission2Complete = hasRuns;
-  const isMission3Complete = instagramCopied;
-  const completedMissionsCount = (isMission1Complete ? 1 : 0) + (isMission2Complete ? 1 : 0) + (isMission3Complete ? 1 : 0);
-
-  const extractFirstName = (fullName: string) => {
-    if (!fullName) return '';
-    const parts = fullName.trim().split(/\s+/);
-    const first = parts[0];
-    const upper = first.toUpperCase();
-    if (["MOI", "MON", "MY", "THE", "CLUB", "RUN"].includes(upper) || upper.startsWith("MON")) {
-      return '';
-    }
-    return first;
-  };
-
-  useEffect(() => {
-    async function checkQuota() {
-      try {
-        const supabase = getSupabase();
-        if (supabase) {
-          const { data: { user } } = await supabase.auth.getUser();
-          if (user) {
-            // Get user's first name from metadata if present
-            const fn = user.user_metadata?.first_name || user.user_metadata?.display_name || user.user_metadata?.club_name || '';
-            if (fn) {
-              setFirstName(extractFirstName(fn));
-            }
-
-            const { data: dbClub, error } = await supabase
-              .from('clubs')
-              .select('whatsapp_messages_sent_this_month, whatsapp_display_name, cagnotte_url, spot_name')
-              .eq('id', user.id)
-              .single();
-
-            if (!error && dbClub) {
-              if (dbClub.whatsapp_messages_sent_this_month >= 200) {
-                setQuotaExceeded(true);
-              }
-              if (dbClub.whatsapp_display_name && !clubName) {
-                setClubName(dbClub.whatsapp_display_name);
-                setFirstName(extractFirstName(dbClub.whatsapp_display_name));
-              }
-            }
-          }
-        } else {
-          const mockQuota = localStorage.getItem('capten_mock_quota_exceeded');
-          if (mockQuota === 'true') {
-            setQuotaExceeded(true);
-          }
-        }
-      } catch (err) {
-        console.error("Failed checking quota or initializing club:", err);
-      }
-    }
-    checkQuota();
-  }, [clubName]);
-
-  const activeMembersCount = athletes.length;
-  const avgReliability = activeMembersCount > 0 
-    ? Math.round(athletes.reduce((acc, a) => acc + (a.reliability || 0), 0) / activeMembersCount) 
-    : 0;
-  
-  const runsCount = runs.length;
-  const runsCompletedPercent = runsCount > 0 ? 100 : 0;
-  const cagnotteSolde = typeof window !== 'undefined' ? (localStorage.getItem('capten_solde_v3') || '0') : '0';
-  const latestRun = runsCount > 0 ? runs[0] : null;
-
-  const totalRunners = athletes.length;
-  const protectedRunners = athletes.filter(a => 
-    a.waiverStatus === "SIGNÉE" && 
-    a.emergencyName && a.emergencyName.trim() !== '' && 
-    a.emergencyPhone && a.emergencyPhone.trim() !== ''
-  ).length;
-
-  useEffect(() => {
-    setWeatherInfo(null);
-    async function fetchWeather() {
-      try {
-        const location = latestRun?.location || 'Paris';
-        const coords = getCoordinates(location);
-        const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${coords.latitude}&longitude=${coords.longitude}&current_weather=true`);
-        if (!res.ok) return;
-        const data = await res.json();
-        const current = data.current_weather;
-        if (!current) return;
-        const mapped = getWeatherDesc(current.weathercode);
-        const temp = Math.round(current.temperature);
-        const windspeed = current.windspeed;
-        const isExtreme = mapped.isStorm || temp > 35 || temp < 0 || windspeed > 50;
-        setWeatherInfo({ emoji: mapped.emoji, temp, desc: mapped.desc, windspeed, isStorm: mapped.isStorm, isExtreme });
-      } catch (err) {
-        // Silencieux
-      }
-    }
-    fetchWeather();
-  }, [latestRun?.id, latestRun?.location]);
-
-  const handleEnableDemoMode = () => {
-    const mockRuns = [
-      {
-        id: "run-demo-1",
-        name: "SESSION RUN & CHILL #42 — RÉPUBLIQUE",
-        title: "Session Run & Chill #42 — Place de la République",
-        date: "Ce soir",
-        time: "19h30",
-        location: "Place de la République, Paris",
-        distance: "10 km",
-        pace: "5'30\"/km",
-        max_slots: 50,
-        slots_taken: 48,
-        status: "scheduled"
-      },
-      {
-        id: "run-demo-2",
-        name: "MORNING RUN CANAL SAINT-MARTIN",
-        title: "Morning Run Canal Saint-Martin",
-        date: "Samedi",
-        time: "09h00",
-        location: "Canal Saint-Martin, Paris",
-        distance: "8 km",
-        pace: "5'45\"/km",
-        max_slots: 30,
-        slots_taken: 28,
-        status: "scheduled"
-      }
-    ];
-
-    const mockAthletes = [
-      { id: "a1", name: "Thomas Lefebvre", phone: "06 14 22 89 10", blood: "A+", emergencyName: "Marie (Épouse)", emergencyPhone: "06 88 12 34 56", allergy: "Aucune", status: "checked_in", distance: 12, streak: 14, waiverStatus: "SIGNÉE", reliability: 98, runsCount: 14 },
-      { id: "a2", name: "Sarah Marchand", phone: "06 98 77 12 34", blood: "O+", emergencyName: "Jean (Père)", emergencyPhone: "06 11 22 33 44", allergy: "Allergie Pénicilline", status: "checked_in", distance: 8, streak: 22, waiverStatus: "SIGNÉE", reliability: 95, runsCount: 22 },
-      { id: "a3", name: "Alexandre Bernard", phone: "06 45 11 22 33", blood: "B-", emergencyName: "Clara (Sœur)", emergencyPhone: "06 77 88 99 00", allergy: "Asthme léger", status: "checked_in", distance: 24, streak: 8, waiverStatus: "SIGNÉE", reliability: 92, runsCount: 8 },
-      { id: "a4", name: "Élodie Petit", phone: "06 33 22 11 00", blood: "AB+", emergencyName: "Lucas (Frère)", emergencyPhone: "06 55 44 33 22", allergy: "Aucune", status: "checked_in", distance: 18, streak: 31, waiverStatus: "SIGNÉE", reliability: 100, runsCount: 31 },
-      { id: "a5", name: "Julien Rochedieu", phone: "06 78 90 12 34", blood: "O-", emergencyName: "Chantal (Mère)", emergencyPhone: "06 99 88 77 66", allergy: "Allergie Fruits à coque", status: "checked_in", distance: 15, streak: 19, waiverStatus: "SIGNÉE", reliability: 94, runsCount: 19 },
-      { id: "a6", name: "Camille Rousseau", phone: "06 12 34 56 78", blood: "A-", emergencyName: "David (Conjoint)", emergencyPhone: "06 44 33 22 11", allergy: "Aucune", status: "checked_in", distance: 11, streak: 5, waiverStatus: "SIGNÉE", reliability: 90, runsCount: 5 },
-      { id: "a7", name: "Maxime Fournier", phone: "06 87 65 43 21", blood: "B+", emergencyName: "Antoine (Ami)", emergencyPhone: "06 22 11 00 99", allergy: "Aucune", status: "checked_in", distance: 31, streak: 12, waiverStatus: "SIGNÉE", reliability: 96, runsCount: 12 }
-    ];
-
-    const mockNotifs = [
-      { id: 'n1', type: 'registration', message: "Thomas Lefebvre a validé son émargement GPS (12m du RDV)", timestamp: "À l'instant" },
-      { id: 'n2', type: 'waiver', message: "Sarah Marchand a signé sa décharge de responsabilité", timestamp: "Il y a 5 min" },
-      { id: 'n3', type: 'cagnotte', message: "Contribution de 25,00 € reçue de Alexandre Bernard", timestamp: "Il y a 12 min" },
-      { id: 'n4', type: 'registration', message: "Élodie Petit s'est inscrite au run SESSION RUN & CHILL #42", timestamp: "Il y a 30 min" },
-      { id: 'n5', type: 'waiver', message: "Julien Rochedieu a mis à jour sa fiche médicale d'urgence ICE", timestamp: "Il y a 1h" }
-    ];
-
-    setRuns(mockRuns);
-    setAthletes(mockAthletes);
-    setNotifications(mockNotifs);
-    setSkipOnboarding(true);
-    setClubName("PARIS RUN CLUB");
-    setCagnotteUrl("https://lydia-app.com/pots?id=capten-paris");
-
-    localStorage.setItem('capten_runs_v3', JSON.stringify(mockRuns));
-    localStorage.setItem('capten_athletes_v3', JSON.stringify(mockAthletes));
-    localStorage.setItem('capten_inapp_notifications', JSON.stringify(mockNotifs));
-    localStorage.setItem('capten_solde_v3', '1840');
-    localStorage.setItem('capten_cagnotte_url', 'https://lydia-app.com/pots?id=capten-paris');
-    localStorage.setItem('capten_onboarding_skipped', 'true');
-    localStorage.setItem('capten_club_name', 'PARIS RUN CLUB');
-  };
-
-  const handleCancelRun = async (runId: string) => {
-    if (window.confirm("Voulez-vous vraiment annuler ce run ?")) {
-      if (isMock) {
-        const updatedRuns = runs.filter((r: any) => r.id !== runId);
-        setRuns(updatedRuns);
-        localStorage.setItem('capten_runs_v3', JSON.stringify(updatedRuns));
-      } else {
-        try {
-          await fetch(`/api/runs?id=${runId}`, { method: 'DELETE' });
-          const runsRes = await fetch('/api/runs');
-          if (runsRes.ok) {
-            const runsData = await runsRes.json();
-            setRuns(runsData);
-          }
-        } catch (e) {
-          console.error(e);
-        }
-      }
-      if (typeof window !== 'undefined') {
-        window.dispatchEvent(new Event('capten_runs_change'));
-      }
-    }
-  };
-
-  const generateSlug = (text: string) => {
-    return (text || '')
-      .toLowerCase()
-      .trim()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/[^a-z0-9\s-]/g, '')
-      .replace(/[\s-]+/g, '-')
-      .replace(/^-+|-+$/g, '');
-  };
-
-  const handleSaveClubName = async () => {
-    if (!onboardingClubName.trim()) return;
-    const finalClubName = onboardingClubName.trim();
-    setClubName(finalClubName);
-    
-    if (isMock) {
-      localStorage.setItem('capten_club_name', finalClubName);
-      localStorage.setItem('capten_onboarding_s2_name', finalClubName);
-      localStorage.setItem('capten_community_type', onboardingCommunityType);
-      if (onboardingCommunityCustom) {
-        localStorage.setItem('capten_community_type_custom', onboardingCommunityCustom);
-      }
-    } else {
-      try {
-        await fetch('/api/club/settings', {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            whatsapp_display_name: finalClubName,
-            community_type: onboardingCommunityType,
-            community_type_custom: onboardingCommunityCustom || null,
-            branding: {
-              ...club?.branding,
-              onboarding_step: 2
-            }
-          })
-        });
-        await refreshClub();
-      } catch (e) {
-        console.error(e);
-      }
-    }
-
-    // Trigger branding change event
-    if (typeof window !== 'undefined') {
-      window.dispatchEvent(new Event('capten_branding_change'));
-    }
-
-    updateStep(2);
-  };
-
-  const handleGoToDashboard = async () => {
-    setSkipOnboarding(true);
-    if (isMock) {
-      localStorage.setItem('capten_onboarding_skipped', 'true');
-    } else {
-      try {
-        await fetch('/api/club/settings', {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            branding: {
-              ...club?.branding,
-              onboarding_skipped: true
-            }
-          })
-        });
-        await refreshClub();
-      } catch (e) {
-        console.error(e);
-      }
-    }
-  };
-
-  const updateStep = async (step: number) => {
-    setOnboardingStep(step);
-    if (isMock) {
-      localStorage.setItem('capten_onboarding_step', String(step));
-    } else {
-      try {
-        await fetch('/api/club/settings', {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            branding: {
-              ...club?.branding,
-              onboarding_step: step
-            }
-          })
-        });
-        await refreshClub();
-      } catch (e) {
-        console.error(e);
-      }
-    }
-  };
-
-  const renderProgressSteps = (step: number) => {
-    return (
-      <div className="flex items-center justify-center gap-2 sm:gap-4 text-[11px] sm:text-[12px] font-medium text-neutral-400 mt-10">
-        <span className={step === 1 ? "text-[#FF5C00] font-bold" : "text-[#9B9B93]"}>① Ton crew</span>
-        <span className="text-neutral-300">———</span>
-        <span className={step === 2 ? "text-[#FF5C00] font-bold" : "text-[#9B9B93]"}>② Ton lien</span>
-        <span className="text-neutral-300">———</span>
-        <span className={step === 3 ? "text-[#FF5C00] font-bold" : "text-[#9B9B93]"}>③ Ton premier run</span>
-      </div>
-    );
-  };
-
-  if (runsCount === 0 && !skipOnboarding) {
-    return (
-      <div className="space-y-10 pb-20">
-        {/* HARMONIZED HEADER */}
-        <header className="flex flex-col gap-1.5 pb-6 sm:pb-10 border-b-[0.5px] border-black/10 mb-8 sm:mb-10">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 w-full">
-            <div className="flex items-center gap-4 flex-wrap">
-              <h1 className="text-[28px] sm:text-[42px] font-display italic font-black uppercase text-black leading-none tracking-tighter">
-                LE HUB DU CREW
-              </h1>
-            </div>
-            <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto">
-              {/* LIVE CLOCK */}
-              <time className="flex text-[11px] sm:text-sm text-capten-textGray font-sans font-medium items-center gap-1.5 sm:gap-2 bg-white/50 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-card-inner border border-black/5 mr-0 sm:mr-2">
-                {time ? (
-                  <>
-                    <span className="text-black font-mono font-bold tracking-tight">
-                      {time.toLocaleTimeString("fr-FR", {
-                        timeZone: "Europe/Paris",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </span>
-                    <span className="text-black/20 font-bold">·</span>
-                    <span className="capitalize text-[9px] sm:text-[12px]">
-                      {time.toLocaleDateString("fr-FR", {
-                        timeZone: "Europe/Paris",
-                        weekday: "short",
-                        day: "numeric",
-                        month: "short",
-                      })}
-                    </span>
-                    {weatherInfo && (
-                      <>
-                        <span className="text-black/20 font-bold">·</span>
-                        <span style={{ color: weatherInfo.isExtreme ? '#DC2626' : '#6B6B63', fontWeight: 650 }} className="flex items-center gap-1 font-bold text-[9px] sm:text-[12px]">
-                          {weatherInfo.emoji} {weatherInfo.temp}°C
-                        </span>
-                      </>
-                    )}
-                  </>
-                ) : (
-                  <span className="opacity-0">00:00 · lun. 1 janv.</span>
-                )}
-              </time>
-              <button
-                onClick={handleEnableDemoMode}
-                className="bg-white border border-[#FF5C00] text-[#FF5C00] px-3.5 py-2.5 rounded-control text-[10px] sm:text-[11px] font-black uppercase tracking-wider flex items-center justify-center gap-1.5 hover:bg-[#FFF0E8] transition-all shadow-sm active:scale-95 cursor-pointer"
-              >
-                ⚡ Démo (Données d'exemple)
-              </button>
-              <Link href="/runs?openPlanifier=true" className="flex-1 sm:flex-initial bg-[#FF5C00] text-white px-4 sm:px-5 py-2.5 rounded-control text-[10px] sm:text-[11px] font-black uppercase tracking-wider flex items-center justify-center gap-2 hover:bg-black transition-all shadow-sm active:scale-95">
-                <Plus size={14} /> {L.launch_session_cap} +
-              </Link>
-            </div>
-          </div>
-        </header>
-
-        {/* ONBOARDING STATE IN 3 STEPS */}
-        {onboardingStep === 1 && (
-          <div className="max-w-xl mx-auto text-center py-12 space-y-8 animate-scale-up">
-            <div className="space-y-4">
-              <h2 
-                style={{ 
-                  fontFamily: "'Barlow Condensed', var(--font-barlow), sans-serif", 
-                  fontSize: '52px', 
-                  fontStyle: 'italic', 
-                  fontWeight: 950, 
-                  color: '#0F0F0D',
-                  lineHeight: '1.1'
-                }}
-                className="uppercase text-center"
-              >
-                Bienvenue{firstName ? `, ${firstName}` : ''}. 👋
-              </h2>
-              <p className="text-[18px] font-sans font-medium text-neutral-500 uppercase tracking-wide">
-                Comment s&apos;appelle ton crew ?
-              </p>
-            </div>
-
-            <div className="bg-white border border-[#E5E5E5] rounded-card-outer p-8 sm:p-10 space-y-6 shadow-sm text-left">
-              <div className="space-y-2">
-                <label className="text-[12px] font-mono font-bold uppercase tracking-wider text-black block">
-                  Nom de ta communauté / crew
-                </label>
-                <input
-                  type="text"
-                  placeholder="Ex : Paris Run Club, Girls Who Walk Paris, Trail Crew..."
-                  value={onboardingClubName}
-                  onChange={(e) => setOnboardingClubName(e.target.value)}
-                  className="w-full px-4 py-4 border border-[#E5E5E5] rounded-control text-[18px] font-sans focus:outline-none focus:border-[#FF5C00] focus:ring-1 focus:ring-[#FF5C00] bg-white shadow-sm transition-all"
-                />
-                <p className="text-[13px] text-[#9B9B93] font-mono mt-2">
-                  Ton portail sera : capten.app/{generateSlug(onboardingClubName) || "[slug-auto-généré]"}
-                </p>
-              </div>
-
-              {/* SÉLECTEUR DE TYPE DE COMMUNAUTÉ */}
-              <div className="space-y-3 pt-3 border-t border-black/5">
-                <label className="text-[12px] font-mono font-bold uppercase tracking-wider text-black block">
-                  Quel type de communauté organises-tu ?
-                </label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {COMMUNITY_OPTIONS.map((opt) => (
-                    <button
-                      key={opt.id}
-                      type="button"
-                      onClick={() => setOnboardingCommunityType(opt.id)}
-                      className={`p-3.5 rounded-control border text-left flex items-start gap-3 transition-all cursor-pointer ${
-                        onboardingCommunityType === opt.id
-                          ? 'border-[#FF5C00] bg-[#FF5C00]/5 text-black ring-1 ring-[#FF5C00]'
-                          : 'border-[#E5E5E5] bg-white text-neutral-600 hover:border-black/20'
-                      }`}
-                    >
-                      <span className="text-2xl shrink-0">{opt.icon}</span>
-                      <div className="min-w-0 flex-1">
-                        <p className="text-[13px] font-black uppercase font-mono tracking-wide">{opt.label}</p>
-                        <p className="text-[10px] text-neutral-500 font-sans leading-tight mt-0.5">{opt.description}</p>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-
-                {onboardingCommunityType === 'other' && (
-                  <div className="pt-2">
-                    <input
-                      type="text"
-                      placeholder="Précise ton type (ex : Roller Club, SwimRun, Vélo...)"
-                      value={onboardingCommunityCustom}
-                      onChange={(e) => setOnboardingCommunityCustom(e.target.value)}
-                      className="w-full px-4 py-3 border border-[#E5E5E5] rounded-control text-sm font-sans focus:outline-none focus:border-[#FF5C00]"
-                    />
-                  </div>
-                )}
-              </div>
-
-              <button
-                onClick={handleSaveClubName}
-                disabled={!onboardingClubName.trim()}
-                className="w-full bg-[#FF5C00] text-white py-4 rounded-control text-[16px] font-bold font-sans hover:bg-black transition-all active:scale-95 disabled:bg-neutral-200 disabled:text-neutral-400 disabled:cursor-not-allowed cursor-pointer shadow-sm text-center block"
-              >
-                C&apos;est mon crew →
-              </button>
-            </div>
-
-            {renderProgressSteps(1)}
-          </div>
-        )}
-
-        {onboardingStep === 2 && (
-          <div className="max-w-xl mx-auto text-center py-12 space-y-8 animate-scale-up">
-            <div className="space-y-2">
-              <h2 
-                style={{ 
-                  fontFamily: "'Barlow Condensed', var(--font-barlow), sans-serif", 
-                  fontSize: '42px', 
-                  fontStyle: 'italic', 
-                  fontWeight: 950, 
-                  color: '#0F0F0D',
-                  lineHeight: '1.1'
-                }}
-                className="uppercase text-center"
-              >
-                Ton portail est prêt. 🎉
-              </h2>
-            </div>
-
-            <div className="bg-white border border-[#FF5C00] rounded-[14px] p-7 sm:p-10 space-y-6 shadow-md text-center">
-              <div className="text-[20px] font-mono font-bold text-[#FF5C00] bg-[#FFF5F0] rounded-[8px] p-3 break-all select-all">
-                capten.app/{generateSlug(clubName) || "slug"}
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <button
-                  onClick={() => {
-                    const shareLink = `https://capten.app/${generateSlug(clubName)}`;
-                    navigator.clipboard.writeText(shareLink);
-                    setInstagramCopied(true);
-                    localStorage.setItem('capten_onboarding_instagram_copied', 'true');
-                    alert("Lien copié dans le presse-papiers !");
-                  }}
-                  className="py-3 px-4 border border-[#FF5C00] text-[#FF5C00] bg-white rounded-control text-[12px] font-bold font-sans hover:bg-[#FFF5F0] transition-all cursor-pointer text-center"
-                >
-                  📋 Copier mon lien
-                </button>
-                <button
-                  onClick={() => {
-                    setInstagramCopied(true);
-                    localStorage.setItem('capten_onboarding_instagram_copied', 'true');
-                    alert("Copie ton lien capten et ajoute-le dans la section 'Site web' de ton profil Instagram !");
-                    window.open("https://instagram.com", "_blank");
-                  }}
-                  className="py-3 px-4 bg-[#FF5C00] text-white rounded-control text-[12px] font-bold font-sans hover:bg-black transition-all cursor-pointer text-center"
-                >
-                  📱 Partager sur Instagram
-                </button>
-              </div>
-
-              <p className="text-[13px] font-sans text-[#9B9B93] leading-relaxed">
-                Tes {L.members_plural_short} peuvent déjà s&apos;inscrire.<br />
-                Lance ta première session quand tu veux.
-              </p>
-
-              <button
-                onClick={() => updateStep(3)}
-                className="w-full bg-black text-white py-3.5 rounded-control text-[12px] font-black uppercase tracking-widest hover:bg-[#FF5C00] transition-all active:scale-95 cursor-pointer mt-4"
-              >
-                Continuer →
-              </button>
-            </div>
-
-            {renderProgressSteps(2)}
-          </div>
-        )}
-
-        {onboardingStep === 3 && (
-          <div className="max-w-xl mx-auto text-center py-12 space-y-8 animate-scale-up">
-            <div className="space-y-2">
-              <h2 
-                style={{ 
-                  fontFamily: "'Barlow Condensed', var(--font-barlow), sans-serif", 
-                  fontSize: '32px', 
-                  fontStyle: 'italic', 
-                  fontWeight: 950, 
-                  color: '#0F0F0D',
-                  lineHeight: '1.1'
-                }}
-                className="uppercase text-center"
-              >
-                Et maintenant ?
-              </h2>
-            </div>
-
-            <div className="bg-white border border-[#E5E5E5] rounded-card-outer p-8 sm:p-10 space-y-6 shadow-sm text-center">
-              <Link
-                href="/runs?openPlanifier=true"
-                className="w-full bg-[#FF5C00] text-white py-4 rounded-control text-[14px] font-bold font-sans hover:bg-black transition-all active:scale-95 cursor-pointer shadow-sm text-center block"
-              >
-                + {L.launch_session_cap} →
-              </Link>
-
-              <button
-                onClick={handleGoToDashboard}
-                className="text-[14px] font-sans font-medium text-[#6B6B63] hover:text-[#0F0F0D] transition-colors cursor-pointer"
-              >
-                Aller au dashboard
-              </button>
-            </div>
-
-            {renderProgressSteps(3)}
-          </div>
-        )}
-      </div>
-    );
-  }
+  const ACTIONS = [
+    { label: `Créer une ${L.session_single}`, icon: <Plus size={16} />, href: '/dashboard/events/new', primary: true },
+    { label: 'Voir les membres', icon: <Users size={16} />, href: '/dashboard/members' },
+    { label: 'Les Spots du Crew', icon: <MapPin size={16} />, href: '/dashboard/spots' },
+    { label: 'Messages', icon: <MessageSquare size={16} />, href: '/messages' },
+    { label: 'Statistiques', icon: <BarChart3 size={16} />, href: '/dashboard/stats' },
+    { label: 'Protection', icon: <ShieldCheck size={16} />, href: '/securite' },
+  ];
 
   return (
-    <div className="space-y-10 pb-20">
-      {/* HARMONIZED HEADER */}
-      <header className="flex flex-col gap-1.5 pb-6 sm:pb-10 border-b-[0.5px] border-black/10 mb-8 sm:mb-10">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 w-full">            <div className="flex items-center gap-4 flex-wrap">
-              <h1 className="text-[28px] sm:text-[42px] font-display italic font-black uppercase text-black leading-none tracking-tighter">
-                LE HUB DU CREW
-              </h1>
-            </div>
-            <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto">
-              {/* LIVE CLOCK */}
-              <time className="flex text-[11px] sm:text-sm text-capten-textGray font-sans font-medium items-center gap-1.5 sm:gap-2 bg-white/50 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-card-inner border border-black/5 mr-0 sm:mr-2">
-                {time ? (
-                  <>
-                    <span className="text-black font-mono font-bold tracking-tight">
-                      {time.toLocaleTimeString("fr-FR", {
-                        timeZone: "Europe/Paris",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </span>
-                    <span className="text-black/20 font-bold">·</span>
-                    <span className="capitalize text-[9px] sm:text-[12px]">
-                      {time.toLocaleDateString("fr-FR", {
-                        timeZone: "Europe/Paris",
-                        weekday: "short",
-                        day: "numeric",
-                        month: "short",
-                      })}
-                    </span>
-                    {weatherInfo && (
-                      <>
-                        <span className="text-black/20 font-bold">·</span>
-                        <span style={{ color: weatherInfo.isExtreme ? '#DC2626' : '#6B6B63', fontWeight: 650 }} className="flex items-center gap-1 font-bold text-[9px] sm:text-[12px]">
-                          {weatherInfo.emoji} {weatherInfo.temp}°C
-                        </span>
-                      </>
-                    )}
-                  </>
-                ) : (
-                  <span className="opacity-0">00:00 · lun. 1 janv.</span>
-                )}
-              </time>
-              <Link href="/runs?openPlanifier=true" className="flex-1 sm:flex-initial bg-[#FF5C00] text-white px-4 sm:px-5 py-2.5 rounded-control text-[10px] sm:text-[11px] font-black uppercase tracking-wider flex items-center justify-center gap-2 hover:bg-black transition-all shadow-sm active:scale-95">
-                <Plus size={14} /> {L.launch_session_cap} +
-              </Link>
-            </div>
-          </div>
-      </header>
+    <div className="space-y-8 pb-20">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+        <div>
+          <p className="text-[13px] text-[#A3A3A3] font-sans">Salut {firstName} 👋</p>
+          <h1 className="text-[28px] sm:text-[36px] font-display italic font-black uppercase text-black leading-none tracking-tighter">
+            {club?.name || 'Mon crew'}
+          </h1>
+        </div>
+        <span className={`inline-flex items-center gap-1.5 self-start px-3 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wider ${
+          isPro ? 'bg-[#1C1B18] text-white' : 'bg-[#F4F4EE] text-[#666562]'
+        }`}>
+          <CreditCard size={12} />
+          {isPro ? 'Captain Pro' : 'Découverte'}
+        </span>
+      </div>
 
-      {/* UPGRADE BANNER */}
-      <UpgradeBanner />
-
-      {/* TRIAL PROGRESS BANNER */}
-      {club?.plan === 'trial' && (
-        <div className="bg-[#FFFDF9] border border-[#FF5C00] rounded-card-outer p-6 sm:p-8 space-y-4 shadow-sm relative overflow-hidden mb-6">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-            <div className="space-y-1">
-              <div className="flex items-center gap-2">
-                <span className="bg-[#FF5C00] text-white text-[8px] font-black px-2 py-0.5 rounded-full tracking-widest uppercase">
-                  Période d'essai Capten
-                </span>
-                <span className="text-[10px] font-bold text-neutral-500 uppercase tracking-wider">
-                  {Math.max(0, 21 - Math.floor((Date.now() - new Date(club.created_at || Date.now()).getTime()) / (1000 * 60 * 60 * 24)))} jours restants (Fin le {new Date(new Date(club.created_at || Date.now()).getTime() + 21 * 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR')})
-                </span>
-              </div>
-              <h3 className="text-[20px] font-display italic font-black uppercase text-black leading-tight">
-                Objectif d'intégration : planifier et clôturer 3 runs
-              </h3>
-              <p className="text-[12px] text-neutral-600 font-sans leading-relaxed">
-                Pour valider ton essai et te familiariser avec le cockpit, nous t'invitons à compléter tes 3 premiers runs.
-              </p>
-            </div>
-            <div className="flex flex-col items-end shrink-0 gap-1.5 w-full md:w-auto">
-              <span className="text-[11px] font-mono font-black uppercase tracking-wider text-[#FF5C00]">
-                Run {Math.min(3, runs.length)} sur 3
-              </span>
-              <div className="w-full md:w-[180px] h-2 bg-neutral-100 rounded-full overflow-hidden border border-black/5">
-                <div 
-                  className="h-full bg-[#FF5C00] transition-all duration-500" 
-                  style={{ width: `${(Math.min(3, runs.length) / 3) * 100}%` }}
-                />
-              </div>
-            </div>
+      {/* Lien d'inscription public */}
+      {joinUrl && (
+        <div className="bg-[#F4F4EE] rounded-[20px] px-5 py-4 flex items-center justify-between gap-4">
+          <div className="min-w-0">
+            <p className="text-[11px] font-black uppercase tracking-widest text-[#A3A3A3] mb-0.5">Lien d'inscription du crew</p>
+            <p className="text-[13px] font-semibold text-[#1A1918] truncate">{joinUrl}</p>
           </div>
-
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pt-4 border-t border-black/5">
-            <p className="text-[11px] text-neutral-500 font-mono">
-              Prochain prélèvement de 49,99€/mois à J+21. Résiliable en 1 clic dans les réglages.
-            </p>
-            <div className="flex items-center gap-3">
-              {runs.length < 3 && (
-                <Link 
-                  href="/runs?openPlanifier=true" 
-                  className="bg-[#FF5C00] hover:bg-black text-white px-4 py-2 rounded-control text-[9px] font-black uppercase tracking-wider transition-all"
-                >
-                  {L.plan_session} +
-                </Link>
-              )}
-              <Link 
-                href="/settings" 
-                className="text-[9px] font-mono font-bold uppercase tracking-wider text-neutral-400 hover:text-black transition-all underline"
-              >
-                Gérer / Résilier mon essai
-              </Link>
-            </div>
-          </div>
+          <button onClick={copyJoin}
+            className="shrink-0 inline-flex items-center gap-1.5 h-9 px-4 rounded-full bg-white border border-black/10 text-[12px] font-bold text-[#333] hover:border-[#FF5C00] hover:text-[#FF5C00] transition-colors">
+            {copied ? <><Check size={13} /> Copié</> : <><Copy size={13} /> Copier</>}
+          </button>
         </div>
       )}
 
-      {/* COPILOT BRIEFING IA */}
-      <CopilotBanner />
-
-
-
-      {/* TOP ROW: 4 MINIMALIST KPI CARDS */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-        {/* Card 1: LE CREW */}
-        <Link 
-          href="/athletes" 
-          className="bg-white border-[0.5px] border-[#E5E5E5] rounded-card-outer p-6 space-y-2 shadow-sm group hover:border-[#FF5C00]/40 hover:shadow-md transition-all duration-300 cursor-pointer"
-        >
-           <p className="text-[9px] font-black text-[#D1D1D1] uppercase tracking-[0.2em] italic">LE CREW</p>
-           <h3 className="text-[32px] font-display italic font-black text-black">{activeMembersCount > 0 ? activeMembersCount : "—"}</h3>
-           <p className="text-[9px] font-medium text-[#A3A3A3] uppercase tracking-widest">
-             {activeMembersCount > 0 ? `${activeMembersCount} MEMBRES` : "Partage ton lien, ton crew arrive."}
-           </p>
-        </Link>
-
-        {/* Card 2: FIDÉLITÉ DU CREW */}
-        <Link 
-          href="/athletes" 
-          className="bg-white border-[0.5px] border-[#E5E5E5] rounded-card-outer p-6 space-y-2 shadow-sm group hover:border-[#FF5C00]/40 hover:shadow-md transition-all duration-300 cursor-pointer"
-        >
-           <p className="text-[9px] font-black text-[#D1D1D1] uppercase tracking-[0.2em] italic">FIDÉLITÉ DU CREW</p>
-           <h3 className="text-[32px] font-display italic font-black text-[#56E39F]">{activeMembersCount > 0 ? `${avgReliability}%` : "—"}</h3>
-           <p className="text-[9px] font-medium text-[#A3A3A3] uppercase tracking-widest">
-             {activeMembersCount > 0 ? "MOYENNE D'ASSIDUITÉ" : "Visible après la 1ère sortie"}
-           </p>
-        </Link>
-
-        {/* Card 3: PROTECTION */}
-        <Link 
-          href="/securite" 
-          title="Membres ayant signé la charte de bienveillance et rempli leur fiche d'urgence."
-          className="bg-white border-[0.5px] border-[#E5E5E5] rounded-card-outer p-6 space-y-2 shadow-sm group hover:border-[#FF5C00]/40 hover:shadow-md transition-all duration-300 cursor-pointer"
-        >
-           <p className="text-[9px] font-black text-[#D1D1D1] uppercase tracking-[0.2em] italic">PROTECTION</p>
-           {totalRunners === 0 ? (
-             <h3 className="text-[32px] font-display italic font-black text-[#9B9B93]">
-               —
-             </h3>
-           ) : (
-             <h3 className={`text-[32px] font-display italic font-black ${protectedRunners === totalRunners ? 'text-[#56E39F]' : 'text-[#FF5C00]'}`}>
-               {protectedRunners}/{totalRunners}
-             </h3>
-           )}
-           <p className="text-[9px] font-medium text-[#A3A3A3] uppercase tracking-widest">
-             {totalRunners === 0 ? "Visible après les 1ères inscriptions" : "membres protégés"}
-           </p>
-        </Link>
-
-        {/* Card 4: CAGNOTTE */}
-        <Link 
-          href="/cagnotte" 
-          className="bg-white border-[0.5px] border-[#E5E5E5] rounded-card-outer p-6 space-y-2 shadow-sm group hover:border-[#FF5C00]/40 hover:shadow-md transition-all duration-300 cursor-pointer"
-        >
-           <p className="text-[9px] font-black text-[#D1D1D1] uppercase tracking-[0.2em] italic">CAGNOTTE</p>
-           <h3 className="text-[32px] font-display italic font-black text-black">{cagnotteSolde}€</h3>
-           <p className="text-[9px] font-medium text-[#A3A3A3] uppercase tracking-widest">
-             {cagnotteUrl ? "SOLDE DISPONIBLE" : "Ajoute ton lien Lydia →"}
-           </p>
-        </Link>
-      </div>
- 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* CENTER LEFT: SESSION IMMINENTE / LATEST RUN COPIER */}
-        {latestRun ? (
-          <div className="col-span-1 lg:col-span-8 bg-white border-[0.5px] border-[#E5E5E5] rounded-card-outer p-6 sm:p-10 flex flex-col justify-between min-h-[380px] sm:h-[450px] shadow-sm relative overflow-hidden group">
-             <div className="space-y-4 relative z-10">
-                {/* 1. Badge "PROCHAIN RUN PLANIFIÉ" */}
-                <div className="flex items-center gap-3">
-                   <div className="bg-[#FF5C00]/10 border border-[#FF5C00]/20 text-[#FF5C00] px-3 py-1 rounded-control text-[10px] font-black uppercase tracking-widest italic animate-pulse">{L.next_session} PLANIFIÉ(E)</div>
-                </div>
-                
-                {/* 2. Nom du run */}
-                <h2 className="text-[28px] sm:text-[36px] font-display italic font-black uppercase text-black leading-tight tracking-tight">
-                  {latestRun.name}
-                </h2>
-                
-                {/* 3. Date · Heure · Météo · Distance · Lieu */}
-                <div className="text-[12px] font-bold text-neutral-500 uppercase tracking-wider flex flex-wrap items-center gap-1.5">
-                  <span>{latestRun.date} · {latestRun.time}</span>
-                  {weatherInfo && (
-                    <span style={{ color: weatherInfo.isExtreme ? '#DC2626' : '#6B6B63', fontWeight: 600 }}>
-                      · {weatherInfo.emoji} {weatherInfo.temp}°C
-                    </span>
-                  )}
-                  <span>· {latestRun.distance} · {latestRun.location}</span>
-                </div>
-
-                {/* Alerte conditions extrêmes */}
-                {weatherInfo && weatherInfo.isExtreme && (
-                  <div className="text-[12px] text-red-600 flex items-center gap-2">
-                    <span>⚠️ Conditions difficiles — tu veux</span>
-                    <button onClick={(e) => { e.preventDefault(); handleCancelRun(latestRun.id); }} className="font-black underline cursor-pointer hover:text-red-800">annuler cette sortie ?</button>
-                  </div>
-                )}
-
-                {/* 4. Pace groups (si configurés) */}
-                {(latestRun.pace_groups || latestRun.paceGroups || latestRun.pace) && (
-                  <div className="text-[13px] text-[#6B6B63] font-sans">
-                     ⏱️ Allure : {latestRun.pace_groups || latestRun.paceGroups || latestRun.pace}
-                  </div>
-                )}
-             </div>
-             
-             <div className="space-y-4 relative z-10 w-full mt-4">
-                {/* 6. [BOUTON ORANGE] COPIER LE LIEN D'INSCRIPTION */}
-                <button 
-                  onClick={handleCopyClubLink} 
-                  className="w-full bg-[#FF5C00] text-white px-8 py-3.5 rounded-control text-[11px] font-black uppercase tracking-widest hover:bg-black transition-all flex items-center justify-center gap-2 active:scale-95 cursor-pointer shadow-sm"
-                >
-                  COPIER LE LIEN D'INSCRIPTION
-                </button>
-                
-                {/* 7. Texte sous le bouton */}
-                <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest text-center">
-                  Colle ce lien dans ta bio Instagram
-                </p>
-
-                {/* 8. Lien discret : Voir le portail */}
-                <div className="text-center">
-                  <Link 
-                    href={`/waiver?runId=${latestRun.id}`} 
-                    className="text-[12px] text-neutral-400 hover:text-black hover:underline uppercase font-bold transition-all"
-                  >
-                    Voir le portail →
-                  </Link>
-                </div>
-
-                {/* 9. Compteur inscrits */}
-                <div className="text-center">
-                  <span className="text-[11.5px] font-black uppercase tracking-widest text-neutral-450">
-                    {latestRun.slots_taken || 0}/{latestRun.max_slots || 50} inscrits
-                  </span>
-                </div>
-             </div>
-          </div>
-        ) : (
-          <div className="col-span-1 lg:col-span-8 bg-white border-[0.5px] border-[#E5E5E5] rounded-card-outer p-6 sm:p-10 flex flex-col justify-between min-h-[380px] sm:h-[450px] shadow-sm relative overflow-hidden group">
-             <div className="space-y-6 relative z-10">
-                <div className="flex items-center gap-3">
-                   {/* Removed HORS LIGNE badge */}
-                </div>
-                <h2 className="text-[44px] sm:text-[94px] font-display italic font-black uppercase leading-none tracking-tighter text-black/20 transition-all duration-700">
-                  AUCUNE <br /> <span className="text-black/10">SESSION</span>
-                </h2>
-                <p className="text-[11px] font-medium text-neutral-500 uppercase tracking-widest leading-relaxed mt-2 text-left">
-                   {L.session_single_cap}, et ça commence.
-                </p>
-             </div>
-             
-             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 relative z-10">
-                <div className="flex -space-x-3">
-                   <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#F4F5F7] border-2 border-white flex items-center justify-center text-[10px] font-black text-[#A3A3A3]">{activeMembersCount}</div>
-                </div>
-                <Link href="/runs?openPlanifier=true" className="w-full sm:w-auto bg-black text-white px-6 sm:px-8 py-3.5 sm:py-4 rounded-control text-[11px] sm:text-[12px] font-black uppercase tracking-[0.2em] hover:bg-[#FF5C00] transition-all flex items-center justify-center gap-3 active:scale-95">
-                   <Plus size={16} /> {L.launch_session_cap} +
-                </Link>
-             </div>
-    
-             <div className="absolute right-0 top-0 w-1/2 h-full bg-gradient-to-l from-[#F4F5F7]/50 to-transparent pointer-events-none" />
-          </div>
-        )}
- 
-        {/* CENTER RIGHT: WIDGETS COLUMN */}
-        <div className="col-span-1 lg:col-span-4 space-y-6">
-           {/* CAGNOTTE WIDGET */}
-           {cagnotteUrl ? (
-             <Link href="/cagnotte" className="block bg-white border-[0.5px] border-[#E5E5E5] rounded-card-outer p-6 sm:p-8 h-[200px] sm:h-[215px] flex flex-col justify-between shadow-sm relative group overflow-hidden hover:border-[#FF5C00] transition-all">
-                <div className="space-y-4">
-                   <div className="flex justify-between items-center">
-                      <span 
-                        style={{
-                          fontFamily: 'var(--font-dm-mono), DM Mono, monospace',
-                          fontSize: '11px',
-                          color: '#9B9B93',
-                          textTransform: 'uppercase'
-                        }}
-                      >
-                        Cagnotte du crew
-                      </span>
-                      <Wallet size={16} className="text-black/20" />
-                   </div>
-                   <div>
-                     <h3 className="text-[20px] sm:text-[24px] font-display italic font-black text-black uppercase leading-tight">LIEN CONFIGURÉ</h3>
-                     <p className="text-[9px] font-mono text-neutral-400 mt-1 uppercase truncate max-w-[220px]">{cagnotteUrl}</p>
-                   </div>
-                </div>
-                <div className="space-y-2">
-                   <p className="text-[9.5px] font-medium text-[#A3A3A3] uppercase tracking-wider leading-relaxed">
-                      Le suivi est déclaratif sur le terrain (virements instantanés Lydia / Wero).
-                   </p>
-                </div>
-             </Link>
-           ) : (
-             <div className="bg-white border-[0.5px] border-[#E5E5E5] rounded-card-outer p-6 sm:p-8 h-[200px] sm:h-[215px] flex flex-col justify-between shadow-sm relative group overflow-hidden transition-all">
-                <div className="space-y-4">
-                   <div className="flex justify-between items-center">
-                      <span 
-                        style={{
-                          fontFamily: 'var(--font-dm-mono), DM Mono, monospace',
-                          fontSize: '11px',
-                          color: '#9B9B93',
-                          textTransform: 'uppercase'
-                        }}
-                      >
-                        Cagnotte du crew
-                      </span>
-                      <Wallet size={16} className="text-black/20" />
-                   </div>
-                   <div className="space-y-2">
-                     <p 
-                       style={{
-                         fontFamily: 'var(--font-dm-sans), DM Sans, sans-serif',
-                         fontSize: '13px',
-                         color: '#6B6B63',
-                         lineHeight: '1.4'
-                       }}
-                     >
-                       Ajoute ton lien Lydia, Revolut ou Wero pour collecter les contributions de tes {L.members_plural_short}.
-                     </p>
-                     <Link 
-                       href="/settings"
-                       className="hover:underline block transition-all"
-                       style={{
-                         fontFamily: 'var(--font-dm-sans), DM Sans, sans-serif',
-                         fontSize: '13px',
-                         color: '#FF5C00',
-                         textDecoration: 'none'
-                       }}
-                     >
-                       → Configurer dans Réglages
-                     </Link>
-                   </div>
-                </div>
-                <div className="space-y-2">
-                   <p className="text-[9.5px] font-medium text-[#A3A3A3] uppercase tracking-wider leading-relaxed">
-                      Le suivi est déclaratif sur le terrain (virements instantanés Lydia / Wero).
-                   </p>
-                </div>
-             </div>
-           )}
-
-            {/* LE COMPTEUR WIDGET — Supprimé, remonté en haut du dashboard */}
- 
-        </div>
-      </div>
- 
- 
-      {/* STREAK & LOYALTY ROW */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* SUIVI DE PARTICIPATION */}
-        <div className="col-span-1 lg:col-span-7 bg-white border-[0.5px] border-[#E5E5E5] rounded-card-outer p-6 sm:p-8 shadow-sm space-y-6">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center gap-3">
-              <Users size={16} className="text-black/20" />
-              <p className="text-[10px] font-black text-[#D1D1D1] uppercase tracking-[0.2em] italic">SUIVI DE PARTICIPATION</p>
+      {/* Stat tiles */}
+      <div className="grid grid-cols-3 gap-4">
+        {STATS.map((s) => (
+          <Link key={s.label} href={s.href}
+            className="bg-white rounded-[20px] border border-black/5 p-5 hover:shadow-[0_8px_32px_rgba(0,0,0,0.06)] hover:-translate-y-0.5 transition-all group">
+            <div className="w-9 h-9 rounded-[12px] bg-[#FF5C00]/[0.08] flex items-center justify-center text-[#FF5C00] mb-3">
+              {s.icon}
             </div>
-            <Link href="/athletes" className="text-[9px] font-black text-black/40 uppercase tracking-widest hover:underline">VOIR TOUT</Link>
-          </div>
-          {athletes.length > 0 ? (
-            <div className="flex flex-col gap-4">
-              {athletes
-                .slice()
-                .sort((a, b) => b.runs - a.runs)
-                .slice(0, 5)
-                .map((athlete, idx) => (
-                  <div key={idx} className="flex items-center justify-between group cursor-default">
-                    <div className="flex items-center gap-4">
-                      {athlete.img && !athlete.img.includes('pravatar.cc') ? (
-                        <img src={athlete.img} alt={athlete.name} className="w-8 h-8 rounded-full grayscale hover:grayscale-0 transition-all border-[0.5px] border-black/5 object-cover shrink-0" />
-                      ) : (
-                        <div className="w-8 h-8 rounded-full bg-slate-200 text-slate-800 border-[0.5px] border-black/10 font-black text-[10px] flex items-center justify-center uppercase shrink-0">
-                          {getInitials(athlete.name)}
-                        </div>
-                      )}
-                      <span className="text-[12px] font-bold text-black uppercase tracking-tight">{athlete.name}</span>
-                    </div>
-                    <span className="text-[11px] font-black uppercase text-neutral-450 tracking-wider">
-                      {athlete.runs} run{athlete.runs > 1 ? 's' : ''} complété{athlete.runs > 1 ? 's' : ''}
-                    </span>
-                  </div>
-                ))}
+            <p className="text-[28px] font-display italic font-black text-black leading-none">
+              {loading ? '—' : s.value}
+            </p>
+            <p className="text-[11px] font-bold uppercase tracking-wider text-[#A3A3A3] mt-1">{s.label}</p>
+          </Link>
+        ))}
+      </div>
+
+      {/* Prochaines sorties */}
+      <div>
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-[13px] font-black uppercase tracking-widest text-[#666562]">Prochaines {L.session_plural}</h2>
+          <Link href="/dashboard/events" className="text-[12px] font-bold text-[#FF5C00] hover:underline inline-flex items-center gap-1">
+            Tout voir <ArrowRight size={12} />
+          </Link>
+        </div>
+        <div className="bg-white rounded-[20px] border border-black/5 overflow-hidden">
+          {loading ? (
+            <div className="flex items-center justify-center py-12"><Loader2 className="animate-spin text-[#FF5C00]" size={22} /></div>
+          ) : upcoming.length === 0 ? (
+            <div className="flex flex-col items-center gap-3 py-12 text-center">
+              <Calendar size={28} className="text-[#D1D1D1]" />
+              <p className="text-[13px] text-[#A3A3A3]">Aucune {L.session_single} prévue.</p>
+              <Link href="/dashboard/events/new"
+                className="inline-flex items-center gap-2 h-10 px-5 rounded-full bg-[#FF5C00] text-white text-[12px] font-black uppercase tracking-wider hover:bg-[#E04B00] transition-colors">
+                <Plus size={14} /> Créer une {L.session_single}
+              </Link>
             </div>
           ) : (
-            <div className="flex items-center justify-center py-10 opacity-50">
-               <p className="text-[11px] font-black text-[#A3A3A3] uppercase tracking-widest text-center">AUCUNE PARTICIPATION ENREGISTRÉE<br/>LANCEZ VOTRE PREMIÈRE SESSION</p>
+            <div className="divide-y divide-black/5">
+              {upcoming.map((ev) => (
+                <Link key={ev.id} href={`/dashboard/events/${ev.id}`} className="flex items-center gap-4 p-4 hover:bg-[#FAFAF8] transition-colors">
+                  <div className="w-11 h-11 rounded-[12px] bg-[#F4F4EE] flex items-center justify-center text-[#FF5C00] shrink-0">
+                    <Calendar size={18} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[14px] font-black uppercase tracking-tight text-black truncate">{ev.title}</p>
+                    <p className="text-[11px] text-[#A3A3A3] mt-0.5">{fmtDate(ev.event_date)}</p>
+                  </div>
+                  {ev.meeting_point_address && (
+                    <span className="hidden sm:flex items-center gap-1 text-[11px] text-[#A3A3A3] max-w-[180px] truncate">
+                      <MapPin size={10} /> {ev.meeting_point_address}
+                    </span>
+                  )}
+                  <ArrowRight size={15} className="text-[#D1D1D1] shrink-0" />
+                </Link>
+              ))}
             </div>
           )}
         </div>
- 
-        {/* SÉRIES ACTIVES & NOTIFICATIONS */}
-        <div className="col-span-1 lg:col-span-5 space-y-6">
-          {/* Stats Row */}
-          <div className="grid grid-cols-2 gap-4">
-            <Link href="/athletes" className="block bg-white border-[0.5px] border-[#E5E5E5] rounded-card-outer p-5 flex flex-col justify-between shadow-sm hover:border-[#FF5C00]/40 hover:shadow-md transition-all duration-300">
-              <p className="text-[8px] font-black text-[#D1D1D1] uppercase tracking-[0.2em] italic">RÉGULARITÉ DU CREW</p>
-              <div className="mt-2">
-                <h3 className="text-[24px] font-display italic font-black text-black leading-none">
-                  {athletes.filter(a => (a.streak || 0) > 0).length}
-                </h3>
-                <p className="text-[8px] font-medium text-[#A3A3A3] uppercase tracking-widest mt-0.5">SUR {activeMembersCount} COUREUR{activeMembersCount > 1 ? 'S' : ''}</p>
-              </div>
-            </Link>
-            <Link href="/athletes" className="block bg-white border-[0.5px] border-[#E5E5E5] rounded-card-outer p-5 flex flex-col justify-between shadow-sm hover:border-[#FF5C00]/40 hover:shadow-md transition-all duration-300">
-              <p className="text-[8px] font-black text-[#D1D1D1] uppercase tracking-[0.2em] italic">ASSIDUITÉ MOYENNE</p>
-              <div className="mt-2">
-                <h3 className="text-[24px] font-display italic font-black text-black leading-none">
-                  {athletes.filter(a => (a.streak || 0) > 0).length > 0
-                    ? Math.round(athletes.filter(a => (a.streak || 0) > 0).reduce((acc, a) => acc + (a.streak || 0), 0) / athletes.filter(a => (a.streak || 0) > 0).length)
-                    : 0
-                  }
-                </h3>
-                <p className="text-[8px] font-medium text-[#A3A3A3] uppercase tracking-widest mt-0.5">SEMAINES</p>
-              </div>
-            </Link>
-          </div>
-
-          {/* Notifications Card */}
-          <div className="bg-white border-[0.5px] border-[#E5E5E5] rounded-card-outer p-6 shadow-sm space-y-4">
-             {/* Header */}
-             <div className="flex justify-between items-center border-b border-black/5 pb-3">
-                <div className="flex items-center gap-2">
-                   <p className="text-[9px] font-black text-[#D1D1D1] uppercase tracking-[0.2em] italic">ACTIVITÉ DU CREW</p>
-                   <span className="bg-[#FF5C00]/10 border border-[#FF5C00]/20 text-[#FF5C00] px-1.5 py-0.5 rounded-[4px] text-[7.5px] font-black uppercase tracking-wider font-mono">
-                      IN-APP
-                   </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <button 
-                    onClick={handleSimulateNotification} 
-                    className="text-[8px] font-black text-[#FF5C00] uppercase tracking-wider hover:underline hover:text-black cursor-pointer"
-                    title="Simuler un événement"
-                  >
-                    + SIMULER
-                  </button>
-                  <span className="text-black/10 text-[8px]">|</span>
-                  <button 
-                    onClick={handleClearNotifications} 
-                    className="text-[8px] font-black text-black/40 uppercase tracking-wider hover:underline hover:text-black cursor-pointer"
-                  >
-                    VIDER
-                  </button>
-                </div>
-             </div>
-
-             {/* Notif Feed */}
-             <div className="space-y-3 max-h-[160px] overflow-y-auto custom-scrollbar pr-1">
-                {notifications.length === 0 ? (
-                  <div className="py-8 text-center text-[#A3A3A3] uppercase text-[9px] font-black tracking-widest leading-relaxed">
-                     Aucune notification.<br/>
-                     Les inscriptions et activités s'afficheront ici.
-                  </div>
-                ) : (
-                  notifications.map((notif: any) => {
-                    const iconColor = notif.type === 'registration' ? 'bg-[#56E39F]/15 text-[#2AA968]' : notif.type === 'waiver' ? 'bg-blue-500/10 text-blue-600' : 'bg-[#FF5C00]/10 text-[#FF5C00]';
-                    const icon = notif.type === 'registration' ? '🏃' : notif.type === 'waiver' ? '📝' : '💰';
-                    
-                    return (
-                      <div key={notif.id} className="flex items-start gap-2.5 text-xs py-0.5 border-b border-black/5 last:border-0 pb-2">
-                        <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs shrink-0 ${iconColor}`}>
-                          {icon}
-                        </span>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-bold text-neutral-800 uppercase tracking-tight text-[10.5px] leading-tight mt-0.5 truncate">
-                            {notif.message}
-                          </p>
-                          <span className="text-[8.5px] text-neutral-400 font-mono uppercase tracking-wider block mt-0.5">
-                            {notif.timestamp}
-                          </span>
-                        </div>
-                      </div>
-                    );
-                  })
-                )}
-             </div>
-
-             <div className="pt-2 border-t border-black/5 flex items-center justify-between text-[8px] font-black text-neutral-400 uppercase tracking-widest">
-                <span>🔒 PAS D'E-MAILS ENVOYÉS</span>
-                <span>FLUX TEMPS RÉEL</span>
-             </div>
-          </div>
-        </div>
       </div>
 
-      {isChecklistVisible && !(club?.plan === 'trial' && ((Date.now() - new Date(club.created_at || Date.now()).getTime()) / (1000 * 60 * 60)) < 48) && (
-        <div className="mt-8">
-          <VictoryChecklist
-            completedMissionsCount={completedMissionsCount}
-            checklistCollapsed={checklistCollapsed}
-            setChecklistCollapsed={setChecklistCollapsed}
-            clubName={clubName}
-            setClubName={setClubName}
-            isMission1Complete={isMission1Complete}
-            isMission2Complete={isMission2Complete}
-            isMission3Complete={isMission3Complete}
-            handleCopyClubLink={handleCopyClubLink}
-            setIsChecklistVisible={setIsChecklistVisible}
-            isMock={isMock}
-            club={club}
-            refreshClub={refreshClub}
-          />
+      {/* Actions rapides */}
+      <div>
+        <h2 className="text-[13px] font-black uppercase tracking-widest text-[#666562] mb-3">Accès rapide</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          {ACTIONS.map((a) => (
+            <Link key={a.label} href={a.href}
+              className={`flex items-center gap-2.5 rounded-[16px] px-4 py-3.5 text-[13px] font-bold transition-all ${
+                a.primary
+                  ? 'bg-[#FF5C00] text-white hover:bg-[#E04B00]'
+                  : 'bg-white border border-black/5 text-[#333] hover:border-[#FF5C00]/40 hover:text-[#FF5C00]'
+              }`}>
+              <span className={a.primary ? 'text-white' : 'text-[#FF5C00]'}>{a.icon}</span>
+              {a.label}
+            </Link>
+          ))}
         </div>
-      )}
+      </div>
     </div>
   );
 }

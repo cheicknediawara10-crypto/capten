@@ -37,7 +37,6 @@ export const metadata: Metadata = {
   }
 };
 
-import { BroadcastProvider } from "@/context/BroadcastContext";
 import { AuthContextProvider } from "@/context/AuthContext";
 import AppLayoutWrapper from "@/components/layout/AppLayoutWrapper";
 
@@ -50,9 +49,7 @@ export default function RootLayout({
     <html lang="fr">
       <body className={`${barlow.variable} ${montserrat.variable} ${dmMono.variable} font-sans bg-[#F4F5F7]`}>
         <AuthContextProvider>
-          <BroadcastProvider>
-            <AppLayoutWrapper>{children}</AppLayoutWrapper>
-          </BroadcastProvider>
+          <AppLayoutWrapper>{children}</AppLayoutWrapper>
         </AuthContextProvider>
       </body>
     </html>
