@@ -2,13 +2,13 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { TrendingUp, MapPin, Heart } from "lucide-react";
+import { MapPinned, MapPin, Heart } from "lucide-react";
 
 const COLS = [
   {
-    icon: TrendingUp,
-    title: "10 % de commission Automatiquement",
-    description: "10 % de commission reversés à ton crew sur chaque conso payée chez vos partenaires.",
+    icon: MapPinned,
+    title: "Les Spots du Crew",
+    description: "Tes adresses préférées (cafés, shops, kinés) avec avantages exclusifs pour tes membres. Ton crew a son identité locale.",
   },
   {
     icon: MapPin,
@@ -35,7 +35,7 @@ export function Features() {
           className="text-[#1C1B18] leading-[1.12] text-center mb-14"
           style={{ fontSize: "30px", fontWeight: 1000, letterSpacing: "-1.2px" }}
         >
-          Automatise ton registre de présence, centralise les fiches d&apos;urgence de tes coureurs et pilote tes revenus.{" "}
+          Automatise ton registre de présence, centralise les fiches d&apos;urgence de tes coureurs et crée l&apos;identité locale de ton crew.{" "}
           Zéro friction : tes membres n&apos;ont rien à installer, tu gères tout depuis ton espace.
         </motion.p>
 

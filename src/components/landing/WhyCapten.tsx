@@ -11,7 +11,7 @@ const FEATURES = [
   "1 seul lien fixe partagé dans le groupe",
   "100 % Web (0 application à installer)",
   "Historique complet et archives des sorties",
-  "10 % de commission automatique Spots",
+  "Les Spots du Crew — Tes adresses, tes avantages",
 ];
 
 const SHADOW =
@@ -49,7 +49,7 @@ export function WhyCapten() {
             style={{ fontSize: "20px", fontWeight: 500, letterSpacing: "-0.4px" }}
           >
             CAPTEN s&apos;ajoute à ton groupe WhatsApp existant pour apporter la
-            sécurité, la géolocalisation et les revenus automatiques. Zéro
+            sécurité, la géolocalisation et l&apos;identité locale de ton crew. Zéro
             changement d&apos;habitude pour tes membres.
           </p>
         </motion.div>

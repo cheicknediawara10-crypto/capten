@@ -14,8 +14,8 @@ const ITEMS = [
     a: "À l'inscription, chaque membre renseigne son contact prioritaire et ses informations médicales en 30 secondes. Ces fiches sont accessibles en 1 clic depuis ton tableau de bord, même sans réseau.",
   },
   {
-    q: "Comment suivre l'argent généré par CAPTEN Spots ?",
-    a: "Chaque transaction chez un partenaire est enregistrée automatiquement. Tu visualises en temps réel la cagnotte générée pour ton club et tu peux demander un virement IBAN dès 50 € accumulés.",
+    q: "Comment fonctionnent Les Spots du Crew ?",
+    a: "Tu ajoutes les adresses préférées de ton crew (cafés, shops running, kinés) depuis ton tableau de bord. Tu peux négocier un avantage avec le gérant (à l'oral) et l'afficher sur la page de ton club. Tes membres montrent leur carte CAPTEN pour en bénéficier. Zéro paiement, zéro commission, zéro complication.",
   },
   {
     q: "Si un membre a un problème de réseau ou plus de batterie au RDV, ça bloque mon registre ?",

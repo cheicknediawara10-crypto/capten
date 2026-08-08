@@ -13,7 +13,7 @@ const rows = [
   "1 seul lien fixe partagé dans le groupe",
   "100 % Web (0 application à installer)",
   "Historique complet et archives des sorties",
-  "10 % de commission automatique Spots",
+  "Les Spots du Crew — Adresses & Avantages",
 ];
 
 export function Comparison() {

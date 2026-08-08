@@ -14,17 +14,16 @@ const FREE: { label: string; ok: boolean }[] = [
   { label: "Tableau de bord basique", ok: true },
   { label: "Check-in GPS", ok: false },
   { label: "WhatsApp automatisé", ok: false },
-  { label: "Capten Spots", ok: false },
+  { label: "Les Spots du Crew", ok: false },
 ];
 
 const PRO = [
   "Membres & sessions illimités",
   "Check-in GPS natif",
   "WhatsApp automatisé (200 msg/mois)",
-  "Fiches ICE + liste d'attente",
-  "Anti-fantôme automatique",
+  "Fiches ICE",
   "Registre légal horodaté (PDF/CSV)",
-  "Capten Spots (85 % → commerce)",
+  "Les Spots du Crew illimités",
   "Support prioritaire",
 ];
 

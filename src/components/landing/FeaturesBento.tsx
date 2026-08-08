@@ -45,8 +45,8 @@ const FEATURES = [
   },
   {
     icon: Zap,
-    title: "Revenus Spots",
-    description: "Monétise ta visibilité avec des spots pour marques locales et partenaires.",
+    title: "Les Spots du Crew",
+    description: "Référence tes adresses préférées et offre des avantages exclusifs à ton crew.",
     large: false,
     accent: false,
   },
