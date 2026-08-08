@@ -7,6 +7,7 @@ import { ProblemCards } from "@/components/landing/ProblemCards";
 import { HowItWorks } from "@/components/landing/HowItWorks";
 import { Features } from "@/components/landing/Features";
 import { WhyCapten } from "@/components/landing/WhyCapten";
+import { SpotsSection } from "@/components/landing/SpotsSection";
 import { Pricing } from "@/components/landing/Pricing";
 import { FAQ } from "@/components/landing/FAQ";
 import { Footer } from "@/components/landing/Footer";
@@ -21,6 +22,7 @@ export default function LandingPage() {
         <HowItWorks />
         <Features />
         <WhyCapten />
+        <SpotsSection />
         <Pricing />
         <FAQ />
       </main>
