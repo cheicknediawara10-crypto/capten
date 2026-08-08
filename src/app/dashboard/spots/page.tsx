@@ -4,14 +4,15 @@ import React, { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   MapPin, Plus, Pencil, Trash2, Loader2, ExternalLink,
-  Coffee, ShoppingBag, Activity, Zap, MoreHorizontal, X, Check,
+  MoreHorizontal, X, Check, ArrowUp, ArrowDown, Gift,
 } from "lucide-react";
 import { getSupabase } from "@/lib/supabase";
 import { useAuth } from "@/context/AuthContext";
+import { SPOT_CATEGORIES, getSpotCategory, type SpotCategorie } from "@/lib/spot-categories";
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
-type Categorie = "cafe" | "shop" | "kine" | "osteo" | "autre";
+type Categorie = SpotCategorie;
 
 interface CrewSpot {
   id: string;
@@ -28,15 +29,8 @@ interface CrewSpot {
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
-const CATEGORIES: { value: Categorie; label: string; emoji: string; icon: React.ReactNode }[] = [
-  { value: "cafe",  label: "Café / Bar",       emoji: "☕", icon: <Coffee size={14} /> },
-  { value: "shop",  label: "Shop Running",      emoji: "👟", icon: <ShoppingBag size={14} /> },
-  { value: "kine",  label: "Kiné / Physio",     emoji: "🦵", icon: <Activity size={14} /> },
-  { value: "osteo", label: "Ostéo / Récup",     emoji: "🤸", icon: <Zap size={14} /> },
-  { value: "autre", label: "Autre",             emoji: "📍", icon: <MapPin size={14} /> },
-];
-
-const getCat = (v: string) => CATEGORIES.find((c) => c.value === v) ?? CATEGORIES[4];
+const CATEGORIES = SPOT_CATEGORIES;
+const getCat = getSpotCategory;
 
 // ── Empty form ───────────────────────────────────────────────────────────────
 
@@ -134,8 +128,8 @@ function SpotModal({
                       : "bg-[#F4F4EE] border-transparent text-[#555] hover:bg-[#EAEADF]"
                   }`}
                 >
-                  <span className="text-lg">{c.emoji}</span>
-                  <span className="text-[9px] font-bold leading-tight">{c.label.split(" /")[0]}</span>
+                  <c.Icon size={18} strokeWidth={2} />
+                  <span className="text-[9px] font-bold leading-tight">{c.short}</span>
                 </button>
               ))}
             </div>
@@ -216,10 +210,18 @@ function SpotCard({
   spot,
   onEdit,
   onDelete,
+  onMoveUp,
+  onMoveDown,
+  isFirst,
+  isLast,
 }: {
   spot: CrewSpot;
   onEdit: () => void;
   onDelete: () => void;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
+  isFirst: boolean;
+  isLast: boolean;
 }) {
   const cat = getCat(spot.categorie);
   const [menu, setMenu] = useState(false);
@@ -255,6 +257,24 @@ function SpotCard({
                 <Pencil size={12} className="text-[#A3A3A3]" />
                 Modifier
               </button>
+              {!isFirst && (
+                <button
+                  onClick={() => { setMenu(false); onMoveUp(); }}
+                  className="w-full flex items-center gap-2.5 px-4 py-3 text-[12px] font-semibold text-[#333] hover:bg-[#F4F4EE] transition-colors"
+                >
+                  <ArrowUp size={12} className="text-[#A3A3A3]" />
+                  Monter
+                </button>
+              )}
+              {!isLast && (
+                <button
+                  onClick={() => { setMenu(false); onMoveDown(); }}
+                  className="w-full flex items-center gap-2.5 px-4 py-3 text-[12px] font-semibold text-[#333] hover:bg-[#F4F4EE] transition-colors"
+                >
+                  <ArrowDown size={12} className="text-[#A3A3A3]" />
+                  Descendre
+                </button>
+              )}
               <button
                 onClick={() => { setMenu(false); onDelete(); }}
                 className="w-full flex items-center gap-2.5 px-4 py-3 text-[12px] font-semibold text-red-500 hover:bg-red-50 transition-colors"
@@ -267,9 +287,9 @@ function SpotCard({
         </AnimatePresence>
       </div>
 
-      {/* Emoji catégorie */}
-      <div className="w-10 h-10 rounded-[14px] bg-[#F4F4EE] flex items-center justify-center text-xl mb-3">
-        {cat.emoji}
+      {/* Icône catégorie */}
+      <div className="w-10 h-10 rounded-[14px] bg-[#FF5C00]/[0.08] flex items-center justify-center mb-3">
+        <cat.Icon size={19} strokeWidth={2} className="text-[#FF5C00]" />
       </div>
 
       <h3 className="text-[15px] font-black uppercase tracking-tight text-black leading-tight mb-0.5">
@@ -295,8 +315,9 @@ function SpotCard({
 
       <div className="flex flex-wrap items-center gap-2 mt-3">
         {spot.avantage && (
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#FF5C00] text-white text-[11px] font-bold">
-            🎁 {spot.avantage}
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#FF5C00] text-white text-[11px] font-bold">
+            <Gift size={11} strokeWidth={2.4} />
+            {spot.avantage}
           </span>
         )}
         {spot.lien_maps && (
@@ -379,6 +400,25 @@ export default function CrewSpotsPage() {
     setSpots((s) => s.filter((x) => x.id !== id));
   }
 
+  async function handleMove(index: number, dir: -1 | 1) {
+    const target = index + dir;
+    if (target < 0 || target >= spots.length) return;
+
+    // Swap in local state for instant feedback
+    const reordered = [...spots];
+    [reordered[index], reordered[target]] = [reordered[target], reordered[index]];
+    setSpots(reordered);
+
+    // Persist new ordre for both affected rows
+    const supabase = getSupabase();
+    if (!supabase) return;
+    await Promise.all(
+      reordered.map((s, i) =>
+        supabase.from("crew_spots").update({ ordre: i }).eq("id", s.id)
+      )
+    );
+  }
+
   return (
     <div className="space-y-8 pb-20">
       {/* Header */}
@@ -402,7 +442,9 @@ export default function CrewSpotsPage() {
 
       {/* Banner info */}
       <div className="bg-[#F4F4EE] rounded-[20px] px-5 py-4 flex items-start gap-3">
-        <span className="text-2xl shrink-0">🗺️</span>
+        <span className="shrink-0 w-9 h-9 rounded-[12px] bg-white flex items-center justify-center">
+          <MapPin size={18} strokeWidth={2} className="text-[#FF5C00]" />
+        </span>
         <div>
           <p className="text-[13px] font-bold text-[#1A1918]">L'after-run, les soins, l'équipement</p>
           <p className="text-[12px] text-[#666562] mt-0.5 leading-snug">
@@ -423,7 +465,9 @@ export default function CrewSpotsPage() {
           animate={{ opacity: 1, y: 0 }}
           className="flex flex-col items-center gap-3 py-20 text-center"
         >
-          <span className="text-5xl">📍</span>
+          <span className="w-16 h-16 rounded-[20px] bg-[#FF5C00]/[0.08] flex items-center justify-center mb-1">
+            <MapPin size={30} strokeWidth={1.8} className="text-[#FF5C00]" />
+          </span>
           <p className="text-[15px] font-black uppercase tracking-tight text-black">
             Aucun spot encore
           </p>
@@ -441,12 +485,16 @@ export default function CrewSpotsPage() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <AnimatePresence>
-            {spots.map((spot) => (
+            {spots.map((spot, i) => (
               <SpotCard
                 key={spot.id}
                 spot={spot}
                 onEdit={() => setModal({ open: true, editing: spot })}
                 onDelete={() => handleDelete(spot.id)}
+                onMoveUp={() => handleMove(i, -1)}
+                onMoveDown={() => handleMove(i, 1)}
+                isFirst={i === 0}
+                isLast={i === spots.length - 1}
               />
             ))}
           </AnimatePresence>

@@ -5,16 +5,13 @@ import { useParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowRight, ChevronLeft, Shield, FileText, CheckCircle2,
-  Loader2, AlertCircle, Eye, EyeOff, MapPin, ExternalLink,
+  Loader2, AlertCircle, Eye, EyeOff, MapPin, ExternalLink, Gift,
 } from "lucide-react";
 import { registerMembre } from "@/app/mon-espace/actions";
+import { getSpotCategory } from "@/lib/spot-categories";
 
 type Step = "infos" | "pin" | "ice" | "waiver" | "success";
 const STEPS: Step[] = ["infos", "pin", "ice", "waiver", "success"];
-
-const CAT_EMOJI: Record<string, string> = {
-  cafe: "☕", shop: "👟", kine: "🦵", osteo: "🤸", autre: "📍",
-};
 
 interface CrewSpot {
   id: string; nom: string; categorie: string; adresse: string | null;
@@ -41,14 +38,19 @@ function SpotsSection({ spots, clubName }: { spots: CrewSpot[]; clubName: string
   if (spots.length === 0) return null;
   return (
     <div className="w-full max-w-sm mt-8 mb-4">
-      <p className="text-[11px] font-bold uppercase tracking-widest text-[#9CA3AF] mb-3 text-center">
-        🗺️ Les Spots du Crew
+      <p className="text-[11px] font-bold uppercase tracking-widest text-[#9CA3AF] mb-3 text-center flex items-center justify-center gap-1.5">
+        <MapPin size={12} className="text-[#FF5500]" />
+        Les Spots du Crew
       </p>
       <div className="space-y-2.5">
-        {spots.map((s) => (
+        {spots.map((s) => {
+          const cat = getSpotCategory(s.categorie);
+          return (
           <div key={s.id} className="bg-white rounded-2xl border border-[#E8E8E8] px-4 py-3.5">
             <div className="flex items-center gap-2.5">
-              <span className="text-lg shrink-0">{CAT_EMOJI[s.categorie] ?? "📍"}</span>
+              <span className="shrink-0 w-8 h-8 rounded-[10px] bg-[#FF5500]/[0.08] flex items-center justify-center">
+                <cat.Icon size={15} strokeWidth={2} className="text-[#FF5500]" />
+              </span>
               <div className="flex-1 min-w-0">
                 <p className="text-[13px] font-extrabold text-[#111111] leading-tight">{s.nom}</p>
                 {s.mot_du_fondateur && (
@@ -63,12 +65,14 @@ function SpotsSection({ spots, clubName }: { spots: CrewSpot[]; clubName: string
               )}
             </div>
             {s.avantage && (
-              <span className="inline-block mt-2 px-2.5 py-0.5 rounded-full bg-[#FF5500] text-white text-[10px] font-bold">
-                🎁 {s.avantage}
+              <span className="inline-flex items-center gap-1 mt-2 px-2.5 py-0.5 rounded-full bg-[#FF5500] text-white text-[10px] font-bold">
+                <Gift size={9} strokeWidth={2.4} />
+                {s.avantage}
               </span>
             )}
           </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

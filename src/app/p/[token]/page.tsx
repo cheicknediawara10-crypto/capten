@@ -3,9 +3,10 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { motion } from "framer-motion";
-import { Phone, MapPin, Shield, Star, Calendar, Loader2, AlertTriangle, ExternalLink } from "lucide-react";
+import { Phone, MapPin, Shield, Star, Calendar, Loader2, AlertTriangle, ExternalLink, Gift } from "lucide-react";
 import { getSupabase } from "@/lib/supabase";
 import { formatDateShort } from "@/lib/utils/format";
+import { getSpotCategory } from "@/lib/spot-categories";
 
 const BADGE_EMOJIS: Record<string, string> = {
   first_run: "🎽",
@@ -14,10 +15,6 @@ const BADGE_EMOJIS: Record<string, string> = {
   explorer: "🗺️",
   ambassador: "📣",
   early_member: "⭐",
-};
-
-const CAT_EMOJI: Record<string, string> = {
-  cafe: "☕", shop: "👟", kine: "🦵", osteo: "🤸", autre: "📍",
 };
 
 interface CrewSpot {
@@ -340,10 +337,14 @@ export default function MemberMicroPage() {
               Recommandés par ton crew
             </p>
             <div className="space-y-3">
-              {spots.map((s) => (
+              {spots.map((s) => {
+                const cat = getSpotCategory(s.categorie);
+                return (
                 <div key={s.id} className="bg-white rounded-[20px] border border-black/5 px-4 py-3.5">
                   <div className="flex items-start gap-2.5">
-                    <span className="text-xl shrink-0 mt-0.5">{CAT_EMOJI[s.categorie] ?? "📍"}</span>
+                    <span className="shrink-0 w-9 h-9 rounded-[12px] bg-[#FF5500]/[0.08] flex items-center justify-center">
+                      <cat.Icon size={16} strokeWidth={2} className="text-[#FF5500]" />
+                    </span>
                     <div className="flex-1 min-w-0">
                       <p className="text-[14px] font-black uppercase tracking-tight text-black leading-tight">
                         {s.nom}
@@ -358,8 +359,9 @@ export default function MemberMicroPage() {
                         </p>
                       )}
                       {s.avantage && (
-                        <span className="inline-block mt-2 px-2.5 py-0.5 rounded-full bg-[#FF5500] text-white text-[10px] font-bold">
-                          🎁 {s.avantage}
+                        <span className="inline-flex items-center gap-1 mt-2 px-2.5 py-0.5 rounded-full bg-[#FF5500] text-white text-[10px] font-bold">
+                          <Gift size={9} strokeWidth={2.4} />
+                          {s.avantage}
                         </span>
                       )}
                     </div>
@@ -375,7 +377,8 @@ export default function MemberMicroPage() {
                     )}
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
           </motion.div>
         )}

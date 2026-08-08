@@ -5,13 +5,15 @@ CREATE TABLE IF NOT EXISTS crew_spots (
   id           UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
   club_id      UUID         NOT NULL REFERENCES clubs(id) ON DELETE CASCADE,
   nom          TEXT         NOT NULL,
-  categorie    TEXT         NOT NULL DEFAULT 'autre',
+  categorie    TEXT         NOT NULL DEFAULT 'autre'
+                 CHECK (categorie IN ('cafe','shop','kine','osteo','autre')),
   adresse      TEXT,
   lien_maps    TEXT,
   mot_du_fondateur TEXT,
   avantage     TEXT,        -- texte libre ex: "-10% sur présentation Capten" — pas de calcul
-  ordre        INT          DEFAULT 0,
-  created_at   TIMESTAMPTZ  NOT NULL DEFAULT now()
+  ordre        INT          NOT NULL DEFAULT 0,
+  created_at   TIMESTAMPTZ  NOT NULL DEFAULT now(),
+  UNIQUE (club_id, nom)
 );
 
 CREATE INDEX IF NOT EXISTS idx_crew_spots_club ON crew_spots(club_id);
