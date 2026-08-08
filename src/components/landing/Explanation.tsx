@@ -2,122 +2,105 @@
 
 import React from "react";
 import { Container } from "./Container";
-import { Button } from "./Button";
-import { MapPin, HeartPulse, Percent, MessageCircle } from "lucide-react";
 import { motion } from "framer-motion";
+import { MapPin, HeartPulse, Percent } from "lucide-react";
+
+const features = [
+  {
+    icon: MapPin,
+    tag: "Check-in GPS",
+    title: "Présence validée sur le lieu, en 2 secondes.",
+    desc: "Sur le lieu de rendez-vous, chaque membre scanne et sa présence est enregistrée instantanément. Registre horodaté, certifié, téléchargeable. Tes membres n'ont rien à installer.",
+    stat: "2s",
+    statLabel: "pour émarger",
+    img: "/assets/running_action.png",
+    reverse: false,
+  },
+  {
+    icon: HeartPulse,
+    tag: "Fiche d'urgence",
+    title: "Chaque coureur a une fiche médicale accessible en 1 clic.",
+    desc: "Contact ICE, groupe sanguin, allergies, traitement. Renseignée par le membre en 30 secondes depuis son téléphone. Consultable uniquement par le Capitaine en session active.",
+    stat: "30s",
+    statLabel: "pour créer la fiche",
+    img: "/assets/runners_trail.png",
+    reverse: true,
+  },
+  {
+    icon: Percent,
+    tag: "Spots — Revenus automatiques",
+    title: "10 % de commission sur chaque conso de tes membres.",
+    desc: "Tes membres consomment chez les partenaires Spots. 10 % reviennent automatiquement à la cagnotte de ton club. Zéro démarche, zéro facturation manuelle.",
+    stat: "10%",
+    statLabel: "reversés au club",
+    img: "/assets/runners_social.png",
+    reverse: false,
+  },
+];
 
 export function Explanation() {
-  const bentoCards = [
-    {
-      icon: MapPin,
-      bgColor: "bg-[#FDF6F0]",
-      accentColor: "text-[#FF5500]",
-      badge: "Check-in GPS",
-      title: "Check-in GPS",
-      desc: "Saisie immédiate au point de RDV sans téléchargement.",
-      img: "/assets/running_action.png"
-    },
-    {
-      icon: HeartPulse,
-      bgColor: "bg-[#F4F3ED]",
-      accentColor: "text-[#1A1918]",
-      badge: "Fiche Santé",
-      title: "Fiche Santé",
-      desc: "Renseignée en 30 sec par le membre. Accessible en 1 clic en cas de pépin.",
-      img: "/assets/runners_trail.png"
-    },
-    {
-      icon: Percent,
-      bgColor: "bg-[#FFF8F4]",
-      accentColor: "text-[#FF5500]",
-      badge: "Cagnotte",
-      title: "10% de commissions. Automatiquement.",
-      desc: "10% sur la conso de tes membres reversés direct à la cagnotte du club.",
-      img: "/assets/runners_social.png"
-    },
-    {
-      icon: MessageCircle,
-      bgColor: "bg-[#F4F3ED]",
-      accentColor: "text-[#1A1918]",
-      badge: "WhatsApp",
-      title: "Fini le chaos WhatsApp.",
-      desc: "Un seul lien pour toutes tes sorties. Plus de sondages sans fin ni messages perdus.",
-      img: "/assets/hero_runners.png"
-    }
-  ];
-
   return (
-    <section className="py-16 md:py-24">
-      <Container className="max-w-6xl mx-auto space-y-20">
-        
-        {/* Statement Paragraph (Centered) */}
-        <div className="max-w-4xl mx-auto text-center border-t border-black/5 pt-12">
-          <p className="text-xl sm:text-3xl font-extrabold text-[#1A1918] leading-[1.25] tracking-tight">
-            Automatise ton registre de présence, centralise les fiches d’urgence de tes coureurs et pilote tes revenus. Zéro friction : tes membres n’ont rien à installer, tu gères tout depuis ton espace.
-          </p>
+    <section id="features" className="py-24 md:py-32 bg-[#0C0C0A]">
+      <Container className="max-w-6xl mx-auto">
+
+        {/* Section header */}
+        <div className="mb-20">
+          <div className="flex items-center gap-3 mb-5">
+            <span className="w-6 h-px bg-[#FF5500]" />
+            <span className="text-[11px] font-bold tracking-[0.2em] uppercase text-[#FF5500]">Fonctionnalités</span>
+          </div>
+          <h2 className="font-extrabold text-4xl sm:text-5xl lg:text-6xl text-white leading-[1.0] tracking-tight max-w-2xl">
+            Tout ce dont ton crew a besoin.{" "}
+            <span className="text-white/25">Rien de plus.</span>
+          </h2>
         </div>
 
-        {/* Comment ça marche - Split Bento Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          
-          {/* Left Column (Sticky Text & CTA) */}
-          <div className="lg:col-span-5 space-y-6 text-left">
-            <div className="inline-block text-[11px] font-extrabold uppercase tracking-widest text-[#1A1918] bg-[#E1E3D3] px-3.5 py-1.5 rounded-full border border-black/5">
-              COMMENT ÇA MARCHE
-            </div>
-
-            <h2 className="font-extrabold text-3xl sm:text-5xl text-[#1A1918] leading-[1.12] tracking-tight">
-              La sérénité d’un club pro. La liberté d’un crew informel.
-            </h2>
-
-            <p className="text-sm sm:text-base text-[#666562] font-medium leading-relaxed">
-              Des milliers de sorties, des milliers de membres gérés. Tout est centralisé au même endroit, sans imposer la moindre application à ta communauté.
-            </p>
-
-            <div className="pt-4">
-              <Button href="/login?mode=signup" variant="dark" size="md">
-                Lancer mon crew →
-              </Button>
-            </div>
-          </div>
-
-          {/* Right Column (2x2 Bento Cards Grid) */}
-          <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-5">
-            {bentoCards.map((card, idx) => (
-              <motion.div
-                key={idx}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: idx * 0.1 }}
-                className="bg-[#EFEFE8] rounded-[24px] p-6 space-y-4 border border-black/5 flex flex-col justify-between hover:shadow-md transition-shadow duration-200"
-              >
-                {/* Thumbnail / Image Card */}
-                <div className="h-32 w-full rounded-2xl overflow-hidden relative bg-white border border-black/5 shadow-inner">
-                  <img
-                    src={card.img}
-                    alt={card.title}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute top-3 left-3 bg-white/95 backdrop-blur px-2.5 py-1 rounded-lg border border-black/5 text-[11px] font-extrabold text-[#1A1918] flex items-center gap-1.5 shadow-sm">
-                    <card.icon className={`w-3.5 h-3.5 ${card.accentColor}`} />
-                    <span>{card.title}</span>
-                  </div>
+        {/* Alternating feature rows */}
+        <div className="space-y-24">
+          {features.map((f, idx) => (
+            <motion.div
+              key={idx}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className={`grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center`}
+            >
+              {/* Text side */}
+              <div className={`space-y-6 ${f.reverse ? "lg:order-last" : ""}`}>
+                <span className="inline-flex items-center gap-2 text-[11px] font-extrabold uppercase tracking-widest text-[#FF5500] bg-[#FF5500]/8 px-3 py-1.5 rounded-full border border-[#FF5500]/15">
+                  <f.icon className="w-3.5 h-3.5" />
+                  {f.tag}
+                </span>
+                <h3 className="font-extrabold text-2xl sm:text-3xl text-white leading-[1.2] tracking-tight">
+                  {f.title}
+                </h3>
+                <p className="text-white/40 text-base leading-relaxed font-medium">
+                  {f.desc}
+                </p>
+                {/* Stat pill */}
+                <div className="inline-flex items-baseline gap-2 bg-[#111110] border border-white/8 px-6 py-3 rounded-xl">
+                  <span className="text-3xl font-extrabold text-[#FF5500]">{f.stat}</span>
+                  <span className="text-sm text-white/40 font-medium">{f.statLabel}</span>
                 </div>
+              </div>
 
-                {/* Card Content */}
-                <div className="space-y-1.5 text-left">
-                  <h3 className="font-extrabold text-base text-[#1A1918] tracking-tight">
-                    {card.title}
-                  </h3>
-                  <p className="text-xs text-[#666562] font-medium leading-relaxed">
-                    {card.desc}
-                  </p>
+              {/* Photo side */}
+              <div className={`relative rounded-3xl overflow-hidden aspect-[4/3] ${f.reverse ? "lg:order-first" : ""}`}>
+                <img
+                  src={f.img}
+                  alt={f.tag}
+                  className="w-full h-full object-cover opacity-80"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0C0C0A]/70 via-[#0C0C0A]/10 to-transparent" />
+                {/* Tag overlay */}
+                <div className="absolute top-4 left-4 bg-[#0C0C0A]/80 backdrop-blur-sm border border-white/10 px-3 py-1.5 rounded-lg text-[11px] font-extrabold text-white flex items-center gap-1.5">
+                  <f.icon className="w-3.5 h-3.5 text-[#FF5500]" />
+                  {f.tag}
                 </div>
-              </motion.div>
-            ))}
-          </div>
-
+              </div>
+            </motion.div>
+          ))}
         </div>
 
       </Container>

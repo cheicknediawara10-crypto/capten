@@ -2,55 +2,71 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { Container } from "./Container";
-import { Smartphone, MapPin, FileCheck } from "lucide-react";
+import { TrendingUp, MapPin, Heart } from "lucide-react";
+
+const COLS = [
+  {
+    icon: TrendingUp,
+    title: "10 % de commission Automatiquement",
+    description: "10 % de commission reversés à ton crew sur chaque conso payée chez vos partenaires.",
+  },
+  {
+    icon: MapPin,
+    title: "Check-in GPS instantané",
+    description: "Valide les présences réelles au point de rendez-vous et mesure l'engagement de ton crew sortie après sortie.",
+  },
+  {
+    icon: Heart,
+    title: "Fiche Santé",
+    description: "Chaque membre renseigne son contact prioritaire et ses infos médicales en 30 secondes.",
+  },
+];
 
 export function Features() {
-  const featuresList = [
-    {
-      icon: Smartphone,
-      title: "100% Web, 0 app requise",
-      desc: "Tes membres n'ont rien à télécharger. Ils s'inscrivent et scannent leur présence en 2 secondes."
-    },
-    {
-      icon: MapPin,
-      title: "Check-in GPS instantané",
-      desc: "Sur le lieu de rendez-vous, l'inscription est validée instantanément. Mesure la réelle présence."
-    },
-    {
-      icon: FileCheck,
-      title: "Registre horodaté d'urgence",
-      desc: "Conserve l'historique officiel de chaque sortie avec l'ensemble des présences en cas de contrôle ou d'incident."
-    }
-  ];
-
   return (
-    <section id="features" className="py-12 md:py-16">
-      <Container className="max-w-5xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-          {featuresList.map((f, idx) => (
+    <section className="py-16 px-5 bg-white">
+      <div className="max-w-[1100px] mx-auto">
+        {/* Statement */}
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="text-[#1C1B18] leading-[1.12] text-center mb-14"
+          style={{ fontSize: "30px", fontWeight: 1000, letterSpacing: "-1.2px" }}
+        >
+          Automatise ton registre de présence, centralise les fiches d&apos;urgence de tes coureurs et pilote tes revenus.{" "}
+          Zéro friction : tes membres n&apos;ont rien à installer, tu gères tout depuis ton espace.
+        </motion.p>
+
+        {/* 3 columns */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-10 sm:gap-16">
+          {COLS.map((col, i) => (
             <motion.div
-              key={idx}
-              initial={{ opacity: 0, y: 20 }}
+              key={col.title}
+              initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: idx * 0.1 }}
-              className="space-y-4 p-6 rounded-[24px]"
+              transition={{ duration: 0.4, delay: i * 0.07 }}
+              className="text-center"
             >
-              {/* Dark Square Icon Pill */}
-              <div className="w-10 h-10 mx-auto rounded-xl bg-[#1A1918] text-white flex items-center justify-center shadow-sm">
-                <f.icon className="w-5 h-5 stroke-[2]" />
-              </div>
-              <h3 className="font-extrabold text-base sm:text-lg text-[#1A1918] tracking-tight leading-snug">
-                {f.title}
+              <h3
+                className="flex items-start justify-center gap-1.5 text-[#1C1B18] leading-snug mb-3"
+                style={{ fontSize: "24px", fontWeight: 1000, letterSpacing: "-0.96px" }}
+              >
+                <col.icon className="w-5 h-5 text-[#FF5500] shrink-0" strokeWidth={2} />
+                {col.title}
               </h3>
-              <p className="text-xs sm:text-sm text-[#666562] font-medium leading-relaxed">
-                {f.desc}
+              <p
+                className="text-[#6B6A6A] leading-snug"
+                style={{ fontSize: "18px", fontWeight: 500 }}
+              >
+                {col.description}
               </p>
             </motion.div>
           ))}
         </div>
-      </Container>
+      </div>
     </section>
   );
 }

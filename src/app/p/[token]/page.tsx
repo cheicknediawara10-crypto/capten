@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { motion } from "framer-motion";
-import { Phone, MapPin, Shield, Star, Calendar, Loader2, AlertTriangle } from "lucide-react";
+import { Phone, MapPin, Shield, Star, Calendar, Loader2, AlertTriangle, ExternalLink } from "lucide-react";
 import { getSupabase } from "@/lib/supabase";
 import { formatDateShort } from "@/lib/utils/format";
 
@@ -15,6 +15,15 @@ const BADGE_EMOJIS: Record<string, string> = {
   ambassador: "📣",
   early_member: "⭐",
 };
+
+const CAT_EMOJI: Record<string, string> = {
+  cafe: "☕", shop: "👟", kine: "🦵", osteo: "🤸", autre: "📍",
+};
+
+interface CrewSpot {
+  id: string; nom: string; categorie: string; adresse: string | null;
+  lien_maps: string | null; mot_du_fondateur: string | null; avantage: string | null;
+}
 
 interface MemberData {
   profile: {
@@ -31,16 +40,17 @@ interface MemberData {
     relationship: string | null;
   } | null;
   badges: { slug: string; name: string; awarded_at: string }[];
-  clubs: { name: string; logo_url: string | null }[];
+  clubs: { id: string; name: string; logo_url: string | null; slug: string | null }[];
   upcomingEvents: { id: string; title: string; event_date: string; meeting_point_address: string | null }[];
   checkinCount: number;
+  spots: CrewSpot[];
 }
 
 export default function MemberMicroPage() {
   const { token } = useParams<{ token: string }>();
   const [data, setData] = useState<MemberData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"card" | "ice" | "events">("card");
+  const [activeTab, setActiveTab] = useState<"card" | "ice" | "events" | "spots">("card");
 
   useEffect(() => {
     async function load() {
@@ -68,22 +78,32 @@ export default function MemberMicroPage() {
         supabase.from("profiles").select("id, full_name, phone, avatar_url, city, created_at").eq("id", profileId).single(),
         supabase.from("ice_contacts").select("contact_name, contact_phone, relationship").eq("profile_id", profileId).single(),
         supabase.from("member_badges").select("awarded_at, badges(slug, name)").eq("member_id", profileId),
-        supabase.from("club_members").select("clubs(name, logo_url)").eq("profile_id", profileId),
+        supabase.from("club_members").select("clubs(id, name, logo_url, slug)").eq("profile_id", profileId),
         supabase.from("checkins").select("*", { count: "exact", head: true }).eq("member_id", profileId).eq("is_validated", true),
       ]);
 
-      // Fetch upcoming events for this member's clubs
+      // Fetch upcoming events + spots for this member's clubs
       const clubIds = (memberships || []).map((m: any) => m.clubs?.id).filter(Boolean);
-      const { data: upcomingEvents } = clubIds.length > 0
-        ? await supabase
-            .from("events")
-            .select("id, title, event_date, meeting_point_address")
-            .in("club_id", clubIds)
-            .eq("status", "published")
-            .gte("event_date", new Date().toISOString())
-            .order("event_date")
-            .limit(5)
-        : { data: [] };
+      const [{ data: upcomingEvents }, { data: spotsData }] = await Promise.all([
+        clubIds.length > 0
+          ? supabase
+              .from("events")
+              .select("id, title, event_date, meeting_point_address")
+              .in("club_id", clubIds)
+              .eq("status", "published")
+              .gte("event_date", new Date().toISOString())
+              .order("event_date")
+              .limit(5)
+          : Promise.resolve({ data: [] }),
+        clubIds.length > 0
+          ? supabase
+              .from("crew_spots")
+              .select("id, nom, categorie, adresse, lien_maps, mot_du_fondateur, avantage")
+              .in("club_id", clubIds)
+              .order("ordre")
+              .limit(6)
+          : Promise.resolve({ data: [] }),
+      ]);
 
       if (!profileRaw) { setLoading(false); return; }
 
@@ -96,11 +116,14 @@ export default function MemberMicroPage() {
           awarded_at: b.awarded_at,
         })),
         clubs: (memberships || []).map((m: any) => ({
+          id: m.clubs?.id,
           name: m.clubs?.name,
           logo_url: m.clubs?.logo_url,
+          slug: m.clubs?.slug ?? null,
         })).filter((c: any) => c.name),
         upcomingEvents: upcomingEvents || [],
         checkinCount: checkinCount || 0,
+        spots: (spotsData as CrewSpot[]) || [],
       });
       setLoading(false);
     }
@@ -125,7 +148,7 @@ export default function MemberMicroPage() {
     );
   }
 
-  const { profile, ice, badges, clubs, upcomingEvents, checkinCount } = data;
+  const { profile, ice, badges, clubs, upcomingEvents, checkinCount, spots } = data;
 
   const initials = (profile.full_name || "?")
     .split(" ")
@@ -182,16 +205,17 @@ export default function MemberMicroPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-black/10 bg-white sticky top-0 z-10">
+      <div className="flex border-b border-black/10 bg-white sticky top-0 z-10 overflow-x-auto">
         {[
           { key: "card" as const, label: "Profil", icon: <Star size={13} /> },
           { key: "ice" as const, label: "ICE", icon: <Shield size={13} /> },
           { key: "events" as const, label: "Agenda", icon: <Calendar size={13} /> },
+          ...(spots.length > 0 ? [{ key: "spots" as const, label: "Spots", icon: <MapPin size={13} /> }] : []),
         ].map((tab) => (
           <button
             key={tab.key}
-            onClick={() => setActiveTab(tab.key)}
-            className={`flex-1 flex items-center justify-center gap-1.5 py-3 text-[11px] font-black uppercase tracking-widest transition-all ${
+            onClick={() => setActiveTab(tab.key as typeof activeTab)}
+            className={`flex-1 flex items-center justify-center gap-1.5 py-3 text-[11px] font-black uppercase tracking-widest transition-all whitespace-nowrap px-3 ${
               activeTab === tab.key
                 ? "text-[#FF5500] border-b-2 border-[#FF5500]"
                 : "text-[#A3A3A3] hover:text-black"
@@ -305,6 +329,53 @@ export default function MemberMicroPage() {
                   ))}
                 </div>
               )}
+            </div>
+          </motion.div>
+        )}
+
+        {/* SPOTS DU CREW */}
+        {activeTab === "spots" && (
+          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
+            <p className="text-[10px] font-black uppercase tracking-widest text-[#A3A3A3] mb-3">
+              Recommandés par ton crew
+            </p>
+            <div className="space-y-3">
+              {spots.map((s) => (
+                <div key={s.id} className="bg-white rounded-[20px] border border-black/5 px-4 py-3.5">
+                  <div className="flex items-start gap-2.5">
+                    <span className="text-xl shrink-0 mt-0.5">{CAT_EMOJI[s.categorie] ?? "📍"}</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[14px] font-black uppercase tracking-tight text-black leading-tight">
+                        {s.nom}
+                      </p>
+                      {s.mot_du_fondateur && (
+                        <p className="text-[11px] text-[#666562] italic mt-0.5">« {s.mot_du_fondateur} »</p>
+                      )}
+                      {s.adresse && (
+                        <p className="text-[11px] text-[#A3A3A3] flex items-center gap-1 mt-1">
+                          <MapPin size={9} />
+                          {s.adresse}
+                        </p>
+                      )}
+                      {s.avantage && (
+                        <span className="inline-block mt-2 px-2.5 py-0.5 rounded-full bg-[#FF5500] text-white text-[10px] font-bold">
+                          🎁 {s.avantage}
+                        </span>
+                      )}
+                    </div>
+                    {s.lien_maps && (
+                      <a
+                        href={s.lien_maps}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="shrink-0 w-8 h-8 rounded-full bg-[#F4F4EE] flex items-center justify-center hover:bg-[#FF5500] hover:text-white text-[#A3A3A3] transition-colors"
+                      >
+                        <ExternalLink size={13} />
+                      </a>
+                    )}
+                  </div>
+                </div>
+              ))}
             </div>
           </motion.div>
         )}

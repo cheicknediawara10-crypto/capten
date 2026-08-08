@@ -2,104 +2,87 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Zap, Menu, X } from "lucide-react";
-import { Button } from "./Button";
-import { Container } from "./Container";
+import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+
+const NAV_LINKS = [
+  { label: "Fonctionnalités", href: "#features" },
+  { label: "Tarifs",          href: "#tarifs" },
+];
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 15);
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    const fn = () => setScrolled(window.scrollY > 8);
+    window.addEventListener("scroll", fn, { passive: true });
+    return () => window.removeEventListener("scroll", fn);
   }, []);
 
-  const navLinks = [
-    { label: "Fonctionnalités", href: "#features" },
-    { label: "Sécurité", href: "#impact" },
-    { label: "Spots", href: "#features" },
-    { label: "Tarifs", href: "#comparison" }
-  ];
-
   return (
-    <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled
-          ? "bg-[#F4F4EE]/90 backdrop-blur-md py-3.5 border-b border-black/5 shadow-sm"
-          : "bg-transparent py-5"
-      }`}
-    >
-      <Container className="max-w-[1200px] flex items-center justify-between">
-        
+    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-200 ${
+      scrolled ? "bg-white shadow-[0_1px_0_0_#E8E8E8]" : "bg-white/0"
+    }`}>
+      <div className="max-w-6xl mx-auto px-6 h-[60px] flex items-center justify-between">
+
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 group">
-          <img
-            src="/logo.png"
-            alt="CAPTEN"
-            className="h-8 w-auto object-contain group-hover:scale-105 transition-transform duration-200"
-          />
+        <Link href="/" className="shrink-0 flex items-center">
+          <img src="/logo.png" alt="CAPTEN" className="h-6 w-auto" />
         </Link>
 
-        {/* Desktop Navigation Links */}
-        <nav className="hidden md:flex items-center gap-8 text-xs font-bold text-[#666562]">
-          {navLinks.map((link, idx) => (
-            <a
-              key={idx}
-              href={link.href}
-              className="hover:text-[#1A1918] transition-colors duration-200"
-            >
-              {link.label}
+        {/* Desktop nav */}
+        <nav className="hidden md:flex items-center gap-8">
+          {NAV_LINKS.map((l) => (
+            <a key={l.href} href={l.href}
+              className="text-[13px] font-medium text-[#374151] hover:text-[#111111] transition-colors">
+              {l.label}
             </a>
           ))}
         </nav>
 
-        {/* Desktop CTA Button */}
-        <div className="hidden sm:flex items-center gap-4">
-          <Button href="/login?mode=signup" variant="primary" size="sm">
-            LANCER UN RUN +
-          </Button>
+        {/* Desktop CTA */}
+        <div className="hidden md:flex items-center gap-3">
+          <a href="/mon-espace"
+            className="text-[13px] font-medium text-[#6B7280] hover:text-[#111111] transition-colors">
+            Espace membre
+          </a>
+          <a href="/login?mode=signup"
+            className="inline-flex items-center h-9 px-4 rounded-xl bg-[#FF5500] text-white text-[13px] font-semibold hover:bg-[#E04B00] transition-colors">
+            Lancer mon crew
+          </a>
         </div>
 
-        {/* Mobile Hamburger Button */}
-        <button
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="sm:hidden p-2 text-[#1A1918] focus:outline-none cursor-pointer rounded-lg hover:bg-black/5"
-          aria-label="Toggle Menu"
-        >
-          {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+        {/* Mobile burger */}
+        <button onClick={() => setOpen((o) => !o)} className="md:hidden p-2 -mr-2 text-[#111111]">
+          {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </button>
+      </div>
 
-      </Container>
-
-      {/* Mobile Animated Dropdown Menu */}
+      {/* Mobile menu */}
       <AnimatePresence>
-        {mobileMenuOpen && (
+        {open && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.2 }}
-            className="sm:hidden bg-[#F4F4EE] border-b border-black/5 px-6 py-6 space-y-4 shadow-xl"
+            className="md:hidden bg-white border-t border-[#E8E8E8] px-6 py-5 space-y-4 overflow-hidden"
           >
-            <nav className="flex flex-col gap-4 text-sm font-bold text-[#666562]">
-              {navLinks.map((link, idx) => (
-                <a
-                  key={idx}
-                  href={link.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="hover:text-[#1A1918] py-1 border-b border-black/5"
-                >
-                  {link.label}
-                </a>
-              ))}
-            </nav>
-            <div className="pt-2">
-              <Button href="/login?mode=signup" variant="primary" size="md" fullWidth>
-                LANCER UN RUN +
-              </Button>
+            {NAV_LINKS.map((l) => (
+              <a key={l.href} href={l.href} onClick={() => setOpen(false)}
+                className="block text-sm font-medium text-[#374151] hover:text-[#111111] py-0.5">
+                {l.label}
+              </a>
+            ))}
+            <div className="pt-2 space-y-2">
+              <a href="/mon-espace"
+                className="block text-sm font-medium text-[#6B7280]">
+                Espace membre
+              </a>
+              <a href="/login?mode=signup"
+                className="inline-flex items-center justify-center w-full h-10 rounded-xl bg-[#FF5500] text-white text-sm font-semibold hover:bg-[#E04B00] transition-colors">
+                Lancer mon crew
+              </a>
             </div>
           </motion.div>
         )}

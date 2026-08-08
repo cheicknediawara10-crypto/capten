@@ -2,9 +2,9 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
-import { 
-  MessageSquare, Zap, Smartphone, CheckCircle2, Clock, X, Check, 
-  Copy, Search, Sliders, ArrowRight, Share2, Sparkles, HelpCircle, Lock
+import {
+  MessageSquare, Zap, Smartphone, CheckCircle2, Clock, X, Check,
+  Copy, Search, Sliders, ArrowRight, Share2, Sparkles, HelpCircle, Lock, MapPin,
 } from 'lucide-react';
 import { getSupabase } from '@/lib/supabase';
 import { useAuth } from '@/context/AuthContext';
@@ -440,14 +440,22 @@ const TemplateCard = React.memo(({ template, parsedPreview, categoryLabel, onSel
 TemplateCard.displayName = "TemplateCard";
 
 // --- SUBCOMPONENT: MOCK VARIABLE SIMULATOR ---
+interface CrewSpotOption {
+  id: string;
+  nom: string;
+  adresse: string | null;
+  avantage: string | null;
+}
+
 interface SimulatorPanelProps {
   simulator: any;
   onChange: (key: string, value: string) => void;
   onReset: () => void;
   selectedTemplate: any;
+  crewSpots: CrewSpotOption[];
 }
 
-const SimulatorPanel = React.memo(({ simulator, onChange, onReset, selectedTemplate }: SimulatorPanelProps) => {
+const SimulatorPanel = React.memo(({ simulator, onChange, onReset, selectedTemplate, crewSpots }: SimulatorPanelProps) => {
   const hasSpot = selectedTemplate && (
     selectedTemplate.templateText.includes("{{spot_name}}") ||
     selectedTemplate.templateText.includes("{{spot_address}}") ||
@@ -485,6 +493,33 @@ const SimulatorPanel = React.memo(({ simulator, onChange, onReset, selectedTempl
       <div className="space-y-4 text-xs">
         {hasSpot && (
           <>
+            {crewSpots.length > 0 && (
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-mono font-black uppercase text-neutral-500 tracking-wider flex items-center gap-1.5">
+                  <MapPin className="w-3 h-3 text-[#FF5C00]" />
+                  <span>Choisir un spot du crew</span>
+                </label>
+                <select
+                  value=""
+                  onChange={(e) => {
+                    const s = crewSpots.find((x) => x.id === e.target.value);
+                    if (!s) return;
+                    onChange("spot_name", s.nom);
+                    onChange("spot_address", s.adresse || "");
+                    if (s.avantage) onChange("spot_message", s.avantage);
+                  }}
+                  className="w-full bg-[#FFF0E8] border border-[#FF5C00]/20 rounded-xl px-3.5 py-2.5 text-black focus:outline-none focus:border-[#FF5C00] transition-colors focus-visible:ring-1 focus-visible:ring-[#FF5C00] font-medium"
+                >
+                  <option value="">— Pré-remplir depuis mes spots —</option>
+                  {crewSpots.map((s) => (
+                    <option key={s.id} value={s.id}>{s.nom}</option>
+                  ))}
+                </select>
+                <p className="text-[10px] text-neutral-400 leading-snug">
+                  Remplit automatiquement à partir de la page « Les Spots ».
+                </p>
+              </div>
+            )}
             <div className="space-y-1.5">
               <label className="text-[10px] font-mono font-black uppercase text-neutral-500 tracking-wider flex justify-between items-center">
                 <span>Nom du Spot</span>
@@ -990,6 +1025,19 @@ export default function MessagesPage() {
   const [runsList, setRunsList] = useState<any[]>([]);
   const [selectedRunId, setSelectedRunId] = useState<string>("");
   const [weatherText, setWeatherText] = useState("🌤️ 17°C, grand soleil");
+
+  // Crew spots (for pre-filling {{spot_*}} in after-run templates)
+  const [crewSpots, setCrewSpots] = useState<CrewSpotOption[]>([]);
+  useEffect(() => {
+    const supabase = getSupabase();
+    if (!supabase || !club?.id) return;
+    supabase
+      .from("crew_spots")
+      .select("id, nom, adresse, avantage")
+      .eq("club_id", club.id)
+      .order("ordre")
+      .then(({ data }) => setCrewSpots((data as CrewSpotOption[]) || []));
+  }, [club?.id]);
 
   const selectedRun = useMemo(() => {
     return runsList.find(r => r.id === selectedRunId) || null;
@@ -1683,11 +1731,12 @@ export default function MessagesPage() {
         {/* RIGHT COLUMN: VARIABLES LAB */}
         {showRightPanel && (
           <div className="xl:col-span-4">
-            <SimulatorPanel 
-              simulator={simulator} 
+            <SimulatorPanel
+              simulator={simulator}
               onChange={handleSimulatorChange}
               onReset={handleResetSimulator}
               selectedTemplate={selectedTemplate}
+              crewSpots={crewSpots}
             />
           </div>
         )}

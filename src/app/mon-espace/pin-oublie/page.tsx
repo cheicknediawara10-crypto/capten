@@ -1,16 +1,36 @@
 "use client";
 
-import React from "react";
+import React, { useState, useTransition } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
-import { ArrowLeft, MessageCircle, ShieldAlert, CheckCircle2 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Mail, ArrowLeft, AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
+import { requestPinReset } from "@/app/mon-espace/actions";
 
 export default function PinOubliePage() {
+  const [email, setEmail]   = useState("");
+  const [sent, setSent]     = useState(false);
+  const [error, setError]   = useState("");
+  const [isPending, start]  = useTransition();
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setError("");
+    const clean = email.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(clean)) {
+      setError("Adresse e-mail invalide.");
+      return;
+    }
+    start(async () => {
+      const res = await requestPinReset(clean);
+      if ("error" in res) { setError(res.error); return; }
+      setSent(true);
+    });
+  }
+
   return (
     <div className="min-h-screen bg-[#FAFAF8] flex flex-col items-center justify-center px-5 py-12">
       <div className="w-full max-w-sm">
 
-        {/* Logo */}
         <div className="flex justify-center mb-10">
           <Link href="/">
             <img src="/logo.png" alt="CAPTEN" className="h-8 w-auto" />
@@ -23,44 +43,83 @@ export default function PinOubliePage() {
           transition={{ type: "spring", stiffness: 80, damping: 20 }}
           className="bg-white rounded-3xl border border-[#E8E8E8] p-8 shadow-[0_4px_24px_rgba(0,0,0,0.06)]"
         >
-          <div className="w-12 h-12 rounded-2xl bg-[#FFF1EB] flex items-center justify-center mb-5 text-[#FF5500]">
-            <ShieldAlert className="w-6 h-6" />
-          </div>
+          <AnimatePresence mode="wait">
+            {!sent ? (
+              <motion.div key="form" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                <div className="mb-7">
+                  <h1 className="text-2xl font-extrabold text-[#111111] tracking-tight mb-1">
+                    Code PIN oublié
+                  </h1>
+                  <p className="text-sm text-[#6B7280]">
+                    Saisis l&apos;adresse e-mail utilisée lors de ton inscription. Tu recevras un lien magique valable 15 minutes.
+                  </p>
+                </div>
 
-          <h1 className="text-2xl font-extrabold text-[#111111] tracking-tight mb-2">
-            Code PIN oublié ?
-          </h1>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div>
+                    <label className="text-[11px] font-bold uppercase tracking-wider text-[#9CA3AF] block mb-1.5">
+                      Adresse e-mail
+                    </label>
+                    <div className="relative">
+                      <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9CA3AF]" />
+                      <input
+                        type="email"
+                        autoComplete="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="ahmed@exemple.fr"
+                        className="capten-input pl-10"
+                        required
+                      />
+                    </div>
+                  </div>
 
-          <p className="text-sm text-[#6B7280] leading-relaxed mb-6">
-            Par mesure de sécurité pour tes données de santé (fiche ICE) et pour éviter les frais SMS, la réinitialisation passe par l’organisateur de ton club.
-          </p>
+                  <AnimatePresence>
+                    {error && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -4 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0 }}
+                        className="flex items-start gap-2 bg-red-50 border border-red-100 rounded-xl p-3"
+                      >
+                        <AlertCircle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
+                        <p className="text-xs text-red-600 font-medium">{error}</p>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
 
-          <div className="space-y-3 bg-[#F9FAFB] border border-[#E5E7EB] rounded-2xl p-4 mb-6 text-xs text-[#4B5563]">
-            <div className="flex items-start gap-2.5">
-              <CheckCircle2 className="w-4 h-4 text-[#22C55E] shrink-0 mt-0.5" />
-              <span>Contacte l'organisateur de ton Run Club sur WhatsApp ou Instagram.</span>
-            </div>
-            <div className="flex items-start gap-2.5">
-              <CheckCircle2 className="w-4 h-4 text-[#22C55E] shrink-0 mt-0.5" />
-              <span>Il générera un PIN temporaire en 1 clic depuis son tableau de bord.</span>
-            </div>
-            <div className="flex items-start gap-2.5">
-              <CheckCircle2 className="w-4 h-4 text-[#22C55E] shrink-0 mt-0.5" />
-              <span>Connecte-toi avec ce PIN pour définir ton nouveau code secret.</span>
-            </div>
-          </div>
-
-          <div className="space-y-2.5">
-            <a
-              href="https://wa.me/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full h-12 bg-[#25D366] hover:bg-[#20BD5A] text-white font-bold text-sm rounded-xl flex items-center justify-center gap-2 transition-colors"
-            >
-              <MessageCircle className="w-4 h-4 fill-white" />
-              Contacter l'organisateur sur WhatsApp
-            </a>
-          </div>
+                  <button
+                    type="submit"
+                    disabled={isPending}
+                    className="w-full h-12 bg-[#FF5500] hover:bg-[#E04B00] disabled:opacity-60 text-white font-bold text-sm rounded-xl flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                  >
+                    {isPending
+                      ? <Loader2 className="w-4 h-4 animate-spin" />
+                      : "Recevoir le lien magique"
+                    }
+                  </button>
+                </form>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="success"
+                initial={{ opacity: 0, scale: 0.96 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="text-center py-4"
+              >
+                <div className="w-14 h-14 rounded-2xl bg-[#DCFCE7] flex items-center justify-center mx-auto mb-4">
+                  <CheckCircle2 className="w-7 h-7 text-[#22C55E]" />
+                </div>
+                <h2 className="text-lg font-extrabold text-[#111111] mb-2">E-mail envoyé !</h2>
+                <p className="text-sm text-[#6B7280] leading-relaxed">
+                  Si cette adresse correspond à un compte membre, tu vas recevoir un e-mail avec un lien valable <strong>15 minutes</strong>.
+                </p>
+                <p className="text-xs text-[#9CA3AF] mt-3">
+                  Pense à vérifier tes spams.
+                </p>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </motion.div>
 
         <div className="mt-5 text-center">

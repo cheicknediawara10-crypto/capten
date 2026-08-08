@@ -1,7 +1,23 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
+// Cookie name must match src/lib/membre-session.ts
+const MEMBRE_COOKIE = 'capten_membre'
+
 export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl
+
+  // ── Protection espace membre (fast-path: cookie presence only) ───────────
+  // Full HMAC signature verification is done in requireMembreSession() inside
+  // the Server Component — middleware only blocks obviously unauthenticated requests.
+  if (pathname.startsWith('/mon-espace/profil') || pathname.startsWith('/mon-espace/decharge')) {
+    const token = request.cookies.get(MEMBRE_COOKIE)?.value
+    if (!token) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/mon-espace'
+      return NextResponse.redirect(url)
+    }
+  }
   let response = NextResponse.next({
     request: {
       headers: request.headers,
@@ -57,8 +73,6 @@ export async function middleware(request: NextRequest) {
       isLoggedIn = true
     }
   }
-
-  const { pathname } = request.nextUrl
 
   const protectedPaths = [
     '/dashboard',

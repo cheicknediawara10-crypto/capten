@@ -4,104 +4,96 @@ import React from "react";
 import { motion } from "framer-motion";
 import { Container } from "./Container";
 import { Button } from "./Button";
-import { Zap, Check, X } from "lucide-react";
+import { Check, X } from "lucide-react";
+
+const rows = [
+  "Fiche d'urgence accessible en 1 clic",
+  "Registre horodaté automatique par GPS",
+  "Rappels automatiques avant chaque départ",
+  "1 seul lien fixe partagé dans le groupe",
+  "100 % Web (0 application à installer)",
+  "Historique complet et archives des sorties",
+  "10 % de commission automatique Spots",
+];
 
 export function Comparison() {
-  const comparisonRows = [
-    "Fiche d'urgence accessible en 1 clic",
-    "Registre horodaté automatique par GPS",
-    "Rappels automatiques avant chaque départ",
-    "1 seul lien fixe partagé dans le groupe",
-    "100 % Web (0 application à installer)",
-    "Historique complet et archives des sorties",
-    "10 % de commission automatique Spots"
-  ];
-
   return (
-    <section id="comparison" className="py-20 md:py-28">
+    <section id="comparison" className="py-20 md:py-28 bg-[#111110]">
       <Container className="max-w-5xl mx-auto">
-        
-        <div className="space-y-10">
-          
-          {/* Header */}
-          <div className="text-center space-y-3 max-w-2xl mx-auto">
-            <h2 className="font-extrabold text-3xl sm:text-5xl text-[#25261D] tracking-tight">
-              Pourquoi CAPTEN
-            </h2>
-            <p className="text-xs sm:text-sm text-[#6B6A6A] font-medium leading-relaxed">
-              CAPTEN s'ajoute à ton groupe WhatsApp existant pour apporter la sécurité, la géolocalisation et des revenus automatiques. Zéro changement d'habitude pour tes membres.
-            </p>
-          </div>
 
-          {/* 3 Columns Comparison Table (Left: Feature, Middle: CAPTEN Floating Dark Card, Right: Ton Dimanche Soir) */}
-          <div className="relative pt-4">
-            
-            {/* Background Table Rows */}
-            <div className="space-y-3">
-              <div className="grid grid-cols-12 pb-3 border-b border-black/10 text-xs font-bold text-[#6B6A6A] uppercase tracking-wider">
-                <div className="col-span-8 sm:col-span-9">Fonctionnalités</div>
-                <div className="col-span-4 sm:col-span-3 text-right pr-4">Ton dimanche soir</div>
-              </div>
-
-              {comparisonRows.map((rowText, rIdx) => (
-                <div
-                  key={rIdx}
-                  className="grid grid-cols-12 bg-[#25261D]/5 p-3.5 sm:p-4 rounded-[12px] items-center text-xs sm:text-sm font-medium text-[#25261D]"
-                >
-                  <div className="col-span-8 sm:col-span-9 pr-4">{rowText}</div>
-                  <div className="col-span-4 sm:col-span-3 text-right pr-4 text-neutral-400 font-bold">
-                    <X className="w-4 h-4 inline-block text-neutral-400" />
-                  </div>
-                </div>
-              ))}
+        {/* Header */}
+        <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-16">
+          <div>
+            <div className="flex items-center gap-3 mb-5">
+              <span className="w-6 h-px bg-[#FF5500]" />
+              <span className="text-[11px] font-bold tracking-[0.2em] uppercase text-[#FF5500]">Pourquoi CAPTEN</span>
             </div>
-
-            {/* CENTRAL FLOATING DARK CARD (#25261D) */}
-            <motion.div
-              initial={{ opacity: 0, y: 25 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              animate={{ y: [0, -5, 0] }}
-              transition={{
-                duration: 0.5,
-                y: { repeat: Infinity, duration: 5, ease: "easeInOut" }
-              }}
-              className="w-full md:w-[300px] lg:w-[330px] md:absolute md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 mt-6 md:mt-0 bg-[#25261D] text-white rounded-[24px] p-6 sm:p-8 space-y-6 shadow-[0_30px_70px_rgba(0,0,0,0.55)] border border-white/10 z-20"
-            >
-              {/* Header Logo */}
-              <div className="flex items-center gap-2 pb-3 border-b border-white/10">
-                <img
-                  src="/logo.png"
-                  alt="CAPTEN"
-                  className="h-5 w-auto object-contain brightness-0 invert"
-                />
-              </div>
-
-              {/* 7 Checkmark Items */}
-              <div className="space-y-3 text-xs font-medium text-neutral-200">
-                {comparisonRows.map((_, cIdx) => (
-                  <div key={cIdx} className="flex items-center gap-2.5">
-                    <div className="w-4 h-4 rounded-full bg-white/20 text-white flex items-center justify-center shrink-0 text-[10px] font-bold">
-                      <Check className="w-3 h-3" />
-                    </div>
-                    <span className="truncate">{comparisonRows[cIdx]}</span>
-                  </div>
-                ))}
-              </div>
-
-              {/* Action Button inside Floating Card */}
-              <div className="pt-2">
-                <Button href="/login?mode=signup" variant="secondary" size="md" fullWidth>
-                  Lancer mon crew
-                </Button>
-              </div>
-
-            </motion.div>
-
+            <h2 className="font-extrabold text-4xl sm:text-5xl text-white leading-[1.0] tracking-tight">
+              Avant vs après.<br />
+              <span className="text-white/25">La différence en un tableau.</span>
+            </h2>
           </div>
-
+          <p className="text-white/35 text-sm font-medium max-w-xs leading-relaxed">
+            CAPTEN s'ajoute à ton groupe WhatsApp existant. Zéro changement d'habitude.
+          </p>
         </div>
 
+        {/* Table */}
+        <div className="relative">
+          {/* Header row */}
+          <div className="grid grid-cols-12 pb-3 border-b border-white/8 text-[11px] font-bold text-white/25 uppercase tracking-widest mb-2">
+            <div className="col-span-7">Fonctionnalité</div>
+            <div className="col-span-3 text-center">CAPTEN</div>
+            <div className="col-span-2 text-right">Sans CAPTEN</div>
+          </div>
+
+          {/* Data rows */}
+          <div className="space-y-1.5">
+            {rows.map((row, idx) => (
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, x: -10 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.3, delay: idx * 0.05 }}
+                className="grid grid-cols-12 bg-[#0C0C0A] border border-white/5 rounded-xl px-5 py-3.5 items-center hover:border-white/10 transition-colors"
+              >
+                <div className="col-span-7 text-sm font-medium text-white/70">{row}</div>
+                <div className="col-span-3 flex justify-center">
+                  <div className="w-6 h-6 rounded-full bg-[#FF5500]/20 flex items-center justify-center">
+                    <Check className="w-3.5 h-3.5 text-[#FF5500]" />
+                  </div>
+                </div>
+                <div className="col-span-2 flex justify-end pr-2">
+                  <X className="w-4 h-4 text-white/20" />
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Floating CTA card */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="mt-8 bg-[#0C0C0A] border border-[#FF5500]/20 rounded-2xl p-8 flex flex-col sm:flex-row items-center justify-between gap-6"
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 rounded-xl bg-[#FF5500]/15 flex items-center justify-center shrink-0">
+                <img src="/logo.png" alt="CAPTEN" className="h-5 w-auto brightness-0 invert" />
+              </div>
+              <div>
+                <div className="font-extrabold text-white text-sm">CAPTEN PRO — 14 jours gratuits</div>
+                <div className="text-white/35 text-xs font-medium mt-0.5">Sans carte bancaire · Résiliable à tout moment</div>
+              </div>
+            </div>
+            <Button href="/login?mode=signup" variant="primary" size="md">
+              Lancer mon crew →
+            </Button>
+          </motion.div>
+
+        </div>
       </Container>
     </section>
   );

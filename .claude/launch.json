@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "capten-next",
+      "runtimeExecutable": "/Users/cd/.gemini/antigravity/scratch/node-v22.15.0-darwin-arm64/bin/node",
+      "runtimeArgs": ["./node_modules/.bin/next", "dev", "-p", "3001"],
+      "port": 3001
+    }
+  ]
+}

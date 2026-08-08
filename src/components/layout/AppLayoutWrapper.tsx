@@ -33,6 +33,8 @@ export default function AppLayoutWrapper({ children }: AppLayoutWrapperProps) {
     cleanPath.startsWith("/securite/signaler") ||
     cleanPath.startsWith("/cagnotte/contribuer") ||
     cleanPath.startsWith("/cagnotte/sponsor") ||
+    // Espace membre (auth PIN — système séparé de l'auth organisateur)
+    cleanPath.startsWith("/mon-espace") ||
     // Nouvelles pages membres publiques (specs Phase D)
     cleanPath.startsWith("/join/") ||
     cleanPath.startsWith("/event/") ||

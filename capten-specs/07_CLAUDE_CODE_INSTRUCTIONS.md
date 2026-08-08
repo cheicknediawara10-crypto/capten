@@ -8,7 +8,7 @@
 
 ## 🎯 MISSION
 
-Tu es un **Principal Full-Stack Engineer et Product Designer**. Ta mission est de construire la **V1 stricte** du SaaS CAPTEN — landing page, authentification, dashboard organisateur avec Copilote IA, carte membre digitale, CAPTEN Spots et système de facturation.
+Tu es un **Principal Full-Stack Engineer et Product Designer**. Ta mission est de construire la **V1 stricte** du SaaS CAPTEN — landing page, authentification, dashboard organisateur avec Copilote IA, carte membre digitale, Les Spots du Crew et système de facturation.
 
 Tu as **toute la liberté** pour améliorer et optimiser la landing page et les interfaces si tu identifies des opportunités de rendre le produit encore plus fluide, moderne et esthétique.
 
@@ -87,8 +87,9 @@ Interdictions : Bootstrap, Material UI, Chakra UI, Prisma, Drizzle, Express, Fas
 
 ### Phase A : Fondations
 - Initialisation Next.js 15 + TailwindCSS + Supabase
-- Tables V1 : profiles (avec colonne pin_hash et date_of_birth), clubs, club_members, events, event_registrations, checkins, ice_contacts, waivers, spots, spot_transactions, subscriptions, withdrawal_requests
+- Tables V1 : profiles (avec colonne pin_hash et date_of_birth), clubs, club_members, events, event_registrations, checkins, ice_contacts, waivers, crew_spots, subscriptions
 - PAS de tables badges, member_badges, member_tokens
+- PAS de tables spot_transactions, withdrawal_requests (aucune gestion financière des Spots)
 - Auth Supabase email/password (organisateurs uniquement)
 - Membres : PAS de Supabase Auth, identification par Nom + Date de naissance + PIN 4 chiffres (hash côté serveur)
 - Middleware pour protéger /dashboard/*
@@ -100,8 +101,8 @@ Interdictions : Bootstrap, Material UI, Chakra UI, Prisma, Drizzle, Express, Fas
 
 ### Phase C : Dashboard Organisateur
 - Layout sidebar sombre (#1D1D1D) + topbar
-- Hub du Crew : 4 StatCards (Membres, Fidélité %, Protection ICE, Cagnotte euros) + prochain run + live activity + Copilote IA
-- Copilote IA : Widget qui suggère des actions contextuelles basées sur les données du club (ex: "3 membres sans fiche ICE", "Pas de run planifié cette semaine", "Cagnotte à 200 euros, planifier un retrait")
+- Hub du Crew : 4 StatCards (Membres, Fidélité %, Protection ICE, Spots du Crew) + prochain run + live activity + Copilote IA
+- Copilote IA : Widget qui suggère des actions contextuelles basées sur les données du club (ex: "3 membres sans fiche ICE", "Pas de run planifié cette semaine", "Ajoute le café où ton crew se retrouve après le run")
 - Gestion du Club : formulaire édition, upload logo, lien public
 - Gestion des Sorties : CRUD complet, carte Leaflet, QR code, lien partage, vue live check-ins Realtime, export registre PDF/CSV
 - Gestion des Membres : tableau, recherche, filtres, détail avec profil + historique + fiche ICE (appel 1 clic) + décharge
@@ -133,7 +134,7 @@ Interdictions : Bootstrap, Material UI, Chakra UI, Prisma, Drizzle, Express, Fas
 - Webhooks pour gérer paiements
 - Table subscriptions (club_id, stripe_customer_id, plan, status, current_period_end)
 - Hard Paywall au Aha Moment : après le 1er run réussi, bloquer le 2ème événement du mois, bloquer le 21ème membre, désactiver GPS en Découverte
-- Gestion IBAN et retraits cagnotte : formulaire IBAN, bouton retrait (minimum 50 euros), table withdrawal_requests
+- PAS de gestion IBAN, PAS de retraits, PAS de cagnotte : les Spots du Crew sont du pur affichage d'informations
 
 ### Phase F : Polish
 - Responsive mobile/tablette/desktop
@@ -156,7 +157,7 @@ Interdictions : Bootstrap, Material UI, Chakra UI, Prisma, Drizzle, Express, Fas
 8. Le registre horodaté est un document légal. Exportable PDF/CSV.
 9. Supabase Realtime obligatoire pour les check-ins en direct.
 10. Hard Paywall au Aha Moment. L'organisateur teste gratuitement, fait son premier run, voit les résultats, puis upgrade Captain Pro.
-11. Commission Spots : 85% commerce / 10% club / 5% CAPTEN. Pas d'autre split.
+11. Les Spots du Crew : ZÉRO gestion financière. Pas de transaction, pas de commission, pas de QR de caisse, pas d'IBAN. L'avantage membre est un texte libre saisi par le fondateur et appliqué à l'oral par le commerçant — CAPTEN n'encaisse ni ne reverse jamais d'argent.
 
 ---
 
@@ -173,7 +174,6 @@ Interdictions : Bootstrap, Material UI, Chakra UI, Prisma, Drizzle, Express, Fas
 - Membres illimités
 - Check-in GPS + QR
 - Export PDF/CSV du registre
-- CAPTEN Spots illimités
 - Copilote IA
 - Support prioritaire
 
@@ -186,11 +186,12 @@ Interdictions : Bootstrap, Material UI, Chakra UI, Prisma, Drizzle, Express, Fas
 6. Message : Ton premier run était un succès. Pour continuer : Captain Pro 29 euros/mois
 7. Stripe Checkout puis Upgrade
 
-### CAPTEN Spots : Split des Revenus
-Quand un membre consomme 100 euros chez un Spot partenaire :
-- 85 euros reste au commerce (pas touché par CAPTEN)
-- 10 euros vers la cagnotte du club (retirable par IBAN)
-- 5 euros vers la commission CAPTEN (revenu plateforme)
+### Les Spots du Crew : Zéro Flux Financier
+Les Spots du Crew ne génèrent AUCUN revenu et ne déplacent AUCUN argent.
+- Le fondateur liste les adresses recommandées par son crew (café d'après-run, shop running, kiné, ostéo…).
+- Chaque spot peut afficher un avantage membre optionnel (ex: "-10% sur présentation de la carte"), négocié à l'oral entre le fondateur et le commerçant.
+- CAPTEN se contente d'afficher l'information : pas de transaction, pas de commission, pas de QR de caisse, pas de cagnotte, pas d'IBAN.
+- Disponible gratuitement et sans limite sur tous les plans (Découverte et Captain Pro).
 
 ---
 
@@ -207,8 +208,7 @@ Quand un membre consomme 100 euros chez un Spot partenaire :
 - Registre horodaté avec export CSV/PDF Captain Pro uniquement
 - Fiches ICE avec appel en 1 clic
 - Décharge numérique avec hash SHA256
-- CAPTEN Spots avec split 85/10/5
-- Demande de retrait IBAN
+- Les Spots du Crew : affichage d'adresses recommandées + avantages membres, ZÉRO gestion financière
 - Statistiques avec graphiques Recharts
 - Page membre accessible via Nom + Prénom + Date de naissance SANS badges
 - Supabase Realtime sur les check-ins
