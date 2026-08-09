@@ -501,11 +501,11 @@ LEFT JOIN spot_transactions st ON c.id = st.club_id AND st.status = 'paid_out'
 GROUP BY c.id, c.name;
 
 INSERT INTO badges (slug, name, description, emoji, category, threshold) VALUES
-('first_run', 'Premier Run', 'A participé à son premier événement avec succès.', '🥉', 'participation', 1),
-('regular_runner', 'Régulier', 'A participé à 10 événements.', '🔥', 'participation', 10),
-('legend', 'Légende', 'A participé à 100 événements.', '🏆', 'participation', 100),
-('explorer', 'Explorateur', 'A participé dans 5 lieux différents.', '🌍', 'discovery', 5),
-('ambassador', 'Ambassadeur', 'A parrainé 5 nouveaux membres.', '🤝', 'community', 5),
+('first_run', 'Premier Run', 'Premier evenement complete avec succes.', '🥉', 'participation', 1),
+('regular_runner', 'Regulier', 'A participe a 10 evenements.', '🔥', 'participation', 10),
+('legend', 'Legende', 'A participe a 100 evenements.', '🏆', 'participation', 100),
+('explorer', 'Explorateur', 'A participe dans 5 lieux differents.', '🌍', 'discovery', 5),
+('ambassador', 'Ambassadeur', 'A parraine 5 nouveaux membres.', '🤝', 'community', 5),
 ('early_member', 'Early Member', 'A rejoint le club dans son premier mois.', '⭐', 'loyalty', 1)
 ON CONFLICT (slug) DO NOTHING;
 
