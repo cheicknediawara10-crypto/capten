@@ -36,11 +36,11 @@ export default function StatsPage() {
         { data: eventsData },
         { data: checkinsData },
       ] = await Promise.all([
-        supabase.from("club_members").select("*", { count: "exact", head: true }).eq("club_id", club.id),
+        supabase.from("membre_club").select("*", { count: "exact", head: true }).eq("club_id", club.id).eq("is_active", true),
         supabase.from("events").select("*", { count: "exact", head: true }).eq("club_id", club.id),
-        supabase.from("checkins").select("*, events!inner(club_id)", { count: "exact", head: true }).eq("events.club_id", club.id).eq("is_validated", true),
+        supabase.from("membre_checkins").select("*, events!inner(club_id)", { count: "exact", head: true }).eq("events.club_id", club.id).eq("is_valid", true),
         supabase.from("events").select("event_date, status").eq("club_id", club.id).order("event_date"),
-        supabase.from("checkins").select("created_at, events!inner(club_id)").eq("events.club_id", club.id).eq("is_validated", true),
+        supabase.from("membre_checkins").select("checked_in_at, events!inner(club_id)").eq("events.club_id", club.id).eq("is_valid", true),
       ]);
 
       setKpis({
@@ -59,7 +59,7 @@ export default function StatsPage() {
         const monthStr = d.toISOString().slice(0, 7);
 
         const evs = (eventsData || []).filter((e: any) => e.event_date?.startsWith(monthStr)).length;
-        const chks = (checkinsData || []).filter((c: any) => c.created_at?.startsWith(monthStr)).length;
+        const chks = (checkinsData || []).filter((c: any) => c.checked_in_at?.startsWith(monthStr)).length;
 
         months.push({ month: label, checkins: chks, members: 0, events: evs });
       }

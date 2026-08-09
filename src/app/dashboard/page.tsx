@@ -39,12 +39,12 @@ export default function DashboardPage() {
       if (!supabase || !club || isMock) { setLoading(false); return; }
 
       const [
-        { count: members },
+        { data: membreRows },
         { data: clubRow },
         { data: events },
         { count: sessions },
       ] = await Promise.all([
-        supabase.from('club_members').select('*', { count: 'exact', head: true }).eq('club_id', club.id).eq('is_active', true),
+        supabase.from('membre_club').select('membre_id').eq('club_id', club.id).eq('is_active', true),
         supabase.from('clubs').select('slug').eq('id', club.id).single(),
         supabase.from('events').select('id, title, event_date, meeting_point_address')
           .eq('club_id', club.id).eq('status', 'published')
@@ -52,17 +52,16 @@ export default function DashboardPage() {
         supabase.from('events').select('*', { count: 'exact', head: true }).eq('club_id', club.id),
       ]);
 
-      setMemberCount(members || 0);
+      const membreIds = (membreRows || []).map((m: any) => m.membre_id).filter(Boolean);
+      setMemberCount(membreIds.length);
       setSlug((clubRow as any)?.slug ?? null);
       setUpcoming((events as UpcomingEvent[]) || []);
       setSessionCount(sessions || 0);
 
-      // Check-ins validés sur les sorties du crew
-      const { data: evIds } = await supabase.from('events').select('id').eq('club_id', club.id);
-      const ids = (evIds || []).map((e: any) => e.id);
-      if (ids.length) {
-        const { count: ci } = await supabase.from('checkins')
-          .select('*', { count: 'exact', head: true }).in('event_id', ids).eq('is_valid', true);
+      // Check-ins validés des membres du crew
+      if (membreIds.length) {
+        const { count: ci } = await supabase.from('membre_checkins')
+          .select('*', { count: 'exact', head: true }).in('membre_id', membreIds).eq('is_valid', true);
         setCheckinCount(ci || 0);
       }
       setLoading(false);

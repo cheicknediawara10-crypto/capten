@@ -3,28 +3,32 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Search, Users, Phone, Shield, FileCheck, ChevronRight, Filter } from "lucide-react";
+import { Search, Phone, Shield, FileCheck, ChevronRight } from "lucide-react";
 import { getSupabase } from "@/lib/supabase";
 import { useAuth } from "@/context/AuthContext";
 
-interface Member {
+interface MembreProfile {
   id: string;
-  profile_id: string;
-  role: string;
+  first_name: string | null;
+  last_name: string | null;
+  phone: string | null;
+  email: string | null;
+}
+
+interface Member {
+  id: string;          // membre_club id
+  membre_id: string;   // membre_profiles id
   joined_at: string;
-  profiles: {
-    id: string;
-    full_name: string | null;
-    phone: string | null;
-    avatar_url: string | null;
-    city: string | null;
-  } | null;
+  membre_profiles: MembreProfile | null;
   _checkins?: number;
   _has_ice?: boolean;
   _has_waiver?: boolean;
 }
 
-type Filter = "all" | "has_ice" | "no_ice" | "has_waiver" | "no_waiver";
+type Filter = "all" | "has_ice" | "no_ice" | "no_waiver";
+
+const fullName = (p: MembreProfile | null) =>
+  [p?.first_name, p?.last_name].filter(Boolean).join(" ").trim();
 
 export default function MembersPage() {
   const { club } = useAuth();
@@ -39,34 +43,34 @@ export default function MembersPage() {
       if (!supabase || !club) { setLoading(false); return; }
 
       const { data } = await supabase
-        .from("club_members")
-        .select("*, profiles(id, full_name, phone, avatar_url, city)")
+        .from("membre_club")
+        .select("id, membre_id, joined_at, membre_profiles(id, first_name, last_name, phone, email)")
         .eq("club_id", club.id)
+        .eq("is_active", true)
         .order("joined_at", { ascending: false });
 
       if (!data) { setLoading(false); return; }
 
-      // Fetch ICE and waiver status for each member
-      const profileIds = data.map((m: Member) => m.profiles?.id).filter(Boolean);
+      const ids = (data as any[]).map((m) => m.membre_id).filter(Boolean);
       const [{ data: iceData }, { data: waiverData }, { data: checkinData }] = await Promise.all([
-        supabase.from("ice_contacts").select("profile_id").in("profile_id", profileIds),
-        supabase.from("waivers").select("profile_id").eq("club_id", club.id).in("profile_id", profileIds),
-        supabase.from("checkins").select("member_id").in("member_id", profileIds),
+        supabase.from("membre_ice").select("membre_id").in("membre_id", ids),
+        supabase.from("membre_waivers").select("membre_id").eq("club_id", club.id).in("membre_id", ids),
+        supabase.from("membre_checkins").select("membre_id").in("membre_id", ids).eq("is_valid", true),
       ]);
 
-      const iceSet = new Set((iceData || []).map((i: any) => i.profile_id));
-      const waiverSet = new Set((waiverData || []).map((w: any) => w.profile_id));
+      const iceSet = new Set((iceData || []).map((i: any) => i.membre_id));
+      const waiverSet = new Set((waiverData || []).map((w: any) => w.membre_id));
       const checkinCounts: Record<string, number> = {};
       for (const c of (checkinData || [])) {
-        checkinCounts[c.member_id] = (checkinCounts[c.member_id] || 0) + 1;
+        checkinCounts[c.membre_id] = (checkinCounts[c.membre_id] || 0) + 1;
       }
 
-      const enriched = data.map((m: Member) => ({
+      const enriched = (data as any[]).map((m) => ({
         ...m,
-        _has_ice: iceSet.has(m.profiles?.id),
-        _has_waiver: waiverSet.has(m.profiles?.id),
-        _checkins: checkinCounts[m.profiles?.id || ""] || 0,
-      }));
+        _has_ice: iceSet.has(m.membre_id),
+        _has_waiver: waiverSet.has(m.membre_id),
+        _checkins: checkinCounts[m.membre_id] || 0,
+      })) as Member[];
 
       setMembers(enriched);
       setLoading(false);
@@ -75,13 +79,12 @@ export default function MembersPage() {
   }, [club]);
 
   const filtered = members.filter((m) => {
-    const name = (m.profiles?.full_name || "").toLowerCase();
-    const phone = (m.profiles?.phone || "").toLowerCase();
+    const name = fullName(m.membre_profiles).toLowerCase();
+    const phone = (m.membre_profiles?.phone || "").toLowerCase();
     const q = search.toLowerCase();
     if (q && !name.includes(q) && !phone.includes(q)) return false;
     if (filter === "has_ice" && !m._has_ice) return false;
     if (filter === "no_ice" && m._has_ice) return false;
-    if (filter === "has_waiver" && !m._has_waiver) return false;
     if (filter === "no_waiver" && m._has_waiver) return false;
     return true;
   });
@@ -102,7 +105,7 @@ export default function MembersPage() {
             Les Membres
           </h1>
           <p className="text-[13px] text-[#A3A3A3] font-sans mt-1">
-            {members.length} membre{members.length > 1 ? "s" : ""} dans le club
+            {members.length} membre{members.length > 1 ? "s" : ""} dans ton crew
           </p>
         </div>
       </div>
@@ -139,11 +142,11 @@ export default function MembersPage() {
         {[
           { label: "Sans ICE", value: members.filter(m => !m._has_ice).length, color: "#EF4444" },
           { label: "Sans décharge", value: members.filter(m => !m._has_waiver).length, color: "#F59E0B" },
-          { label: "Membres actifs", value: members.filter(m => (m._checkins || 0) > 0).length, color: "#22C55E" },
+          { label: "Ont couru", value: members.filter(m => (m._checkins || 0) > 0).length, color: "#22C55E" },
         ].map((stat) => (
           <div key={stat.label} className="bg-white rounded-[20px] border border-black/5 p-4 text-center">
             <p className="text-[28px] font-display font-black italic leading-none" style={{ color: stat.color }}>
-              {stat.value}
+              {loading ? "—" : stat.value}
             </p>
             <p className="text-[10px] text-[#A3A3A3] uppercase tracking-wider mt-1">{stat.label}</p>
           </div>
@@ -164,19 +167,21 @@ export default function MembersPage() {
           className="flex flex-col items-center py-16 text-center"
         >
           <div className="text-4xl mb-3">🫂</div>
-          <p className="text-[15px] font-black uppercase text-black">Aucun membre trouvé</p>
-          <p className="text-[12px] text-[#A3A3A3] mt-1">Essaie un autre filtre ou terme de recherche.</p>
+          <p className="text-[15px] font-black uppercase text-black">
+            {members.length === 0 ? "Aucun membre encore" : "Aucun membre trouvé"}
+          </p>
+          <p className="text-[12px] text-[#A3A3A3] mt-1">
+            {members.length === 0
+              ? "Partage ton lien d'inscription pour que ton crew rejoigne."
+              : "Essaie un autre filtre ou terme de recherche."}
+          </p>
         </motion.div>
       ) : (
         <div className="bg-white rounded-[24px] border border-black/5 overflow-hidden">
           <div className="divide-y divide-black/5">
             {filtered.map((member, i) => {
-              const initials = (member.profiles?.full_name || "?")
-                .split(" ")
-                .map((n) => n[0])
-                .join("")
-                .toUpperCase()
-                .slice(0, 2);
+              const name = fullName(member.membre_profiles) || "Membre sans nom";
+              const initials = name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
               return (
                 <motion.div
                   key={member.id}
@@ -185,27 +190,21 @@ export default function MembersPage() {
                   transition={{ delay: i * 0.03 }}
                 >
                   <Link
-                    href={`/dashboard/members/${member.profiles?.id}`}
+                    href={`/dashboard/members/${member.membre_id}`}
                     className="flex items-center gap-4 p-4 hover:bg-[#FAFAFA] transition-colors group"
                   >
                     <div className="w-10 h-10 rounded-full bg-[#FF5500]/10 flex items-center justify-center shrink-0 font-black text-[12px] text-[#FF5500]">
-                      {member.profiles?.avatar_url ? (
-                        <img src={member.profiles.avatar_url} alt="" className="w-10 h-10 rounded-full object-cover" />
-                      ) : initials}
+                      {initials || "?"}
                     </div>
 
                     <div className="flex-1 min-w-0">
-                      <p className="text-[14px] font-semibold text-black truncate">
-                        {member.profiles?.full_name || "Membre sans nom"}
-                      </p>
+                      <p className="text-[14px] font-semibold text-black truncate">{name}</p>
                       <p className="text-[11px] text-[#A3A3A3] flex items-center gap-1">
                         <Phone size={9} />
-                        {member.profiles?.phone || "—"}
-                        {member.profiles?.city && ` · ${member.profiles.city}`}
+                        {member.membre_profiles?.phone || "—"}
                       </p>
                     </div>
 
-                    {/* Badges */}
                     <div className="flex items-center gap-1.5 shrink-0">
                       <span className={`w-6 h-6 rounded-full flex items-center justify-center ${member._has_ice ? "bg-[#DCFCE7]" : "bg-[#FEE2E2]"}`} title={member._has_ice ? "ICE renseigné" : "ICE manquant"}>
                         <Shield size={11} className={member._has_ice ? "text-[#22C55E]" : "text-[#EF4444]"} />
@@ -215,7 +214,7 @@ export default function MembersPage() {
                       </span>
                       {(member._checkins || 0) > 0 && (
                         <span className="bg-[#F4F4EE] text-[#666562] text-[10px] font-bold px-2 py-0.5 rounded-full">
-                          {member._checkins} runs
+                          {member._checkins}
                         </span>
                       )}
                     </div>
