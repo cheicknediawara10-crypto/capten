@@ -194,6 +194,7 @@ CREATE INDEX IF NOT EXISTS idx_events_date ON events(event_date);
 CREATE INDEX IF NOT EXISTS idx_events_status ON events(status);
 ALTER TABLE events ADD COLUMN IF NOT EXISTS club_id UUID;
 ALTER TABLE events ADD COLUMN IF NOT EXISTS status event_status NOT NULL DEFAULT 'draft';
+ALTER TABLE events ADD COLUMN IF NOT EXISTS event_date TIMESTAMPTZ;
 ALTER TABLE events ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Published events are public" ON events;
 CREATE POLICY "Published events are public" ON events FOR SELECT USING (status = 'published' OR status = 'completed');
@@ -219,6 +220,7 @@ CREATE TABLE IF NOT EXISTS event_registrations (
 CREATE INDEX IF NOT EXISTS idx_event_reg_event ON event_registrations(event_id);
 CREATE INDEX IF NOT EXISTS idx_event_reg_member ON event_registrations(member_id);
 ALTER TABLE event_registrations ADD COLUMN IF NOT EXISTS member_id UUID;
+ALTER TABLE event_registrations ADD COLUMN IF NOT EXISTS event_id UUID;
 ALTER TABLE event_registrations ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Registrations viewable by club admins and self" ON event_registrations;
 CREATE POLICY "Registrations viewable by club admins and self" ON event_registrations FOR SELECT USING (
@@ -277,6 +279,7 @@ CREATE TABLE IF NOT EXISTS ice_contacts (
   medical_notes TEXT,
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+ALTER TABLE ice_contacts ADD COLUMN IF NOT EXISTS member_id UUID;
 ALTER TABLE ice_contacts ADD COLUMN IF NOT EXISTS profile_id UUID REFERENCES profiles(id) ON DELETE CASCADE;
 ALTER TABLE ice_contacts ADD COLUMN IF NOT EXISTS contact_name TEXT;
 ALTER TABLE ice_contacts ADD COLUMN IF NOT EXISTS contact_phone TEXT;
@@ -358,6 +361,7 @@ CREATE TABLE IF NOT EXISTS spot_transactions (
 );
 CREATE INDEX IF NOT EXISTS idx_spot_tx_spot ON spot_transactions(spot_id);
 CREATE INDEX IF NOT EXISTS idx_spot_tx_club ON spot_transactions(club_id);
+ALTER TABLE spot_transactions ADD COLUMN IF NOT EXISTS spot_id UUID;
 ALTER TABLE spot_transactions ADD COLUMN IF NOT EXISTS club_id UUID;
 ALTER TABLE spot_transactions ADD COLUMN IF NOT EXISTS commission_amount DECIMAL(10,2) DEFAULT 0;
 ALTER TABLE spot_transactions ADD COLUMN IF NOT EXISTS status spot_tx_status DEFAULT 'pending';
@@ -394,6 +398,7 @@ CREATE TABLE IF NOT EXISTS member_badges (
   club_id UUID REFERENCES clubs(id) ON DELETE CASCADE
 );
 CREATE INDEX IF NOT EXISTS idx_mb_member ON member_badges(member_id);
+ALTER TABLE member_badges ADD COLUMN IF NOT EXISTS member_id UUID;
 ALTER TABLE member_badges ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Member badges are public" ON member_badges;
 CREATE POLICY "Member badges are public" ON member_badges FOR SELECT USING (true);
