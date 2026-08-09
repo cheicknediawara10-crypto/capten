@@ -254,7 +254,7 @@ export default async function ProfilPage({
             >
               <div>
                 <p className="text-sm font-bold text-[#111111]">Changer mon code PIN</p>
-                <p className="text-xs text-[#9CA3AF] mt-0.5">Via SMS de réinitialisation</p>
+                <p className="text-xs text-[#9CA3AF] mt-0.5">Via e-mail de réinitialisation</p>
               </div>
               <ChevronRight className="w-4 h-4 text-[#9CA3AF]" />
             </Link>
