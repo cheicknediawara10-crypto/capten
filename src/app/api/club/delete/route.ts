@@ -20,47 +20,41 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ success: true, message: "Toutes les données du club ont été supprimées définitivement (Mode Démo)." });
     }
 
-    // 1. Supprimer les membres du club
-    const { error: membersErr } = await supabase
-      .from('members')
-      .delete()
-      .eq('club_id', captainId);
+    // Convention : clubs.id = id du fondateur authentifié.
+    const clubId = captainId;
 
-    if (membersErr) {
-      log('error', 'gdpr.delete.members_failed', { club_id: captainId, error: membersErr.message });
+    // 1. Membres du crew : supprimer les membre_profiles rattachés (cascade ICE,
+    //    décharges, check-ins, resets PIN via FK ON DELETE CASCADE), puis les liens.
+    const { data: membreLinks } = await supabase
+      .from('membre_club')
+      .select('membre_id')
+      .eq('club_id', clubId);
+    const membreIds = (membreLinks || []).map((m: any) => m.membre_id).filter(Boolean);
+    if (membreIds.length) {
+      const { error: membresErr } = await supabase
+        .from('membre_profiles')
+        .delete()
+        .in('id', membreIds);
+      if (membresErr) {
+        log('error', 'gdpr.delete.membres_failed', { club_id: clubId, error: membresErr.message });
+      }
+    }
+    await supabase.from('membre_club').delete().eq('club_id', clubId);
+    await supabase.from('membre_waivers').delete().eq('club_id', clubId);
+
+    // 2. Spots du crew
+    const { error: spotsErr } = await supabase.from('crew_spots').delete().eq('club_id', clubId);
+    if (spotsErr) {
+      log('error', 'gdpr.delete.spots_failed', { club_id: clubId, error: spotsErr.message });
     }
 
-    // 2. Supprimer les runs / sessions du club
-    const { error: runsErr } = await supabase
-      .from('runs')
-      .delete()
-      .eq('club_id', captainId);
-
-    if (runsErr) {
-      log('error', 'gdpr.delete.runs_failed', { club_id: captainId, error: runsErr.message });
+    // 3. Sorties (cascade event_registrations / checkins via FK)
+    const { error: eventsErr } = await supabase.from('events').delete().eq('club_id', clubId);
+    if (eventsErr) {
+      log('error', 'gdpr.delete.events_failed', { club_id: clubId, error: eventsErr.message });
     }
 
-    // 3. Supprimer les événements spots du club
-    const { error: spotEventsErr } = await supabase
-      .from('spot_events')
-      .delete()
-      .eq('club_id', captainId);
-
-    if (spotEventsErr) {
-      log('error', 'gdpr.delete.spot_events_failed', { club_id: captainId, error: spotEventsErr.message });
-    }
-
-    // 4. Supprimer les incidents / signalements du club
-    const { error: incidentsErr } = await supabase
-      .from('incidents')
-      .delete()
-      .eq('club_id', captainId);
-
-    if (incidentsErr) {
-      log('error', 'gdpr.delete.incidents_failed', { club_id: captainId, error: incidentsErr.message });
-    }
-
-    // 5. Supprimer le club et le profil fondateur
+    // 4. Supprimer le club et le profil fondateur
     const { error: clubErr } = await supabase
       .from('clubs')
       .delete()

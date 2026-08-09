@@ -21,18 +21,15 @@ export default function AppLayoutWrapper({ children }: AppLayoutWrapperProps) {
     cleanPath === "/" ||
     cleanPath.startsWith("/login") ||
     cleanPath.startsWith("/reset-password") ||
-    cleanPath.startsWith("/waiver") ||
     cleanPath === "/cgu" ||
     cleanPath === "/mentions-legales" ||
     cleanPath === "/rgpd" ||
     cleanPath.includes("/checkin") ||
-    cleanPath.startsWith("/securite/signaler") ||
     // Espace membre (auth PIN — système séparé de l'auth organisateur)
     cleanPath.startsWith("/mon-espace") ||
     // Pages membres publiques
     cleanPath.startsWith("/join/") ||
-    cleanPath.startsWith("/event/") ||
-    cleanPath.startsWith("/p/");
+    cleanPath.startsWith("/event/");
 
   if (isPublicPage) {
     return (

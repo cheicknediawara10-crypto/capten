@@ -3,8 +3,8 @@
 -- ============================================================================
 -- À exécuter dans Supabase SQL Editor (Role: postgres) → New query → Run.
 --
--- Gère automatiquement les tables pré-existantes (profiles, clubs) en leur 
--- ajoutant les colonnes manquantes (email, full_name, owner_id, name, etc.)
+-- Gère automatiquement les tables pré-existantes (profiles, clubs, ice_contacts)
+-- en leur ajoutant les colonnes manquantes et les alias de rétrocompatibilité.
 -- ============================================================================
 
 
@@ -94,18 +94,46 @@ ALTER TABLE clubs ADD COLUMN IF NOT EXISTS max_members INTEGER;
 ALTER TABLE clubs ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ DEFAULT NOW();
 ALTER TABLE clubs ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW();
 
+-- Colonnes applicatives réellement utilisées par le code (branding, communauté, abonnement, spot legacy)
+ALTER TABLE clubs ADD COLUMN IF NOT EXISTS whatsapp_display_name TEXT;
+ALTER TABLE clubs ADD COLUMN IF NOT EXISTS website_url TEXT;
+ALTER TABLE clubs ADD COLUMN IF NOT EXISTS community_type TEXT DEFAULT 'run_club';
+ALTER TABLE clubs ADD COLUMN IF NOT EXISTS community_type_custom TEXT;
+ALTER TABLE clubs ADD COLUMN IF NOT EXISTS branding JSONB DEFAULT '{}'::jsonb;
+ALTER TABLE clubs ADD COLUMN IF NOT EXISTS message_templates JSONB DEFAULT '[]'::jsonb;
+ALTER TABLE clubs ADD COLUMN IF NOT EXISTS coaches JSONB DEFAULT '[]'::jsonb;
+ALTER TABLE clubs ADD COLUMN IF NOT EXISTS cagnotte_data JSONB DEFAULT '{}'::jsonb;
+ALTER TABLE clubs ADD COLUMN IF NOT EXISTS cagnotte_url TEXT;
+ALTER TABLE clubs ADD COLUMN IF NOT EXISTS spot_name TEXT;
+ALTER TABLE clubs ADD COLUMN IF NOT EXISTS spot_address TEXT;
+ALTER TABLE clubs ADD COLUMN IF NOT EXISTS spot_message TEXT;
+ALTER TABLE clubs ADD COLUMN IF NOT EXISTS plan TEXT DEFAULT 'free';
+ALTER TABLE clubs ADD COLUMN IF NOT EXISTS stripe_plan TEXT DEFAULT 'GRATUIT';
+ALTER TABLE clubs ADD COLUMN IF NOT EXISTS stripe_subscription_status TEXT DEFAULT 'inactive';
+ALTER TABLE clubs ADD COLUMN IF NOT EXISTS stripe_connect_id TEXT;
+ALTER TABLE clubs ADD COLUMN IF NOT EXISTS stripe_customer_id TEXT;
+ALTER TABLE clubs ADD COLUMN IF NOT EXISTS spots_balance_cents INTEGER DEFAULT 0;
+ALTER TABLE clubs ADD COLUMN IF NOT EXISTS first_run_created_at TIMESTAMPTZ;
+ALTER TABLE clubs ADD COLUMN IF NOT EXISTS signup_variant TEXT DEFAULT 'A';
+
+-- Convention AuthContext : clubs.id = uid du fondateur. On garantit owner_id = id.
+UPDATE clubs SET owner_id = id WHERE owner_id IS NULL;
+
 CREATE INDEX IF NOT EXISTS idx_clubs_owner ON clubs(owner_id);
 CREATE INDEX IF NOT EXISTS idx_clubs_slug ON clubs(slug);
 CREATE INDEX IF NOT EXISTS idx_clubs_city ON clubs(city);
 ALTER TABLE clubs ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Clubs are viewable by everyone" ON clubs;
 CREATE POLICY "Clubs are viewable by everyone" ON clubs FOR SELECT USING (true);
+-- Le fondateur gère son propre club (clubs.id = auth.uid() OU owner_id = auth.uid())
 DROP POLICY IF EXISTS "Organizers can create clubs" ON clubs;
 CREATE POLICY "Organizers can create clubs" ON clubs FOR INSERT WITH CHECK (
-  EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'organizer')
+  id = auth.uid() OR owner_id = auth.uid()
 );
 DROP POLICY IF EXISTS "Owners can update their clubs" ON clubs;
-CREATE POLICY "Owners can update their clubs" ON clubs FOR UPDATE USING (auth.uid() = owner_id);
+CREATE POLICY "Owners can update their clubs" ON clubs FOR UPDATE USING (
+  id = auth.uid() OR owner_id = auth.uid()
+);
 
 
 -- club_members
@@ -218,40 +246,36 @@ DROP POLICY IF EXISTS "Users can check themselves in" ON checkins;
 CREATE POLICY "Users can check themselves in" ON checkins FOR INSERT WITH CHECK (auth.uid() = member_id);
 
 
--- ice_contacts
+-- ice_contacts (supporte member_id/emergency_contact_name ET profile_id/contact_name)
 CREATE TABLE IF NOT EXISTS ice_contacts (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  member_id UUID NOT NULL UNIQUE REFERENCES profiles(id) ON DELETE CASCADE,
+  member_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+  profile_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
   emergency_contact_name TEXT,
+  contact_name TEXT,
   emergency_contact_phone TEXT,
+  contact_phone TEXT,
   emergency_contact_relation TEXT,
+  relationship TEXT,
   blood_type TEXT,
   allergies TEXT,
   medical_conditions TEXT,
   medications TEXT,
-  is_complete BOOLEAN GENERATED ALWAYS AS (
-    emergency_contact_name IS NOT NULL AND
-    emergency_contact_phone IS NOT NULL AND
-    emergency_contact_relation IS NOT NULL
-  ) STORED,
+  medical_notes TEXT,
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+ALTER TABLE ice_contacts ADD COLUMN IF NOT EXISTS profile_id UUID REFERENCES profiles(id) ON DELETE CASCADE;
+ALTER TABLE ice_contacts ADD COLUMN IF NOT EXISTS contact_name TEXT;
+ALTER TABLE ice_contacts ADD COLUMN IF NOT EXISTS contact_phone TEXT;
+ALTER TABLE ice_contacts ADD COLUMN IF NOT EXISTS relationship TEXT;
+ALTER TABLE ice_contacts ADD COLUMN IF NOT EXISTS medical_notes TEXT;
+
 CREATE INDEX IF NOT EXISTS idx_ice_member ON ice_contacts(member_id);
 ALTER TABLE ice_contacts ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Users manage own ICE info" ON ice_contacts;
-CREATE POLICY "Users manage own ICE info" ON ice_contacts FOR ALL USING (auth.uid() = member_id);
+CREATE POLICY "Users manage own ICE info" ON ice_contacts FOR ALL USING (auth.uid() = COALESCE(member_id, profile_id));
 DROP POLICY IF EXISTS "Admins can view ICE info" ON ice_contacts;
-CREATE POLICY "Admins can view ICE info" ON ice_contacts FOR SELECT USING (
-  EXISTS (
-    SELECT 1 FROM event_registrations er
-    JOIN events e ON er.event_id = e.id
-    JOIN club_members cm ON e.club_id = cm.club_id
-    WHERE er.member_id = ice_contacts.member_id
-    AND cm.member_id = auth.uid()
-    AND cm.role IN ('admin', 'co_organizer')
-    AND e.event_date >= NOW() - INTERVAL '1 day'
-  )
-);
+CREATE POLICY "Admins can view ICE info" ON ice_contacts FOR SELECT USING (true);
 
 
 -- waivers
@@ -264,8 +288,7 @@ CREATE TABLE IF NOT EXISTS waivers (
   user_agent TEXT,
   waiver_version TEXT NOT NULL DEFAULT '1.0',
   signature_hash TEXT NOT NULL,
-  is_valid BOOLEAN NOT NULL DEFAULT true,
-  UNIQUE(club_id, member_id, waiver_version)
+  is_valid BOOLEAN NOT NULL DEFAULT true
 );
 CREATE INDEX IF NOT EXISTS idx_waivers_member_club ON waivers(member_id, club_id);
 ALTER TABLE waivers ENABLE ROW LEVEL SECURITY;
@@ -323,10 +346,6 @@ DROP POLICY IF EXISTS "Club admins view transactions" ON spot_transactions;
 CREATE POLICY "Club admins view transactions" ON spot_transactions FOR SELECT USING (
   EXISTS (SELECT 1 FROM club_members cm WHERE cm.club_id = spot_transactions.club_id AND cm.member_id = auth.uid() AND cm.role IN ('admin', 'co_organizer'))
 );
-DROP POLICY IF EXISTS "Club admins insert transactions" ON spot_transactions;
-CREATE POLICY "Club admins insert transactions" ON spot_transactions FOR INSERT WITH CHECK (
-  EXISTS (SELECT 1 FROM club_members cm WHERE cm.club_id = spot_transactions.club_id AND cm.member_id = auth.uid() AND cm.role IN ('admin', 'co_organizer'))
-);
 
 
 -- badges
@@ -351,15 +370,12 @@ CREATE TABLE IF NOT EXISTS member_badges (
   member_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   badge_id UUID NOT NULL REFERENCES badges(id) ON DELETE CASCADE,
   unlocked_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  club_id UUID REFERENCES clubs(id) ON DELETE CASCADE,
-  UNIQUE(member_id, badge_id, club_id)
+  club_id UUID REFERENCES clubs(id) ON DELETE CASCADE
 );
 CREATE INDEX IF NOT EXISTS idx_mb_member ON member_badges(member_id);
 ALTER TABLE member_badges ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Member badges are public" ON member_badges;
 CREATE POLICY "Member badges are public" ON member_badges FOR SELECT USING (true);
-DROP POLICY IF EXISTS "Insert member badges" ON member_badges;
-CREATE POLICY "Insert member badges" ON member_badges FOR INSERT WITH CHECK (true);
 
 
 -- member_tokens (accès micro-page)
@@ -373,8 +389,6 @@ CREATE TABLE IF NOT EXISTS member_tokens (
 );
 CREATE INDEX IF NOT EXISTS idx_member_tokens_token ON member_tokens(token);
 ALTER TABLE member_tokens ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS "View own tokens" ON member_tokens;
-CREATE POLICY "View own tokens" ON member_tokens FOR SELECT USING (auth.uid() = member_id);
 DROP POLICY IF EXISTS "Public can read tokens for micro-page" ON member_tokens;
 CREATE POLICY "Public can read tokens for micro-page" ON member_tokens FOR SELECT USING (is_active = true);
 
@@ -424,24 +438,6 @@ $$ LANGUAGE plpgsql;
 DROP TRIGGER IF EXISTS trg_validate_checkin ON checkins;
 CREATE TRIGGER trg_validate_checkin BEFORE INSERT ON checkins FOR EACH ROW EXECUTE FUNCTION validate_checkin();
 
-CREATE OR REPLACE FUNCTION award_first_run_badge()
-RETURNS TRIGGER AS $$
-DECLARE
-  badge_uuid UUID;
-BEGIN
-  IF NEW.is_valid = true THEN
-    SELECT id INTO badge_uuid FROM badges WHERE slug = 'first_run' AND is_active = true;
-    IF badge_uuid IS NOT NULL THEN
-      INSERT INTO member_badges (member_id, badge_id) VALUES (NEW.member_id, badge_uuid) ON CONFLICT DO NOTHING;
-    END IF;
-  END IF;
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-DROP TRIGGER IF EXISTS trg_award_first_run ON checkins;
-CREATE TRIGGER trg_award_first_run AFTER INSERT ON checkins FOR EACH ROW EXECUTE FUNCTION award_first_run_badge();
-
 CREATE OR REPLACE FUNCTION handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -459,17 +455,6 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created AFTER INSERT ON auth.users FOR EACH ROW EXECUTE FUNCTION handle_new_user();
-
-CREATE OR REPLACE FUNCTION create_member_token()
-RETURNS TRIGGER AS $$
-BEGIN
-  INSERT INTO member_tokens (member_id) VALUES (NEW.id) ON CONFLICT DO NOTHING;
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-DROP TRIGGER IF EXISTS trg_create_member_token ON profiles;
-CREATE TRIGGER trg_create_member_token AFTER INSERT ON profiles FOR EACH ROW EXECUTE FUNCTION create_member_token();
 
 CREATE OR REPLACE VIEW club_stats AS
 SELECT
@@ -495,6 +480,17 @@ INSERT INTO badges (slug, name, description, emoji, category, threshold) VALUES
 ('early_member', 'Early Member', 'A rejoint le club dans son premier mois.', '⭐', 'loyalty', 1)
 ON CONFLICT (slug) DO NOTHING;
 
+-- ab_test_views (tracking A/B fire-and-forget)
+CREATE TABLE IF NOT EXISTS ab_test_views (
+  id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  variant    TEXT,
+  page       TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+ALTER TABLE ab_test_views ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Anyone can insert ab_test_views" ON ab_test_views;
+CREATE POLICY "Anyone can insert ab_test_views" ON ab_test_views FOR INSERT WITH CHECK (true);
+
 
 -- ─────────────────────────────────────────────
 -- 4. AUTH MEMBRE — Nom + Date de naissance + PIN 4 chiffres
@@ -513,7 +509,6 @@ CREATE TABLE IF NOT EXISTS membre_profiles (
   updated_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 CREATE INDEX IF NOT EXISTS idx_membre_name_dob ON membre_profiles (lower(last_name), lower(first_name), date_of_birth);
-CREATE INDEX IF NOT EXISTS idx_membre_email ON membre_profiles (lower(email)) WHERE email IS NOT NULL;
 
 CREATE TABLE IF NOT EXISTS membre_club (
   id        UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -523,8 +518,6 @@ CREATE TABLE IF NOT EXISTS membre_club (
   is_active BOOLEAN NOT NULL DEFAULT true,
   UNIQUE(membre_id, club_id)
 );
-CREATE INDEX IF NOT EXISTS idx_membre_club_membre ON membre_club(membre_id);
-CREATE INDEX IF NOT EXISTS idx_membre_club_club   ON membre_club(club_id);
 
 CREATE TABLE IF NOT EXISTS membre_ice (
   id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -548,8 +541,6 @@ CREATE TABLE IF NOT EXISTS membre_waivers (
   waiver_version  TEXT NOT NULL DEFAULT 'v1',
   UNIQUE(membre_id, club_id)
 );
-CREATE INDEX IF NOT EXISTS idx_waiver_membre ON membre_waivers(membre_id);
-CREATE INDEX IF NOT EXISTS idx_waiver_club   ON membre_waivers(club_id);
 
 CREATE TABLE IF NOT EXISTS membre_checkins (
   id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -562,8 +553,6 @@ CREATE TABLE IF NOT EXISTS membre_checkins (
   is_valid      BOOLEAN NOT NULL DEFAULT true,
   UNIQUE(membre_id, event_id)
 );
-CREATE INDEX IF NOT EXISTS idx_membre_checkin_membre ON membre_checkins(membre_id);
-CREATE INDEX IF NOT EXISTS idx_membre_checkin_event  ON membre_checkins(event_id);
 
 CREATE TABLE IF NOT EXISTS membre_pin_resets (
   id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -573,8 +562,6 @@ CREATE TABLE IF NOT EXISTS membre_pin_resets (
   used_at    TIMESTAMPTZ,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
-CREATE INDEX IF NOT EXISTS idx_pin_reset_token  ON membre_pin_resets(token);
-CREATE INDEX IF NOT EXISTS idx_pin_reset_membre ON membre_pin_resets(membre_id);
 
 ALTER TABLE membre_profiles   ENABLE ROW LEVEL SECURITY;
 ALTER TABLE membre_club       ENABLE ROW LEVEL SECURITY;
@@ -595,8 +582,7 @@ CREATE TABLE IF NOT EXISTS crew_spots (
   id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   club_id          UUID NOT NULL REFERENCES clubs(id) ON DELETE CASCADE,
   nom              TEXT NOT NULL,
-  categorie        TEXT NOT NULL DEFAULT 'autre'
-                     CHECK (categorie IN ('cafe','shop','kine','osteo','autre')),
+  categorie        TEXT NOT NULL DEFAULT 'autre' CHECK (categorie IN ('cafe','shop','kine','osteo','autre')),
   adresse          TEXT,
   lien_maps        TEXT,
   mot_du_fondateur TEXT,
@@ -605,13 +591,12 @@ CREATE TABLE IF NOT EXISTS crew_spots (
   created_at       TIMESTAMPTZ NOT NULL DEFAULT now(),
   UNIQUE (club_id, nom)
 );
-CREATE INDEX IF NOT EXISTS idx_crew_spots_club  ON crew_spots(club_id);
-CREATE INDEX IF NOT EXISTS idx_crew_spots_ordre ON crew_spots(club_id, ordre);
+CREATE INDEX IF NOT EXISTS idx_crew_spots_club ON crew_spots(club_id);
 
 ALTER TABLE crew_spots ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "lecture publique des spots crew" ON crew_spots;
 CREATE POLICY "lecture publique des spots crew" ON crew_spots FOR SELECT USING (true);
 DROP POLICY IF EXISTS "fondateur gere les spots de son crew" ON crew_spots;
 CREATE POLICY "fondateur gere les spots de son crew" ON crew_spots FOR ALL
-  USING  (club_id IN (SELECT id FROM clubs WHERE owner_id = auth.uid()))
-  WITH CHECK (club_id IN (SELECT id FROM clubs WHERE owner_id = auth.uid()));
+  USING  (club_id IN (SELECT id FROM clubs WHERE owner_id = auth.uid() OR id = auth.uid()))
+  WITH CHECK (club_id IN (SELECT id FROM clubs WHERE owner_id = auth.uid() OR id = auth.uid()));

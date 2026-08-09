@@ -10,7 +10,7 @@ export async function middleware(request: NextRequest) {
   // ── Protection espace membre (fast-path: cookie presence only) ───────────
   // Full HMAC signature verification is done in requireMembreSession() inside
   // the Server Component — middleware only blocks obviously unauthenticated requests.
-  if (pathname.startsWith('/mon-espace/profil') || pathname.startsWith('/mon-espace/decharge')) {
+  if (pathname.startsWith('/mon-espace/profil')) {
     const token = request.cookies.get(MEMBRE_COOKIE)?.value
     if (!token) {
       const url = request.nextUrl.clone()
@@ -76,23 +76,15 @@ export async function middleware(request: NextRequest) {
 
   const protectedPaths = [
     '/dashboard',
-    '/runs',
-    '/athletes',
     '/messages',
     '/plan',
     '/securite',
     '/settings',
-    '/cagnotte',
-    '/avantages',
-    '/social-wall',
-    '/spots/explorer',
-    '/spots/events',
-    '/spots/scan'
   ]
 
   const isProtectedPath = protectedPaths.some((path) =>
     pathname.startsWith(path)
-  ) && !pathname.includes('/debrief') && !pathname.includes('/checkin') && !pathname.includes('/cagnotte/contribuer') && !pathname.includes('/cagnotte/sponsor') && !pathname.includes('/securite/signaler')
+  ) && !pathname.includes('/checkin')
 
   const isAuthPage = pathname.startsWith('/login')
   const isLandingPage = pathname === '/'

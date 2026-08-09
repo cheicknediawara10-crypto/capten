@@ -16,7 +16,7 @@ export const PLAN_FEATURES: Record<PlanTier, Feature[]> = {
 };
 
 export const FREE_LIMITS = {
-  MAX_ACTIVE_MEMBERS: 25,
+  MAX_ACTIVE_MEMBERS: 20,
   MAX_ACTIVE_RUNS: 1,
 };
 
@@ -49,27 +49,19 @@ export async function getActiveMembersCount(clubId: string, isMock: boolean = fa
   if (!supabase) return 0;
 
   try {
-    const sixtyDaysAgo = new Date();
-    sixtyDaysAgo.setDate(sixtyDaysAgo.getDate() - 60);
-
-    // Query registrations where status is checked_in and the run belongs to this club
-    const { data, error } = await supabase
-      .from('registrations')
-      .select('runner_id, runs!inner(club_id)')
-      .eq('status', 'checked_in')
-      .eq('runs.club_id', clubId)
-      .gte('checked_in_at', sixtyDaysAgo.toISOString());
+    // Membres actifs = inscrits actifs du crew (tables membre_* du V1)
+    const { count, error } = await supabase
+      .from('membre_club')
+      .select('*', { count: 'exact', head: true })
+      .eq('club_id', clubId)
+      .eq('is_active', true);
 
     if (error) {
-      console.error('Error fetching registrations for active member count:', error);
+      console.error('Error fetching active member count:', error);
       return 0;
     }
 
-    if (!data) return 0;
-
-    // Filter to get unique runner count
-    const uniqueRunners = new Set(data.map((r: any) => r.runner_id));
-    return uniqueRunners.size;
+    return count || 0;
   } catch (err) {
     console.error('Error in getActiveMembersCount:', err);
     return 0;
@@ -97,11 +89,13 @@ export async function getActiveRunsCount(clubId: string, isMock: boolean = false
   if (!supabase) return 0;
 
   try {
+    // Sorties actives = events publiés à venir (modèle réel)
     const { count, error } = await supabase
-      .from('runs')
+      .from('events')
       .select('*', { count: 'exact', head: true })
       .eq('club_id', clubId)
-      .eq('status', 'scheduled');
+      .eq('status', 'published')
+      .gte('event_date', new Date().toISOString());
 
     if (error) {
       console.error('Error fetching active runs count:', error);

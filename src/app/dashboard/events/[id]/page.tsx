@@ -39,20 +39,23 @@ interface Event {
   club_id: string;
 }
 
+interface MembreLite { first_name: string | null; last_name: string | null; phone: string | null }
+const membreName = (m: MembreLite | null) =>
+  [m?.first_name, m?.last_name].filter(Boolean).join(" ").trim();
+const membreInitials = (m: MembreLite | null) =>
+  membreName(m).split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2) || "?";
+
 interface Registration {
   id: string;
-  created_at: string;
-  status: string;
-  profiles: { full_name: string | null; phone: string | null; avatar_url: string | null } | null;
+  membre_profiles: MembreLite | null;
 }
 
 interface Checkin {
   id: string;
-  created_at: string;
+  checked_in_at: string;
   method: string;
-  is_validated: boolean;
-  distance_meters: number | null;
-  profiles: { full_name: string | null; phone: string | null } | null;
+  is_valid: boolean;
+  membre_profiles: MembreLite | null;
 }
 
 export default function EventDetailPage() {
@@ -75,16 +78,22 @@ export default function EventDetailPage() {
     const supabase = getSupabase();
     if (!supabase) return;
 
-    const [{ data: ev }, { data: regs }, { data: chks }] = await Promise.all([
-      supabase.from("events").select("*").eq("id", id).single(),
-      supabase.from("event_registrations").select("*, profiles(full_name, phone, avatar_url)").eq("event_id", id).order("created_at", { ascending: false }),
-      supabase.from("checkins").select("*, profiles(full_name, phone)").eq("event_id", id).order("created_at", { ascending: false }),
+    const { data: ev } = await supabase.from("events").select("*").eq("id", id).single();
+    if (!ev) { setLoading(false); return; }
+
+    const [{ data: regs }, { data: chks }] = await Promise.all([
+      supabase.from("membre_club")
+        .select("id, membre_profiles(first_name, last_name, phone)")
+        .eq("club_id", ev.club_id).eq("is_active", true),
+      supabase.from("membre_checkins")
+        .select("id, checked_in_at, is_valid, method, membre_profiles(first_name, last_name, phone)")
+        .eq("event_id", id).order("checked_in_at", { ascending: false }),
     ]);
 
     setEvent(ev);
-    setRegistrations(regs || []);
-    setCheckins(chks || []);
-    setLiveCount((chks || []).filter((c: Checkin) => c.is_validated).length);
+    setRegistrations((regs as unknown as Registration[]) || []);
+    setCheckins((chks as unknown as Checkin[]) || []);
+    setLiveCount(((chks as unknown as Checkin[]) || []).filter((c) => c.is_valid).length);
     setLoading(false);
   }, [id]);
 
@@ -96,14 +105,14 @@ export default function EventDetailPage() {
     if (!supabase) return;
 
     const channel = supabase
-      .channel(`checkins-${id}`)
+      .channel(`membre-checkins-${id}`)
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "checkins", filter: `event_id=eq.${id}` },
+        { event: "*", schema: "public", table: "membre_checkins", filter: `event_id=eq.${id}` },
         (payload) => {
           if (payload.eventType === "INSERT") {
             setCheckins((prev) => [payload.new as Checkin, ...prev]);
-            if ((payload.new as Checkin).is_validated) {
+            if ((payload.new as Checkin).is_valid) {
               setLiveCount((c) => c + 1);
             }
           } else if (payload.eventType === "UPDATE") {
@@ -313,18 +322,13 @@ export default function EventDetailPage() {
                     <div key={reg.id} className="flex items-center gap-4 p-4">
                       <div className="w-9 h-9 rounded-full bg-[#FF5500]/10 flex items-center justify-center shrink-0">
                         <span className="text-[11px] font-black text-[#FF5500]">
-                          {reg.profiles?.full_name?.split(" ").map(n => n[0]).join("").toUpperCase().slice(0,2) || "?"}
+                          {membreInitials(reg.membre_profiles)}
                         </span>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-black truncate">{reg.profiles?.full_name || "Anonyme"}</p>
-                        <p className="text-[11px] text-[#A3A3A3]">{reg.profiles?.phone}</p>
+                        <p className="text-sm font-semibold text-black truncate">{membreName(reg.membre_profiles) || "Membre"}</p>
+                        <p className="text-[11px] text-[#A3A3A3]">{reg.membre_profiles?.phone || "—"}</p>
                       </div>
-                      <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${
-                        reg.status === "confirmed" ? "bg-[#DCFCE7] text-[#22C55E]" : "bg-[#FEF3C7] text-[#F59E0B]"
-                      }`}>
-                        {reg.status}
-                      </span>
                     </div>
                   ))}
                 </div>
@@ -352,24 +356,23 @@ export default function EventDetailPage() {
                       transition={{ delay: i * 0.03 }}
                       className="flex items-center gap-4 p-4"
                     >
-                      <div className={`w-2.5 h-2.5 rounded-full shrink-0 ${chk.is_validated ? "bg-[#22C55E]" : "bg-[#F59E0B]"}`} />
+                      <div className={`w-2.5 h-2.5 rounded-full shrink-0 ${chk.is_valid ? "bg-[#22C55E]" : "bg-[#F59E0B]"}`} />
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-black">{chk.profiles?.full_name || "Anonyme"}</p>
+                        <p className="text-sm font-semibold text-black">{membreName(chk.membre_profiles) || "Membre"}</p>
                         <p className="text-[11px] text-[#A3A3A3]">
-                          {new Date(chk.created_at).toLocaleTimeString("fr-FR")}
-                          {chk.distance_meters !== null && ` · ${Math.round(chk.distance_meters)}m`}
+                          {chk.checked_in_at ? new Date(chk.checked_in_at).toLocaleTimeString("fr-FR") : ""}
                         </p>
                       </div>
                       <div className="flex items-center gap-2">
                         <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${
-                          chk.method === "qr" ? "bg-[#EDE9FE] text-[#7C3AED]" : "bg-[#DBEAFE] text-[#3B82F6]"
+                          chk.method === "qr_code" ? "bg-[#EDE9FE] text-[#7C3AED]" : "bg-[#DBEAFE] text-[#3B82F6]"
                         }`}>
-                          {chk.method === "qr" ? "QR" : "GPS"}
+                          {chk.method === "qr_code" ? "QR" : chk.method === "manual" ? "Manuel" : "GPS"}
                         </span>
                         <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${
-                          chk.is_validated ? "bg-[#DCFCE7] text-[#22C55E]" : "bg-[#FEF3C7] text-[#F59E0B]"
+                          chk.is_valid ? "bg-[#DCFCE7] text-[#22C55E]" : "bg-[#FEF3C7] text-[#F59E0B]"
                         }`}>
-                          {chk.is_validated ? "✓" : "Attente"}
+                          {chk.is_valid ? "✓" : "Attente"}
                         </span>
                       </div>
                     </motion.div>

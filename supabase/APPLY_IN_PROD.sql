@@ -94,18 +94,46 @@ ALTER TABLE clubs ADD COLUMN IF NOT EXISTS max_members INTEGER;
 ALTER TABLE clubs ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ DEFAULT NOW();
 ALTER TABLE clubs ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW();
 
+-- Colonnes applicatives réellement utilisées par le code (branding, communauté, abonnement, spot legacy)
+ALTER TABLE clubs ADD COLUMN IF NOT EXISTS whatsapp_display_name TEXT;
+ALTER TABLE clubs ADD COLUMN IF NOT EXISTS website_url TEXT;
+ALTER TABLE clubs ADD COLUMN IF NOT EXISTS community_type TEXT DEFAULT 'run_club';
+ALTER TABLE clubs ADD COLUMN IF NOT EXISTS community_type_custom TEXT;
+ALTER TABLE clubs ADD COLUMN IF NOT EXISTS branding JSONB DEFAULT '{}'::jsonb;
+ALTER TABLE clubs ADD COLUMN IF NOT EXISTS message_templates JSONB DEFAULT '[]'::jsonb;
+ALTER TABLE clubs ADD COLUMN IF NOT EXISTS coaches JSONB DEFAULT '[]'::jsonb;
+ALTER TABLE clubs ADD COLUMN IF NOT EXISTS cagnotte_data JSONB DEFAULT '{}'::jsonb;
+ALTER TABLE clubs ADD COLUMN IF NOT EXISTS cagnotte_url TEXT;
+ALTER TABLE clubs ADD COLUMN IF NOT EXISTS spot_name TEXT;
+ALTER TABLE clubs ADD COLUMN IF NOT EXISTS spot_address TEXT;
+ALTER TABLE clubs ADD COLUMN IF NOT EXISTS spot_message TEXT;
+ALTER TABLE clubs ADD COLUMN IF NOT EXISTS plan TEXT DEFAULT 'free';
+ALTER TABLE clubs ADD COLUMN IF NOT EXISTS stripe_plan TEXT DEFAULT 'GRATUIT';
+ALTER TABLE clubs ADD COLUMN IF NOT EXISTS stripe_subscription_status TEXT DEFAULT 'inactive';
+ALTER TABLE clubs ADD COLUMN IF NOT EXISTS stripe_connect_id TEXT;
+ALTER TABLE clubs ADD COLUMN IF NOT EXISTS stripe_customer_id TEXT;
+ALTER TABLE clubs ADD COLUMN IF NOT EXISTS spots_balance_cents INTEGER DEFAULT 0;
+ALTER TABLE clubs ADD COLUMN IF NOT EXISTS first_run_created_at TIMESTAMPTZ;
+ALTER TABLE clubs ADD COLUMN IF NOT EXISTS signup_variant TEXT DEFAULT 'A';
+
+-- Convention AuthContext : clubs.id = uid du fondateur. On garantit owner_id = id.
+UPDATE clubs SET owner_id = id WHERE owner_id IS NULL;
+
 CREATE INDEX IF NOT EXISTS idx_clubs_owner ON clubs(owner_id);
 CREATE INDEX IF NOT EXISTS idx_clubs_slug ON clubs(slug);
 CREATE INDEX IF NOT EXISTS idx_clubs_city ON clubs(city);
 ALTER TABLE clubs ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Clubs are viewable by everyone" ON clubs;
 CREATE POLICY "Clubs are viewable by everyone" ON clubs FOR SELECT USING (true);
+-- Le fondateur gère son propre club (clubs.id = auth.uid() OU owner_id = auth.uid())
 DROP POLICY IF EXISTS "Organizers can create clubs" ON clubs;
 CREATE POLICY "Organizers can create clubs" ON clubs FOR INSERT WITH CHECK (
-  EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'organizer')
+  id = auth.uid() OR owner_id = auth.uid()
 );
 DROP POLICY IF EXISTS "Owners can update their clubs" ON clubs;
-CREATE POLICY "Owners can update their clubs" ON clubs FOR UPDATE USING (auth.uid() = owner_id);
+CREATE POLICY "Owners can update their clubs" ON clubs FOR UPDATE USING (
+  id = auth.uid() OR owner_id = auth.uid()
+);
 
 
 -- club_members
@@ -452,6 +480,17 @@ INSERT INTO badges (slug, name, description, emoji, category, threshold) VALUES
 ('early_member', 'Early Member', 'A rejoint le club dans son premier mois.', '⭐', 'loyalty', 1)
 ON CONFLICT (slug) DO NOTHING;
 
+-- ab_test_views (tracking A/B fire-and-forget)
+CREATE TABLE IF NOT EXISTS ab_test_views (
+  id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  variant    TEXT,
+  page       TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+ALTER TABLE ab_test_views ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Anyone can insert ab_test_views" ON ab_test_views;
+CREATE POLICY "Anyone can insert ab_test_views" ON ab_test_views FOR INSERT WITH CHECK (true);
+
 
 -- ─────────────────────────────────────────────
 -- 4. AUTH MEMBRE — Nom + Date de naissance + PIN 4 chiffres
@@ -559,5 +598,5 @@ DROP POLICY IF EXISTS "lecture publique des spots crew" ON crew_spots;
 CREATE POLICY "lecture publique des spots crew" ON crew_spots FOR SELECT USING (true);
 DROP POLICY IF EXISTS "fondateur gere les spots de son crew" ON crew_spots;
 CREATE POLICY "fondateur gere les spots de son crew" ON crew_spots FOR ALL
-  USING  (club_id IN (SELECT id FROM clubs WHERE owner_id = auth.uid()))
-  WITH CHECK (club_id IN (SELECT id FROM clubs WHERE owner_id = auth.uid()));
+  USING  (club_id IN (SELECT id FROM clubs WHERE owner_id = auth.uid() OR id = auth.uid()))
+  WITH CHECK (club_id IN (SELECT id FROM clubs WHERE owner_id = auth.uid() OR id = auth.uid()));

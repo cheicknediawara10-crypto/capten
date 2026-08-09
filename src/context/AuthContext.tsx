@@ -98,6 +98,7 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
           .from('clubs')
           .insert({
             id: userId,
+            owner_id: userId,
             whatsapp_display_name: 'MON RUN CLUB',
             community_type: 'run_club'
           })
