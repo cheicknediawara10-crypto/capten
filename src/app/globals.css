@@ -36,6 +36,30 @@
   --radius-xl:   20px;
   --radius-2xl:  24px;
   --radius-full: 9999px;
+
+  /* App surfaces (espace fondateur) — pilotent le mode clair/sombre */
+  --app-bg:         #F4F5F7;
+  --app-surface:    #FFFFFF;
+  --app-surface-2:  #F4F4EE;
+  --app-text:       #1A1918;
+  --app-text-muted: #8A8880;
+  --app-border:     rgba(0,0,0,0.06);
+  --app-hover:      #FAFAF8;
+  --app-accent:     #FF5C00;
+  --app-accent-soft: rgba(255,92,0,0.08);
+}
+
+/* ─── Thème sombre (toggle) ─────────────────────────────────────────────── */
+:root[data-theme="dark"] {
+  --app-bg:         #0E0E0C;
+  --app-surface:    #1A1A17;
+  --app-surface-2:  #23231F;
+  --app-text:       #F4F3EF;
+  --app-text-muted: #918E86;
+  --app-border:     rgba(255,255,255,0.08);
+  --app-hover:      #201F1B;
+  --app-accent:     #FF6A1A;
+  --app-accent-soft: rgba(255,106,26,0.12);
 }
 
 /* ─── Base ──────────────────────────────────────────────────────────────── */

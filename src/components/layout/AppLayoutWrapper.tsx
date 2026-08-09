@@ -46,7 +46,7 @@ export default function AppLayoutWrapper({ children }: AppLayoutWrapperProps) {
       <Sidebar />
 
       {/* Main Content Area */}
-      <main className="flex-1 min-w-0 bg-[#F4F5F7] lg:pl-[280px] overflow-x-hidden">
+      <main className="flex-1 min-w-0 bg-[var(--app-bg)] text-[color:var(--app-text)] lg:pl-[280px] overflow-x-hidden">
         {/* Mobile Header (Only on small screens) */}
         <MobileHeader />
 

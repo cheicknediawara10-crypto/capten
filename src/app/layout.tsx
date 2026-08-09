@@ -47,7 +47,15 @@ export default function RootLayout({
 }) {
   return (
     <html lang="fr">
-      <body className={`${barlow.variable} ${montserrat.variable} ${dmMono.variable} font-sans bg-[#F4F5F7]`}>
+      <head>
+        {/* Applique le thème avant le paint pour éviter le flash */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{var t=localStorage.getItem('capten_theme');if(t==='dark')document.documentElement.setAttribute('data-theme','dark');}catch(e){}`,
+          }}
+        />
+      </head>
+      <body className={`${barlow.variable} ${montserrat.variable} ${dmMono.variable} font-sans bg-[var(--app-bg)]`}>
         <AuthContextProvider>
           <AppLayoutWrapper>{children}</AppLayoutWrapper>
         </AuthContextProvider>

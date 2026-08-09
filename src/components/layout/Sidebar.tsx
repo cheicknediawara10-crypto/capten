@@ -10,6 +10,7 @@ import {
   MessageSquare, CreditCard, Shield, Plus, History, CloudRain, Wind, Droplets, Activity, Lock, PlayCircle
 } from "lucide-react";
 import { logout } from "@/app/login/actions";
+import ThemeToggle from "@/components/layout/ThemeToggle";
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -73,7 +74,10 @@ export default function Sidebar() {
   ];
 
   return (
-    <aside className="hidden lg:flex w-[280px] bg-white h-screen fixed left-0 top-0 flex-col z-[100] border-r-[1px] border-black/5 py-10 shadow-none">
+    <aside
+      className="hidden lg:flex w-[280px] h-screen fixed left-0 top-0 flex-col z-[100] border-r-[1px] py-10 shadow-none"
+      style={{ background: "var(--app-surface)", borderColor: "var(--app-border)" }}
+    >
       <div className="px-5 py-4 max-h-[60px] flex items-center mb-10">
         <Link href="/dashboard" className="flex items-center gap-2.5 active:scale-95 transition-all">
           <img src={logo} alt="CAPTEN" className="h-[36px] w-auto object-contain rounded-control" />
@@ -83,7 +87,7 @@ export default function Sidebar() {
       <nav className="flex-1 space-y-8 overflow-y-auto custom-scrollbar">
         {sections.map((section) => (
           <div key={section.title}>
-            <p className="text-[10px] text-[#D1D1D1] font-black uppercase tracking-[0.3em] mb-4 px-8 italic">{section.title}</p>
+            <p className="text-[10px] text-[color:var(--app-text-muted)] font-black uppercase tracking-[0.3em] mb-4 px-8 italic opacity-70">{section.title}</p>
             <div className="space-y-0.5">
               {section.items.map((item: any) => {
                 const isActive =
@@ -95,10 +99,10 @@ export default function Sidebar() {
                 const content = (
                   <>
                     {isActive && <div className="absolute left-0 top-0 bottom-0 w-[4px] bg-[#FF5C00]" />}
-                    <span className={isActive ? 'text-[#FF5C00]' : 'text-[#A3A3A3]'}>
+                    <span className={isActive ? 'text-[#FF5C00]' : 'text-[color:var(--app-text-muted)]'}>
                       {item.icon}
                     </span>
-                    <span className={`text-[13px] tracking-tight ${isActive ? 'text-[#FF5C00] font-bold' : 'text-[#555555] font-medium'}`}>
+                    <span className={`text-[13px] tracking-tight ${isActive ? 'text-[#FF5C00] font-bold' : 'text-[color:var(--app-text)] font-medium'}`}>
                       {item.name}
                     </span>
                   </>
@@ -111,7 +115,7 @@ export default function Sidebar() {
                       href={item.href}
                       target={item.target}
                       rel="noopener noreferrer"
-                      className="relative flex items-center gap-4 px-8 py-2.5 transition-all text-[#555555] hover:text-black hover:bg-gray-50"
+                      className="relative flex items-center gap-4 px-8 py-2.5 transition-all text-[color:var(--app-text)] hover:bg-[var(--app-hover)]"
                     >
                       {content}
                     </a>
@@ -122,7 +126,7 @@ export default function Sidebar() {
                   <Link 
                     key={item.name}
                     href={item.href}
-                    className={`relative flex items-center gap-4 px-8 py-2.5 transition-all ${isActive ? 'bg-[#FFF0E8]/60 text-[#FF5C00]' : 'text-[#555555] hover:text-black hover:bg-gray-50'}`}
+                    className={`relative flex items-center gap-4 px-8 py-2.5 transition-all ${isActive ? 'bg-[var(--app-accent-soft)] text-[#FF5C00]' : 'text-[color:var(--app-text)] hover:bg-[var(--app-hover)]'}`}
                   >
                     {content}
                   </Link>
@@ -133,12 +137,16 @@ export default function Sidebar() {
         ))}
       </nav>
 
-      <div className="mt-auto pt-6 border-t-[0.5px] border-black/5 px-6">
-        <button 
+      <div className="mt-auto pt-6 border-t-[0.5px] px-6 space-y-2" style={{ borderColor: "var(--app-border)" }}>
+        <div className="flex items-center justify-between px-4 py-2">
+          <span className="text-[11px] font-bold uppercase tracking-widest text-[color:var(--app-text-muted)]">Thème</span>
+          <ThemeToggle />
+        </div>
+        <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-4 py-3 text-[#A3A3A3] hover:text-[#FF0000] hover:bg-[#FF0000]/5 rounded-control transition-all group"
+          className="w-full flex items-center gap-3 px-4 py-3 text-[color:var(--app-text-muted)] hover:text-[#FF0000] hover:bg-[#FF0000]/5 rounded-control transition-all group"
         >
-          <LogOut size={18} strokeWidth={1.5} className="text-[#D1D1D1] group-hover:text-[#FF0000]" />
+          <LogOut size={18} strokeWidth={1.5} className="text-[color:var(--app-text-muted)] group-hover:text-[#FF0000]" />
           <span className="text-[12px] font-bold uppercase tracking-widest">Déconnexion</span>
         </button>
       </div>
