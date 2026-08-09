@@ -152,6 +152,12 @@ CREATE TABLE IF NOT EXISTS club_members (
 CREATE INDEX IF NOT EXISTS idx_club_members_club_id ON club_members(club_id);
 CREATE INDEX IF NOT EXISTS idx_club_members_member_id ON club_members(member_id);
 CREATE INDEX IF NOT EXISTS idx_club_members_referral ON club_members(referral_code);
+-- Blindage colonnes (si la table préexistait avec un schéma ancien)
+ALTER TABLE club_members ADD COLUMN IF NOT EXISTS member_id UUID;
+ALTER TABLE club_members ADD COLUMN IF NOT EXISTS club_id UUID;
+ALTER TABLE club_members ADD COLUMN IF NOT EXISTS role club_role DEFAULT 'member';
+ALTER TABLE club_members ADD COLUMN IF NOT EXISTS is_active BOOLEAN NOT NULL DEFAULT true;
+ALTER TABLE club_members ADD COLUMN IF NOT EXISTS referral_code TEXT;
 ALTER TABLE club_members ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Members viewable by everyone" ON club_members;
 CREATE POLICY "Members viewable by everyone" ON club_members FOR SELECT USING (true);
@@ -186,6 +192,8 @@ CREATE TABLE IF NOT EXISTS events (
 CREATE INDEX IF NOT EXISTS idx_events_club_id ON events(club_id);
 CREATE INDEX IF NOT EXISTS idx_events_date ON events(event_date);
 CREATE INDEX IF NOT EXISTS idx_events_status ON events(status);
+ALTER TABLE events ADD COLUMN IF NOT EXISTS club_id UUID;
+ALTER TABLE events ADD COLUMN IF NOT EXISTS status event_status NOT NULL DEFAULT 'draft';
 ALTER TABLE events ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Published events are public" ON events;
 CREATE POLICY "Published events are public" ON events FOR SELECT USING (status = 'published' OR status = 'completed');
@@ -210,6 +218,7 @@ CREATE TABLE IF NOT EXISTS event_registrations (
 );
 CREATE INDEX IF NOT EXISTS idx_event_reg_event ON event_registrations(event_id);
 CREATE INDEX IF NOT EXISTS idx_event_reg_member ON event_registrations(member_id);
+ALTER TABLE event_registrations ADD COLUMN IF NOT EXISTS member_id UUID;
 ALTER TABLE event_registrations ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Registrations viewable by club admins and self" ON event_registrations;
 CREATE POLICY "Registrations viewable by club admins and self" ON event_registrations FOR SELECT USING (
@@ -237,6 +246,9 @@ CREATE TABLE IF NOT EXISTS checkins (
 );
 CREATE INDEX IF NOT EXISTS idx_checkins_event ON checkins(event_id);
 CREATE INDEX IF NOT EXISTS idx_checkins_member ON checkins(member_id);
+ALTER TABLE checkins ADD COLUMN IF NOT EXISTS member_id UUID;
+ALTER TABLE checkins ADD COLUMN IF NOT EXISTS event_id UUID;
+ALTER TABLE checkins ADD COLUMN IF NOT EXISTS is_valid BOOLEAN NOT NULL DEFAULT false;
 ALTER TABLE checkins ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Checkins viewable by self and admins" ON checkins;
 CREATE POLICY "Checkins viewable by self and admins" ON checkins FOR SELECT USING (
@@ -292,6 +304,8 @@ CREATE TABLE IF NOT EXISTS waivers (
   is_valid BOOLEAN NOT NULL DEFAULT true
 );
 CREATE INDEX IF NOT EXISTS idx_waivers_member_club ON waivers(member_id, club_id);
+ALTER TABLE waivers ADD COLUMN IF NOT EXISTS member_id UUID;
+ALTER TABLE waivers ADD COLUMN IF NOT EXISTS club_id UUID;
 ALTER TABLE waivers ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "View own waivers" ON waivers;
 CREATE POLICY "View own waivers" ON waivers FOR SELECT USING (auth.uid() = member_id);
@@ -319,6 +333,8 @@ CREATE TABLE IF NOT EXISTS spots (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+ALTER TABLE spots ADD COLUMN IF NOT EXISTS is_active BOOLEAN NOT NULL DEFAULT true;
+ALTER TABLE spots ADD COLUMN IF NOT EXISTS club_id UUID;
 ALTER TABLE spots ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Spots viewable by public" ON spots;
 CREATE POLICY "Spots viewable by public" ON spots FOR SELECT USING (is_active = true);
@@ -342,6 +358,9 @@ CREATE TABLE IF NOT EXISTS spot_transactions (
 );
 CREATE INDEX IF NOT EXISTS idx_spot_tx_spot ON spot_transactions(spot_id);
 CREATE INDEX IF NOT EXISTS idx_spot_tx_club ON spot_transactions(club_id);
+ALTER TABLE spot_transactions ADD COLUMN IF NOT EXISTS club_id UUID;
+ALTER TABLE spot_transactions ADD COLUMN IF NOT EXISTS commission_amount DECIMAL(10,2) DEFAULT 0;
+ALTER TABLE spot_transactions ADD COLUMN IF NOT EXISTS status spot_tx_status DEFAULT 'pending';
 ALTER TABLE spot_transactions ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Club admins view transactions" ON spot_transactions;
 CREATE POLICY "Club admins view transactions" ON spot_transactions FOR SELECT USING (
@@ -360,6 +379,7 @@ CREATE TABLE IF NOT EXISTS badges (
   threshold INTEGER NOT NULL DEFAULT 1,
   is_active BOOLEAN NOT NULL DEFAULT true
 );
+ALTER TABLE badges ADD COLUMN IF NOT EXISTS is_active BOOLEAN NOT NULL DEFAULT true;
 ALTER TABLE badges ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Badges are public" ON badges;
 CREATE POLICY "Badges are public" ON badges FOR SELECT USING (is_active = true);
@@ -389,6 +409,9 @@ CREATE TABLE IF NOT EXISTS member_tokens (
   is_active BOOLEAN NOT NULL DEFAULT true
 );
 CREATE INDEX IF NOT EXISTS idx_member_tokens_token ON member_tokens(token);
+ALTER TABLE member_tokens ADD COLUMN IF NOT EXISTS is_active BOOLEAN NOT NULL DEFAULT true;
+ALTER TABLE member_tokens ADD COLUMN IF NOT EXISTS token TEXT;
+ALTER TABLE member_tokens ADD COLUMN IF NOT EXISTS member_id UUID;
 ALTER TABLE member_tokens ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Public can read tokens for micro-page" ON member_tokens;
 CREATE POLICY "Public can read tokens for micro-page" ON member_tokens FOR SELECT USING (is_active = true);
