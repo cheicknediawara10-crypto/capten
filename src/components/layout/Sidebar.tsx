@@ -23,14 +23,12 @@ export default function Sidebar() {
       setLogo(savedLogo || "/logo.png");
 
       const savedType = localStorage.getItem("capten_community_type");
-      if (savedType === "run_club") {
-        setSessionMenuLabel("Les Runs");
-      } else if (savedType === "walk_club") {
+      if (savedType === "walk_club") {
         setSessionMenuLabel("Les Marches");
       } else if (savedType === "trail_hiking") {
         setSessionMenuLabel("Les Sorties Trail");
       } else {
-        setSessionMenuLabel("Les Sorties");
+        setSessionMenuLabel("Les Runs");
       }
     };
 
@@ -67,7 +65,7 @@ export default function Sidebar() {
     {
       title: "COMPTE",
       items: [
-        { name: "Mon Club", icon: <Settings size={18} strokeWidth={1.5} />, href: "/dashboard/club" },
+        { name: "Mon Crew", icon: <Settings size={18} strokeWidth={1.5} />, href: "/dashboard/club" },
         { name: "Abonnement", icon: <CreditCard size={18} strokeWidth={1.5} />, href: "/plan" },
         { name: "Support & Aide", icon: <HelpCircle size={18} strokeWidth={1.5} />, href: "/support" },
       ]

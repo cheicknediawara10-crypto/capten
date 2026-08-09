@@ -23,7 +23,7 @@ export default function MobileNav() {
       } else if (savedType === "trail_hiking") {
         setSessionMenuLabel("Sorties Trail");
       } else {
-        setSessionMenuLabel("Les Sorties");
+        setSessionMenuLabel("Les Runs");
       }
     };
     updateBranding();

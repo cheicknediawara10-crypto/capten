@@ -200,11 +200,17 @@ DROP POLICY IF EXISTS "Published events are public" ON events;
 CREATE POLICY "Published events are public" ON events FOR SELECT USING (status = 'published' OR status = 'completed');
 DROP POLICY IF EXISTS "Club admins can see all events" ON events;
 CREATE POLICY "Club admins can see all events" ON events FOR SELECT USING (
-  EXISTS (SELECT 1 FROM club_members cm WHERE cm.club_id = events.club_id AND cm.member_id = auth.uid())
+  EXISTS (SELECT 1 FROM clubs c WHERE c.id = events.club_id AND (c.owner_id = auth.uid() OR c.id = auth.uid()))
+  OR EXISTS (SELECT 1 FROM club_members cm WHERE cm.club_id = events.club_id AND cm.member_id = auth.uid())
 );
+-- Le fondateur (owner du crew) gère ses runs, en plus des co-organisateurs
 DROP POLICY IF EXISTS "Club admins can manage events" ON events;
 CREATE POLICY "Club admins can manage events" ON events FOR ALL USING (
-  EXISTS (SELECT 1 FROM club_members cm WHERE cm.club_id = events.club_id AND cm.member_id = auth.uid() AND cm.role IN ('admin', 'co_organizer'))
+  EXISTS (SELECT 1 FROM clubs c WHERE c.id = events.club_id AND (c.owner_id = auth.uid() OR c.id = auth.uid()))
+  OR EXISTS (SELECT 1 FROM club_members cm WHERE cm.club_id = events.club_id AND cm.member_id = auth.uid() AND cm.role IN ('admin', 'co_organizer'))
+) WITH CHECK (
+  EXISTS (SELECT 1 FROM clubs c WHERE c.id = events.club_id AND (c.owner_id = auth.uid() OR c.id = auth.uid()))
+  OR EXISTS (SELECT 1 FROM club_members cm WHERE cm.club_id = events.club_id AND cm.member_id = auth.uid() AND cm.role IN ('admin', 'co_organizer'))
 );
 
 

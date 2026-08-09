@@ -87,7 +87,7 @@ export default function DashboardPage() {
   ];
 
   const ACTIONS = [
-    { label: `Créer une ${L.session_single}`, icon: <Plus size={16} />, href: '/dashboard/events/new', primary: true },
+    { label: `Créer ${L.session_single}`, icon: <Plus size={16} />, href: '/dashboard/events/new', primary: true },
     { label: 'Voir les membres', icon: <Users size={16} />, href: '/dashboard/members' },
     { label: 'Les Spots du Crew', icon: <MapPin size={16} />, href: '/dashboard/spots' },
     { label: 'Messages', icon: <MessageSquare size={16} />, href: '/messages' },
@@ -146,7 +146,7 @@ export default function DashboardPage() {
       {/* Prochaines sorties */}
       <div>
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-[13px] font-black uppercase tracking-widest text-[#666562]">Prochaines {L.session_plural}</h2>
+          <h2 className="text-[13px] font-black uppercase tracking-widest text-[#666562]">Tes {L.session_plural} à venir</h2>
           <Link href="/dashboard/events" className="text-[12px] font-bold text-[#FF5C00] hover:underline inline-flex items-center gap-1">
             Tout voir <ArrowRight size={12} />
           </Link>
@@ -157,10 +157,10 @@ export default function DashboardPage() {
           ) : upcoming.length === 0 ? (
             <div className="flex flex-col items-center gap-3 py-12 text-center">
               <Calendar size={28} className="text-[#D1D1D1]" />
-              <p className="text-[13px] text-[#A3A3A3]">Aucune {L.session_single} prévue.</p>
+              <p className="text-[13px] text-[#A3A3A3]">Pas de {L.session_plural} à venir.</p>
               <Link href="/dashboard/events/new"
                 className="inline-flex items-center gap-2 h-10 px-5 rounded-full bg-[#FF5C00] text-white text-[12px] font-black uppercase tracking-wider hover:bg-[#E04B00] transition-colors">
-                <Plus size={14} /> Créer une {L.session_single}
+                <Plus size={14} /> Créer {L.session_single}
               </Link>
             </div>
           ) : (

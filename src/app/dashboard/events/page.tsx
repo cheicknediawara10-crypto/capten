@@ -77,10 +77,10 @@ export default function EventsPage() {
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-[28px] sm:text-[36px] font-display italic font-black uppercase text-black leading-none tracking-tighter">
-            Les Sorties
+            Les Runs
           </h1>
           <p className="text-[13px] text-[#A3A3A3] font-sans mt-1">
-            {upcoming > 0 ? `${upcoming} sortie${upcoming > 1 ? "s" : ""} à venir` : "Planifie ta prochaine sortie"}
+            {upcoming > 0 ? `${upcoming} run${upcoming > 1 ? "s" : ""} à venir` : "Planifie ton prochain run"}
           </p>
         </div>
         <Link
@@ -122,19 +122,21 @@ export default function EventsPage() {
           animate={{ opacity: 1, y: 0 }}
           className="flex flex-col items-center justify-center py-24 space-y-4"
         >
-          <div className="text-5xl">🏃</div>
+          <div className="w-14 h-14 rounded-2xl bg-[#FF5500]/[0.08] flex items-center justify-center">
+            <MapPin size={26} className="text-[#FF5500]" />
+          </div>
           <h3 className="text-[20px] font-display italic font-black uppercase text-black">
-            Aucune sortie prévue
+            Aucun run prévu
           </h3>
           <p className="text-[13px] text-[#A3A3A3] font-sans text-center max-w-xs">
-            Lance ta première sortie et partage le lien avec ton crew.
+            Lance ton premier run et partage le lien avec ton crew.
           </p>
           <Link
             href="/dashboard/events/new"
             className="flex items-center gap-2 bg-[#FF5500] text-white px-6 py-3 rounded-full text-[12px] font-black uppercase tracking-widest hover:bg-black transition-all"
           >
             <Plus size={14} />
-            Créer une sortie
+            Créer un run
           </Link>
         </motion.div>
       ) : (

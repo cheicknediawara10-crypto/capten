@@ -31,8 +31,18 @@ export default function ClubSettingsPage() {
       const supabase = getSupabase();
       if (!supabase || !authClub) { setLoading(false); return; }
 
-      const { data } = await supabase.from("clubs").select("*").eq("id", authClub.id).single();
-      setClub(data);
+      const { data } = await supabase.from("clubs").select("*").eq("id", authClub.id).maybeSingle();
+      // Fallback sur les infos déjà chargées par AuthContext si la requête ne renvoie rien
+      setClub((data as Club) || ({
+        id: authClub.id,
+        name: authClub.name || "",
+        slug: (authClub as any).slug || "",
+        description: null,
+        logo_url: (authClub.branding as any)?.logo || null,
+        city: null,
+        sport_type: null,
+        website_url: null,
+      } as Club));
       setLoading(false);
     }
     load();
@@ -106,9 +116,9 @@ export default function ClubSettingsPage() {
     <div className="pb-20 space-y-6 max-w-2xl">
       <div>
         <h1 className="text-[28px] sm:text-[36px] font-display italic font-black uppercase text-black leading-none tracking-tighter">
-          Mon Club
+          Mon Crew
         </h1>
-        <p className="text-[13px] text-[#A3A3A3] mt-1">Paramètres et identité de ton club</p>
+        <p className="text-[13px] text-[#A3A3A3] mt-1">Paramètres et identité de ton crew</p>
       </div>
 
       {/* Logo */}

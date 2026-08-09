@@ -49,24 +49,24 @@ export default function SupportPage() {
 
   const faqs = [
     {
-      q: "Que faire en cas d'accident ou de malaise pendant une session ?",
-      a: "Accédez immédiatement au profil du membre depuis votre tableau de bord ou scannez sa carte de membre. La fiche d'urgence (groupe sanguin, allergies, contact ICE) s'affiche en 1 clic. Appelez le 112 ou 15 en priorité si l'état le nécessite."
+      q: "Que faire en cas d'accident ou de malaise pendant un run ?",
+      a: "Ouvre la fiche du membre depuis Membres ou Protection : le contact d'urgence (ICE), le groupe sanguin et les allergies s'affichent en 1 clic. Appelle le 112 ou le 15 en priorité si l'état le nécessite."
     },
     {
-      q: "Un membre n'a pas signé sa décharge, peut-il participer ?",
-      a: "Par mesure de sécurité juridique pour vous et votre club, la décharge doit être signée sur son navigateur avant de démarrer. Envoyez-lui votre lien d'inscription unique : cela ne prend que 30 secondes."
+      q: "Un membre n'a pas signé sa décharge, peut-il courir ?",
+      a: "Par sécurité juridique pour toi et ton crew, la décharge se signe à l'inscription (via ton lien unique). Renvoie-lui le lien d'inscription : ça prend 30 secondes et c'est horodaté."
     },
     {
-      q: "Comment fonctionne le virement des cagnottes ?",
-      a: "Capten ne touche pas votre argent et ne prend 0% de commission. Les membres contribuent directement sur votre lien Sumeria (Lydia), Revolut ou Wero. Les fonds arrivent instantanément sur votre propre téléphone."
+      q: "Comment un membre rejoint mon crew ?",
+      a: "Partage ton lien d'inscription (dispo sur le Tableau de bord). Le coureur s'inscrit avec Prénom + Nom + Date de naissance + un code PIN à 4 chiffres — aucune app à installer, rien à mémoriser d'autre."
     },
     {
-      q: "Le commerce partenaire (Spot) souhaite modifier l'horaire de réservation ?",
-      a: "Vous pouvez annuler ou reprogrammer une date Spots depuis l'onglet 'Spots' de votre interface. Le commerce et vos membres recevront une mise à jour automatique par email."
+      q: "C'est quoi Les Spots du Crew ? Capten touche une commission ?",
+      a: "Non, zéro paiement et zéro commission. Les Spots, c'est juste tes bonnes adresses (café d'après-run, shop, kiné) affichées à ton crew. Si tu as négocié un avantage à l'oral avec un commerçant, tu l'indiques en texte libre — Capten n'encaisse jamais rien."
     },
     {
-      q: "Comment ajouter un co-capitaine ou un adjoint ?",
-      a: "Rendez-vous dans l'onglet 'Réglages' > 'Équipe d'encadrement'. Vous pouvez inviter un adjoint en saisissant son prénom et son adresse email."
+      q: "Comment fonctionne le check-in GPS d'un run ?",
+      a: "Depuis la fiche du run, tes membres valident leur présence au point de rendez-vous (GPS ou QR). Tu vois qui est là en direct sur ton tableau de bord — pour ne laisser personne derrière."
     }
   ];
 
@@ -80,12 +80,12 @@ export default function SupportPage() {
               SUPPORT & ASSISTANCE
             </h1>
             <span className="bg-[#FF5C00]/10 text-[#FF5C00] border border-[#FF5C00]/20 px-3 py-1 rounded-full text-[10px] font-mono font-black uppercase tracking-wider flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-[#56E39F] animate-pulse" /> 24/7 CAPTAIN HELPDESK
+              <span className="w-2 h-2 rounded-full bg-[#56E39F] animate-pulse" /> SUPPORT CAPTEN
             </span>
           </div>
         </div>
         <p className="text-xs sm:text-sm text-neutral-500 font-medium max-w-2xl mt-1">
-          Un problème pendant une session, une question juridique ou un besoin d&apos;assistance ? L&apos;équipe Capten est disponible pour répondre à vos urgences terrain.
+          Un souci pendant un run, une question juridique ou un besoin d&apos;assistance ? L&apos;équipe Capten est là pour répondre à tes urgences terrain.
         </p>
       </header>
 
@@ -102,7 +102,7 @@ export default function SupportPage() {
               <h3 className="text-[20px] font-display italic font-black uppercase text-white mt-1">WHATSAPP CAPTAIN</h3>
             </div>
             <p className="text-[11px] text-white/85 leading-relaxed font-medium">
-              Contactez directement l&apos;équipe de fondateurs sur WhatsApp pour une réponse prioritaire avant votre session.
+              Contacte directement l&apos;équipe Capten sur WhatsApp pour une réponse prioritaire avant ton run.
             </p>
           </div>
           <div className="pt-6 mt-4 border-t border-white/15">
@@ -153,15 +153,15 @@ export default function SupportPage() {
             </div>
             <div className="space-y-2 text-[11px] font-mono text-neutral-600">
               <p className="flex items-center justify-between border-b border-black/5 pb-1.5">
-                <span>Base Supabase RLS :</span>
+                <span>Plateforme :</span>
                 <span className="text-[#56E39F] font-bold">100% OK</span>
               </p>
               <p className="flex items-center justify-between border-b border-black/5 pb-1.5">
-                <span>Paiements Stripe :</span>
+                <span>Paiements sécurisés :</span>
                 <span className="text-[#56E39F] font-bold">100% OK</span>
               </p>
               <p className="flex items-center justify-between">
-                <span>WhatsApp Bot :</span>
+                <span>Données &amp; sauvegardes :</span>
                 <span className="text-[#56E39F] font-bold">100% OK</span>
               </p>
             </div>
