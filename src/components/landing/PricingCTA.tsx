@@ -61,7 +61,7 @@ export function PricingCTA() {
 
             <div className="mb-8">
               <div className="text-[42px] font-extrabold text-white leading-none">
-                49,99 <span className="text-white/25 text-2xl font-semibold">€/mois</span>
+                29,99 <span className="text-white/25 text-2xl font-semibold">€/mois</span>
               </div>
               <div className="text-sm text-white/30 font-medium mt-2">ou 399 € / an — 2 mois offerts</div>
             </div>

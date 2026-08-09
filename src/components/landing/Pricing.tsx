@@ -146,7 +146,7 @@ export function Pricing() {
                   className="text-white leading-none"
                   style={{ fontSize: "52px", fontWeight: 1000, letterSpacing: "-2px" }}
                 >
-                  29€
+                  29,99€
                 </span>
                 <span
                   className="text-white/40 mb-2"

@@ -64,7 +64,7 @@ export default function CGUPage() {
               CAPTEN propose un essai gratuit de 21 jours, sans carte bancaire requise. À l'issue de cet essai, l'utilisation de la plateforme nécessite la souscription à notre abonnement PRO unique :
             </p>
             <ul className="list-disc pl-6 space-y-2">
-              <li><strong>Tarif Mensuel :</strong> 49,99€ par mois, sans engagement, résiliable en 1 clic.</li>
+              <li><strong>Tarif Mensuel :</strong> 29,99€ par mois, sans engagement, résiliable en 1 clic.</li>
               <li><strong>Tarif Annuel :</strong> 399€ par an, facturé annuellement (équivalant à 2 mois offerts).</li>
             </ul>
             <p>

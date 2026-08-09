@@ -882,7 +882,7 @@ function LoginForm() {
               }}>
                 <li>Accès complet premium immédiat sans restriction.</li>
                 <li style={{ fontWeight: 800, color: C.text }}>Rien ne t'est prélevé aujourd'hui.</li>
-                <li>Débit de 49,99 €/mois à partir du <span style={{ fontWeight: 700 }}>{new Date(Date.now() + 21 * 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR')}</span>.</li>
+                <li>Débit de 29,99 €/mois à partir du <span style={{ fontWeight: 700 }}>{new Date(Date.now() + 21 * 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR')}</span>.</li>
                 <li>Annulation en 1 clic sans justification depuis tes réglages.</li>
               </ul>
             </div>

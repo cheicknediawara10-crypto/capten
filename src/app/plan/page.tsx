@@ -187,7 +187,7 @@ export default function PlanPage() {
     if (success === 'true' && sessionId && planNameParam) {
       const mockPlan = {
         name: planNameParam,
-        price: planNameParam === 'CAPTEN' ? (billingInterval === 'yearly' ? '499€' : '49,99€') : '0€',
+        price: planNameParam === 'CAPTEN' ? (billingInterval === 'yearly' ? '299€' : '29,99€') : '0€',
         period: billingInterval === 'yearly' ? '/an' : '/mois',
       };
       setSelectedPlan(mockPlan);
@@ -304,10 +304,10 @@ export default function PlanPage() {
     },
     {
       name: "CAPTEN",
-      price: billingInterval === 'monthly' ? "49,99€" : "41,58€",
+      price: billingInterval === 'monthly' ? "29,99€" : "24,99€",
       period: "/mois",
-      billingNote: billingInterval === 'yearly' 
-        ? "Facturé 499€/an (2 mois offerts)" 
+      billingNote: billingInterval === 'yearly'
+        ? "Facturé 299,90€/an (2 mois offerts)"
         : "Essai 21 jours gratuit — Rien ne t'est prélevé aujourd'hui",
       desc: "Le cockpit de pilotage ultime pour structurer ton crew et le faire grandir comme un pro.",
       tag: billingInterval === 'yearly'

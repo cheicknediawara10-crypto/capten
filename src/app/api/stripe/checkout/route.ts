@@ -78,8 +78,8 @@ export async function POST(request: Request) {
       }
 
       const isYearly = billingInterval === 'yearly';
-      // CAPTEN: 49.99€/mois ou 499€/an
-      const planAmount = isYearly ? 499.00 : 49.99;
+      // CAPTEN: 29,99€/mois ou 299,90€/an (2 mois offerts)
+      const planAmount = isYearly ? 299.90 : 29.99;
 
       const intervalText = isYearly ? 'yearly' : 'monthly';
       const stripeInterval = isYearly ? 'year' : 'month';
