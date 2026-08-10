@@ -77,19 +77,19 @@ export default function StatsPage() {
     load();
   }, [club]);
 
-  const COLORS = ["#FF5500", "#1A1918", "#A3A3A3"];
+  const COLORS = ["#FF5C00", "#1A1918", "#A3A3A3"];
 
   const KPI_CARDS = [
-    { label: "Membres", value: kpis.members, icon: <Users size={18} className="text-[#FF5500]" />, suffix: "" },
-    { label: "Sorties", value: kpis.events, icon: <Calendar size={18} className="text-[#FF5500]" />, suffix: "" },
-    { label: "Check-ins", value: kpis.checkins, icon: <CheckSquare size={18} className="text-[#FF5500]" />, suffix: "" },
-    { label: "Moy. par sortie", value: kpis.avgPerEvent, icon: <TrendingUp size={18} className="text-[#FF5500]" />, suffix: "" },
+    { label: "Membres", value: kpis.members, icon: <Users size={18} className="text-[#FF5C00]" />, suffix: "" },
+    { label: "Sorties", value: kpis.events, icon: <Calendar size={18} className="text-[#FF5C00]" />, suffix: "" },
+    { label: "Check-ins", value: kpis.checkins, icon: <CheckSquare size={18} className="text-[#FF5C00]" />, suffix: "" },
+    { label: "Moy. par sortie", value: kpis.avgPerEvent, icon: <TrendingUp size={18} className="text-[#FF5C00]" />, suffix: "" },
   ];
 
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="animate-spin text-[#FF5500]" size={32} />
+        <Loader2 className="animate-spin text-[#FF5C00]" size={32} />
       </div>
     );
   }
@@ -97,10 +97,10 @@ export default function StatsPage() {
   return (
     <div className="space-y-8 pb-20">
       <div>
-        <h1 className="text-[28px] sm:text-[36px] font-display italic font-black uppercase text-black leading-none tracking-tighter">
+        <h1 className="text-[28px] sm:text-[36px] font-display italic font-black uppercase text-[color:var(--app-text)] leading-none tracking-tighter">
           Statistiques
         </h1>
-        <p className="text-[13px] text-[#A3A3A3] mt-1">Aperçu de l'activité de ton club</p>
+        <p className="text-[13px] text-[color:var(--app-text-muted)] mt-1">Aperçu de l'activité de ton club</p>
       </div>
 
       {/* KPI cards */}
@@ -111,13 +111,13 @@ export default function StatsPage() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.06 }}
-            className="bg-white rounded-[24px] border border-black/5 p-5"
+            className="bg-[var(--app-surface)] rounded-[24px] border border-[color:var(--app-border)] p-5"
           >
             <div className="flex items-center justify-between mb-3">
-              <span className="text-[10px] font-black uppercase tracking-widest text-[#A3A3A3]">{kpi.label}</span>
+              <span className="text-[10px] font-black uppercase tracking-widest text-[color:var(--app-text-muted)]">{kpi.label}</span>
               {kpi.icon}
             </div>
-            <p className="text-[36px] font-display font-black italic text-black leading-none">
+            <p className="text-[36px] font-display font-black italic text-[color:var(--app-text)] leading-none">
               {kpi.value}
             </p>
           </motion.div>
@@ -129,9 +129,9 @@ export default function StatsPage() {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="bg-white rounded-[24px] border border-black/5 p-6"
+        className="bg-[var(--app-surface)] rounded-[24px] border border-[color:var(--app-border)] p-6"
       >
-        <h3 className="text-[11px] font-black uppercase tracking-widest text-[#666562] mb-6">
+        <h3 className="text-[11px] font-black uppercase tracking-widest text-[color:var(--app-text-muted)] mb-6">
           Check-ins — 6 derniers mois
         </h3>
         <ResponsiveContainer width="100%" height={220}>
@@ -141,15 +141,15 @@ export default function StatsPage() {
             <YAxis tick={{ fontSize: 11, fill: "#A3A3A3" }} axisLine={false} tickLine={false} />
             <Tooltip
               contentStyle={{ border: "none", borderRadius: 12, boxShadow: "0 8px 32px rgba(0,0,0,0.12)", fontSize: 12 }}
-              cursor={{ stroke: "#FF5500", strokeWidth: 1, strokeDasharray: "4 4" }}
+              cursor={{ stroke: "#FF5C00", strokeWidth: 1, strokeDasharray: "4 4" }}
             />
             <Line
               type="monotone"
               dataKey="checkins"
-              stroke="#FF5500"
+              stroke="#FF5C00"
               strokeWidth={2.5}
-              dot={{ fill: "#FF5500", r: 4, strokeWidth: 0 }}
-              activeDot={{ r: 6, fill: "#FF5500" }}
+              dot={{ fill: "#FF5C00", r: 4, strokeWidth: 0 }}
+              activeDot={{ r: 6, fill: "#FF5C00" }}
               name="Check-ins"
             />
           </LineChart>
@@ -162,9 +162,9 @@ export default function StatsPage() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.25 }}
-          className="bg-white rounded-[24px] border border-black/5 p-6"
+          className="bg-[var(--app-surface)] rounded-[24px] border border-[color:var(--app-border)] p-6"
         >
-          <h3 className="text-[11px] font-black uppercase tracking-widest text-[#666562] mb-6">
+          <h3 className="text-[11px] font-black uppercase tracking-widest text-[color:var(--app-text-muted)] mb-6">
             Sorties par mois
           </h3>
           <ResponsiveContainer width="100%" height={180}>
@@ -174,7 +174,7 @@ export default function StatsPage() {
               <YAxis tick={{ fontSize: 11, fill: "#A3A3A3" }} axisLine={false} tickLine={false} />
               <Tooltip
                 contentStyle={{ border: "none", borderRadius: 12, boxShadow: "0 8px 32px rgba(0,0,0,0.12)", fontSize: 12 }}
-                cursor={{ fill: "rgba(255,85,0,0.06)" }}
+                cursor={{ fill: "rgba(255,92,0,0.06)" }}
               />
               <Bar dataKey="events" fill="#1A1918" radius={[6, 6, 0, 0]} name="Sorties" />
             </BarChart>
@@ -186,9 +186,9 @@ export default function StatsPage() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="bg-white rounded-[24px] border border-black/5 p-6"
+          className="bg-[var(--app-surface)] rounded-[24px] border border-[color:var(--app-border)] p-6"
         >
-          <h3 className="text-[11px] font-black uppercase tracking-widest text-[#666562] mb-6">
+          <h3 className="text-[11px] font-black uppercase tracking-widest text-[color:var(--app-text-muted)] mb-6">
             Répartition par sport
           </h3>
           <div className="flex items-center gap-6">
@@ -214,8 +214,8 @@ export default function StatsPage() {
               {sportData.map((item, i) => (
                 <div key={item.name} className="flex items-center gap-2">
                   <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: COLORS[i] }} />
-                  <span className="text-[12px] font-medium text-[#1A1918] flex-1">{item.name}</span>
-                  <span className="text-[12px] font-black text-[#1A1918]">{item.value}%</span>
+                  <span className="text-[12px] font-medium text-[color:var(--app-text)] flex-1">{item.name}</span>
+                  <span className="text-[12px] font-black text-[color:var(--app-text)]">{item.value}%</span>
                 </div>
               ))}
             </div>

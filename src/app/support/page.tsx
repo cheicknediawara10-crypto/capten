@@ -71,12 +71,12 @@ export default function SupportPage() {
   ];
 
   return (
-    <div className="space-y-10 pb-20 text-black">
+    <div className="space-y-10 pb-20 text-[color:var(--app-text)]">
       {/* HEADER */}
-      <header className="flex flex-col gap-1.5 pb-6 sm:pb-10 border-b-[0.5px] border-black/10 mb-8 sm:mb-10">
+      <header className="flex flex-col gap-1.5 pb-6 sm:pb-10 border-b-[0.5px] border-[color:var(--app-border)] mb-8 sm:mb-10">
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 w-full">
           <div className="flex flex-wrap items-center gap-4">
-            <h1 className="text-[28px] sm:text-[42px] font-display italic font-black uppercase text-black leading-none tracking-tight">
+            <h1 className="text-[28px] sm:text-[42px] font-display italic font-black uppercase text-[color:var(--app-text)] leading-none tracking-tight">
               SUPPORT & ASSISTANCE
             </h1>
             <span className="bg-[#FF5C00]/10 text-[#FF5C00] border border-[#FF5C00]/20 px-3 py-1 rounded-full text-[10px] font-mono font-black uppercase tracking-wider flex items-center gap-1.5">
@@ -84,7 +84,7 @@ export default function SupportPage() {
             </span>
           </div>
         </div>
-        <p className="text-xs sm:text-sm text-neutral-500 font-medium max-w-2xl mt-1">
+        <p className="text-xs sm:text-sm text-[color:var(--app-text-muted)] font-medium max-w-2xl mt-1">
           Un souci pendant un run, une question juridique ou un besoin d&apos;assistance ? L&apos;équipe Capten est là pour répondre à tes urgences terrain.
         </p>
       </header>
@@ -110,7 +110,7 @@ export default function SupportPage() {
               href={whatsappSupportUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full bg-white text-[#075E54] hover:bg-white/90 py-3 rounded-control text-[10px] font-black uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md font-sans"
+              className="w-full bg-[var(--app-surface)] text-[#075E54] hover:bg-white/90 py-3 rounded-control text-[10px] font-black uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md font-sans"
             >
               Ouvrir WhatsApp Support <ArrowRight size={14} />
             </a>
@@ -118,20 +118,20 @@ export default function SupportPage() {
         </div>
 
         {/* EMAIL SUPPORT */}
-        <div className="bg-white border border-[#E5E5E5] rounded-card-outer p-6 sm:p-8 flex flex-col justify-between shadow-sm relative overflow-hidden group">
+        <div className="bg-[var(--app-surface)] border border-[color:var(--app-border)] rounded-card-outer p-6 sm:p-8 flex flex-col justify-between shadow-sm relative overflow-hidden group">
           <div className="space-y-4">
-            <div className="w-10 h-10 rounded-2xl bg-black/5 border border-black/10 flex items-center justify-center text-black">
+            <div className="w-10 h-10 rounded-2xl bg-black/5 border border-[color:var(--app-border)] flex items-center justify-center text-[color:var(--app-text)]">
               <Mail size={22} />
             </div>
             <div>
-              <span className="text-[9px] font-black text-neutral-400 uppercase tracking-widest block font-mono">SUPPORT FORMEL</span>
-              <h3 className="text-[20px] font-display italic font-black uppercase text-black mt-1">EMAIL DIRECT</h3>
+              <span className="text-[9px] font-black text-[color:var(--app-text-muted)] uppercase tracking-widest block font-mono">SUPPORT FORMEL</span>
+              <h3 className="text-[20px] font-display italic font-black uppercase text-[color:var(--app-text)] mt-1">EMAIL DIRECT</h3>
             </div>
-            <p className="text-[11px] text-neutral-500 leading-relaxed font-medium">
-              Envoyez-nous vos questions administratives, factures ou suggestions à <span className="font-mono text-black font-bold">support@capten.app</span>.
+            <p className="text-[11px] text-[color:var(--app-text-muted)] leading-relaxed font-medium">
+              Envoyez-nous vos questions administratives, factures ou suggestions à <span className="font-mono text-[color:var(--app-text)] font-bold">support@capten.app</span>.
             </p>
           </div>
-          <div className="pt-6 mt-4 border-t border-black/5">
+          <div className="pt-6 mt-4 border-t border-[color:var(--app-border)]">
             <a
               href="mailto:support@capten.app?subject=Demande%20Capitaine%20Capten"
               className="w-full bg-black text-white hover:bg-black/80 py-3 rounded-control text-[10px] font-black uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm font-sans"
@@ -142,21 +142,21 @@ export default function SupportPage() {
         </div>
 
         {/* SYSTEM STATUS */}
-        <div className="bg-[#F8F9FA] border border-black/5 rounded-card-outer p-6 sm:p-8 flex flex-col justify-between shadow-sm relative">
+        <div className="bg-[var(--app-surface-2)] border border-[color:var(--app-border)] rounded-card-outer p-6 sm:p-8 flex flex-col justify-between shadow-sm relative">
           <div className="space-y-4">
             <div className="w-10 h-10 rounded-2xl bg-[#56E39F]/10 border border-[#56E39F]/20 flex items-center justify-center text-[#56E39F]">
               <ShieldCheck size={22} />
             </div>
             <div>
               <span className="text-[9px] font-black text-[#56E39F] uppercase tracking-widest block font-mono">SÉCURITÉ &amp; RÉSEAU</span>
-              <h3 className="text-[20px] font-display italic font-black uppercase text-black mt-1">ÉTAT SYSTÈME</h3>
+              <h3 className="text-[20px] font-display italic font-black uppercase text-[color:var(--app-text)] mt-1">ÉTAT SYSTÈME</h3>
             </div>
             <div className="space-y-2 text-[11px] font-mono text-neutral-600">
-              <p className="flex items-center justify-between border-b border-black/5 pb-1.5">
+              <p className="flex items-center justify-between border-b border-[color:var(--app-border)] pb-1.5">
                 <span>Plateforme :</span>
                 <span className="text-[#56E39F] font-bold">100% OK</span>
               </p>
-              <p className="flex items-center justify-between border-b border-black/5 pb-1.5">
+              <p className="flex items-center justify-between border-b border-[color:var(--app-border)] pb-1.5">
                 <span>Paiements sécurisés :</span>
                 <span className="text-[#56E39F] font-bold">100% OK</span>
               </p>
@@ -166,8 +166,8 @@ export default function SupportPage() {
               </p>
             </div>
           </div>
-          <div className="pt-6 mt-4 border-t border-black/5 text-center">
-            <span className="text-[9px] font-mono font-bold text-neutral-400 uppercase tracking-widest">
+          <div className="pt-6 mt-4 border-t border-[color:var(--app-border)] text-center">
+            <span className="text-[9px] font-mono font-bold text-[color:var(--app-text-muted)] uppercase tracking-widest">
               Dernière vérification : il y a 30s
             </span>
           </div>
@@ -177,12 +177,12 @@ export default function SupportPage() {
       {/* FORM & FAQ CONTAINER */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* TICKET FORM (8 COLS) */}
-        <div className="col-span-1 lg:col-span-7 bg-white border border-[#E5E5E5] rounded-card-outer p-6 sm:p-8 space-y-6 shadow-sm">
-          <div className="border-b border-black/5 pb-4">
-            <h2 className="text-[18px] font-display italic font-black uppercase text-black">
+        <div className="col-span-1 lg:col-span-7 bg-[var(--app-surface)] border border-[color:var(--app-border)] rounded-card-outer p-6 sm:p-8 space-y-6 shadow-sm">
+          <div className="border-b border-[color:var(--app-border)] pb-4">
+            <h2 className="text-[18px] font-display italic font-black uppercase text-[color:var(--app-text)]">
               TRANSMETTRE UN SIGNALEMENT / TICKET
             </h2>
-            <p className="text-[11px] text-neutral-500 font-medium mt-1">
+            <p className="text-[11px] text-[color:var(--app-text-muted)] font-medium mt-1">
               Posez une question à l&apos;équipe ou signalez un dysfonctionnement sur votre interface.
             </p>
           </div>
@@ -192,11 +192,11 @@ export default function SupportPage() {
               <div className="w-12 h-12 bg-[#56E39F] text-white rounded-full flex items-center justify-center mx-auto">
                 <Check size={24} strokeWidth={3} />
               </div>
-              <h3 className="text-base font-display italic font-black uppercase text-black">
+              <h3 className="text-base font-display italic font-black uppercase text-[color:var(--app-text)]">
                 TICKET REÇU AVEC SUCCÈS !
               </h3>
               <p className="text-xs text-neutral-600 font-medium max-w-md mx-auto leading-relaxed">
-                Notre équipe d&apos;astreinte a bien reçu votre demande pour le club <span className="font-bold text-black">{clubName}</span>. Nous vous répondrons par email sous de très brefs délais.
+                Notre équipe d&apos;astreinte a bien reçu votre demande pour le club <span className="font-bold text-[color:var(--app-text)]">{clubName}</span>. Nous vous répondrons par email sous de très brefs délais.
               </p>
               <button
                 onClick={() => setSubmittedSuccess(false)}
@@ -209,13 +209,13 @@ export default function SupportPage() {
             <form onSubmit={handleSendTicket} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-[9px] font-mono font-black uppercase text-neutral-500 tracking-wider">
+                  <label className="text-[9px] font-mono font-black uppercase text-[color:var(--app-text-muted)] tracking-wider">
                     Nature du besoin
                   </label>
                   <select
                     value={ticketCategory}
                     onChange={(e) => setTicketCategory(e.target.value)}
-                    className="w-full bg-[#F4F5F7] border border-black/5 rounded-control px-4 py-2.5 text-xs font-bold text-black focus:outline-none focus:border-[#FF5C00] focus:bg-white transition-all"
+                    className="w-full bg-[var(--app-surface-2)] border border-[color:var(--app-border)] rounded-control px-4 py-2.5 text-xs font-bold text-[color:var(--app-text)] focus:outline-none focus:border-[#FF5C00] focus:bg-[var(--app-surface)] transition-all"
                   >
                     <option value="Urgent — Session ce soir">Urgent — Session imminente</option>
                     <option value="Question Juridique / Décharge">Question Juridique / Décharge</option>
@@ -226,7 +226,7 @@ export default function SupportPage() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-[9px] font-mono font-black uppercase text-neutral-500 tracking-wider">
+                  <label className="text-[9px] font-mono font-black uppercase text-[color:var(--app-text-muted)] tracking-wider">
                     Votre Email de Contact
                   </label>
                   <input
@@ -235,13 +235,13 @@ export default function SupportPage() {
                     value={contactEmail}
                     onChange={(e) => setContactEmail(e.target.value)}
                     placeholder="capitaine@exemple.com"
-                    className="w-full bg-[#F4F5F7] border border-black/5 rounded-control px-4 py-2.5 text-xs font-bold text-black focus:outline-none focus:border-[#FF5C00] focus:bg-white transition-all"
+                    className="w-full bg-[var(--app-surface-2)] border border-[color:var(--app-border)] rounded-control px-4 py-2.5 text-xs font-bold text-[color:var(--app-text)] focus:outline-none focus:border-[#FF5C00] focus:bg-[var(--app-surface)] transition-all"
                   />
                 </div>
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-[9px] font-mono font-black uppercase text-neutral-500 tracking-wider">
+                <label className="text-[9px] font-mono font-black uppercase text-[color:var(--app-text-muted)] tracking-wider">
                   Description détaillée de la demande
                 </label>
                 <textarea
@@ -250,7 +250,7 @@ export default function SupportPage() {
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   placeholder="Expliquez ce que vous souhaitez accomplir ou le problème rencontré..."
-                  className="w-full bg-[#F4F5F7] border border-black/5 rounded-control px-4 py-3 text-xs font-medium text-black focus:outline-none focus:border-[#FF5C00] focus:bg-white transition-all resize-none leading-relaxed"
+                  className="w-full bg-[var(--app-surface-2)] border border-[color:var(--app-border)] rounded-control px-4 py-3 text-xs font-medium text-[color:var(--app-text)] focus:outline-none focus:border-[#FF5C00] focus:bg-[var(--app-surface)] transition-all resize-none leading-relaxed"
                 />
               </div>
 
@@ -275,12 +275,12 @@ export default function SupportPage() {
         </div>
 
         {/* FAQ ACCORDION (5 COLS) */}
-        <div className="col-span-1 lg:col-span-5 bg-white border border-[#E5E5E5] rounded-card-outer p-6 sm:p-8 space-y-6 shadow-sm">
-          <div className="border-b border-black/5 pb-4">
-            <h2 className="text-[18px] font-display italic font-black uppercase text-black">
+        <div className="col-span-1 lg:col-span-5 bg-[var(--app-surface)] border border-[color:var(--app-border)] rounded-card-outer p-6 sm:p-8 space-y-6 shadow-sm">
+          <div className="border-b border-[color:var(--app-border)] pb-4">
+            <h2 className="text-[18px] font-display italic font-black uppercase text-[color:var(--app-text)]">
               QUESTIONS FRÉQUENTES
             </h2>
-            <p className="text-[11px] text-neutral-500 font-medium mt-1">
+            <p className="text-[11px] text-[color:var(--app-text-muted)] font-medium mt-1">
               Réponses immédiates aux situations de terrain habituelles.
             </p>
           </div>
@@ -291,17 +291,17 @@ export default function SupportPage() {
               return (
                 <div
                   key={idx}
-                  className="border border-black/5 rounded-card-inner bg-[#F8F9FA] overflow-hidden transition-all"
+                  className="border border-[color:var(--app-border)] rounded-card-inner bg-[var(--app-surface-2)] overflow-hidden transition-all"
                 >
                   <button
                     onClick={() => setOpenFaq(isOpen ? null : idx)}
-                    className="w-full p-4 text-left font-bold text-xs flex justify-between items-center text-black hover:text-[#FF5C00] transition-colors"
+                    className="w-full p-4 text-left font-bold text-xs flex justify-between items-center text-[color:var(--app-text)] hover:text-[#FF5C00] transition-colors"
                   >
                     <span>{faq.q}</span>
                     {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                   </button>
                   {isOpen && (
-                    <div className="px-4 pb-4 text-[11px] font-medium text-neutral-600 leading-relaxed border-t border-black/5 pt-3 bg-white">
+                    <div className="px-4 pb-4 text-[11px] font-medium text-neutral-600 leading-relaxed border-t border-[color:var(--app-border)] pt-3 bg-[var(--app-surface)]">
                       {faq.a}
                     </div>
                   )}

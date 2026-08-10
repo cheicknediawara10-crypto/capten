@@ -157,7 +157,7 @@ export default function EventDetailPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="animate-spin text-[#FF5500]" size={32} />
+        <Loader2 className="animate-spin text-[#FF5C00]" size={32} />
       </div>
     );
   }
@@ -165,8 +165,8 @@ export default function EventDetailPage() {
   if (!event) {
     return (
       <div className="text-center py-24">
-        <p className="text-[#666562]">Sortie introuvable.</p>
-        <Link href="/dashboard/events" className="text-[#FF5500] mt-4 inline-block text-sm">← Retour</Link>
+        <p className="text-[color:var(--app-text-muted)]">Sortie introuvable.</p>
+        <Link href="/dashboard/events" className="text-[#FF5C00] mt-4 inline-block text-sm">← Retour</Link>
       </div>
     );
   }
@@ -180,7 +180,7 @@ export default function EventDetailPage() {
         <div className="flex items-start gap-4">
           <Link
             href="/dashboard/events"
-            className="flex items-center gap-1.5 text-[#666562] hover:text-black transition-colors text-sm font-medium mt-1"
+            className="flex items-center gap-1.5 text-[color:var(--app-text-muted)] hover:text-[color:var(--app-text)] transition-colors text-sm font-medium mt-1"
           >
             <ArrowLeft size={15} />
             Retour
@@ -200,7 +200,7 @@ export default function EventDetailPage() {
                 </span>
               )}
             </div>
-            <h1 className="text-[24px] sm:text-[32px] font-display italic font-black uppercase text-black leading-none tracking-tighter">
+            <h1 className="text-[24px] sm:text-[32px] font-display italic font-black uppercase text-[color:var(--app-text)] leading-none tracking-tighter">
               {event.title}
             </h1>
           </div>
@@ -212,8 +212,8 @@ export default function EventDetailPage() {
             disabled={isPublishing}
             className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-[11px] font-black uppercase tracking-widest transition-all ${
               event.status === "published"
-                ? "border border-black/10 text-[#666562] hover:border-black hover:text-black"
-                : "bg-[#FF5500] text-white hover:bg-black"
+                ? "border border-[color:var(--app-border)] text-[color:var(--app-text-muted)] hover:border-black hover:text-[color:var(--app-text)]"
+                : "bg-[#FF5C00] text-white hover:bg-black"
             }`}
           >
             {isPublishing ? <Loader2 size={12} className="animate-spin" /> : event.status === "published" ? <Lock size={12} /> : <Globe size={12} />}
@@ -229,15 +229,15 @@ export default function EventDetailPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-1 bg-white border border-black/5 rounded-full p-1 w-fit shadow-sm overflow-x-auto">
+      <div className="flex items-center gap-1 bg-[var(--app-surface)] border border-[color:var(--app-border)] rounded-full p-1 w-fit shadow-sm overflow-x-auto">
         {TABS.map((tab) => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
             className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider whitespace-nowrap transition-all ${
               activeTab === tab.key
-                ? "bg-[#FF5500] text-white shadow-sm"
-                : "text-[#666562] hover:text-black"
+                ? "bg-[#FF5C00] text-white shadow-sm"
+                : "text-[color:var(--app-text-muted)] hover:text-[color:var(--app-text)]"
             }`}
           >
             {tab.icon}
@@ -251,32 +251,32 @@ export default function EventDetailPage() {
         {activeTab === "details" && (
           <motion.div key="details" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="bg-white rounded-[24px] border border-black/5 p-6 space-y-4">
-                <h3 className="text-[11px] font-black uppercase tracking-widest text-[#666562]">Informations</h3>
+              <div className="bg-[var(--app-surface)] rounded-[24px] border border-[color:var(--app-border)] p-6 space-y-4">
+                <h3 className="text-[11px] font-black uppercase tracking-widest text-[color:var(--app-text-muted)]">Informations</h3>
                 <div className="space-y-3">
                   <div className="flex items-center gap-3">
-                    <Calendar size={16} className="text-[#FF5500] shrink-0" />
+                    <Calendar size={16} className="text-[#FF5C00] shrink-0" />
                     <div>
-                      <p className="text-[11px] text-[#A3A3A3] uppercase tracking-wider">Date</p>
-                      <p className="text-sm font-semibold text-black">
+                      <p className="text-[11px] text-[color:var(--app-text-muted)] uppercase tracking-wider">Date</p>
+                      <p className="text-sm font-semibold text-[color:var(--app-text)]">
                         {formatDateShort(event.event_date)} à {new Date(event.event_date).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}
                       </p>
                     </div>
                   </div>
                   {event.meeting_point_address && (
                     <div className="flex items-center gap-3">
-                      <MapPin size={16} className="text-[#FF5500] shrink-0" />
+                      <MapPin size={16} className="text-[#FF5C00] shrink-0" />
                       <div>
-                        <p className="text-[11px] text-[#A3A3A3] uppercase tracking-wider">Point RDV</p>
-                        <p className="text-sm font-semibold text-black">{event.meeting_point_address}</p>
+                        <p className="text-[11px] text-[color:var(--app-text-muted)] uppercase tracking-wider">Point RDV</p>
+                        <p className="text-sm font-semibold text-[color:var(--app-text)]">{event.meeting_point_address}</p>
                       </div>
                     </div>
                   )}
                   <div className="flex items-center gap-3">
-                    <Users size={16} className="text-[#FF5500] shrink-0" />
+                    <Users size={16} className="text-[#FF5C00] shrink-0" />
                     <div>
-                      <p className="text-[11px] text-[#A3A3A3] uppercase tracking-wider">Capacité</p>
-                      <p className="text-sm font-semibold text-black">
+                      <p className="text-[11px] text-[color:var(--app-text-muted)] uppercase tracking-wider">Capacité</p>
+                      <p className="text-sm font-semibold text-[color:var(--app-text)]">
                         {registrations.length}{event.max_participants ? ` / ${event.max_participants}` : ""} inscrits
                       </p>
                     </div>
@@ -285,21 +285,21 @@ export default function EventDetailPage() {
               </div>
 
               {event.description && (
-                <div className="bg-white rounded-[24px] border border-black/5 p-6">
-                  <h3 className="text-[11px] font-black uppercase tracking-widest text-[#666562] mb-3">Description</h3>
-                  <p className="text-sm text-[#1A1918] leading-relaxed">{event.description}</p>
+                <div className="bg-[var(--app-surface)] rounded-[24px] border border-[color:var(--app-border)] p-6">
+                  <h3 className="text-[11px] font-black uppercase tracking-widest text-[color:var(--app-text-muted)] mb-3">Description</h3>
+                  <p className="text-sm text-[color:var(--app-text)] leading-relaxed">{event.description}</p>
                 </div>
               )}
 
-              <div className="bg-white rounded-[24px] border border-black/5 p-6">
-                <h3 className="text-[11px] font-black uppercase tracking-widest text-[#666562] mb-4">Check-in en direct</h3>
+              <div className="bg-[var(--app-surface)] rounded-[24px] border border-[color:var(--app-border)] p-6">
+                <h3 className="text-[11px] font-black uppercase tracking-widest text-[color:var(--app-text-muted)] mb-4">Check-in en direct</h3>
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-[40px] font-display font-black italic text-black leading-none">{liveCount}</p>
-                    <p className="text-[11px] text-[#A3A3A3] mt-1">check-ins validés</p>
+                    <p className="text-[40px] font-display font-black italic text-[color:var(--app-text)] leading-none">{liveCount}</p>
+                    <p className="text-[11px] text-[color:var(--app-text-muted)] mt-1">check-ins validés</p>
                   </div>
-                  <div className="w-16 h-16 rounded-full border-4 border-[#FF5500]/20 flex items-center justify-center">
-                    <Wifi size={24} className="text-[#FF5500]" />
+                  <div className="w-16 h-16 rounded-full border-4 border-[#FF5C00]/20 flex items-center justify-center">
+                    <Wifi size={24} className="text-[#FF5C00]" />
                   </div>
                 </div>
               </div>
@@ -310,24 +310,24 @@ export default function EventDetailPage() {
         {/* REGISTRATIONS TAB */}
         {activeTab === "registrations" && (
           <motion.div key="registrations" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}>
-            <div className="bg-white rounded-[24px] border border-black/5 overflow-hidden">
+            <div className="bg-[var(--app-surface)] rounded-[24px] border border-[color:var(--app-border)] overflow-hidden">
               {registrations.length === 0 ? (
                 <div className="flex flex-col items-center py-16 text-center">
                   <div className="text-4xl mb-3">🙋</div>
-                  <p className="text-[13px] text-[#666562]">Aucun inscrit pour l'instant.</p>
+                  <p className="text-[13px] text-[color:var(--app-text-muted)]">Aucun inscrit pour l'instant.</p>
                 </div>
               ) : (
-                <div className="divide-y divide-black/5">
+                <div className="divide-y divide-[color:var(--app-border)]">
                   {registrations.map((reg) => (
                     <div key={reg.id} className="flex items-center gap-4 p-4">
-                      <div className="w-9 h-9 rounded-full bg-[#FF5500]/10 flex items-center justify-center shrink-0">
-                        <span className="text-[11px] font-black text-[#FF5500]">
+                      <div className="w-9 h-9 rounded-full bg-[#FF5C00]/10 flex items-center justify-center shrink-0">
+                        <span className="text-[11px] font-black text-[#FF5C00]">
                           {membreInitials(reg.membre_profiles)}
                         </span>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-black truncate">{membreName(reg.membre_profiles) || "Membre"}</p>
-                        <p className="text-[11px] text-[#A3A3A3]">{reg.membre_profiles?.phone || "—"}</p>
+                        <p className="text-sm font-semibold text-[color:var(--app-text)] truncate">{membreName(reg.membre_profiles) || "Membre"}</p>
+                        <p className="text-[11px] text-[color:var(--app-text-muted)]">{reg.membre_profiles?.phone || "—"}</p>
                       </div>
                     </div>
                   ))}
@@ -340,14 +340,14 @@ export default function EventDetailPage() {
         {/* CHECKINS TAB */}
         {activeTab === "checkins" && (
           <motion.div key="checkins" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}>
-            <div className="bg-white rounded-[24px] border border-black/5 overflow-hidden">
+            <div className="bg-[var(--app-surface)] rounded-[24px] border border-[color:var(--app-border)] overflow-hidden">
               {checkins.length === 0 ? (
                 <div className="flex flex-col items-center py-16 text-center">
                   <div className="text-4xl mb-3">📍</div>
-                  <p className="text-[13px] text-[#666562]">Aucun check-in encore.</p>
+                  <p className="text-[13px] text-[color:var(--app-text-muted)]">Aucun check-in encore.</p>
                 </div>
               ) : (
-                <div className="divide-y divide-black/5">
+                <div className="divide-y divide-[color:var(--app-border)]">
                   {checkins.map((chk, i) => (
                     <motion.div
                       key={chk.id}
@@ -358,8 +358,8 @@ export default function EventDetailPage() {
                     >
                       <div className={`w-2.5 h-2.5 rounded-full shrink-0 ${chk.is_valid ? "bg-[#22C55E]" : "bg-[#F59E0B]"}`} />
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-black">{membreName(chk.membre_profiles) || "Membre"}</p>
-                        <p className="text-[11px] text-[#A3A3A3]">
+                        <p className="text-sm font-semibold text-[color:var(--app-text)]">{membreName(chk.membre_profiles) || "Membre"}</p>
+                        <p className="text-[11px] text-[color:var(--app-text-muted)]">
                           {chk.checked_in_at ? new Date(chk.checked_in_at).toLocaleTimeString("fr-FR") : ""}
                         </p>
                       </div>
@@ -387,9 +387,9 @@ export default function EventDetailPage() {
         {activeTab === "qr" && (
           <motion.div key="qr" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}>
             <div className="max-w-sm mx-auto">
-              <div className="bg-white rounded-[24px] border border-black/5 p-8 flex flex-col items-center gap-6">
-                <p className="text-[11px] font-black uppercase tracking-widest text-[#666562]">QR Code Check-in</p>
-                <div className="p-4 bg-white rounded-[16px] border-2 border-black/10">
+              <div className="bg-[var(--app-surface)] rounded-[24px] border border-[color:var(--app-border)] p-8 flex flex-col items-center gap-6">
+                <p className="text-[11px] font-black uppercase tracking-widest text-[color:var(--app-text-muted)]">QR Code Check-in</p>
+                <div className="p-4 bg-[var(--app-surface)] rounded-[16px] border-2 border-[color:var(--app-border)]">
                   <QRCodeSVG
                     value={checkinUrl}
                     size={200}
@@ -400,7 +400,7 @@ export default function EventDetailPage() {
                   />
                 </div>
                 <div className="w-full text-center">
-                  <p className="text-[11px] text-[#A3A3A3] break-all font-mono">{checkinUrl}</p>
+                  <p className="text-[11px] text-[color:var(--app-text-muted)] break-all font-mono">{checkinUrl}</p>
                 </div>
                 <button
                   onClick={() => {
@@ -413,7 +413,7 @@ export default function EventDetailPage() {
                     a.download = `checkin-${event.title.replace(/\s+/g, "-").toLowerCase()}.svg`;
                     a.click();
                   }}
-                  className="flex items-center gap-2 w-full justify-center px-6 py-3 rounded-full bg-black text-white text-[11px] font-black uppercase tracking-widest hover:bg-[#FF5500] transition-all"
+                  className="flex items-center gap-2 w-full justify-center px-6 py-3 rounded-full bg-black text-white text-[11px] font-black uppercase tracking-widest hover:bg-[#FF5C00] transition-all"
                 >
                   <Download size={13} />
                   Télécharger le QR Code

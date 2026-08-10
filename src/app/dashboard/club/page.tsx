@@ -105,7 +105,7 @@ export default function ClubSettingsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="animate-spin text-[#FF5500]" size={32} />
+        <Loader2 className="animate-spin text-[#FF5C00]" size={32} />
       </div>
     );
   }
@@ -115,21 +115,21 @@ export default function ClubSettingsPage() {
   return (
     <div className="pb-20 space-y-6 max-w-2xl">
       <div>
-        <h1 className="text-[28px] sm:text-[36px] font-display italic font-black uppercase text-black leading-none tracking-tighter">
+        <h1 className="text-[28px] sm:text-[36px] font-display italic font-black uppercase text-[color:var(--app-text)] leading-none tracking-tighter">
           Mon Crew
         </h1>
-        <p className="text-[13px] text-[#A3A3A3] mt-1">Paramètres et identité de ton crew</p>
+        <p className="text-[13px] text-[color:var(--app-text-muted)] mt-1">Paramètres et identité de ton crew</p>
       </div>
 
       {/* Logo */}
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white rounded-[24px] border border-black/5 p-6"
+        className="bg-[var(--app-surface)] rounded-[24px] border border-[color:var(--app-border)] p-6"
       >
-        <h2 className="text-[11px] font-black uppercase tracking-widest text-[#666562] mb-4">Logo</h2>
+        <h2 className="text-[11px] font-black uppercase tracking-widest text-[color:var(--app-text-muted)] mb-4">Logo</h2>
         <div className="flex items-center gap-5">
-          <div className="w-20 h-20 rounded-[20px] bg-[#F4F4EE] flex items-center justify-center overflow-hidden shrink-0">
+          <div className="w-20 h-20 rounded-[20px] bg-[var(--app-surface-2)] flex items-center justify-center overflow-hidden shrink-0">
             {club.logo_url ? (
               <img src={club.logo_url} alt="" className="w-full h-full object-cover" />
             ) : (
@@ -147,12 +147,12 @@ export default function ClubSettingsPage() {
             <button
               onClick={() => fileRef.current?.click()}
               disabled={logoUploading}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-full border border-black/10 text-[11px] font-black uppercase tracking-widest text-[#666562] hover:border-black hover:text-black transition-all disabled:opacity-50"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-full border border-[color:var(--app-border)] text-[11px] font-black uppercase tracking-widest text-[color:var(--app-text-muted)] hover:border-black hover:text-[color:var(--app-text)] transition-all disabled:opacity-50"
             >
               {logoUploading ? <Loader2 size={12} className="animate-spin" /> : <Upload size={12} />}
               {logoUploading ? "Envoi…" : "Changer le logo"}
             </button>
-            <p className="text-[10px] text-[#A3A3A3] mt-1.5">PNG ou JPG · max 2 Mo</p>
+            <p className="text-[10px] text-[color:var(--app-text-muted)] mt-1.5">PNG ou JPG · max 2 Mo</p>
           </div>
         </div>
       </motion.div>
@@ -162,44 +162,44 @@ export default function ClubSettingsPage() {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.05 }}
-        className="bg-white rounded-[24px] border border-black/5 p-6 space-y-4"
+        className="bg-[var(--app-surface)] rounded-[24px] border border-[color:var(--app-border)] p-6 space-y-4"
       >
-        <h2 className="text-[11px] font-black uppercase tracking-widest text-[#666562]">Informations</h2>
+        <h2 className="text-[11px] font-black uppercase tracking-widest text-[color:var(--app-text-muted)]">Informations</h2>
 
         <div className="space-y-1">
-          <label className="text-[10px] font-bold uppercase tracking-widest text-[#666562]">Nom du club</label>
+          <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--app-text-muted)]">Nom du club</label>
           <input
             type="text"
             value={club.name}
             onChange={(e) => update("name", e.target.value)}
-            className="w-full h-11 px-4 rounded-[12px] border border-[#E5E7EB] text-sm font-medium focus:border-[#FF5500] focus:ring-2 focus:ring-[#FF5500]/20 outline-none transition-all"
+            className="w-full h-11 px-4 rounded-[12px] border border-[color:var(--app-border)] text-sm font-medium focus:border-[#FF5C00] focus:ring-2 focus:ring-[#FF5C00]/20 outline-none transition-all"
           />
         </div>
 
         <div className="space-y-1">
-          <label className="text-[10px] font-bold uppercase tracking-widest text-[#666562]">Description</label>
+          <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--app-text-muted)]">Description</label>
           <textarea
             value={club.description || ""}
             onChange={(e) => update("description", e.target.value)}
             rows={3}
-            className="w-full px-4 py-3 rounded-[12px] border border-[#E5E7EB] text-sm font-medium focus:border-[#FF5500] focus:ring-2 focus:ring-[#FF5500]/20 outline-none transition-all resize-none"
+            className="w-full px-4 py-3 rounded-[12px] border border-[color:var(--app-border)] text-sm font-medium focus:border-[#FF5C00] focus:ring-2 focus:ring-[#FF5C00]/20 outline-none transition-all resize-none"
             placeholder="Qui êtes-vous ? Quand courrez-vous ?"
           />
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1">
-            <label className="text-[10px] font-bold uppercase tracking-widest text-[#666562]">Ville</label>
+            <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--app-text-muted)]">Ville</label>
             <input
               type="text"
               value={club.city || ""}
               onChange={(e) => update("city", e.target.value)}
               placeholder="Paris"
-              className="w-full h-11 px-4 rounded-[12px] border border-[#E5E7EB] text-sm font-medium focus:border-[#FF5500] focus:ring-2 focus:ring-[#FF5500]/20 outline-none transition-all"
+              className="w-full h-11 px-4 rounded-[12px] border border-[color:var(--app-border)] text-sm font-medium focus:border-[#FF5C00] focus:ring-2 focus:ring-[#FF5C00]/20 outline-none transition-all"
             />
           </div>
           <div className="space-y-1">
-            <label className="text-[10px] font-bold uppercase tracking-widest text-[#666562] flex items-center gap-1">
+            <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--app-text-muted)] flex items-center gap-1">
               <Globe size={10} />
               Site web
             </label>
@@ -208,7 +208,7 @@ export default function ClubSettingsPage() {
               value={club.website_url || ""}
               onChange={(e) => update("website_url", e.target.value)}
               placeholder="https://…"
-              className="w-full h-11 px-4 rounded-[12px] border border-[#E5E7EB] text-sm font-medium focus:border-[#FF5500] focus:ring-2 focus:ring-[#FF5500]/20 outline-none transition-all"
+              className="w-full h-11 px-4 rounded-[12px] border border-[color:var(--app-border)] text-sm font-medium focus:border-[#FF5C00] focus:ring-2 focus:ring-[#FF5C00]/20 outline-none transition-all"
             />
           </div>
         </div>
@@ -219,25 +219,25 @@ export default function ClubSettingsPage() {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="bg-white rounded-[24px] border border-black/5 p-6"
+        className="bg-[var(--app-surface)] rounded-[24px] border border-[color:var(--app-border)] p-6"
       >
-        <h2 className="text-[11px] font-black uppercase tracking-widest text-[#666562] mb-3 flex items-center gap-1.5">
+        <h2 className="text-[11px] font-black uppercase tracking-widest text-[color:var(--app-text-muted)] mb-3 flex items-center gap-1.5">
           <Link2 size={12} />
           Lien d'inscription membres
         </h2>
         <div className="flex items-center gap-2">
-          <p className="flex-1 text-[12px] font-mono text-[#666562] bg-[#F4F4EE] rounded-[12px] px-4 py-2.5 truncate">
+          <p className="flex-1 text-[12px] font-mono text-[color:var(--app-text-muted)] bg-[var(--app-surface-2)] rounded-[12px] px-4 py-2.5 truncate">
             {joinLink}
           </p>
           <button
             onClick={copyLink}
-            className="flex items-center gap-1.5 px-4 py-2.5 rounded-[12px] bg-black text-white text-[11px] font-black uppercase tracking-widest hover:bg-[#FF5500] transition-all shrink-0"
+            className="flex items-center gap-1.5 px-4 py-2.5 rounded-[12px] bg-black text-white text-[11px] font-black uppercase tracking-widest hover:bg-[#FF5C00] transition-all shrink-0"
           >
             {copied ? <Check size={12} /> : <Copy size={12} />}
             {copied ? "Copié" : "Copier"}
           </button>
         </div>
-        <p className="text-[10px] text-[#A3A3A3] mt-2">
+        <p className="text-[10px] text-[color:var(--app-text-muted)] mt-2">
           Partage ce lien pour que les membres rejoignent ton club et remplissent leur fiche.
         </p>
       </motion.div>
@@ -246,7 +246,7 @@ export default function ClubSettingsPage() {
       <button
         onClick={save}
         disabled={saving}
-        className="flex items-center gap-2 px-8 py-3 rounded-full bg-[#FF5500] text-white text-[11px] font-black uppercase tracking-widest hover:bg-black transition-all active:scale-95 disabled:opacity-50"
+        className="flex items-center gap-2 px-8 py-3 rounded-full bg-[#FF5C00] text-white text-[11px] font-black uppercase tracking-widest hover:bg-black transition-all active:scale-95 disabled:opacity-50"
       >
         {saving ? <Loader2 size={13} className="animate-spin" /> : <Save size={13} />}
         Enregistrer les modifications

@@ -76,16 +76,16 @@ export default function EventsPage() {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-[28px] sm:text-[36px] font-display italic font-black uppercase text-black leading-none tracking-tighter">
+          <h1 className="text-[28px] sm:text-[36px] font-display italic font-black uppercase text-[color:var(--app-text)] leading-none tracking-tighter">
             Les Runs
           </h1>
-          <p className="text-[13px] text-[#A3A3A3] font-sans mt-1">
+          <p className="text-[13px] text-[color:var(--app-text-muted)] font-sans mt-1">
             {upcoming > 0 ? `${upcoming} run${upcoming > 1 ? "s" : ""} à venir` : "Planifie ton prochain run"}
           </p>
         </div>
         <Link
           href="/dashboard/events/new"
-          className="flex items-center gap-2 bg-[#FF5500] text-white px-5 py-2.5 rounded-full text-[11px] font-black uppercase tracking-widest hover:bg-black transition-all active:scale-95"
+          className="flex items-center gap-2 bg-[#FF5C00] text-white px-5 py-2.5 rounded-full text-[11px] font-black uppercase tracking-widest hover:bg-black transition-all active:scale-95"
         >
           <Plus size={14} />
           Nouveau Run
@@ -93,15 +93,15 @@ export default function EventsPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-1 bg-white border border-black/5 rounded-full p-1 w-fit shadow-sm">
+      <div className="flex items-center gap-1 bg-[var(--app-surface)] border border-[color:var(--app-border)] rounded-full p-1 w-fit shadow-sm">
         {TABS.map((tab) => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
             className={`px-4 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider transition-all ${
               activeTab === tab.key
-                ? "bg-[#FF5500] text-white shadow-sm"
-                : "text-[#666562] hover:text-black"
+                ? "bg-[#FF5C00] text-white shadow-sm"
+                : "text-[color:var(--app-text-muted)] hover:text-[color:var(--app-text)]"
             }`}
           >
             {tab.label}
@@ -113,7 +113,7 @@ export default function EventsPage() {
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {[1,2,3].map(i => (
-            <div key={i} className="bg-white rounded-[24px] p-6 animate-pulse h-48 border border-black/5" />
+            <div key={i} className="bg-[var(--app-surface)] rounded-[24px] p-6 animate-pulse h-48 border border-[color:var(--app-border)]" />
           ))}
         </div>
       ) : filtered.length === 0 ? (
@@ -122,18 +122,18 @@ export default function EventsPage() {
           animate={{ opacity: 1, y: 0 }}
           className="flex flex-col items-center justify-center py-24 space-y-4"
         >
-          <div className="w-14 h-14 rounded-2xl bg-[#FF5500]/[0.08] flex items-center justify-center">
-            <MapPin size={26} className="text-[#FF5500]" />
+          <div className="w-14 h-14 rounded-2xl bg-[#FF5C00]/[0.08] flex items-center justify-center">
+            <MapPin size={26} className="text-[#FF5C00]" />
           </div>
-          <h3 className="text-[20px] font-display italic font-black uppercase text-black">
+          <h3 className="text-[20px] font-display italic font-black uppercase text-[color:var(--app-text)]">
             Aucun run prévu
           </h3>
-          <p className="text-[13px] text-[#A3A3A3] font-sans text-center max-w-xs">
+          <p className="text-[13px] text-[color:var(--app-text-muted)] font-sans text-center max-w-xs">
             Lance ton premier run et partage le lien avec ton crew.
           </p>
           <Link
             href="/dashboard/events/new"
-            className="flex items-center gap-2 bg-[#FF5500] text-white px-6 py-3 rounded-full text-[12px] font-black uppercase tracking-widest hover:bg-black transition-all"
+            className="flex items-center gap-2 bg-[#FF5C00] text-white px-6 py-3 rounded-full text-[12px] font-black uppercase tracking-widest hover:bg-black transition-all"
           >
             <Plus size={14} />
             Créer un run
@@ -153,12 +153,12 @@ export default function EventsPage() {
               >
                 <Link
                   href={`/dashboard/events/${event.id}`}
-                  className="block bg-white rounded-[24px] border border-black/5 p-6 hover:shadow-[0_12px_40px_rgba(0,0,0,0.10)] hover:-translate-y-0.5 transition-all group"
+                  className="block bg-[var(--app-surface)] rounded-[24px] border border-[color:var(--app-border)] p-6 hover:shadow-[0_12px_40px_rgba(0,0,0,0.10)] hover:-translate-y-0.5 transition-all group"
                 >
                   {/* Date bar */}
                   <div className="flex items-start justify-between mb-4">
-                    <div className="flex items-center gap-2 text-[11px] text-[#666562] font-medium">
-                      <Calendar size={13} className="text-[#FF5500]" />
+                    <div className="flex items-center gap-2 text-[11px] text-[color:var(--app-text-muted)] font-medium">
+                      <Calendar size={13} className="text-[#FF5C00]" />
                       {formatDateShort(event.event_date)}
                     </div>
                     <span
@@ -170,35 +170,35 @@ export default function EventsPage() {
                   </div>
 
                   {/* Title */}
-                  <h3 className="text-[16px] font-black uppercase text-black mb-3 leading-tight tracking-tight group-hover:text-[#FF5500] transition-colors">
+                  <h3 className="text-[16px] font-black uppercase text-[color:var(--app-text)] mb-3 leading-tight tracking-tight group-hover:text-[#FF5C00] transition-colors">
                     {event.title}
                   </h3>
 
                   {/* Meta */}
                   <div className="space-y-1.5">
                     {event.meeting_point_address && (
-                      <div className="flex items-center gap-2 text-[12px] text-[#666562]">
+                      <div className="flex items-center gap-2 text-[12px] text-[color:var(--app-text-muted)]">
                         <MapPin size={12} />
                         <span className="truncate">{event.meeting_point_address}</span>
                       </div>
                     )}
-                    <div className="flex items-center gap-2 text-[12px] text-[#666562]">
+                    <div className="flex items-center gap-2 text-[12px] text-[color:var(--app-text-muted)]">
                       <Clock size={12} />
                       {new Date(event.event_date).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}
                     </div>
                     {event.max_participants && (
-                      <div className="flex items-center gap-2 text-[12px] text-[#666562]">
+                      <div className="flex items-center gap-2 text-[12px] text-[color:var(--app-text-muted)]">
                         <Users size={12} />
                         <span>Max {event.max_participants} participants</span>
                       </div>
                     )}
                   </div>
 
-                  <div className="mt-4 pt-4 border-t border-black/5 flex justify-between items-center">
-                    <span className="text-[10px] text-[#A3A3A3] font-mono uppercase tracking-wider">
+                  <div className="mt-4 pt-4 border-t border-[color:var(--app-border)] flex justify-between items-center">
+                    <span className="text-[10px] text-[color:var(--app-text-muted)] font-mono uppercase tracking-wider">
                       Voir les détails
                     </span>
-                    <ChevronRight size={14} className="text-[#A3A3A3] group-hover:text-[#FF5500] transition-colors" />
+                    <ChevronRight size={14} className="text-[color:var(--app-text-muted)] group-hover:text-[#FF5C00] transition-colors" />
                   </div>
                 </Link>
               </motion.div>

@@ -344,10 +344,10 @@ export default function SettingsPage() {
   return (
     <div className="space-y-10 pb-20 px-4 sm:px-0">
       {/* HARMONIZED HEADER */}
-      <header className="flex flex-col gap-3 pb-8 border-b-[0.5px] border-black/10 mb-10">
+      <header className="flex flex-col gap-3 pb-8 border-b-[0.5px] border-[color:var(--app-border)] mb-10">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 w-full">
             <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 w-full">
-              <h1 className="text-[28px] sm:text-[42px] font-display italic font-black uppercase text-black leading-none tracking-tight">
+              <h1 className="text-[28px] sm:text-[42px] font-display italic font-black uppercase text-[color:var(--app-text)] leading-none tracking-tight">
                 RÉGLAGES
               </h1>
             </div>
@@ -372,14 +372,14 @@ export default function SettingsPage() {
       <div className="grid grid-cols-12 gap-6">
         
         {/* BRANDING & IDENTITY */}
-        <div className="col-span-12 md:col-span-4 bg-white border-[0.5px] border-[#E5E5E5] rounded-card-outer p-6 sm:p-8 space-y-6 shadow-sm">
+        <div className="col-span-12 md:col-span-4 bg-[var(--app-surface)] border-[0.5px] border-[color:var(--app-border)] rounded-card-outer p-6 sm:p-8 space-y-6 shadow-sm">
            <div className="flex items-center gap-3 border-b-[0.5px] border-[#F4F5F7] pb-4">
               <Monitor size={18} className="text-[#D1D1D1]" />
-              <h3 className="text-[11px] font-black text-black uppercase tracking-[0.2em] italic">TON CREW</h3>
+              <h3 className="text-[11px] font-black text-[color:var(--app-text)] uppercase tracking-[0.2em] italic">TON CREW</h3>
            </div>
            <div className="space-y-4">
               <div className="flex items-center gap-6">
-                 <label htmlFor="logo-upload" className="w-16 h-16 bg-[#F4F5F7] border-[0.5px] border-black/5 rounded-control flex items-center justify-center text-[#D1D1D1] shrink-0 cursor-pointer hover:border-[#FF5C00] hover:bg-black/5 overflow-hidden transition-all relative">
+                 <label htmlFor="logo-upload" className="w-16 h-16 bg-[var(--app-surface-2)] border-[0.5px] border-[color:var(--app-border)] rounded-control flex items-center justify-center text-[#D1D1D1] shrink-0 cursor-pointer hover:border-[#FF5C00] hover:bg-black/5 overflow-hidden transition-all relative">
                     {logoUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={logoUrl} alt="Logo Club" className="w-full h-full object-cover" />
@@ -389,18 +389,18 @@ export default function SettingsPage() {
                  </label>
                  <input type="file" id="logo-upload" accept="image/*" className="hidden" onChange={handleLogoChange} />
                  <div className="space-y-1">
-                    <p className="text-[10px] font-black uppercase text-black">LOGO DU CLUB</p>
-                    <p className="text-[9px] font-medium text-[#A3A3A3] uppercase">Format PNG ou SVG (400px)</p>
+                    <p className="text-[10px] font-black uppercase text-[color:var(--app-text)]">LOGO DU CLUB</p>
+                    <p className="text-[9px] font-medium text-[color:var(--app-text-muted)] uppercase">Format PNG ou SVG (400px)</p>
                  </div>
               </div>
 
               {/* TYPE DE COMMUNAUTÉ */}
               <div className="pt-4 border-t border-[#F4F5F7] space-y-2">
-                 <p className="text-[10px] font-black uppercase text-black">TYPE DE COMMUNAUTÉ</p>
+                 <p className="text-[10px] font-black uppercase text-[color:var(--app-text)]">TYPE DE COMMUNAUTÉ</p>
                  <select
                    value={communityType}
                    onChange={(e) => setCommunityType(e.target.value as any)}
-                   className="w-full bg-[#F4F5F7] border border-black/5 rounded-control px-3 py-2 text-[11px] font-mono font-bold text-black focus:outline-none focus:border-[#FF5C00] focus:bg-white transition-all cursor-pointer"
+                   className="w-full bg-[var(--app-surface-2)] border border-[color:var(--app-border)] rounded-control px-3 py-2 text-[11px] font-mono font-bold text-[color:var(--app-text)] focus:outline-none focus:border-[#FF5C00] focus:bg-[var(--app-surface)] transition-all cursor-pointer"
                  >
                    {COMMUNITY_OPTIONS.map((opt) => (
                      <option key={opt.id} value={opt.id}>
@@ -414,7 +414,7 @@ export default function SettingsPage() {
                      placeholder="Préciser le type (ex: Roller Club)"
                      value={communityTypeCustom}
                      onChange={(e) => setCommunityTypeCustom(e.target.value)}
-                     className="w-full mt-2 bg-[#F4F5F7] border border-black/5 rounded-control px-3 py-2 text-[11px] font-mono text-black focus:outline-none focus:border-[#FF5C00]"
+                     className="w-full mt-2 bg-[var(--app-surface-2)] border border-[color:var(--app-border)] rounded-control px-3 py-2 text-[11px] font-mono text-[color:var(--app-text)] focus:outline-none focus:border-[#FF5C00]"
                    />
                  )}
               </div>
@@ -422,33 +422,33 @@ export default function SettingsPage() {
         </div>
 
         {/* INTEGRATIONS HUB */}
-        <div className="col-span-12 md:col-span-8 bg-white border-[0.5px] border-[#E5E5E5] rounded-card-outer p-6 sm:p-8 space-y-6 shadow-sm">
+        <div className="col-span-12 md:col-span-8 bg-[var(--app-surface)] border-[0.5px] border-[color:var(--app-border)] rounded-card-outer p-6 sm:p-8 space-y-6 shadow-sm">
            <div className="flex items-center gap-3 border-b-[0.5px] border-[#F4F5F7] pb-4">
               <Share2 size={18} className="text-[#D1D1D1]" />
-              <h3 className="text-[11px] font-black text-black uppercase tracking-[0.2em] italic">OUTILS CONNECTÉS</h3>
+              <h3 className="text-[11px] font-black text-[color:var(--app-text)] uppercase tracking-[0.2em] italic">OUTILS CONNECTÉS</h3>
            </div>
            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {/* WHATSAPP AUTOMATION CARD (GRAYED OUT / V2 PROMISE) */}
-              <div className="p-4 bg-[#F4F5F7] border-[0.5px] border-black/5 rounded-card-inner flex justify-between items-center opacity-60 cursor-default select-none">
+              <div className="p-4 bg-[var(--app-surface-2)] border-[0.5px] border-[color:var(--app-border)] rounded-card-inner flex justify-between items-center opacity-60 cursor-default select-none">
                  <div className="space-y-1">
-                    <p className="text-[12px] font-display italic font-black uppercase text-[#A3A3A3]">WHATSAPP AUTOMATION</p>
-                    <p className="text-[9px] font-medium text-[#A3A3A3] uppercase tracking-wider">L'automatisation WhatsApp arrive en V2.</p>
+                    <p className="text-[12px] font-display italic font-black uppercase text-[color:var(--app-text-muted)]">WHATSAPP AUTOMATION</p>
+                    <p className="text-[9px] font-medium text-[color:var(--app-text-muted)] uppercase tracking-wider">L'automatisation WhatsApp arrive en V2.</p>
                  </div>
-                 <span className="text-[9px] font-black italic tracking-widest text-[#A3A3A3]">
+                 <span className="text-[9px] font-black italic tracking-widest text-[color:var(--app-text-muted)]">
                     BIENTÔT
                  </span>
               </div>
 
               {/* COPILOT EMAIL BRIEFING */}
-              <div className="p-4 bg-white border-[0.5px] border-black/10 rounded-card-inner flex flex-col justify-between space-y-3">
+              <div className="p-4 bg-[var(--app-surface)] border-[0.5px] border-[color:var(--app-border)] rounded-card-inner flex flex-col justify-between space-y-3">
                  <div className="space-y-1 text-left">
-                    <p className="text-[12px] font-display italic font-black uppercase text-black">BRIEFING COPILOTE (EMAIL)</p>
-                    <p className="text-[9px] font-medium text-[#A3A3A3] uppercase tracking-wider">Fréquence d'envoi du brief quotidien par email</p>
+                    <p className="text-[12px] font-display italic font-black uppercase text-[color:var(--app-text)]">BRIEFING COPILOTE (EMAIL)</p>
+                    <p className="text-[9px] font-medium text-[color:var(--app-text-muted)] uppercase tracking-wider">Fréquence d'envoi du brief quotidien par email</p>
                  </div>
                  <select 
                    value={copilotEmailFreq}
                    onChange={(e) => setCopilotEmailFreq(e.target.value as any)}
-                   className="w-full bg-[#F4F5F7] border border-black/5 rounded-control px-2.5 py-1.5 text-[11px] font-mono font-bold text-black focus:outline-none focus:border-[#FF5C00] focus:bg-white transition-all cursor-pointer"
+                   className="w-full bg-[var(--app-surface-2)] border border-[color:var(--app-border)] rounded-control px-2.5 py-1.5 text-[11px] font-mono font-bold text-[color:var(--app-text)] focus:outline-none focus:border-[#FF5C00] focus:bg-[var(--app-surface)] transition-all cursor-pointer"
                  >
                    <option value="quotidien">QUOTIDIEN</option>
                    <option value="hebdo">HEBDOMADAIRE</option>
@@ -459,37 +459,37 @@ export default function SettingsPage() {
         </div>
 
         {/* SECURITY & SAFE ZONE */}
-        <div className="col-span-12 md:col-span-6 bg-white border-[0.5px] border-[#E5E5E5] rounded-card-outer p-6 sm:p-8 space-y-6 shadow-sm">
+        <div className="col-span-12 md:col-span-6 bg-[var(--app-surface)] border-[0.5px] border-[color:var(--app-border)] rounded-card-outer p-6 sm:p-8 space-y-6 shadow-sm">
            <div className="flex items-center gap-3 border-b-[0.5px] border-[#F4F5F7] pb-4">
               <Shield size={18} className="text-[#FF5C00]" />
-              <h3 className="text-[11px] font-black text-black uppercase tracking-[0.2em] italic">SÉCURITÉ DU CREW</h3>
+              <h3 className="text-[11px] font-black text-[color:var(--app-text)] uppercase tracking-[0.2em] italic">SÉCURITÉ DU CREW</h3>
            </div>
            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div className="space-y-4">
                  <div className="space-y-1.5">
-                    <p className="text-[10px] font-black uppercase text-black">NUMÉROS SOS PRIORITAIRES</p>
+                    <p className="text-[10px] font-black uppercase text-[color:var(--app-text)]">NUMÉROS SOS PRIORITAIRES</p>
                     <input 
                       type="text" 
                       value={sosNumbers}
                       onChange={(e) => setSosNumbers(e.target.value)}
-                      className="w-full bg-[#F4F5F7] border border-black/5 rounded-control px-3 py-2 text-[12px] font-mono font-bold text-black focus:outline-none focus:border-[#FF5C00] focus:bg-white focus-visible:ring-1 focus-visible:ring-[#FF5C00] transition-all"
+                      className="w-full bg-[var(--app-surface-2)] border border-[color:var(--app-border)] rounded-control px-3 py-2 text-[12px] font-mono font-bold text-[color:var(--app-text)] focus:outline-none focus:border-[#FF5C00] focus:bg-[var(--app-surface)] focus-visible:ring-1 focus-visible:ring-[#FF5C00] transition-all"
                     />
                  </div>
                  <div className="space-y-1.5">
-                    <p className="text-[10px] font-black uppercase text-black">CONTACT D'URGENCE DE L'ORGANISATEUR</p>
+                    <p className="text-[10px] font-black uppercase text-[color:var(--app-text)]">CONTACT D'URGENCE DE L'ORGANISATEUR</p>
                     <input 
                       type="text" 
                       value={safetyContact}
                       onChange={(e) => setSafetyContact(e.target.value)}
-                      className="w-full bg-[#F4F5F7] border border-black/5 rounded-control px-3 py-2 text-[12px] font-mono font-bold text-black focus:outline-none focus:border-[#FF5C00] focus:bg-white focus-visible:ring-1 focus-visible:ring-[#FF5C00] transition-all"
+                      className="w-full bg-[var(--app-surface-2)] border border-[color:var(--app-border)] rounded-control px-3 py-2 text-[12px] font-mono font-bold text-[color:var(--app-text)] focus:outline-none focus:border-[#FF5C00] focus:bg-[var(--app-surface)] focus-visible:ring-1 focus-visible:ring-[#FF5C00] transition-all"
                     />
                  </div>
               </div>
-              <div className="bg-[#F4F5F7] border border-black/5 rounded-card-inner p-5 flex flex-col justify-center gap-2">
+              <div className="bg-[var(--app-surface-2)] border border-[color:var(--app-border)] rounded-card-inner p-5 flex flex-col justify-center gap-2">
                  <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center text-[#FF5C00]">
                     <AlertTriangle size={16} />
                  </div>
-                 <p className="text-[10px] font-black uppercase tracking-widest leading-relaxed text-black">
+                 <p className="text-[10px] font-black uppercase tracking-widest leading-relaxed text-[color:var(--app-text)]">
                    NUMÉROS D'URGENCE
                  </p>
                  <p className="text-[10px] font-medium leading-relaxed text-[#6B6B63]">
@@ -500,14 +500,14 @@ export default function SettingsPage() {
         </div>
 
         {/* CAGNOTTE CONFIG */}
-        <div className="col-span-12 md:col-span-6 bg-white border-[0.5px] border-[#E5E5E5] rounded-card-outer p-6 sm:p-8 space-y-6 shadow-sm">
+        <div className="col-span-12 md:col-span-6 bg-[var(--app-surface)] border-[0.5px] border-[color:var(--app-border)] rounded-card-outer p-6 sm:p-8 space-y-6 shadow-sm">
            <div className="flex items-center gap-3 border-b-[0.5px] border-[#F4F5F7] pb-4">
               <Wallet size={18} className="text-[#FF5C00]" />
-              <h3 className="text-[11px] font-black text-black uppercase tracking-[0.2em] italic">CAGNOTTE POST-RUN</h3>
+              <h3 className="text-[11px] font-black text-[color:var(--app-text)] uppercase tracking-[0.2em] italic">CAGNOTTE POST-RUN</h3>
            </div>
            <div className="space-y-4">
               <div className="space-y-2 text-left">
-                 <label className="text-[8px] font-black text-black uppercase tracking-widest italic block">
+                 <label className="text-[8px] font-black text-[color:var(--app-text)] uppercase tracking-widest italic block">
                     URL Cagnotte / Lien de Paiement
                  </label>
                  <input 
@@ -515,15 +515,15 @@ export default function SettingsPage() {
                    value={cagnotteUrl}
                    onChange={(e) => setCagnotteUrl(e.target.value)}
                    placeholder="https://sumeria.eu/collect/tonnom"
-                   className="w-full bg-[#F4F5F7] border border-black/10 rounded-control px-3.5 py-2.5 text-[12px] font-mono font-bold text-black focus:outline-none focus:border-[#FF5C00] focus:bg-white focus-visible:ring-1 focus-visible:ring-[#FF5C00] transition-all placeholder:text-neutral-450"
+                   className="w-full bg-[var(--app-surface-2)] border border-[color:var(--app-border)] rounded-control px-3.5 py-2.5 text-[12px] font-mono font-bold text-[color:var(--app-text)] focus:outline-none focus:border-[#FF5C00] focus:bg-[var(--app-surface)] focus-visible:ring-1 focus-visible:ring-[#FF5C00] transition-all placeholder:text-neutral-450"
                  />
               </div>
 
-              <div className="text-[9.5px] font-medium text-[#A3A3A3] leading-relaxed uppercase space-y-1 bg-[#F4F5F7]/30 border border-black/[0.03] p-3 rounded-card-inner text-left">
-                 <p className="text-[8px] font-black text-neutral-400">Colle ici le lien de ta cagnotte ou de ton profil de paiement. Exemples acceptés :</p>
-                 <p className="font-bold text-black/60 pt-0.5">• Sumeria → sumeria.eu/collect#tonnom</p>
-                 <p className="font-bold text-black/60">• Revolut → revolut.me/tonnom</p>
-                 <p className="font-bold text-black/60">• PayPal → paypal.me/tonnom</p>
+              <div className="text-[9.5px] font-medium text-[color:var(--app-text-muted)] leading-relaxed uppercase space-y-1 bg-[var(--app-surface-2)]/30 border border-black/[0.03] p-3 rounded-card-inner text-left">
+                 <p className="text-[8px] font-black text-[color:var(--app-text-muted)]">Colle ici le lien de ta cagnotte ou de ton profil de paiement. Exemples acceptés :</p>
+                 <p className="font-bold text-[color:var(--app-text)]/60 pt-0.5">• Sumeria → sumeria.eu/collect#tonnom</p>
+                 <p className="font-bold text-[color:var(--app-text)]/60">• Revolut → revolut.me/tonnom</p>
+                 <p className="font-bold text-[color:var(--app-text)]/60">• PayPal → paypal.me/tonnom</p>
               </div>
 
               <button 
@@ -566,16 +566,16 @@ export default function SettingsPage() {
         </div>
 
         {/* SUBSCRIPTION & ACCESS */}
-        <div className="col-span-12 bg-white border-[0.5px] border-[#E5E5E5] rounded-card-outer p-6 sm:p-8 flex flex-col lg:flex-row gap-6 items-start lg:items-center justify-between shadow-sm">
+        <div className="col-span-12 bg-[var(--app-surface)] border-[0.5px] border-[color:var(--app-border)] rounded-card-outer p-6 sm:p-8 flex flex-col lg:flex-row gap-6 items-start lg:items-center justify-between shadow-sm">
            <div className="flex items-center gap-6 text-left">
               <div className="w-12 h-12 bg-[#FF5C00]/10 rounded-control flex items-center justify-center text-[#FF5C00] shrink-0">
                  <CreditCard size={24} />
               </div>
               <div className="space-y-1">
-                 <h4 className="text-[15px] sm:text-[16px] font-black uppercase text-black">
+                 <h4 className="text-[15px] sm:text-[16px] font-black uppercase text-[color:var(--app-text)]">
                    Mon Abonnement CAPTEN : <span className="text-[#FF5C00]">{club?.plan === 'trial' ? 'ESSAI EN COURS' : currentPlan === 'CAPTEN' ? 'ACTIF PRO' : 'GRATUIT'}</span>
                  </h4>
-                 <p className="text-[9px] sm:text-[10px] font-medium text-[#A3A3A3] uppercase tracking-widest leading-relaxed">
+                 <p className="text-[9px] sm:text-[10px] font-medium text-[color:var(--app-text-muted)] uppercase tracking-widest leading-relaxed">
                    {club?.plan === 'trial' 
                      ? `Période d'essai gratuite active • ${Math.max(0, 21 - Math.floor((Date.now() - new Date(club.created_at || Date.now()).getTime()) / (1000 * 60 * 60 * 24)))} jours restants`
                      : currentPlan === 'CAPTEN'
@@ -587,7 +587,7 @@ export default function SettingsPage() {
            <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
               <button 
                 onClick={() => setShowTeamModal(true)}
-                className="w-full sm:w-auto px-6 py-3.5 bg-[#F4F5F7] text-black text-[10px] font-black uppercase tracking-widest rounded-control hover:bg-black hover:text-white transition-all cursor-pointer text-center"
+                className="w-full sm:w-auto px-6 py-3.5 bg-[var(--app-surface-2)] text-[color:var(--app-text)] text-[10px] font-black uppercase tracking-widest rounded-control hover:bg-black hover:text-white transition-all cursor-pointer text-center"
               >
                 GÉRER L'ÉQUIPE
               </button>
@@ -682,7 +682,7 @@ export default function SettingsPage() {
                   <br /><span className="text-[#25D366] font-bold">Paramètres &gt; Appareils Connectés &gt; Lier un appareil</span>, puis scannez ce code.
                 </p>
 
-                <div className="bg-white p-4 rounded-card-inner w-56 h-56 mx-auto flex items-center justify-center relative overflow-hidden shadow-[0_0_30px_rgba(37,211,102,0.15)] border-[0.5px] border-white/10">
+                <div className="bg-[var(--app-surface)] p-4 rounded-card-inner w-56 h-56 mx-auto flex items-center justify-center relative overflow-hidden shadow-[0_0_30px_rgba(37,211,102,0.15)] border-[0.5px] border-white/10">
                   {whatsappQr ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img 
@@ -693,7 +693,7 @@ export default function SettingsPage() {
                   ) : (
                     <div className="flex flex-col items-center justify-center gap-3">
                       <div className="w-8 h-8 border-2 border-black/20 border-t-[#25D366] rounded-full animate-spin" />
-                      <p className="text-[9px] font-black text-black uppercase tracking-widest">GÉNÉRATION DU CODE...</p>
+                      <p className="text-[9px] font-black text-[color:var(--app-text)] uppercase tracking-widest">GÉNÉRATION DU CODE...</p>
                     </div>
                   )}
                 </div>
@@ -704,7 +704,7 @@ export default function SettingsPage() {
                       fetchWhatsappStatus();
                       showToast("Vérification en cours...");
                     }}
-                    className="flex-1 py-3 bg-[#25D366] text-black hover:bg-[#00E676] rounded-control text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer shadow-[0_0_15px_rgba(37,211,102,0.3)]"
+                    className="flex-1 py-3 bg-[#25D366] text-[color:var(--app-text)] hover:bg-[#00E676] rounded-control text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer shadow-[0_0_15px_rgba(37,211,102,0.3)]"
                   >
                     VÉRIFIER LA CONNEXION
                   </button>
