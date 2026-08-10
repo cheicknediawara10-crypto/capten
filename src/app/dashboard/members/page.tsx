@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Search, Phone, Shield, FileCheck, ChevronRight } from "lucide-react";
+import { Search, Phone, Shield, FileCheck, ChevronRight, Users } from "lucide-react";
 import { getSupabase } from "@/lib/supabase";
 import { useAuth } from "@/context/AuthContext";
 
@@ -96,39 +96,39 @@ export default function MembersPage() {
     { key: "has_ice", label: "ICE OK" },
   ];
 
+  const card = "bg-[var(--app-surface)] border border-[color:var(--app-border)]";
+
   return (
     <div className="space-y-8 pb-20">
       {/* Header */}
-      <div className="flex items-start justify-between">
-        <div>
-          <h1 className="text-[28px] sm:text-[36px] font-display italic font-black uppercase text-black leading-none tracking-tighter">
-            Les Membres
-          </h1>
-          <p className="text-[13px] text-[#A3A3A3] font-sans mt-1">
-            {members.length} membre{members.length > 1 ? "s" : ""} dans ton crew
-          </p>
-        </div>
+      <div>
+        <h1 className="text-[30px] sm:text-[40px] font-display italic font-black uppercase text-[color:var(--app-text)] leading-none tracking-tighter">
+          Les Membres
+        </h1>
+        <p className="text-[13px] text-[color:var(--app-text-muted)] font-sans mt-1">
+          {members.length} membre{members.length > 1 ? "s" : ""} dans ton crew
+        </p>
       </div>
 
       {/* Search + Filters */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1 max-w-md">
-          <Search size={15} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#A3A3A3]" />
+          <Search size={15} className="absolute left-4 top-1/2 -translate-y-1/2 text-[color:var(--app-text-muted)]" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Nom, téléphone…"
-            className="w-full h-11 pl-10 pr-4 rounded-full border border-[#E5E7EB] text-sm focus:border-[#FF5500] focus:ring-2 focus:ring-[#FF5500]/20 outline-none transition-all bg-white"
+            className={`w-full h-11 pl-10 pr-4 rounded-full ${card} text-sm text-[color:var(--app-text)] placeholder:text-[color:var(--app-text-muted)] focus:border-[#FF5C00] outline-none transition-all`}
           />
         </div>
-        <div className="flex gap-1 bg-white border border-black/5 rounded-full p-1 shadow-sm h-fit">
+        <div className={`flex gap-1 ${card} rounded-full p-1 h-fit`}>
           {FILTERS.map((f) => (
             <button
               key={f.key}
               onClick={() => setFilter(f.key)}
-              className={`px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all whitespace-nowrap ${
-                filter === f.key ? "bg-[#FF5500] text-white" : "text-[#666562] hover:text-black"
+              className={`px-3 py-1.5 rounded-full text-[10px] font-semibold uppercase tracking-wider transition-all whitespace-nowrap ${
+                filter === f.key ? "bg-[#FF5C00] text-white" : "text-[color:var(--app-text-muted)] hover:text-[color:var(--app-text)]"
               }`}
             >
               {f.label}
@@ -144,11 +144,11 @@ export default function MembersPage() {
           { label: "Sans décharge", value: members.filter(m => !m._has_waiver).length, color: "#F59E0B" },
           { label: "Ont couru", value: members.filter(m => (m._checkins || 0) > 0).length, color: "#22C55E" },
         ].map((stat) => (
-          <div key={stat.label} className="bg-white rounded-[20px] border border-black/5 p-4 text-center">
+          <div key={stat.label} className={`${card} rounded-2xl p-4 text-center`}>
             <p className="text-[28px] font-display font-black italic leading-none" style={{ color: stat.color }}>
               {loading ? "—" : stat.value}
             </p>
-            <p className="text-[10px] text-[#A3A3A3] uppercase tracking-wider mt-1">{stat.label}</p>
+            <p className="text-[10px] text-[color:var(--app-text-muted)] uppercase tracking-wider mt-1">{stat.label}</p>
           </div>
         ))}
       </div>
@@ -157,28 +157,30 @@ export default function MembersPage() {
       {loading ? (
         <div className="space-y-2">
           {[1,2,3,4,5].map(i => (
-            <div key={i} className="bg-white rounded-[20px] p-4 animate-pulse h-16 border border-black/5" />
+            <div key={i} className={`${card} rounded-2xl p-4 animate-pulse h-16`} />
           ))}
         </div>
       ) : filtered.length === 0 ? (
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col items-center py-16 text-center"
+          className="flex flex-col items-center gap-3 py-16 text-center"
         >
-          <div className="text-4xl mb-3">🫂</div>
-          <p className="text-[15px] font-black uppercase text-black">
+          <div className="w-14 h-14 rounded-2xl bg-[var(--app-accent-soft)] flex items-center justify-center">
+            <Users size={26} className="text-[#FF5C00]" />
+          </div>
+          <p className="text-[15px] font-semibold text-[color:var(--app-text)]">
             {members.length === 0 ? "Aucun membre encore" : "Aucun membre trouvé"}
           </p>
-          <p className="text-[12px] text-[#A3A3A3] mt-1">
+          <p className="text-[12px] text-[color:var(--app-text-muted)] max-w-xs">
             {members.length === 0
               ? "Partage ton lien d'inscription pour que ton crew rejoigne."
               : "Essaie un autre filtre ou terme de recherche."}
           </p>
         </motion.div>
       ) : (
-        <div className="bg-white rounded-[24px] border border-black/5 overflow-hidden">
-          <div className="divide-y divide-black/5">
+        <div className={`${card} rounded-2xl overflow-hidden`}>
+          <div className="divide-y divide-[color:var(--app-border)]">
             {filtered.map((member, i) => {
               const name = fullName(member.membre_profiles) || "Membre sans nom";
               const initials = name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
@@ -191,35 +193,35 @@ export default function MembersPage() {
                 >
                   <Link
                     href={`/dashboard/members/${member.membre_id}`}
-                    className="flex items-center gap-4 p-4 hover:bg-[#FAFAFA] transition-colors group"
+                    className="flex items-center gap-4 p-4 hover:bg-[var(--app-hover)] transition-colors group"
                   >
-                    <div className="w-10 h-10 rounded-full bg-[#FF5500]/10 flex items-center justify-center shrink-0 font-black text-[12px] text-[#FF5500]">
+                    <div className="w-10 h-10 rounded-full bg-[var(--app-accent-soft)] flex items-center justify-center shrink-0 font-bold text-[12px] text-[#FF5C00]">
                       {initials || "?"}
                     </div>
 
                     <div className="flex-1 min-w-0">
-                      <p className="text-[14px] font-semibold text-black truncate">{name}</p>
-                      <p className="text-[11px] text-[#A3A3A3] flex items-center gap-1">
+                      <p className="text-[14px] font-semibold text-[color:var(--app-text)] truncate">{name}</p>
+                      <p className="text-[11px] text-[color:var(--app-text-muted)] flex items-center gap-1">
                         <Phone size={9} />
                         {member.membre_profiles?.phone || "—"}
                       </p>
                     </div>
 
                     <div className="flex items-center gap-1.5 shrink-0">
-                      <span className={`w-6 h-6 rounded-full flex items-center justify-center ${member._has_ice ? "bg-[#DCFCE7]" : "bg-[#FEE2E2]"}`} title={member._has_ice ? "ICE renseigné" : "ICE manquant"}>
+                      <span className={`w-6 h-6 rounded-full flex items-center justify-center ${member._has_ice ? "bg-[#22C55E]/15" : "bg-[#EF4444]/12"}`} title={member._has_ice ? "ICE renseigné" : "ICE manquant"}>
                         <Shield size={11} className={member._has_ice ? "text-[#22C55E]" : "text-[#EF4444]"} />
                       </span>
-                      <span className={`w-6 h-6 rounded-full flex items-center justify-center ${member._has_waiver ? "bg-[#DCFCE7]" : "bg-[#FEE2E2]"}`} title={member._has_waiver ? "Décharge signée" : "Décharge manquante"}>
+                      <span className={`w-6 h-6 rounded-full flex items-center justify-center ${member._has_waiver ? "bg-[#22C55E]/15" : "bg-[#EF4444]/12"}`} title={member._has_waiver ? "Décharge signée" : "Décharge manquante"}>
                         <FileCheck size={11} className={member._has_waiver ? "text-[#22C55E]" : "text-[#EF4444]"} />
                       </span>
                       {(member._checkins || 0) > 0 && (
-                        <span className="bg-[#F4F4EE] text-[#666562] text-[10px] font-bold px-2 py-0.5 rounded-full">
+                        <span className="bg-[var(--app-surface-2)] text-[color:var(--app-text-muted)] text-[10px] font-bold px-2 py-0.5 rounded-full">
                           {member._checkins}
                         </span>
                       )}
                     </div>
 
-                    <ChevronRight size={14} className="text-[#A3A3A3] group-hover:text-[#FF5500] transition-colors shrink-0" />
+                    <ChevronRight size={14} className="text-[color:var(--app-text-muted)] group-hover:text-[#FF5C00] transition-colors shrink-0" />
                   </Link>
                 </motion.div>
               );

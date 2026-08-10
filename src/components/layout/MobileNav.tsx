@@ -61,7 +61,7 @@ export default function MobileNav() {
   }, [pathname]);
 
   return (
-    <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t-[0.5px] border-[#E5E5E5] z-[100] pb-safe-bottom shadow-[0_-4px_24px_rgba(0,0,0,0.06)] select-none">
+    <div className="lg:hidden fixed bottom-0 left-0 right-0 backdrop-blur-md border-t-[0.5px] z-[100] pb-safe-bottom shadow-[0_-4px_24px_rgba(0,0,0,0.06)] select-none" style={{ background: "color-mix(in srgb, var(--app-surface) 95%, transparent)", borderColor: "var(--app-border)" }}>
       
       {/* Hide Scrollbars CSS Injection */}
       <style jsx global>{`
@@ -75,8 +75,8 @@ export default function MobileNav() {
       `}</style>
 
       {/* Horizontal Fade Overlays */}
-      <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-white to-transparent pointer-events-none z-10" />
-      <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white to-transparent pointer-events-none z-10" />
+      <div className="absolute left-0 top-0 bottom-0 w-8 pointer-events-none z-10" style={{ background: "linear-gradient(to right, var(--app-surface), transparent)" }} />
+      <div className="absolute right-0 top-0 bottom-0 w-8 pointer-events-none z-10" style={{ background: "linear-gradient(to left, var(--app-surface), transparent)" }} />
 
       {/* Sliding Scroll Container */}
       <div 

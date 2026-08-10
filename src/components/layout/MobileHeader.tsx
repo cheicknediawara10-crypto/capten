@@ -38,7 +38,7 @@ export default function MobileHeader() {
       items: [
         { name: "Dashboard", icon: <LayoutDashboard size={18} strokeWidth={1.5} />, href: "/dashboard" },
         { name: "Membres", icon: <Users size={18} strokeWidth={1.5} />, href: "/dashboard/members" },
-        { name: "Les Sorties", icon: <Map size={18} strokeWidth={1.5} />, href: "/dashboard/events" },
+        { name: "Les Runs", icon: <Map size={18} strokeWidth={1.5} />, href: "/dashboard/events" },
         { name: "Statistiques", icon: <BarChart3 size={18} strokeWidth={1.5} />, href: "/dashboard/stats" },
         { name: "Messages", icon: <MessageSquare size={18} strokeWidth={1.5} />, href: "/messages" },
       ]
@@ -63,7 +63,7 @@ export default function MobileHeader() {
   return (
     <>
       {/* HEADER BAR */}
-      <div className="lg:hidden flex items-center justify-between p-4 bg-white/90 backdrop-blur-md border-b-[0.5px] border-[#E5E5E5] sticky top-0 z-[120] shadow-sm">
+      <div className="lg:hidden flex items-center justify-between p-4 backdrop-blur-md border-b-[0.5px] sticky top-0 z-[120] shadow-sm" style={{ background: "color-mix(in srgb, var(--app-surface) 90%, transparent)", borderColor: "var(--app-border)" }}>
         <Link href="/" className="flex items-center gap-2.5 active:scale-95 transition-all">
           <img src={logo} alt="CAPTEN" className="h-[24px] w-auto object-contain rounded-control" />
         </Link>
@@ -72,7 +72,7 @@ export default function MobileHeader() {
         <button 
           onClick={() => setIsOpen(!isOpen)}
           aria-label="Toggle menu"
-          className="w-10 h-10 rounded-control border border-black/5 bg-[#F8F9FA] hover:bg-black/5 flex items-center justify-center text-black active:scale-90 transition-all cursor-pointer"
+          className="w-10 h-10 rounded-control border flex items-center justify-center text-[color:var(--app-text)] active:scale-90 transition-all cursor-pointer"
         >
           {isOpen ? <X size={18} /> : <Menu size={18} />}
         </button>
@@ -85,11 +85,11 @@ export default function MobileHeader() {
           <div className="absolute inset-0" onClick={() => setIsOpen(false)} />
 
           {/* Drawer Menu */}
-          <div className="relative w-[300px] max-w-[85vw] bg-white h-screen shadow-2xl flex flex-col pt-24 pb-6 overflow-y-auto animate-slide-in-right">
+          <div className="relative w-[300px] max-w-[85vw] h-screen shadow-2xl flex flex-col pt-24 pb-6 overflow-y-auto animate-slide-in-right" style={{ background: "var(--app-surface)" }}>
             <nav className="flex-1 px-6 space-y-6">
               {menuSections.map((section) => (
                 <div key={section.title} className="space-y-2">
-                  <p className="text-[9px] text-[#A3A3A3] font-black uppercase tracking-[0.25em] pl-3 italic">
+                  <p className="text-[9px] text-[color:var(--app-text-muted)] font-black uppercase tracking-[0.25em] pl-3 italic">
                     {section.title}
                   </p>
                   <div className="space-y-1">
@@ -99,7 +99,7 @@ export default function MobileHeader() {
 
                       const content = (
                         <>
-                          <span className={isActive ? 'text-[#FF5C00]' : 'text-[#A3A3A3]'}>
+                          <span className={isActive ? 'text-[#FF5C00]' : 'text-[color:var(--app-text-muted)]'}>
                             {item.icon}
                           </span>
                           <span className="text-[12px] uppercase tracking-wider font-bold">
@@ -116,7 +116,7 @@ export default function MobileHeader() {
                             target={item.target}
                             rel="noopener noreferrer"
                             onClick={() => setIsOpen(false)}
-                            className="flex items-center gap-3.5 px-4 py-3 rounded-control transition-all active:scale-98 text-[#555555] hover:bg-[#F8F9FA] hover:text-black"
+                            className="flex items-center gap-3.5 px-4 py-3 rounded-control transition-all active:scale-98 text-[color:var(--app-text)] hover:bg-[var(--app-hover)]"
                           >
                             {content}
                           </a>
@@ -130,8 +130,8 @@ export default function MobileHeader() {
                           onClick={() => setIsOpen(false)}
                           className={`flex items-center gap-3.5 px-4 py-3 rounded-control transition-all active:scale-98 ${
                             isActive 
-                              ? 'bg-[#FFF0E8] text-[#FF5C00] font-bold' 
-                              : 'text-[#555555] hover:bg-[#F8F9FA] hover:text-black'
+                              ? 'bg-[var(--app-accent-soft)] text-[#FF5C00] font-bold' 
+                              : 'text-[color:var(--app-text)] hover:bg-[var(--app-hover)]'
                           }`}
                         >
                           {content}
