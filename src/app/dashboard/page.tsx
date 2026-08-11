@@ -5,6 +5,7 @@ import Link from 'next/link';
 import {
   Users, MapPin, BarChart3, MessageSquare, ArrowRight, Plus,
   Calendar, Copy, Check, ShieldCheck, CreditCard, Loader2,
+  CheckCircle2, Circle, X, Rocket, Settings2,
 } from 'lucide-react';
 import { getSupabase } from '@/lib/supabase';
 import { useAuth } from '@/context/AuthContext';
@@ -32,6 +33,11 @@ export default function DashboardPage() {
   const [upcoming, setUpcoming] = useState<UpcomingEvent[]>([]);
   const [slug, setSlug] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [obDismissed, setObDismissed] = useState(true);
+
+  useEffect(() => {
+    setObDismissed(localStorage.getItem('capten_onboarding_done') === '1');
+  }, []);
 
   useEffect(() => {
     async function load() {
@@ -80,6 +86,39 @@ export default function DashboardPage() {
     setTimeout(() => setCopied(false), 1800);
   };
 
+  // ── Onboarding "Lance ton crew" (guide vers l'Aha Moment) ──
+  const DEFAULT_NAMES = ['MON RUN CLUB', 'Mon Run Club', 'Mon crew', 'Mon Crew'];
+  const steps = [
+    {
+      key: 'perso',
+      done: !!club?.name && !DEFAULT_NAMES.includes(club.name),
+      title: 'Personnalise ton crew',
+      desc: 'Nom, logo, ville — donne-lui une identité.',
+      href: '/dashboard/club', cta: 'Éditer', icon: <Settings2 size={15} />,
+    },
+    {
+      key: 'share',
+      done: memberCount > 0,
+      title: 'Partage ton lien d’inscription',
+      desc: 'Tes coureurs rejoignent en 30 s, sans app à installer.',
+      action: 'copy' as const, icon: <Users size={15} />,
+    },
+    {
+      key: 'run',
+      done: sessionCount > 0,
+      title: 'Crée ton premier run',
+      desc: 'Planifie, publie, et suis les présences en direct.',
+      href: '/dashboard/events/new', cta: 'Créer', icon: <Calendar size={15} />,
+    },
+  ];
+  const doneCount = steps.filter((s) => s.done).length;
+  const showOnboarding = !loading && !isMock && !obDismissed && doneCount < steps.length;
+
+  const dismissOnboarding = () => {
+    localStorage.setItem('capten_onboarding_done', '1');
+    setObDismissed(true);
+  };
+
   const STATS = [
     { label: 'Membres', value: memberCount, icon: <Users size={18} />, href: '/dashboard/members' },
     { label: L.session_plural_cap, value: sessionCount, icon: <Calendar size={18} />, href: '/dashboard/events' },
@@ -117,8 +156,64 @@ export default function DashboardPage() {
         </span>
       </div>
 
+      {/* Onboarding — Lance ton crew */}
+      {showOnboarding && (
+        <div className="rounded-2xl border border-[#FF5C00]/25 bg-[var(--app-accent-soft)] overflow-hidden">
+          <div className="flex items-center justify-between gap-3 px-5 pt-5">
+            <div className="flex items-center gap-2.5">
+              <span className="w-9 h-9 rounded-xl bg-[#FF5C00] flex items-center justify-center text-white shrink-0">
+                <Rocket size={17} />
+              </span>
+              <div>
+                <p className="text-[15px] font-display italic font-black uppercase text-[color:var(--app-text)] leading-none">Lance ton crew</p>
+                <p className="text-[12px] text-[color:var(--app-text-muted)] mt-1">{doneCount}/{steps.length} étapes — tu y es presque.</p>
+              </div>
+            </div>
+            <button onClick={dismissOnboarding} title="Masquer"
+              className="shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-[color:var(--app-text-muted)] hover:bg-[var(--app-hover)] transition-colors">
+              <X size={14} />
+            </button>
+          </div>
+
+          {/* Barre de progression */}
+          <div className="px-5 mt-3">
+            <div className="h-1.5 rounded-full bg-[color:var(--app-border)] overflow-hidden">
+              <div className="h-full rounded-full bg-[#FF5C00] transition-all" style={{ width: `${(doneCount / steps.length) * 100}%` }} />
+            </div>
+          </div>
+
+          {/* Étapes */}
+          <div className="p-3 sm:p-4 space-y-2">
+            {steps.map((s) => (
+              <div key={s.key}
+                className={`flex items-center gap-3 rounded-xl px-3 py-3 ${s.done ? 'opacity-60' : 'bg-[var(--app-surface)] border border-[color:var(--app-border)]'}`}>
+                {s.done
+                  ? <CheckCircle2 size={20} className="text-[#22C55E] shrink-0" />
+                  : <Circle size={20} className="text-[color:var(--app-text-muted)] shrink-0" />}
+                <div className="flex-1 min-w-0">
+                  <p className={`text-[13px] font-semibold text-[color:var(--app-text)] ${s.done ? 'line-through' : ''}`}>{s.title}</p>
+                  {!s.done && <p className="text-[11px] text-[color:var(--app-text-muted)] mt-0.5">{s.desc}</p>}
+                </div>
+                {!s.done && s.action === 'copy' && joinUrl && (
+                  <button onClick={copyJoin}
+                    className="shrink-0 inline-flex items-center gap-1.5 h-9 px-4 rounded-full bg-[#FF5C00] text-white text-[12px] font-semibold hover:bg-[#E04B00] transition-colors">
+                    {copied ? <><Check size={13} /> Copié</> : <><Copy size={13} /> Copier le lien</>}
+                  </button>
+                )}
+                {!s.done && s.href && (
+                  <Link href={s.href}
+                    className="shrink-0 inline-flex items-center gap-1.5 h-9 px-4 rounded-full bg-[#FF5C00] text-white text-[12px] font-semibold hover:bg-[#E04B00] transition-colors">
+                    {s.cta} <ArrowRight size={13} />
+                  </Link>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Lien d'inscription public */}
-      {joinUrl && (
+      {!showOnboarding && joinUrl && (
         <div className={`${card} rounded-2xl px-5 py-4 flex items-center justify-between gap-4`}>
           <div className="min-w-0">
             <p className="text-[11px] font-semibold uppercase tracking-widest text-[color:var(--app-text-muted)] mb-1">Lien d'inscription du crew</p>
