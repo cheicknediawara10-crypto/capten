@@ -18,7 +18,7 @@ interface Club {
 }
 
 export default function ClubSettingsPage() {
-  const { club: authClub } = useAuth();
+  const { user, club: authClub } = useAuth();
   const [club, setClub] = useState<Club | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -28,25 +28,28 @@ export default function ClubSettingsPage() {
 
   useEffect(() => {
     async function load() {
-      const supabase = getSupabase();
-      if (!supabase || !authClub) { setLoading(false); return; }
-
-      const { data } = await supabase.from("clubs").select("*").eq("id", authClub.id).maybeSingle();
-      // Fallback sur les infos déjà chargées par AuthContext si la requête ne renvoie rien
-      setClub((data as Club) || ({
-        id: authClub.id,
-        name: authClub.name || "",
-        slug: (authClub as any).slug || "",
+      const clubId = authClub?.id || user?.id || "";
+      const emptyClub: Club = {
+        id: clubId,
+        name: (authClub?.name && !["MON RUN CLUB", "Mon Run Club"].includes(authClub.name)) ? authClub.name : "",
+        slug: (authClub as any)?.slug || "",
         description: null,
-        logo_url: (authClub.branding as any)?.logo || null,
+        logo_url: (authClub?.branding as any)?.logo || null,
         city: null,
         sport_type: null,
         website_url: null,
-      } as Club));
+      };
+
+      const supabase = getSupabase();
+      // On rend toujours un formulaire éditable, même sans ligne clubs encore créée.
+      if (!supabase || !clubId) { setClub(emptyClub); setLoading(false); return; }
+
+      const { data } = await supabase.from("clubs").select("*").eq("id", clubId).maybeSingle();
+      setClub((data as Club) || emptyClub);
       setLoading(false);
     }
     load();
-  }, [authClub]);
+  }, [authClub, user]);
 
   const update = (key: keyof Club, value: string) =>
     setClub((prev) => prev ? { ...prev, [key]: value } : prev);
@@ -76,21 +79,30 @@ export default function ClubSettingsPage() {
 
   async function save() {
     if (!club) return;
+    const clubId = club.id || user?.id;
+    if (!clubId) { alert("Session introuvable, reconnecte-toi."); return; }
     setSaving(true);
     const supabase = getSupabase();
     if (!supabase) { setSaving(false); return; }
 
-    const { error } = await supabase.from("clubs").update({
+    // Upsert : crée la ligne du crew si elle n'existe pas encore (crew tout neuf)
+    const { error } = await supabase.from("clubs").upsert({
+      id: clubId,
+      owner_id: clubId,
       name: club.name,
       description: club.description,
       logo_url: club.logo_url,
       city: club.city,
       website_url: club.website_url,
-    }).eq("id", club.id);
+    }, { onConflict: "id" });
 
     if (error) alert("Erreur : " + error.message);
+    else showSaved();
     setSaving(false);
   }
+
+  const [saved, setSaved] = useState(false);
+  const showSaved = () => { setSaved(true); setTimeout(() => setSaved(false), 2000); };
 
   const joinLink = typeof window !== "undefined" && club
     ? `${window.location.origin}/join/${club.slug}`
@@ -248,8 +260,8 @@ export default function ClubSettingsPage() {
         disabled={saving}
         className="flex items-center gap-2 px-8 py-3 rounded-full bg-[#FF5C00] text-white text-[11px] font-black uppercase tracking-widest hover:bg-black transition-all active:scale-95 disabled:opacity-50"
       >
-        {saving ? <Loader2 size={13} className="animate-spin" /> : <Save size={13} />}
-        Enregistrer les modifications
+        {saving ? <Loader2 size={13} className="animate-spin" /> : saved ? <Check size={13} /> : <Save size={13} />}
+        {saved ? "Enregistré ✓" : "Enregistrer les modifications"}
       </button>
     </div>
   );
