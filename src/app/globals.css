@@ -49,17 +49,17 @@
   --app-accent-soft: rgba(255,92,0,0.08);
 }
 
-/* ─── Thème sombre (toggle) ─────────────────────────────────────────────── */
+/* ─── Thème sombre PREMIUM (Whoop/Runna) — défaut de l'espace fondateur ─── */
 :root[data-theme="dark"] {
-  --app-bg:         #0E0E0C;
-  --app-surface:    #1A1A17;
-  --app-surface-2:  #23231F;
-  --app-text:       #F4F3EF;
-  --app-text-muted: #918E86;
-  --app-border:     rgba(255,255,255,0.08);
-  --app-hover:      #201F1B;
+  --app-bg:         #0B0B0A;
+  --app-surface:    #161615;
+  --app-surface-2:  #201F1D;
+  --app-text:       #F6F5F2;
+  --app-text-muted: #918D85;
+  --app-border:     rgba(255,255,255,0.075);
+  --app-hover:      #1D1C1A;
   --app-accent:     #FF6A1A;
-  --app-accent-soft: rgba(255,106,26,0.12);
+  --app-accent-soft: rgba(255,106,26,0.14);
 }
 
 /* ─── Base ──────────────────────────────────────────────────────────────── */
