@@ -226,21 +226,56 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* Stat tiles */}
-      <div className="grid grid-cols-3 gap-3 sm:gap-4">
-        {STATS.map((s) => (
-          <Link key={s.label} href={s.href}
-            className={`${card} rounded-2xl p-5 hover:border-[#FF5C00]/30 transition-colors group`}>
-            <div className="w-9 h-9 rounded-xl bg-[var(--app-accent-soft)] flex items-center justify-center text-[#FF5C00] mb-4">
-              {s.icon}
+      {/* Stats premium — anneau de croissance + métriques (façon Whoop/Runna) */}
+      {(() => {
+        const goal = isPro ? 50 : 20;
+        const pct = goal > 0 ? Math.min(memberCount / goal, 1) : 0;
+        const R = 62, CIRC = 2 * Math.PI * R;
+        const METRICS = [
+          { label: 'Runs', value: sessionCount, href: '/dashboard/events', icon: <Calendar size={16} /> },
+          { label: 'Check-ins', value: checkinCount, href: '/dashboard/stats', icon: <Check size={16} /> },
+          { label: isPro ? 'Membres' : 'Places libres', value: isPro ? '∞' : Math.max(goal - memberCount, 0), href: '/dashboard/members', icon: <Users size={16} /> },
+        ];
+        return (
+          <div className={`${card} rounded-2xl p-6 sm:p-7`}>
+            <div className="flex flex-col sm:flex-row items-center gap-7 sm:gap-9">
+              {/* Anneau */}
+              <Link href="/dashboard/members" className="relative shrink-0 group" style={{ width: 152, height: 152 }}>
+                <svg width="152" height="152" viewBox="0 0 152 152" className="-rotate-90">
+                  <circle cx="76" cy="76" r={R} fill="none" stroke="var(--app-surface-2)" strokeWidth="13" />
+                  <circle
+                    cx="76" cy="76" r={R} fill="none" stroke="#FF5C00" strokeWidth="13" strokeLinecap="round"
+                    strokeDasharray={CIRC} strokeDashoffset={loading ? CIRC : CIRC * (1 - pct)}
+                    style={{ transition: 'stroke-dashoffset .8s cubic-bezier(.16,1,.3,1)' }}
+                  />
+                </svg>
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  <span className="text-[40px] font-display italic font-black text-[color:var(--app-text)] leading-none">{loading ? '—' : memberCount}</span>
+                  <span className="text-[10px] uppercase tracking-widest text-[color:var(--app-text-muted)] mt-1.5">sur {goal} membres</span>
+                </div>
+              </Link>
+
+              {/* Séparateur */}
+              <div className="hidden sm:block w-px self-stretch bg-[color:var(--app-border)]" />
+
+              {/* Métriques */}
+              <div className="flex-1 w-full grid grid-cols-3 gap-4 sm:gap-6">
+                {METRICS.map((m) => (
+                  <Link key={m.label} href={m.href} className="group flex flex-col items-center sm:items-start">
+                    <span className="w-9 h-9 rounded-xl bg-[var(--app-accent-soft)] flex items-center justify-center text-[#FF5C00] mb-3">
+                      {m.icon}
+                    </span>
+                    <span className="text-[30px] font-display italic font-black text-[color:var(--app-text)] leading-none group-hover:text-[#FF5C00] transition-colors">
+                      {loading ? '—' : m.value}
+                    </span>
+                    <span className="text-[10px] font-medium uppercase tracking-wider text-[color:var(--app-text-muted)] mt-1.5 text-center sm:text-left">{m.label}</span>
+                  </Link>
+                ))}
+              </div>
             </div>
-            <p className="text-[32px] font-display italic font-black text-[color:var(--app-text)] leading-none">
-              {loading ? '—' : s.value}
-            </p>
-            <p className="text-[11px] font-medium uppercase tracking-wider text-[color:var(--app-text-muted)] mt-1.5">{s.label}</p>
-          </Link>
-        ))}
-      </div>
+          </div>
+        );
+      })()}
 
       {/* Prochains runs */}
       <div>
