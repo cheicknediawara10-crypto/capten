@@ -6,8 +6,9 @@ import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const NAV_LINKS = [
-  { label: "Fonctionnalités", href: "#features" },
-  { label: "Tarifs",          href: "#tarifs" },
+  { label: "Fonctionnalités",    href: "/#features" },
+  { label: "Les Spots du Crew",  href: "/les-spots-du-crew" },
+  { label: "Tarifs",             href: "/#tarifs" },
 ];
 
 export function Navbar() {

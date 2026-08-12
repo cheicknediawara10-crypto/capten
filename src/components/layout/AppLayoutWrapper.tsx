@@ -24,6 +24,7 @@ export default function AppLayoutWrapper({ children }: AppLayoutWrapperProps) {
     cleanPath === "/cgu" ||
     cleanPath === "/mentions-legales" ||
     cleanPath === "/rgpd" ||
+    cleanPath === "/les-spots-du-crew" ||
     cleanPath.includes("/checkin") ||
     // Espace membre (auth PIN — système séparé de l'auth organisateur)
     cleanPath.startsWith("/mon-espace") ||
