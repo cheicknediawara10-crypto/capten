@@ -102,7 +102,7 @@ export default function SupportPage() {
               <h3 className="text-[20px] font-display italic font-black uppercase text-white mt-1">WHATSAPP CAPTAIN</h3>
             </div>
             <p className="text-[11px] text-white/85 leading-relaxed font-medium">
-              Contacte directement l&apos;équipe Capten sur WhatsApp pour une réponse prioritaire avant ton run.
+              Contacte directement l&apos;équipe pour une réponse prioritaire avant ton run.
             </p>
           </div>
           <div className="pt-6 mt-4 border-t border-white/15">
@@ -112,7 +112,7 @@ export default function SupportPage() {
               rel="noopener noreferrer"
               className="w-full bg-[var(--app-surface)] text-[#075E54] hover:bg-white/90 py-3 rounded-control text-[10px] font-black uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md font-sans"
             >
-              Ouvrir WhatsApp Support <ArrowRight size={14} />
+              Ouvrir WhatsApp <ArrowRight size={14} />
             </a>
           </div>
         </div>
@@ -128,7 +128,7 @@ export default function SupportPage() {
               <h3 className="text-[20px] font-display italic font-black uppercase text-[color:var(--app-text)] mt-1">EMAIL DIRECT</h3>
             </div>
             <p className="text-[11px] text-[color:var(--app-text-muted)] leading-relaxed font-medium">
-              Envoyez-nous vos questions administratives, factures ou suggestions à <span className="font-mono text-[color:var(--app-text)] font-bold">support@capten.app</span>.
+              Questions admin, factures ou suggestions à <span className="font-mono text-[color:var(--app-text)] font-bold">support@capten.app</span>.
             </p>
           </div>
           <div className="pt-6 mt-4 border-t border-[color:var(--app-border)]">

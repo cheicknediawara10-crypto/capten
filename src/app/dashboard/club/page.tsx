@@ -258,7 +258,7 @@ export default function ClubSettingsPage() {
       <button
         onClick={save}
         disabled={saving}
-        className="flex items-center gap-2 px-8 py-3 rounded-full bg-[#FF5C00] text-white text-[11px] font-black uppercase tracking-widest hover:bg-black transition-all active:scale-95 disabled:opacity-50"
+        className="flex items-center gap-2 px-8 py-3 rounded-full bg-[#FF5C00] text-white text-[11px] font-black uppercase tracking-widest hover:bg-[#E04B00] transition-all active:scale-95 disabled:opacity-50"
       >
         {saving ? <Loader2 size={13} className="animate-spin" /> : saved ? <Check size={13} /> : <Save size={13} />}
         {saved ? "Enregistré ✓" : "Enregistrer les modifications"}

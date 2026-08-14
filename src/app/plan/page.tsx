@@ -286,48 +286,33 @@ export default function PlanPage() {
     {
       name: "GRATUIT",
       price: "0€",
-      period: "",
-      billingNote: "Pour lancer ton crew.",
-      desc: "Idéal pour les petits crews qui démarrent et veulent tester l'infrastructure.",
+      period: "/mois",
+      billingNote: "",
+      desc: "Pour lancer ton crew.",
       features: [
-        { t: "Page publique du crew", d: "Inscriptions rapides en 1 lien partagé.", included: true },
-        { t: "1 sortie active à la fois", d: "Planification standard.", included: true },
-        { t: "Fiche d'urgence de base", d: "Sécurité et contacts d'urgence.", included: true },
-        { t: "Jusqu'à 20 membres", d: "Idéal pour démarrer ton crew.", included: true },
-        { t: "Les Spots du Crew", d: "Tes bonnes adresses, dispo sur tous les plans.", included: true },
-        { t: "Check-in GPS", d: "Validation de présence géolocalisée verrouillée.", included: false },
-        { t: "Registre légal horodaté", d: "Export PDF/CSV des présences verrouillé.", included: false },
-        { t: "Sorties illimitées", d: "Historiques et planifications multiples verrouillés.", included: false }
+        { t: "1 run par mois", d: "", included: true },
+        { t: "20 membres max", d: "", included: true },
+        { t: "Fiches ICE & décharges", d: "", included: true },
       ],
       button: currentPlan === "GRATUIT" ? "PLAN ACTUEL" : "COMMENCER GRATUITEMENT",
       type: currentPlan === "GRATUIT" ? "current" : "action"
     },
     {
       name: "CAPTEN",
-      price: billingInterval === 'monthly' ? "29,99€" : "24,99€",
+      price: "29,99€",
       period: "/mois",
-      billingNote: billingInterval === 'yearly'
-        ? "Facturé 299,90€/an (2 mois offerts)"
-        : "Essai 21 jours gratuit — Rien ne t'est prélevé aujourd'hui",
-      desc: "Le cockpit de pilotage ultime pour structurer ton crew et le faire grandir comme un pro.",
-      tag: billingInterval === 'yearly'
-        ? "RECOMMANDÉ — 2 MOIS OFFERTS"
-        : "ESSAI 21 JOURS GRATUITS",
+      billingNote: "",
+      desc: "Tout, sans limite.",
+      tag: "Populaire",
       features: [
-        { t: "Page publique du crew", d: "Inscriptions rapides en 1 lien partagé.", included: true },
-        { t: "Sorties illimitées", d: "Planifie autant de sorties simultanées que tu veux.", included: true },
-        { t: "Membres illimités", d: "Aucune limite de croissance pour ton crew.", included: true },
-        { t: "Check-in GPS natif", d: "Valide les présences réelles au point de RDV.", included: true },
-        { t: "Fiches ICE + liste d'attente", d: "Sécurité et gestion des places.", included: true },
-        { t: "Registre légal horodaté", d: "Export PDF/CSV, preuve légale de présence.", included: true },
-        { t: "Les Spots du Crew", d: "Tes adresses recommandées et avantages négociés.", included: true },
-        { t: "Anti-fantôme + support prioritaire", d: "Responsabilise ton crew, réponses rapides.", included: true }
+        { t: "Membres & runs illimités", d: "", included: true },
+        { t: "Check-in GPS natif", d: "", included: true },
+        { t: "WhatsApp automatisé", d: "", included: true },
+        { t: "Les Spots du Crew", d: "", included: true },
+        { t: "Registre légal (PDF/CSV)", d: "", included: true },
+        { t: "Support prioritaire", d: "", included: true },
       ],
-      button: currentPlan === "CAPTEN" ? "PLAN ACTUEL" : (
-        billingInterval === 'yearly' 
-          ? "ACTIVER LE PLAN ANNUEL" 
-          : "ESSAI 21 JOURS GRATUIT"
-      ),
+      button: currentPlan === "CAPTEN" ? "PLAN ACTUEL" : "Passer à Captain Pro",
       type: currentPlan === "CAPTEN" ? "current" : "action"
     }
   ];
@@ -341,27 +326,6 @@ export default function PlanPage() {
         </h1>
         <p className="text-[13px] text-[color:var(--app-text-muted)] mt-2">Ton plan Capten et ta facturation.</p>
       </header>
-
-      {/* BILLING TOGGLE */}
-      <div className="flex items-center gap-1.5 bg-[var(--app-surface)] border border-[color:var(--app-border)] rounded-full p-1.5 max-w-[420px] mx-auto">
-        <button
-          type="button"
-          onClick={() => setBillingInterval('monthly')}
-          className={`flex-1 px-4 py-2 text-[11px] font-black uppercase tracking-wider rounded-full transition-all cursor-pointer ${billingInterval === 'monthly' ? 'bg-[#FF5C00] text-white' : 'text-[color:var(--app-text-muted)] hover:text-[color:var(--app-text)]'}`}
-        >
-          Mensuel
-        </button>
-        <button
-          type="button"
-          onClick={() => setBillingInterval('yearly')}
-          className={`flex-1 px-4 py-2 text-[11px] font-black uppercase tracking-wider rounded-full transition-all cursor-pointer flex items-center justify-center gap-2 ${billingInterval === 'yearly' ? 'bg-[#FF5C00] text-white' : 'text-[color:var(--app-text-muted)] hover:text-[color:var(--app-text)]'}`}
-        >
-          Annuel
-          <span className="bg-[#3DD68C] text-black text-[8px] font-black px-2 py-0.5 rounded-full tracking-widest">
-            -17%
-          </span>
-        </button>
-      </div>
 
       {/* PRICING GRID */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto items-stretch">
@@ -432,9 +396,11 @@ export default function PlanPage() {
                         <div className={`text-[12px] font-bold leading-tight ${isCapten ? 'text-white' : included ? 'text-[color:var(--app-text)]' : 'text-[color:var(--app-text-muted)]'}`}>
                           {t}
                         </div>
-                        <div className={`text-[11px] font-medium leading-normal mt-1 whitespace-pre-line ${isCapten ? 'text-white/70' : 'text-[color:var(--app-text-muted)]'}`}>
-                          {d}
-                        </div>
+                        {d && (
+                          <div className={`text-[11px] font-medium leading-normal mt-1 whitespace-pre-line ${isCapten ? 'text-white/70' : 'text-[color:var(--app-text-muted)]'}`}>
+                            {d}
+                          </div>
+                        )}
                       </div>
                     </div>
                   ))}
@@ -450,7 +416,7 @@ export default function PlanPage() {
                       disabled={isCurrent || isProcessing}
                       className={`w-full py-4 rounded-xl text-[10px] sm:text-[11px] font-black uppercase tracking-[0.2em] transition-all cursor-pointer active:scale-95 disabled:scale-100 disabled:cursor-default ${
                         isCurrent
-                          ? (isCapten ? 'bg-white/20 text-white' : 'bg-[#3DD68C]/15 text-[#3DD68C] border border-[#3DD68C]/25')
+                          ? (isCapten ? 'bg-white/20 text-white' : 'bg-[var(--app-surface-2)] text-[color:var(--app-text-muted)]')
                           : isCapten
                             ? 'bg-white text-[#E04B00] hover:bg-white/90'
                             : 'bg-[#FF5C00] text-white hover:bg-[#E04B00]'

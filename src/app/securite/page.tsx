@@ -63,9 +63,9 @@ export default function SecuritePage() {
       {/* Réflexes protection */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[
-          { icon: <Users size={18} />, title: 'Fiches ICE', desc: 'Contact prioritaire et infos médicales de chaque membre, accessibles en 1 clic.', href: '/dashboard/members', cta: 'Voir les membres' },
-          { icon: <FileText size={18} />, title: 'Décharges signées', desc: 'Chaque membre signe une décharge horodatée à l\'inscription — preuve légale.', href: '/dashboard/members', cta: 'Vérifier' },
-          { icon: <ShieldCheck size={18} />, title: 'Check-in au RDV', desc: 'Valide qui est présent au point de départ, pour ne laisser personne derrière.', href: '/dashboard/events', cta: 'Les runs' },
+          { icon: <Users size={18} />, title: 'Fiches ICE', desc: 'Contact prioritaire et infos médicales, en 1 clic.', href: '/dashboard/members', cta: 'Voir les membres' },
+          { icon: <FileText size={18} />, title: 'Décharges signées', desc: 'Chaque membre signe une décharge horodatée — preuve légale.', href: '/dashboard/members', cta: 'Vérifier' },
+          { icon: <ShieldCheck size={18} />, title: 'Check-in au RDV', desc: 'Valide qui est présent au départ, personne derrière.', href: '/dashboard/events', cta: 'Les runs' },
         ].map((c) => (
           <div key={c.title} className="bg-[var(--app-surface)] rounded-3xl border border-[color:var(--app-border)] p-5 flex flex-col">
             <div className="w-10 h-10 rounded-xl bg-[var(--app-accent-soft)] flex items-center justify-center text-[#FF5C00] mb-3">
