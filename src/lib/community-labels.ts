@@ -39,6 +39,7 @@ export interface CommunityLabels {
   community_label: string;
   session_single: string;          // "un run", "une marche", "une sortie trail"
   session_single_cap: string;      // "Un run", "Une marche", "Une sortie trail"
+  session_word: string;            // nom nu sans article : "run", "marche", "sortie trail", "session"
   session_plural: string;          // "runs", "marches", "sorties trail"
   session_plural_cap: string;      // "Runs", "Marches", "Sorties trail"
   members_plural: string;          // "tes coureurs", "tes marcheurs", "ton groupe"
@@ -73,6 +74,7 @@ export function getCommunityLabels(
         community_label: 'social walk club',
         session_single: 'une marche',
         session_single_cap: 'Une marche',
+        session_word: 'marche',
         session_plural: 'marches',
         session_plural_cap: 'Marches',
         members_plural: 'tes marcheurs',
@@ -100,6 +102,7 @@ export function getCommunityLabels(
         community_label: 'groupe de trail et randonnée',
         session_single: 'une sortie trail',
         session_single_cap: 'Une sortie trail',
+        session_word: 'sortie trail',
         session_plural: 'sorties trail',
         session_plural_cap: 'Sorties trail',
         members_plural: 'ton groupe',
@@ -128,6 +131,7 @@ export function getCommunityLabels(
         community_label: label,
         session_single: 'une session',
         session_single_cap: 'Une session',
+        session_word: 'session',
         session_plural: 'sessions',
         session_plural_cap: 'Sessions',
         members_plural: 'tes membres',
@@ -156,6 +160,7 @@ export function getCommunityLabels(
         community_label: 'social run club',
         session_single: 'un run',
         session_single_cap: 'Un run',
+        session_word: 'run',
         session_plural: 'runs',
         session_plural_cap: 'Runs',
         members_plural: 'tes coureurs',
