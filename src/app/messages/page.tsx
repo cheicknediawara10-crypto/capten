@@ -1493,26 +1493,13 @@ export default function MessagesPage() {
       )}
 
       {/* HEADER SECTION */}
-      <header className="flex flex-col gap-4 pb-8 border-b border-[color:var(--app-border)] mb-8">
-        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 w-full">
-          <div>
-            <span className="font-mono text-xs uppercase tracking-widest text-[#FF5C00] font-black">
-              [ 💬 KIT DE COMMUNICATION WHATSAPP V1 ]
-            </span>
-            <h1 className="text-3xl sm:text-5xl font-display italic font-black uppercase text-[color:var(--app-text)] tracking-tighter leading-none mt-2">
-              Zéro frais d'envoi. <span className="text-[#FF5C00]">Copy-Paste Direct.</span>
-            </h1>
-            <p className="text-sm font-sans text-[color:var(--app-text-muted)] mt-2 max-w-3xl leading-relaxed">
-              Propulse l'engagement de ton crew sans payer un centime. Génère les messages parfaits, intègre les données de ta sortie et partage-les directement dans ton groupe WhatsApp.
-            </p>
-          </div>
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0">
-            <div className="flex items-center gap-3 bg-[var(--app-surface-2)] border border-[color:var(--app-border)] rounded-xl px-4 py-2 text-xs font-mono text-[color:var(--app-text-muted)]">
-              <div className="w-2.5 h-2.5 rounded-full bg-[#56E39F] animate-pulse"></div>
-              0€ DE FRAIS · 100% GRATUIT
-            </div>
-          </div>
-        </div>
+      <header className="mb-8">
+        <h1 className="text-[30px] sm:text-[40px] font-display italic font-black uppercase text-[color:var(--app-text)] leading-none tracking-tighter">
+          Messages
+        </h1>
+        <p className="text-[13px] text-[color:var(--app-text-muted)] mt-1">
+          25 modèles prêts à copier-coller dans ton WhatsApp — zéro frais, zéro Twilio.
+        </p>
       </header>
 
       {/* RUN SELECTOR DROPDOWN */}
@@ -1537,13 +1524,13 @@ export default function MessagesPage() {
         ) : (
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <p className="text-xs font-medium text-[color:var(--app-text-muted)] uppercase tracking-tight">
-              Planifie d&apos;abord une sortie pour générer tes messages →
+              Planifie d&apos;abord un run pour générer tes messages →
             </p>
-            <Link 
-              href="/runs" 
+            <Link
+              href="/dashboard/events/new"
               className="px-4 py-2.5 bg-[#FF5C00] text-white rounded-control text-[10px] font-black uppercase tracking-widest hover:bg-[#E04B00] transition-all text-center block active:scale-95 shadow-sm"
             >
-              + PLANIFIER UNE SORTIE
+              + PLANIFIER UN RUN
             </Link>
           </div>
         )}
