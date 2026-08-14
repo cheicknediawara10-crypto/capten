@@ -51,7 +51,7 @@ export default function RootLayout({
         {/* Applique le thème avant le paint pour éviter le flash */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `try{var t=localStorage.getItem('capten_theme');if(t!=='light')document.documentElement.setAttribute('data-theme','dark');}catch(e){}`,
+            __html: `try{if(!localStorage.getItem('capten_theme_migrated_dark')){localStorage.removeItem('capten_theme');localStorage.setItem('capten_theme_migrated_dark','1');}var t=localStorage.getItem('capten_theme');if(t!=='light')document.documentElement.setAttribute('data-theme','dark');}catch(e){}`,
           }}
         />
       </head>
