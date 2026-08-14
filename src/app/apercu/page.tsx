@@ -91,9 +91,8 @@ export default function ApercuPage() {
     <div className="min-h-screen flex" style={{ background: BG, color: TXT }}>
       {/* Sidebar complète */}
       <aside className="hidden lg:flex w-[264px] shrink-0 flex-col py-8 px-4 border-r sticky top-0 h-screen overflow-y-auto" style={{ borderColor: BORD, background: SURF }}>
-        <div className="flex items-center gap-2.5 px-3 mb-10">
-          <img src="/logo.png" alt="" className="h-7 w-auto" />
-          <span className="font-display italic font-black text-lg" style={{ color: TXT }}>CAPTEN</span>
+        <div className="flex items-center px-3 mb-10">
+          <img src="/logo.png" alt="CAPTEN" className="h-7 w-auto" style={{ filter: "brightness(0) invert(1)" }} />
         </div>
         <nav className="space-y-7 flex-1">
           {NAV_SECTIONS.map((sec) => (

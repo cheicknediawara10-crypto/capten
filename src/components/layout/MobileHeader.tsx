@@ -65,7 +65,7 @@ export default function MobileHeader() {
       {/* HEADER BAR */}
       <div className="lg:hidden flex items-center justify-between p-4 backdrop-blur-md border-b-[0.5px] sticky top-0 z-[120] shadow-sm" style={{ background: "color-mix(in srgb, var(--app-surface) 90%, transparent)", borderColor: "var(--app-border)" }}>
         <Link href="/" className="flex items-center gap-2.5 active:scale-95 transition-all">
-          <img src={logo} alt="CAPTEN" className="h-[24px] w-auto object-contain rounded-control" />
+          <img src={logo} alt="CAPTEN" className={`h-[24px] w-auto object-contain rounded-control ${logo === "/logo.png" ? "capten-logo" : ""}`} />
         </Link>
 
         {/* Menu toggle button */}

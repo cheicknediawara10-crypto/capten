@@ -81,7 +81,7 @@ export default function Sidebar() {
     >
       <div className="px-5 py-4 max-h-[60px] flex items-center mb-10">
         <Link href="/dashboard" className="flex items-center gap-2.5 active:scale-95 transition-all">
-          <img src={logo} alt="CAPTEN" className="h-[36px] w-auto object-contain rounded-control" />
+          <img src={logo} alt="CAPTEN" className={`h-[36px] w-auto object-contain rounded-control ${logo === "/logo.png" ? "capten-logo" : ""}`} />
         </Link>
       </div>
 
