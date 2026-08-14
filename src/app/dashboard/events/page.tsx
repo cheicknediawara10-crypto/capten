@@ -23,10 +23,10 @@ interface Event {
 }
 
 const STATUS_LABELS: Record<string, { label: string; color: string; bg: string }> = {
-  draft:     { label: "Brouillon",  color: "#F59E0B", bg: "#FEF3C7" },
-  published: { label: "Publié",     color: "#22C55E", bg: "#DCFCE7" },
-  completed: { label: "Terminé",    color: "#6B7280", bg: "#F3F4F6" },
-  cancelled: { label: "Annulé",     color: "#EF4444", bg: "#FEE2E2" },
+  draft:     { label: "Brouillon",  color: "#F59E0B", bg: "rgba(245,158,11,0.14)" },
+  published: { label: "Publié",     color: "#3DD68C", bg: "rgba(61,214,140,0.14)" },
+  completed: { label: "Terminé",    color: "#94A3B8", bg: "rgba(148,163,184,0.14)" },
+  cancelled: { label: "Annulé",     color: "#F87171", bg: "rgba(248,113,113,0.14)" },
 };
 
 export default function EventsPage() {

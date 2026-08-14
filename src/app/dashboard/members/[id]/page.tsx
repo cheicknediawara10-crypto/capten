@@ -162,7 +162,7 @@ export default function MemberDetailPage() {
                 <p className="text-sm font-semibold text-[color:var(--app-text)]">{ice.relationship || "Non précisé"}</p>
               </div>
               <a href={`tel:${ice.contact_phone}`}
-                className="flex items-center gap-2 w-full justify-center bg-[#DCFCE7] text-[#22C55E] px-4 py-2.5 rounded-full text-[11px] font-black uppercase tracking-widest hover:bg-[#22C55E] hover:text-white transition-all">
+                className="flex items-center gap-2 w-full justify-center bg-[#3DD68C]/15 text-[#3DD68C] px-4 py-2.5 rounded-full text-[11px] font-black uppercase tracking-widest hover:bg-[#3DD68C] hover:text-black transition-all">
                 <Phone size={13} />
                 {ice.contact_phone}
               </a>
