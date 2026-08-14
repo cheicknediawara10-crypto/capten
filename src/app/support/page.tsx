@@ -151,7 +151,7 @@ export default function SupportPage() {
               <span className="text-[9px] font-black text-[#56E39F] uppercase tracking-widest block font-mono">SÉCURITÉ &amp; RÉSEAU</span>
               <h3 className="text-[20px] font-display italic font-black uppercase text-[color:var(--app-text)] mt-1">ÉTAT SYSTÈME</h3>
             </div>
-            <div className="space-y-2 text-[11px] font-mono text-neutral-600">
+            <div className="space-y-2 text-[11px] font-mono text-[color:var(--app-text-muted)]">
               <p className="flex items-center justify-between border-b border-[color:var(--app-border)] pb-1.5">
                 <span>Plateforme :</span>
                 <span className="text-[#56E39F] font-bold">100% OK</span>
@@ -195,7 +195,7 @@ export default function SupportPage() {
               <h3 className="text-base font-display italic font-black uppercase text-[color:var(--app-text)]">
                 TICKET REÇU AVEC SUCCÈS !
               </h3>
-              <p className="text-xs text-neutral-600 font-medium max-w-md mx-auto leading-relaxed">
+              <p className="text-xs text-[color:var(--app-text-muted)] font-medium max-w-md mx-auto leading-relaxed">
                 Notre équipe d&apos;astreinte a bien reçu votre demande pour le club <span className="font-bold text-[color:var(--app-text)]">{clubName}</span>. Nous vous répondrons par email sous de très brefs délais.
               </p>
               <button
@@ -301,7 +301,7 @@ export default function SupportPage() {
                     {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                   </button>
                   {isOpen && (
-                    <div className="px-4 pb-4 text-[11px] font-medium text-neutral-600 leading-relaxed border-t border-[color:var(--app-border)] pt-3 bg-[var(--app-surface)]">
+                    <div className="px-4 pb-4 text-[11px] font-medium text-[color:var(--app-text-muted)] leading-relaxed border-t border-[color:var(--app-border)] pt-3 bg-[var(--app-surface)]">
                       {faq.a}
                     </div>
                   )}

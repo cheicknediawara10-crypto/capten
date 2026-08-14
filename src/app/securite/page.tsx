@@ -21,21 +21,21 @@ export default function SecuritePage() {
   const emergencyLines = sosNumbers.split(',').map((s) => s.trim()).filter(Boolean);
 
   return (
-    <div className="space-y-8 pb-20">
+    <div className="space-y-6 pb-20">
       {/* Header */}
       <div>
-        <h1 className="text-[28px] sm:text-[36px] font-display italic font-black uppercase text-black leading-none tracking-tighter">
+        <h1 className="text-[30px] sm:text-[40px] font-display italic font-black uppercase text-[color:var(--app-text)] leading-none tracking-tighter">
           Protection
         </h1>
-        <p className="text-[13px] text-[#A3A3A3] font-sans mt-1">
+        <p className="text-[13px] text-[color:var(--app-text-muted)] font-sans mt-1">
           Tes réflexes de sécurité et les contacts d'urgence de ton crew.
         </p>
       </div>
 
-      {/* Numéros d'urgence */}
-      <div className="bg-[#1C1B18] rounded-[24px] p-7">
-        <div className="flex items-center gap-2 mb-5">
-          <span className="w-9 h-9 rounded-[12px] bg-[#FF5C00] flex items-center justify-center">
+      {/* Numéros d'urgence — panneau d'alerte sombre (accent constant clair/dark) */}
+      <div className="rounded-3xl p-7" style={{ background: 'linear-gradient(160deg, #1C1B18, #121110)' }}>
+        <div className="flex items-center gap-2.5 mb-5">
+          <span className="w-9 h-9 rounded-xl bg-[#FF5C00] flex items-center justify-center">
             <Siren size={18} className="text-white" />
           </span>
           <h2 className="text-[13px] font-black uppercase tracking-widest text-white">Numéros d'urgence</h2>
@@ -45,7 +45,7 @@ export default function SecuritePage() {
             const num = line.match(/\d{2,3}/)?.[0] || '';
             return (
               <a key={i} href={num ? `tel:${num}` : undefined}
-                className="flex items-center gap-2.5 bg-white/[0.06] hover:bg-white/[0.1] rounded-[16px] px-4 py-3 transition-colors">
+                className="flex items-center gap-2.5 bg-white/[0.06] hover:bg-white/[0.1] rounded-2xl px-4 py-3 transition-colors">
                 <Phone size={15} className="text-[#FF5C00] shrink-0" />
                 <span className="text-[13px] font-semibold text-white leading-snug">{line}</span>
               </a>
@@ -65,14 +65,14 @@ export default function SecuritePage() {
         {[
           { icon: <Users size={18} />, title: 'Fiches ICE', desc: 'Contact prioritaire et infos médicales de chaque membre, accessibles en 1 clic.', href: '/dashboard/members', cta: 'Voir les membres' },
           { icon: <FileText size={18} />, title: 'Décharges signées', desc: 'Chaque membre signe une décharge horodatée à l\'inscription — preuve légale.', href: '/dashboard/members', cta: 'Vérifier' },
-          { icon: <ShieldCheck size={18} />, title: 'Check-in au RDV', desc: 'Valide qui est présent au point de départ, pour ne laisser personne derrière.', href: '/dashboard/events', cta: 'Les sorties' },
+          { icon: <ShieldCheck size={18} />, title: 'Check-in au RDV', desc: 'Valide qui est présent au point de départ, pour ne laisser personne derrière.', href: '/dashboard/events', cta: 'Les runs' },
         ].map((c) => (
-          <div key={c.title} className="bg-white rounded-[20px] border border-black/5 p-5 flex flex-col">
-            <div className="w-10 h-10 rounded-[12px] bg-[#FF5C00]/[0.08] flex items-center justify-center text-[#FF5C00] mb-3">
+          <div key={c.title} className="bg-[var(--app-surface)] rounded-3xl border border-[color:var(--app-border)] p-5 flex flex-col">
+            <div className="w-10 h-10 rounded-xl bg-[var(--app-accent-soft)] flex items-center justify-center text-[#FF5C00] mb-3">
               {c.icon}
             </div>
-            <h3 className="text-[15px] font-black uppercase tracking-tight text-black mb-1">{c.title}</h3>
-            <p className="text-[12px] text-[#666562] leading-snug flex-1">{c.desc}</p>
+            <h3 className="text-[15px] font-black uppercase tracking-tight text-[color:var(--app-text)] mb-1">{c.title}</h3>
+            <p className="text-[12px] text-[color:var(--app-text-muted)] leading-snug flex-1">{c.desc}</p>
             <Link href={c.href} className="mt-4 inline-flex items-center gap-1 text-[12px] font-bold text-[#FF5C00] hover:underline">
               {c.cta} <ArrowRight size={12} />
             </Link>
@@ -81,12 +81,12 @@ export default function SecuritePage() {
       </div>
 
       {/* Réglage */}
-      <div className="bg-[#F4F4EE] rounded-[20px] px-5 py-4 flex items-center justify-between gap-4">
-        <p className="text-[12px] text-[#666562] leading-snug">
+      <div className="bg-[var(--app-surface-2)] rounded-3xl px-5 py-4 flex items-center justify-between gap-4">
+        <p className="text-[12px] text-[color:var(--app-text-muted)] leading-snug">
           Personnalise les numéros d'urgence et le contact sécurité de ton crew dans les réglages.
         </p>
         <Link href="/settings"
-          className="shrink-0 inline-flex items-center gap-1.5 h-9 px-4 rounded-full bg-white border border-black/10 text-[12px] font-bold text-[#333] hover:border-[#FF5C00] hover:text-[#FF5C00] transition-colors">
+          className="shrink-0 inline-flex items-center gap-1.5 h-9 px-4 rounded-full bg-[var(--app-surface)] border border-[color:var(--app-border)] text-[12px] font-bold text-[color:var(--app-text)] hover:border-[#FF5C00] hover:text-[#FF5C00] transition-colors">
           Réglages <ArrowRight size={13} />
         </Link>
       </div>

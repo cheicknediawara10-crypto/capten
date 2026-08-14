@@ -394,9 +394,9 @@ const TemplateCard = React.memo(({ template, parsedPreview, categoryLabel, onSel
         onSelect(template);
       }}
       title={tooltip}
-      className={`relative overflow-hidden rounded-[20px] border p-5 transition-all duration-300 group shadow-sm flex flex-col justify-between select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF5C00] focus-visible:ring-offset-2 focus-visible:ring-offset-white ${
+      className={`relative overflow-hidden rounded-[20px] border p-5 transition-all duration-300 group shadow-sm flex flex-col justify-between select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF5C00] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--app-bg)] ${
         isDisabled 
-          ? 'border-[color:var(--app-border)] bg-neutral-50/50 opacity-45 cursor-not-allowed' 
+          ? 'border-[color:var(--app-border)] bg-[var(--app-surface-2)] opacity-45 cursor-not-allowed' 
           : 'border-[color:var(--app-border)] bg-[var(--app-surface)] hover:border-[#FF5C00] hover:shadow-md hover:-translate-y-1 active:translate-y-0 cursor-pointer'
       }`}
       tabIndex={isDisabled ? -1 : 0}
@@ -423,13 +423,13 @@ const TemplateCard = React.memo(({ template, parsedPreview, categoryLabel, onSel
           {template.contextHint}
         </p>
 
-        <div className="bg-[var(--app-surface-2)] border border-[color:var(--app-border)] rounded-xl p-3.5 text-xs text-neutral-700 font-sans italic mt-4 relative max-h-24 overflow-hidden [mask-image:linear-gradient(to_bottom,black_60%,transparent_100%)]">
+        <div className="bg-[var(--app-surface-2)] border border-[color:var(--app-border)] rounded-xl p-3.5 text-xs text-[color:var(--app-text-muted)] font-sans italic mt-4 relative max-h-24 overflow-hidden [mask-image:linear-gradient(to_bottom,black_60%,transparent_100%)]">
           {parsedPreview}
         </div>
       </div>
 
       <div className="mt-5 pt-3 border-t border-[color:var(--app-border)] flex items-center justify-between">
-        <span className="text-[10px] font-mono text-neutral-600 group-hover:text-[color:var(--app-text)] transition-colors flex items-center gap-1.5 font-bold">
+        <span className="text-[10px] font-mono text-[color:var(--app-text-muted)] group-hover:text-[color:var(--app-text)] transition-colors flex items-center gap-1.5 font-bold">
           {isDisabled ? '🔒 INDISPONIBLE' : '🎯 SÉLECTIONNER'} <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
         </span>
         <span className="text-[9px] font-mono text-[color:var(--app-text-muted)] font-medium">{isDisabled ? tooltip : 'Copie & Partage'}</span>
@@ -795,7 +795,7 @@ const MessageEditorModal = React.memo(({
                     rows={7}
                     value={editedText}
                     onChange={(e) => setEditedText(e.target.value)}
-                    className="w-full bg-[var(--app-surface-2)] border border-[color:var(--app-border)] rounded-2xl px-4 py-3 text-xs text-[color:var(--app-text)] placeholder-neutral-400 focus:outline-none focus:border-[#FF5C00] transition-colors focus:bg-[var(--app-surface)] resize-none leading-relaxed font-sans focus-visible:ring-1 focus-visible:ring-[#FF5C00]"
+                    className="w-full bg-[var(--app-surface-2)] border border-[color:var(--app-border)] rounded-2xl px-4 py-3 text-xs text-[color:var(--app-text)] placeholder-[color:var(--app-text-muted)] focus:outline-none focus:border-[#FF5C00] transition-colors focus:bg-[var(--app-surface)] resize-none leading-relaxed font-sans focus-visible:ring-1 focus-visible:ring-[#FF5C00]"
                   />
                   <div className="flex justify-between items-center text-[9px] font-mono text-[color:var(--app-text-muted)]">
                     <span>{editedText.length} caractères</span>
@@ -938,14 +938,14 @@ const MessageEditorModal = React.memo(({
                 <>
                   <button
                     onClick={onResetBase}
-                    className="flex-1 py-3.5 border border-[color:var(--app-border)] hover:bg-black/5 text-neutral-600 hover:text-[color:var(--app-text)] rounded-xl text-xs font-mono font-black uppercase tracking-wider transition-all active:scale-95 duration-200 min-h-[44px] flex items-center justify-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
+                    className="flex-1 py-3.5 border border-[color:var(--app-border)] hover:bg-black/5 text-[color:var(--app-text-muted)] hover:text-[color:var(--app-text)] rounded-xl text-xs font-mono font-black uppercase tracking-wider transition-all active:scale-95 duration-200 min-h-[44px] flex items-center justify-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
                   >
                     Restaurer
                   </button>
 
                   <button
                     onClick={onSaveBase}
-                    className="flex-[2] py-3.5 bg-[#FF5C00] hover:bg-black text-white rounded-xl text-xs font-mono font-black uppercase tracking-wider transition-all active:scale-95 duration-200 min-h-[44px] flex items-center justify-center gap-2 font-bold shadow-lg shadow-[#FF5C00]/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF5C00]"
+                    className="flex-[2] py-3.5 bg-[#FF5C00] hover:bg-[#E04B00] text-white rounded-xl text-xs font-mono font-black uppercase tracking-wider transition-all active:scale-95 duration-200 min-h-[44px] flex items-center justify-center gap-2 font-bold shadow-lg shadow-[#FF5C00]/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF5C00]"
                   >
                     Enregistrer modèle
                   </button>
@@ -1502,12 +1502,12 @@ export default function MessagesPage() {
             <h1 className="text-3xl sm:text-5xl font-display italic font-black uppercase text-[color:var(--app-text)] tracking-tighter leading-none mt-2">
               Zéro frais d'envoi. <span className="text-[#FF5C00]">Copy-Paste Direct.</span>
             </h1>
-            <p className="text-sm font-sans text-neutral-600 mt-2 max-w-3xl leading-relaxed">
+            <p className="text-sm font-sans text-[color:var(--app-text-muted)] mt-2 max-w-3xl leading-relaxed">
               Propulse l'engagement de ton crew sans payer un centime. Génère les messages parfaits, intègre les données de ta sortie et partage-les directement dans ton groupe WhatsApp.
             </p>
           </div>
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0">
-            <div className="flex items-center gap-3 bg-[var(--app-surface-2)] border border-[color:var(--app-border)] rounded-xl px-4 py-2 text-xs font-mono text-neutral-600">
+            <div className="flex items-center gap-3 bg-[var(--app-surface-2)] border border-[color:var(--app-border)] rounded-xl px-4 py-2 text-xs font-mono text-[color:var(--app-text-muted)]">
               <div className="w-2.5 h-2.5 rounded-full bg-[#56E39F] animate-pulse"></div>
               0€ DE FRAIS · 100% GRATUIT
             </div>
@@ -1541,7 +1541,7 @@ export default function MessagesPage() {
             </p>
             <Link 
               href="/runs" 
-              className="px-4 py-2.5 bg-[#FF5C00] text-white rounded-control text-[10px] font-black uppercase tracking-widest hover:bg-black transition-all text-center block active:scale-95 shadow-sm"
+              className="px-4 py-2.5 bg-[#FF5C00] text-white rounded-control text-[10px] font-black uppercase tracking-widest hover:bg-[#E04B00] transition-all text-center block active:scale-95 shadow-sm"
             >
               + PLANIFIER UNE SORTIE
             </Link>
@@ -1576,7 +1576,7 @@ export default function MessagesPage() {
                   className={`px-4 py-3 rounded-lg text-xs font-bold transition-all uppercase tracking-wider min-h-[44px] flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF5C00] ${
                     activeTab === tab.id
                       ? 'bg-[#FF5C00] text-white shadow-lg shadow-[#FF5C00]/25'
-                      : 'text-neutral-600 hover:text-[color:var(--app-text)] hover:bg-[var(--app-surface-2)]'
+                      : 'text-[color:var(--app-text-muted)] hover:text-[color:var(--app-text)] hover:bg-[var(--app-surface-2)]'
                   }`}
                 >
                   {tab.label}
@@ -1592,7 +1592,7 @@ export default function MessagesPage() {
                 placeholder="Rechercher un modèle..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-[var(--app-surface-2)] border border-[color:var(--app-border)] rounded-xl pl-10 pr-4 py-2.5 text-xs text-[color:var(--app-text)] placeholder-neutral-500 focus:outline-none focus:border-[#FF5C00] transition-colors focus:bg-[var(--app-surface)] focus-visible:ring-1 focus-visible:ring-[#FF5C00]"
+                className="w-full bg-[var(--app-surface-2)] border border-[color:var(--app-border)] rounded-xl pl-10 pr-4 py-2.5 text-xs text-[color:var(--app-text)] placeholder-[color:var(--app-text-muted)] focus:outline-none focus:border-[#FF5C00] transition-colors focus:bg-[var(--app-surface)] focus-visible:ring-1 focus-visible:ring-[#FF5C00]"
                 aria-label="Rechercher dans les modèles"
               />
               {searchQuery && (

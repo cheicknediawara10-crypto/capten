@@ -76,7 +76,7 @@ export default function EventsPage() {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-[28px] sm:text-[36px] font-display italic font-black uppercase text-[color:var(--app-text)] leading-none tracking-tighter">
+          <h1 className="text-[30px] sm:text-[40px] font-display italic font-black uppercase text-[color:var(--app-text)] leading-none tracking-tighter">
             Les Runs
           </h1>
           <p className="text-[13px] text-[color:var(--app-text-muted)] font-sans mt-1">
@@ -85,7 +85,7 @@ export default function EventsPage() {
         </div>
         <Link
           href="/dashboard/events/new"
-          className="flex items-center gap-2 bg-[#FF5C00] text-white px-5 py-2.5 rounded-full text-[11px] font-black uppercase tracking-widest hover:bg-black transition-all active:scale-95"
+          className="flex items-center gap-2 bg-[#FF5C00] text-white px-5 py-2.5 rounded-full text-[11px] font-black uppercase tracking-widest hover:bg-[#E04B00] transition-all active:scale-95"
         >
           <Plus size={14} />
           Nouveau Run
@@ -133,7 +133,7 @@ export default function EventsPage() {
           </p>
           <Link
             href="/dashboard/events/new"
-            className="flex items-center gap-2 bg-[#FF5C00] text-white px-6 py-3 rounded-full text-[12px] font-black uppercase tracking-widest hover:bg-black transition-all"
+            className="flex items-center gap-2 bg-[#FF5C00] text-white px-6 py-3 rounded-full text-[12px] font-black uppercase tracking-widest hover:bg-[#E04B00] transition-all"
           >
             <Plus size={14} />
             Créer un run

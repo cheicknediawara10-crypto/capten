@@ -333,96 +333,94 @@ export default function PlanPage() {
   ];
 
   return (
-    <div className="space-y-12 pb-20 px-4 sm:px-0">
-      {/* HARMONIZED HEADER */}
-      <header className="flex flex-col gap-3 pb-8 border-b-[1px] border-black/5 mb-10">
-        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 w-full">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 w-full">
-            <h1 className="text-[28px] sm:text-[42px] font-display italic font-black uppercase text-black leading-none tracking-tight">
-              PLAN & INFRASTRUCTURE
-            </h1>
-          </div>
-        </div>
+    <div className="space-y-10 pb-20 px-4 sm:px-0">
+      {/* HEADER */}
+      <header className="pb-6 border-b border-[color:var(--app-border)]">
+        <h1 className="text-[30px] sm:text-[42px] font-display italic font-black uppercase text-[color:var(--app-text)] leading-none tracking-tight">
+          Abonnement
+        </h1>
+        <p className="text-[13px] text-[color:var(--app-text-muted)] mt-2">Ton plan Capten et ta facturation.</p>
       </header>
 
       {/* BILLING TOGGLE */}
-      <div className="flex justify-center items-center gap-4 mb-4 bg-white/60 border border-black/5 rounded-[12px] p-4 max-w-[480px] mx-auto shadow-sm">
-        <button 
+      <div className="flex items-center gap-1.5 bg-[var(--app-surface)] border border-[color:var(--app-border)] rounded-full p-1.5 max-w-[420px] mx-auto">
+        <button
           type="button"
           onClick={() => setBillingInterval('monthly')}
-          className={`px-4 py-2 text-[10px] font-black uppercase tracking-wider rounded-[6px] transition-all cursor-pointer ${billingInterval === 'monthly' ? 'bg-black text-white' : 'bg-transparent text-neutral-400 hover:text-black'}`}
+          className={`flex-1 px-4 py-2 text-[11px] font-black uppercase tracking-wider rounded-full transition-all cursor-pointer ${billingInterval === 'monthly' ? 'bg-[#FF5C00] text-white' : 'text-[color:var(--app-text-muted)] hover:text-[color:var(--app-text)]'}`}
         >
           Mensuel
         </button>
-        <button 
+        <button
           type="button"
           onClick={() => setBillingInterval('yearly')}
-          className={`px-4 py-2 text-[10px] font-black uppercase tracking-wider rounded-[6px] transition-all cursor-pointer flex items-center gap-2 ${billingInterval === 'yearly' ? 'bg-black text-white' : 'bg-transparent text-neutral-400 hover:text-black'}`}
+          className={`flex-1 px-4 py-2 text-[11px] font-black uppercase tracking-wider rounded-full transition-all cursor-pointer flex items-center justify-center gap-2 ${billingInterval === 'yearly' ? 'bg-[#FF5C00] text-white' : 'text-[color:var(--app-text-muted)] hover:text-[color:var(--app-text)]'}`}
         >
           Annuel
-          <span className="bg-[#FF5C00] text-white text-[8px] font-black px-2 py-0.5 rounded-full tracking-widest">
-            -17% (2 MOIS OFFERTS)
+          <span className="bg-[#3DD68C] text-black text-[8px] font-black px-2 py-0.5 rounded-full tracking-widest">
+            -17%
           </span>
         </button>
       </div>
 
       {/* PRICING GRID */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto items-stretch">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto items-stretch">
         {displayPlans.map((plan, idx) => {
           const isCapten = plan.name === "CAPTEN";
           const isCurrent = plan.name === currentPlan;
-          
+
           return (
-            <div 
-              key={idx} 
-              className={`relative bg-white border w-full rounded-[24px] p-6 sm:p-10 flex flex-col justify-between shadow-lg transition-all h-full ${
-                isCapten 
-                  ? 'border-[#FF5C00] ring-1 ring-[#FF5C00]/20' 
-                  : 'border-[#E5E5E5]'
-              } ${isCurrent ? 'border-black ring-2 ring-black/10' : ''}`}
+            <div
+              key={idx}
+              className="relative w-full rounded-3xl p-7 sm:p-9 flex flex-col justify-between h-full overflow-hidden"
+              style={isCapten
+                ? { background: 'linear-gradient(160deg, #FF6A1A, #E04B00)' }
+                : { background: 'var(--app-surface)', border: '1px solid var(--app-border)' }}
             >
               {plan.tag && (
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#FF5C00] text-white text-[9px] font-black px-5 py-1.5 rounded-full tracking-widest z-10 whitespace-nowrap">
-                  {plan.tag}
+                <div className="absolute top-5 right-5 inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider bg-white/20 text-white z-10 whitespace-nowrap">
+                  <Sparkles size={10} /> {plan.tag}
                 </div>
               )}
-              
-              <div className="space-y-8">
-                <div className="space-y-4">
-                  <div className="flex justify-between items-start">
-                    <h3 className="text-[24px] font-display italic font-black uppercase text-black tracking-tight">
+
+              <div className="space-y-7">
+                <div className="space-y-3">
+                  <div className="flex justify-between items-start gap-3">
+                    <h3 className={`text-[22px] font-display italic font-black uppercase tracking-tight ${isCapten ? 'text-white' : 'text-[color:var(--app-text)]'}`}>
                       {plan.name === 'CAPTEN' ? 'CAPTEN PRO' : 'CAPTEN GRATUIT'}
                     </h3>
                     {isCurrent && (
-                      <span className="text-[8px] font-black text-emerald-600 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-full tracking-widest">
+                      <span className={`shrink-0 text-[8px] font-black px-2.5 py-0.5 rounded-full tracking-widest ${isCapten ? 'bg-white/20 text-white' : 'bg-[#3DD68C]/15 text-[#3DD68C] border border-[#3DD68C]/25'}`}>
                         PLAN ACTUEL
                       </span>
                     )}
                   </div>
                   <div className="space-y-1">
                     <div className="flex items-baseline gap-1">
-                       <span className="text-[40px] sm:text-[48px] font-display italic font-black text-black leading-none">{plan.price}</span>
-                       {plan.period && <span className="text-[12px] sm:text-[14px] font-bold text-[#A3A3A3] uppercase">{plan.period}</span>}
+                       <span className={`text-[40px] sm:text-[48px] font-display italic font-black leading-none ${isCapten ? 'text-white' : 'text-[color:var(--app-text)]'}`}>{plan.price}</span>
+                       {plan.period && <span className={`text-[12px] sm:text-[14px] font-bold uppercase ${isCapten ? 'text-white/70' : 'text-[color:var(--app-text-muted)]'}`}>{plan.period}</span>}
                     </div>
                     {plan.billingNote && (
-                      <p className="text-[9px] font-black text-[#FF5C00] uppercase tracking-wider mt-0.5">
+                      <p className={`text-[10px] font-bold uppercase tracking-wider mt-0.5 ${isCapten ? 'text-white/85' : 'text-[#FF5C00]'}`}>
                         {plan.billingNote}
                       </p>
                     )}
                   </div>
                 </div>
 
-                <p className="text-[12px] font-sans text-neutral-600 leading-relaxed text-left">
+                <p className={`text-[12px] leading-relaxed text-left ${isCapten ? 'text-white/85' : 'text-[color:var(--app-text-muted)]'}`}>
                   {plan.desc}
                 </p>
 
-                <div className="space-y-4 pt-6 border-t border-black/5">
+                <div className={`space-y-3.5 pt-6 border-t ${isCapten ? 'border-white/20' : 'border-[color:var(--app-border)]'}`}>
                   {plan.features.map(({ t, d, included }, i) => (
-                    <div key={i} className={`flex items-start gap-3 text-left ${!included ? 'opacity-40' : ''}`}>
+                    <div key={i} className={`flex items-start gap-3 text-left ${!included ? 'opacity-45' : ''}`}>
                       <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${
-                        included 
-                          ? 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20' 
-                          : 'bg-neutral-100 text-neutral-400 border border-neutral-200'
+                        isCapten
+                          ? 'bg-white/20 text-white'
+                          : included
+                            ? 'bg-[#3DD68C]/15 text-[#3DD68C] border border-[#3DD68C]/25'
+                            : 'bg-[var(--app-surface-2)] text-[color:var(--app-text-muted)] border border-[color:var(--app-border)]'
                       }`}>
                         {included ? (
                           <Check size={11} strokeWidth={3} />
@@ -431,10 +429,10 @@ export default function PlanPage() {
                         )}
                       </div>
                       <div>
-                        <div className={`text-[12px] font-bold leading-tight ${included ? 'text-black' : 'text-neutral-400'}`}>
+                        <div className={`text-[12px] font-bold leading-tight ${isCapten ? 'text-white' : included ? 'text-[color:var(--app-text)]' : 'text-[color:var(--app-text-muted)]'}`}>
                           {t}
                         </div>
-                        <div className="text-[11px] text-neutral-500 font-medium leading-normal mt-1 whitespace-pre-line">
+                        <div className={`text-[11px] font-medium leading-normal mt-1 whitespace-pre-line ${isCapten ? 'text-white/70' : 'text-[color:var(--app-text-muted)]'}`}>
                           {d}
                         </div>
                       </div>
@@ -443,24 +441,24 @@ export default function PlanPage() {
                 </div>
               </div>
 
-              <div className="pt-8 sm:pt-12">
+              <div className="pt-8">
                 {isLoggedIn ? (
                   <>
-                    <button 
+                    <button
                       type="button"
                       onClick={() => !isCurrent && handleUpgradePlan(plan)}
                       disabled={isCurrent || isProcessing}
-                      className={`w-full py-4 rounded-[10px] text-[10px] sm:text-[11px] font-black uppercase tracking-[0.2em] transition-all cursor-pointer active:scale-95 disabled:scale-100 disabled:cursor-default ${
-                        isCurrent 
-                          ? 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20' 
+                      className={`w-full py-4 rounded-xl text-[10px] sm:text-[11px] font-black uppercase tracking-[0.2em] transition-all cursor-pointer active:scale-95 disabled:scale-100 disabled:cursor-default ${
+                        isCurrent
+                          ? (isCapten ? 'bg-white/20 text-white' : 'bg-[#3DD68C]/15 text-[#3DD68C] border border-[#3DD68C]/25')
                           : isCapten
-                            ? 'bg-[#FF5C00] text-white shadow-lg shadow-orange-500/20 hover:bg-black'
-                            : 'bg-black text-white hover:bg-neutral-800'
+                            ? 'bg-white text-[#E04B00] hover:bg-white/90'
+                            : 'bg-[#FF5C00] text-white hover:bg-[#E04B00]'
                       }`}
                     >
                       {isProcessing && processingPlan === plan.name ? (
                         <div className="flex items-center justify-center gap-2">
-                          <div className="w-3.5 h-3.5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                          <div className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin" />
                           ACTIVATION...
                         </div>
                       ) : (
@@ -471,7 +469,7 @@ export default function PlanPage() {
                       <button
                         type="button"
                         onClick={handleCancelSubscription}
-                        className="w-full mt-4 text-[10px] font-black text-red-500 hover:text-red-700 hover:underline uppercase tracking-wider transition-all cursor-pointer text-center bg-transparent border-none outline-none"
+                        className="w-full mt-4 text-[10px] font-black text-white/80 hover:text-white hover:underline uppercase tracking-wider transition-all cursor-pointer text-center bg-transparent border-none outline-none"
                       >
                         Résilier mon abonnement Capten →
                       </button>
@@ -482,17 +480,17 @@ export default function PlanPage() {
                   <>
                     {plan.name === 'GRATUIT' ? (
                       variant === 'A' ? (
-                        <Link 
+                        <Link
                           href="/login?mode=signup&variant=A"
-                          className="w-full text-center py-4 rounded-[10px] text-[10px] sm:text-[11px] font-black uppercase tracking-[0.2em] transition-all bg-black text-white hover:bg-neutral-800 block cursor-pointer"
+                          className="w-full text-center py-4 rounded-xl text-[10px] sm:text-[11px] font-black uppercase tracking-[0.2em] transition-all bg-[#FF5C00] text-white hover:bg-[#E04B00] block cursor-pointer"
                         >
                           COMMENCER GRATUITEMENT
                         </Link>
                       ) : (
                         <div className="text-center py-4">
-                          <Link 
+                          <Link
                             href="/login?mode=signup&variant=B&free=true"
-                            className="text-[11px] font-black text-neutral-400 hover:text-black transition-all uppercase tracking-wider underline cursor-pointer"
+                            className="text-[11px] font-black text-[color:var(--app-text-muted)] hover:text-[color:var(--app-text)] transition-all uppercase tracking-wider underline cursor-pointer"
                           >
                             ou continuer avec le plan gratuit
                           </Link>
@@ -500,15 +498,15 @@ export default function PlanPage() {
                       )
                     ) : (
                       <div className="space-y-3 text-center">
-                        <Link 
+                        <Link
                           href="/login?mode=signup&upgrade=true"
-                          className="w-full text-center py-4 rounded-[10px] text-[10px] sm:text-[11px] font-black uppercase tracking-[0.2em] transition-all bg-[#FF5C00] text-white hover:bg-black block cursor-pointer shadow-lg shadow-orange-500/20"
+                          className="w-full text-center py-4 rounded-xl text-[10px] sm:text-[11px] font-black uppercase tracking-[0.2em] transition-all bg-white text-[#E04B00] hover:bg-white/90 block cursor-pointer"
                         >
                           {billingInterval === 'yearly' ? "ACTIVER LE PLAN ANNUEL" : "ESSAI 21 JOURS GRATUIT — ACCÈS COMPLET"}
                         </Link>
-                        <Link 
+                        <Link
                           href="/login?mode=signup&free=true"
-                          className="text-[10px] font-bold text-neutral-400 hover:text-black transition-all uppercase tracking-wider underline block pt-1 cursor-pointer"
+                          className="text-[10px] font-bold text-white/70 hover:text-white transition-all uppercase tracking-wider underline block pt-1 cursor-pointer"
                         >
                           ou continuer avec le plan gratuit
                         </Link>

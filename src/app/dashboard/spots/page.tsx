@@ -86,22 +86,22 @@ function SpotModal({
         initial={{ opacity: 0, scale: 0.96, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.96, y: 20 }}
-        className="w-full max-w-lg bg-white rounded-[28px] shadow-2xl overflow-hidden"
+        className="w-full max-w-lg bg-[var(--app-surface)] rounded-[28px] shadow-2xl overflow-hidden border border-[color:var(--app-border)]"
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-7 pt-7 pb-5 border-b border-black/5">
-          <h2 className="text-[20px] font-display font-black italic uppercase tracking-tight text-black">
+        <div className="flex items-center justify-between px-7 pt-7 pb-5 border-b border-[color:var(--app-border)]">
+          <h2 className="text-[20px] font-display font-black italic uppercase tracking-tight text-[color:var(--app-text)]">
             {initial ? "Modifier le spot" : "Ajouter un spot"}
           </h2>
-          <button onClick={onClose} className="w-8 h-8 rounded-full bg-[#F4F4EE] flex items-center justify-center hover:bg-[#EAEADF] transition-colors">
-            <X size={14} className="text-[#555]" />
+          <button onClick={onClose} className="w-8 h-8 rounded-full bg-[var(--app-surface-2)] flex items-center justify-center hover:bg-[var(--app-hover)] transition-colors">
+            <X size={14} className="text-[color:var(--app-text-muted)]" />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="p-7 space-y-5 max-h-[70vh] overflow-y-auto">
           {/* Nom */}
           <div className="space-y-1.5">
-            <label className="text-[10px] font-black uppercase tracking-widest text-[#A3A3A3]">
+            <label className="text-[10px] font-black uppercase tracking-widest text-[color:var(--app-text-muted)]">
               Nom du lieu <span className="text-[#FF5C00]">*</span>
             </label>
             <input
@@ -109,13 +109,13 @@ function SpotModal({
               value={form.nom}
               onChange={(e) => set("nom", e.target.value)}
               placeholder="Café Central, Running Store…"
-              className="w-full bg-[#F4F4EE] border border-transparent focus:border-[#FF5C00] focus:bg-white rounded-[14px] px-4 py-3 text-[14px] text-black outline-none transition-all"
+              className="w-full bg-[var(--app-surface-2)] border border-transparent focus:border-[#FF5C00] focus:bg-[var(--app-surface)] rounded-[14px] px-4 py-3 text-[14px] text-[color:var(--app-text)] outline-none transition-all"
             />
           </div>
 
           {/* Catégorie */}
           <div className="space-y-1.5">
-            <label className="text-[10px] font-black uppercase tracking-widest text-[#A3A3A3]">Catégorie</label>
+            <label className="text-[10px] font-black uppercase tracking-widest text-[color:var(--app-text-muted)]">Catégorie</label>
             <div className="grid grid-cols-5 gap-2">
               {CATEGORIES.map((c) => (
                 <button
@@ -125,7 +125,7 @@ function SpotModal({
                   className={`flex flex-col items-center gap-1 p-2.5 rounded-[14px] border transition-all text-center ${
                     form.categorie === c.value
                       ? "bg-[#FF5C00] border-[#FF5C00] text-white"
-                      : "bg-[#F4F4EE] border-transparent text-[#555] hover:bg-[#EAEADF]"
+                      : "bg-[var(--app-surface-2)] border-transparent text-[color:var(--app-text-muted)] hover:bg-[var(--app-hover)]"
                   }`}
                 >
                   <c.Icon size={18} strokeWidth={2} />
@@ -137,43 +137,43 @@ function SpotModal({
 
           {/* Adresse */}
           <div className="space-y-1.5">
-            <label className="text-[10px] font-black uppercase tracking-widest text-[#A3A3A3]">Adresse (optionnel)</label>
+            <label className="text-[10px] font-black uppercase tracking-widest text-[color:var(--app-text-muted)]">Adresse (optionnel)</label>
             <input
               type="text"
               value={form.adresse}
               onChange={(e) => set("adresse", e.target.value)}
               placeholder="12 rue de la Paix, Paris"
-              className="w-full bg-[#F4F4EE] border border-transparent focus:border-[#FF5C00] focus:bg-white rounded-[14px] px-4 py-3 text-[14px] text-black outline-none transition-all"
+              className="w-full bg-[var(--app-surface-2)] border border-transparent focus:border-[#FF5C00] focus:bg-[var(--app-surface)] rounded-[14px] px-4 py-3 text-[14px] text-[color:var(--app-text)] outline-none transition-all"
             />
           </div>
 
           {/* Lien Maps */}
           <div className="space-y-1.5">
-            <label className="text-[10px] font-black uppercase tracking-widest text-[#A3A3A3]">Lien Google Maps (optionnel)</label>
+            <label className="text-[10px] font-black uppercase tracking-widest text-[color:var(--app-text-muted)]">Lien Google Maps (optionnel)</label>
             <input
               type="url"
               value={form.lien_maps}
               onChange={(e) => set("lien_maps", e.target.value)}
               placeholder="https://maps.google.com/…"
-              className="w-full bg-[#F4F4EE] border border-transparent focus:border-[#FF5C00] focus:bg-white rounded-[14px] px-4 py-3 text-[14px] text-black outline-none transition-all"
+              className="w-full bg-[var(--app-surface-2)] border border-transparent focus:border-[#FF5C00] focus:bg-[var(--app-surface)] rounded-[14px] px-4 py-3 text-[14px] text-[color:var(--app-text)] outline-none transition-all"
             />
           </div>
 
           {/* Mot du fondateur */}
           <div className="space-y-1.5">
-            <label className="text-[10px] font-black uppercase tracking-widest text-[#A3A3A3]">Ton mot (optionnel)</label>
+            <label className="text-[10px] font-black uppercase tracking-widest text-[color:var(--app-text-muted)]">Ton mot (optionnel)</label>
             <input
               type="text"
               value={form.mot_du_fondateur}
               onChange={(e) => set("mot_du_fondateur", e.target.value)}
               placeholder="Notre QG d'après-run, On y va tous les jeudis…"
-              className="w-full bg-[#F4F4EE] border border-transparent focus:border-[#FF5C00] focus:bg-white rounded-[14px] px-4 py-3 text-[14px] text-black outline-none transition-all"
+              className="w-full bg-[var(--app-surface-2)] border border-transparent focus:border-[#FF5C00] focus:bg-[var(--app-surface)] rounded-[14px] px-4 py-3 text-[14px] text-[color:var(--app-text)] outline-none transition-all"
             />
           </div>
 
           {/* Avantage */}
           <div className="space-y-1.5">
-            <label className="text-[10px] font-black uppercase tracking-widest text-[#A3A3A3]">
+            <label className="text-[10px] font-black uppercase tracking-widest text-[color:var(--app-text-muted)]">
               Avantage pour le crew (optionnel)
             </label>
             <input
@@ -181,9 +181,9 @@ function SpotModal({
               value={form.avantage}
               onChange={(e) => set("avantage", e.target.value)}
               placeholder="-10% sur présentation de la page Capten"
-              className="w-full bg-[#F4F4EE] border border-transparent focus:border-[#FF5C00] focus:bg-white rounded-[14px] px-4 py-3 text-[14px] text-black outline-none transition-all"
+              className="w-full bg-[var(--app-surface-2)] border border-transparent focus:border-[#FF5C00] focus:bg-[var(--app-surface)] rounded-[14px] px-4 py-3 text-[14px] text-[color:var(--app-text)] outline-none transition-all"
             />
-            <p className="text-[11px] text-[#A3A3A3]">
+            <p className="text-[11px] text-[color:var(--app-text-muted)]">
               Texte libre — c'est toi qui l'as négocié avec le commerçant. Capten affiche juste l'info.
             </p>
           </div>
@@ -232,15 +232,15 @@ function SpotCard({
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.95 }}
-      className="bg-white rounded-[24px] border border-black/5 p-5 relative group hover:shadow-[0_8px_32px_rgba(0,0,0,0.06)] transition-all"
+      className="bg-[var(--app-surface)] rounded-[24px] border border-[color:var(--app-border)] p-5 relative group hover:shadow-[0_8px_32px_rgba(0,0,0,0.25)] transition-all"
     >
       {/* Menu kebab */}
       <div className="absolute top-4 right-4">
         <button
           onClick={() => setMenu((m) => !m)}
-          className="w-7 h-7 rounded-full bg-[#F4F4EE] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-[#EAEADF]"
+          className="w-7 h-7 rounded-full bg-[var(--app-surface-2)] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-[var(--app-hover)]"
         >
-          <MoreHorizontal size={13} className="text-[#555]" />
+          <MoreHorizontal size={13} className="text-[color:var(--app-text-muted)]" />
         </button>
         <AnimatePresence>
           {menu && (
@@ -248,36 +248,36 @@ function SpotCard({
               initial={{ opacity: 0, scale: 0.9, y: -4 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9 }}
-              className="absolute right-0 top-9 bg-white rounded-[16px] border border-black/5 shadow-xl overflow-hidden z-10 min-w-[140px]"
+              className="absolute right-0 top-9 bg-[var(--app-surface)] rounded-[16px] border border-[color:var(--app-border)] shadow-xl overflow-hidden z-10 min-w-[140px]"
             >
               <button
                 onClick={() => { setMenu(false); onEdit(); }}
-                className="w-full flex items-center gap-2.5 px-4 py-3 text-[12px] font-semibold text-[#333] hover:bg-[#F4F4EE] transition-colors"
+                className="w-full flex items-center gap-2.5 px-4 py-3 text-[12px] font-semibold text-[color:var(--app-text)] hover:bg-[var(--app-surface-2)] transition-colors"
               >
-                <Pencil size={12} className="text-[#A3A3A3]" />
+                <Pencil size={12} className="text-[color:var(--app-text-muted)]" />
                 Modifier
               </button>
               {!isFirst && (
                 <button
                   onClick={() => { setMenu(false); onMoveUp(); }}
-                  className="w-full flex items-center gap-2.5 px-4 py-3 text-[12px] font-semibold text-[#333] hover:bg-[#F4F4EE] transition-colors"
+                  className="w-full flex items-center gap-2.5 px-4 py-3 text-[12px] font-semibold text-[color:var(--app-text)] hover:bg-[var(--app-surface-2)] transition-colors"
                 >
-                  <ArrowUp size={12} className="text-[#A3A3A3]" />
+                  <ArrowUp size={12} className="text-[color:var(--app-text-muted)]" />
                   Monter
                 </button>
               )}
               {!isLast && (
                 <button
                   onClick={() => { setMenu(false); onMoveDown(); }}
-                  className="w-full flex items-center gap-2.5 px-4 py-3 text-[12px] font-semibold text-[#333] hover:bg-[#F4F4EE] transition-colors"
+                  className="w-full flex items-center gap-2.5 px-4 py-3 text-[12px] font-semibold text-[color:var(--app-text)] hover:bg-[var(--app-surface-2)] transition-colors"
                 >
-                  <ArrowDown size={12} className="text-[#A3A3A3]" />
+                  <ArrowDown size={12} className="text-[color:var(--app-text-muted)]" />
                   Descendre
                 </button>
               )}
               <button
                 onClick={() => { setMenu(false); onDelete(); }}
-                className="w-full flex items-center gap-2.5 px-4 py-3 text-[12px] font-semibold text-red-500 hover:bg-red-50 transition-colors"
+                className="w-full flex items-center gap-2.5 px-4 py-3 text-[12px] font-semibold text-red-500 hover:bg-red-500/10 transition-colors"
               >
                 <Trash2 size={12} />
                 Supprimer
@@ -292,22 +292,22 @@ function SpotCard({
         <cat.Icon size={19} strokeWidth={2} className="text-[#FF5C00]" />
       </div>
 
-      <h3 className="text-[15px] font-black uppercase tracking-tight text-black leading-tight mb-0.5">
+      <h3 className="text-[15px] font-black uppercase tracking-tight text-[color:var(--app-text)] leading-tight mb-0.5">
         {spot.nom}
       </h3>
 
-      <span className="inline-block text-[10px] font-bold uppercase tracking-wider text-[#A3A3A3] mb-3">
+      <span className="inline-block text-[10px] font-bold uppercase tracking-wider text-[color:var(--app-text-muted)] mb-3">
         {cat.label}
       </span>
 
       {spot.mot_du_fondateur && (
-        <p className="text-[12px] text-[#666562] italic mb-3 leading-snug">
+        <p className="text-[12px] text-[color:var(--app-text-muted)] italic mb-3 leading-snug">
           « {spot.mot_du_fondateur} »
         </p>
       )}
 
       {spot.adresse && (
-        <div className="flex items-center gap-1 text-[11px] text-[#A3A3A3] mb-2">
+        <div className="flex items-center gap-1 text-[11px] text-[color:var(--app-text-muted)] mb-2">
           <MapPin size={10} />
           <span className="truncate">{spot.adresse}</span>
         </div>
@@ -325,7 +325,7 @@ function SpotCard({
             href={spot.lien_maps}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full border border-black/10 text-[11px] font-medium text-[#555] hover:border-[#FF5C00] hover:text-[#FF5C00] transition-colors"
+            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full border border-[color:var(--app-border)] text-[11px] font-medium text-[color:var(--app-text-muted)] hover:border-[#FF5C00] hover:text-[#FF5C00] transition-colors"
           >
             <ExternalLink size={9} />
             Voir sur la carte
@@ -424,10 +424,10 @@ export default function CrewSpotsPage() {
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-[28px] sm:text-[36px] font-display italic font-black uppercase text-black leading-none tracking-tighter">
+          <h1 className="text-[30px] sm:text-[40px] font-display italic font-black uppercase text-[color:var(--app-text)] leading-none tracking-tighter">
             Les Spots du Crew
           </h1>
-          <p className="text-[13px] text-[#A3A3A3] font-sans mt-1">
+          <p className="text-[13px] text-[color:var(--app-text-muted)] font-sans mt-1">
             Tes adresses recommandées — café, shop, kiné, ostéo…
           </p>
         </div>
@@ -441,13 +441,13 @@ export default function CrewSpotsPage() {
       </div>
 
       {/* Banner info */}
-      <div className="bg-[#F4F4EE] rounded-[20px] px-5 py-4 flex items-start gap-3">
-        <span className="shrink-0 w-9 h-9 rounded-[12px] bg-white flex items-center justify-center">
+      <div className="bg-[var(--app-surface-2)] rounded-[20px] px-5 py-4 flex items-start gap-3">
+        <span className="shrink-0 w-9 h-9 rounded-[12px] bg-[var(--app-surface)] flex items-center justify-center">
           <MapPin size={18} strokeWidth={2} className="text-[#FF5C00]" />
         </span>
         <div>
-          <p className="text-[13px] font-bold text-[#1A1918]">L'after-run, les soins, l'équipement</p>
-          <p className="text-[12px] text-[#666562] mt-0.5 leading-snug">
+          <p className="text-[13px] font-bold text-[color:var(--app-text)]">L'after-run, les soins, l'équipement</p>
+          <p className="text-[12px] text-[color:var(--app-text-muted)] mt-0.5 leading-snug">
             Ces spots apparaîtront sur la page d'inscription de ton crew et sur la fiche de chaque membre.
             Les avantages sont des accords que <em>tu</em> as négociés à l'oral — Capten affiche juste l'info.
           </p>
@@ -468,15 +468,15 @@ export default function CrewSpotsPage() {
           <span className="w-16 h-16 rounded-[20px] bg-[#FF5C00]/[0.08] flex items-center justify-center mb-1">
             <MapPin size={30} strokeWidth={1.8} className="text-[#FF5C00]" />
           </span>
-          <p className="text-[15px] font-black uppercase tracking-tight text-black">
+          <p className="text-[15px] font-black uppercase tracking-tight text-[color:var(--app-text)]">
             Aucun spot encore
           </p>
-          <p className="text-[12px] text-[#A3A3A3] max-w-xs">
+          <p className="text-[12px] text-[color:var(--app-text-muted)] max-w-xs">
             Ajoute le café où ton crew se retrouve après le run, le shop où vous achetez vos pompes, ou le kiné qui vous remet sur pied.
           </p>
           <button
             onClick={() => setModal({ open: true })}
-            className="mt-2 inline-flex items-center gap-2 h-10 px-6 rounded-full bg-black text-white text-[12px] font-black uppercase tracking-wider hover:bg-[#FF5C00] transition-colors"
+            className="mt-2 inline-flex items-center gap-2 h-10 px-6 rounded-full bg-[#FF5C00] text-white text-[12px] font-black uppercase tracking-wider hover:bg-[#E04B00] transition-colors"
           >
             <Plus size={14} />
             Ajouter mon premier spot
@@ -503,7 +503,7 @@ export default function CrewSpotsPage() {
           <motion.button
             layout
             onClick={() => setModal({ open: true })}
-            className="border-2 border-dashed border-black/10 rounded-[24px] p-5 flex flex-col items-center justify-center gap-2 text-[#A3A3A3] hover:border-[#FF5C00] hover:text-[#FF5C00] transition-colors min-h-[160px]"
+            className="border-2 border-dashed border-[color:var(--app-border)] rounded-[24px] p-5 flex flex-col items-center justify-center gap-2 text-[color:var(--app-text-muted)] hover:border-[#FF5C00] hover:text-[#FF5C00] transition-colors min-h-[160px]"
           >
             <Plus size={22} />
             <span className="text-[12px] font-black uppercase tracking-wider">Ajouter un spot</span>

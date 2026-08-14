@@ -54,6 +54,7 @@ export default function Sidebar() {
         { name: "Membres", icon: <Users size={18} strokeWidth={1.5} />, href: "/dashboard/members" },
         { name: sessionMenuLabel, icon: <Map size={18} strokeWidth={1.5} />, href: "/dashboard/events" },
         { name: "Statistiques", icon: <BarChart3 size={18} strokeWidth={1.5} />, href: "/dashboard/stats" },
+        { name: "Messages", icon: <MessageSquare size={18} strokeWidth={1.5} />, href: "/messages" },
       ]
     },
     {
