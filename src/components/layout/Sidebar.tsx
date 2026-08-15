@@ -103,7 +103,7 @@ export default function Sidebar() {
                     <span className={isActive ? 'text-[#FF5C00]' : 'text-[color:var(--app-text-muted)]'}>
                       {item.icon}
                     </span>
-                    <span className={`text-[13px] tracking-tight ${isActive ? 'text-[#FF5C00] font-bold' : 'text-[color:var(--app-text)] font-medium'}`}>
+                    <span className={`font-display italic uppercase text-[16px] tracking-wide leading-none ${isActive ? 'text-[#FF5C00]' : 'text-[color:var(--app-text)]'}`}>
                       {item.name}
                     </span>
                   </>

@@ -100,7 +100,7 @@ export default function ApercuPage() {
               <p className="text-[10px] font-black uppercase tracking-[0.3em] px-4 mb-3 italic opacity-70" style={{ color: MUT }}>{sec.title}</p>
               <div className="space-y-1">
                 {sec.items.map((n) => (
-                  <div key={n.label} className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-[13px] font-medium" style={(n as any).active ? { background: "rgba(255,106,26,0.12)", color: ORANGE } : { color: MUT }}>
+                  <div key={n.label} className="flex items-center gap-3 px-4 py-2.5 rounded-xl font-display italic uppercase text-[16px] tracking-wide leading-none" style={(n as any).active ? { background: "rgba(255,106,26,0.12)", color: ORANGE } : { color: TXT }}>
                     <n.icon size={18} strokeWidth={1.6} />
                     {n.label}
                   </div>
