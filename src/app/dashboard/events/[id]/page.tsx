@@ -5,13 +5,14 @@ import { useParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft, Calendar, MapPin, Users, QrCode, CheckSquare, FileText, List,
-  Download, Globe, Lock, Trash2, Loader2, Wifi
+  Download, Globe, Lock, Trash2, Loader2, Wifi, Megaphone, Camera
 } from "lucide-react";
 import { getSupabase } from "@/lib/supabase";
 import { useAuth } from "@/context/AuthContext";
 import Link from "next/link";
 import { formatDateShort } from "@/lib/utils/format";
 import dynamic from "next/dynamic";
+import CrewVisualModal from "@/components/visuals/CrewVisualModal";
 
 const QRCodeSVG = dynamic(() => import("qrcode.react").then((m) => ({ default: m.QRCodeSVG })), { ssr: false });
 
@@ -37,6 +38,9 @@ interface Event {
   is_recurring: boolean;
   checkin_radius_meters: number;
   club_id: string;
+  distance_km: number | null;
+  affiche_telechargee?: boolean;
+  story_telechargee?: boolean;
 }
 
 interface MembreLite { first_name: string | null; last_name: string | null; phone: string | null }
@@ -69,6 +73,8 @@ export default function EventDetailPage() {
   const [loading, setLoading] = useState(true);
   const [liveCount, setLiveCount] = useState(0);
   const [isPublishing, setIsPublishing] = useState(false);
+  const [visualModal, setVisualModal] = useState<null | "affiche" | "story">(null);
+  const [clubMeta, setClubMeta] = useState<{ slug: string | null; logo_url: string | null }>({ slug: null, logo_url: null });
 
   const checkinUrl = typeof window !== "undefined"
     ? `${window.location.origin}/checkin/${id}`
@@ -95,6 +101,14 @@ export default function EventDetailPage() {
     setCheckins((chks as unknown as Checkin[]) || []);
     setLiveCount(((chks as unknown as Checkin[]) || []).filter((c) => c.is_valid).length);
     setLoading(false);
+
+    // Métadonnées du crew (slug + logo) pour les visuels partageables
+    const { data: cm } = await supabase
+      .from("clubs")
+      .select("slug, logo_url")
+      .eq("id", ev.club_id)
+      .maybeSingle();
+    if (cm) setClubMeta({ slug: cm.slug ?? null, logo_url: cm.logo_url ?? null });
   }, [id]);
 
   useEffect(() => {
@@ -173,6 +187,42 @@ export default function EventDetailPage() {
 
   const s = STATUS_LABELS[event.status] || STATUS_LABELS.draft;
 
+  // ── Visuels du Crew ──
+  const runDate = new Date(event.event_date);
+  const isPro = (club?.stripe_plan || "").toUpperCase() === "CAPTEN";
+  const crewName = club?.name || "Mon Crew";
+  const logoUrl = clubMeta.logo_url || (club?.branding as any)?.logo || null;
+  const slugSafe = clubMeta.slug || "crew";
+  const mins = runDate.getMinutes();
+  const dayTime = `${runDate.toLocaleDateString("fr-FR", { weekday: "long" })} ${runDate.getHours()}H${mins ? String(mins).padStart(2, "0") : ""}`;
+  const dateLabel = runDate.toLocaleDateString("fr-FR", { day: "numeric", month: "long" });
+  const isoDay = runDate.toISOString().slice(0, 10);
+
+  const afficheVisible = event.status === "draft" || event.status === "published";
+  const storyVisible = event.status === "published" || event.status === "completed";
+  const storyEnabled = event.status === "completed" && liveCount >= 1;
+  const storyTooltip =
+    event.status !== "completed" ? "Disponible après le run" : liveCount < 1 ? "Aucun coureur confirmé pour ce run" : "";
+
+  const runData = {
+    crewName,
+    slug: slugSafe,
+    runTitle: event.title,
+    dayTime,
+    location: event.meeting_point_address,
+    distanceKm: event.distance_km,
+    presentCount: liveCount,
+    runDateLabel: dateLabel,
+  };
+
+  const markDownloaded = async (which: "affiche" | "story") => {
+    const supabase = getSupabase();
+    if (!supabase) return;
+    const field = which === "affiche" ? "affiche_telechargee" : "story_telechargee";
+    await supabase.from("events").update({ [field]: true }).eq("id", event.id);
+    setEvent((e) => (e ? { ...e, [field]: true } : e));
+  };
+
   return (
     <div className="pb-20 space-y-6">
       {/* Header */}
@@ -206,7 +256,31 @@ export default function EventDetailPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          {afficheVisible && (
+            <button
+              onClick={() => isPro && setVisualModal("affiche")}
+              disabled={!isPro}
+              title={!isPro ? "Disponible sur le plan Capten" : ""}
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-[11px] font-black uppercase tracking-widest transition-all border border-[color:var(--app-border)] ${
+                !isPro ? "opacity-40 cursor-not-allowed text-[color:var(--app-text-muted)]" : "text-[color:var(--app-text)] hover:border-[#FF5C00] hover:text-[#FF5C00]"
+              }`}
+            >
+              <Megaphone size={13} /> Affiche
+            </button>
+          )}
+          {storyVisible && (
+            <button
+              onClick={() => isPro && storyEnabled && setVisualModal("story")}
+              disabled={!isPro || !storyEnabled}
+              title={!isPro ? "Disponible sur le plan Capten" : storyTooltip}
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-[11px] font-black uppercase tracking-widest transition-all border border-[color:var(--app-border)] ${
+                !isPro || !storyEnabled ? "opacity-40 cursor-not-allowed text-[color:var(--app-text-muted)]" : "text-[color:var(--app-text)] hover:border-[#FF5C00] hover:text-[#FF5C00]"
+              }`}
+            >
+              <Camera size={13} /> Story
+            </button>
+          )}
           <button
             onClick={togglePublish}
             disabled={isPublishing}
@@ -423,6 +497,18 @@ export default function EventDetailPage() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {visualModal && (
+        <CrewVisualModal
+          open
+          type={visualModal}
+          onClose={() => setVisualModal(null)}
+          data={runData}
+          logoUrl={logoUrl}
+          fileBaseName={`${visualModal}-${slugSafe}-${isoDay}`}
+          onDownloaded={() => markDownloaded(visualModal)}
+        />
+      )}
     </div>
   );
 }

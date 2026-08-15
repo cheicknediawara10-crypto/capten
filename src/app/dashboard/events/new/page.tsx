@@ -30,6 +30,7 @@ export default function NewEventPage() {
     meeting_point_lat: null as number | null,
     meeting_point_lng: null as number | null,
     max_participants: "",
+    distance_km: "",
     is_recurring: false,
     checkin_radius_meters: 200,
   });
@@ -74,6 +75,7 @@ export default function NewEventPage() {
       meeting_point_lat: form.meeting_point_lat,
       meeting_point_lng: form.meeting_point_lng,
       max_participants: form.max_participants ? parseInt(form.max_participants) : null,
+      distance_km: form.distance_km ? parseFloat(form.distance_km) : null,
       is_recurring: form.is_recurring,
       checkin_radius_meters: form.checkin_radius_meters,
       status,
@@ -245,6 +247,21 @@ export default function NewEventPage() {
               onChange={(e) => update("max_participants", e.target.value)}
               placeholder="50"
               min="1"
+              className="w-full h-11 px-4 rounded-[12px] border border-[color:var(--app-border)] text-sm font-medium focus:border-[#FF5C00] focus:ring-2 focus:ring-[#FF5C00]/20 outline-none transition-all"
+            />
+          </div>
+
+          <div className="space-y-1">
+            <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--app-text-muted)]">
+              Distance du run (km) — optionnel
+            </label>
+            <input
+              type="number"
+              value={form.distance_km}
+              onChange={(e) => update("distance_km", e.target.value)}
+              placeholder="ex: 8"
+              min="0"
+              step="0.1"
               className="w-full h-11 px-4 rounded-[12px] border border-[color:var(--app-border)] text-sm font-medium focus:border-[#FF5C00] focus:ring-2 focus:ring-[#FF5C00]/20 outline-none transition-all"
             />
           </div>
