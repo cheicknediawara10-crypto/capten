@@ -9,6 +9,7 @@ import {
   ExternalLink, Check, MessageCircle, Mail, Send, Sparkles,
   MessageSquare, Copy, Share2,
 } from "lucide-react";
+import CopiloteWidget from "@/components/copilote/CopiloteWidget";
 
 // Palette premium autonome (la page force le dark showcase)
 const BG = "#0B0B0A", SURF = "#151513", SURF2 = "#201F1C", BORD = "rgba(255,255,255,0.07)";
@@ -430,6 +431,9 @@ export default function ApercuPage() {
           Fin de l'aperçu — données de démonstration. <span style={{ color: ORANGE }}>Valide et je pousse tout en prod.</span>
         </p>
       </main>
+
+      {/* Copilote flottant (aperçu) */}
+      <CopiloteWidget preview />
     </div>
   );
 }

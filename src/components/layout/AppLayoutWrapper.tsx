@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Sidebar from "@/components/layout/Sidebar";
 import MobileHeader from "@/components/layout/MobileHeader";
 import MobileNav from "@/components/layout/MobileNav";
+import CopiloteWidget from "@/components/copilote/CopiloteWidget";
 
 interface AppLayoutWrapperProps {
   children: React.ReactNode;
@@ -27,6 +28,7 @@ export default function AppLayoutWrapper({ children }: AppLayoutWrapperProps) {
     cleanPath === "/les-spots-du-crew" ||
     cleanPath === "/apercu" ||
     cleanPath === "/apercu-visuels" ||
+    cleanPath === "/apercu-copilote" ||
     cleanPath.includes("/checkin") ||
     // Espace membre (auth PIN — système séparé de l'auth organisateur)
     cleanPath.startsWith("/mon-espace") ||
@@ -70,6 +72,9 @@ export default function AppLayoutWrapper({ children }: AppLayoutWrapperProps) {
         {/* Mobile Navigation Bar (Bottom) */}
         <MobileNav />
       </main>
+
+      {/* Copilote — assistant flottant (tout l'espace fondateur) */}
+      <CopiloteWidget />
     </div>
   );
 }
