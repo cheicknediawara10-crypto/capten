@@ -10,6 +10,7 @@ import {
 import { getSupabase } from "@/lib/supabase";
 import { useAuth } from "@/context/AuthContext";
 import { detectAlertsForClub, alertsToRows } from "@/lib/copilote/detectors";
+import CopiloteAssist from "@/components/copilote/CopiloteAssist";
 
 interface Alert {
   id: string;
@@ -194,6 +195,8 @@ export default function CopilotePanel({
           </AnimatePresence>
         </div>
       )}
+
+      <CopiloteAssist preview={preview} />
     </div>
   );
 }
