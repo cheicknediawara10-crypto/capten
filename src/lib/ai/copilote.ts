@@ -4,7 +4,9 @@
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const MODEL = "gemini-2.0-flash";
+// gemini-2.0-flash a été déprécié (404 "no longer available"). 2.5-flash est GA,
+// rapide et pas cher. Repli possible : "gemini-flash-latest" (alias toujours à jour).
+const MODEL = "gemini-2.5-flash";
 
 export type CopiloteIntent = "annonce" | "motivation" | "mot" | "situation" | "libre";
 
