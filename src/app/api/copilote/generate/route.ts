@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { generateCopiloteMessage, type CopiloteIntent } from "@/lib/ai/copilote";
+import { fetchCrewContext } from "@/lib/copilote/context";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 30;
@@ -56,7 +57,15 @@ export async function POST(req: NextRequest) {
   const intent = (VALID.includes(body.intent) ? body.intent : "libre") as CopiloteIntent;
   const input = String(body.input || "").slice(0, 600);
 
-  const { text, aiUsed } = await generateCopiloteMessage({ intent, input, crewName });
+  // Contexte crew (agrégats + faits) pour des messages personnalisés
+  let context;
+  try {
+    context = await fetchCrewContext(admin, clubId);
+  } catch {
+    context = undefined;
+  }
+
+  const { text, aiUsed } = await generateCopiloteMessage({ intent, input, crewName, context });
 
   // 5. Compteur : on n'incrémente que si l'IA a réellement été appelée
   let newUsed = used;

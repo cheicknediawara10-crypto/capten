@@ -3,6 +3,7 @@
 // ou en panne · zéro donnée sensible (juste prénoms + faits d'activité).
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import type { CrewContext } from "@/lib/copilote/context";
 
 // gemini-2.0-flash a été déprécié (404 "no longer available"). 2.5-flash est GA,
 // rapide et pas cher. Repli possible : "gemini-flash-latest" (alias toujours à jour).
@@ -14,6 +15,19 @@ export interface GenerateInput {
   intent: CopiloteIntent;
   input: string; // ce que le fondateur décrit (texte libre)
   crewName: string;
+  context?: CrewContext; // faits d'activité du crew, pour personnaliser
+}
+
+// Bloc de contexte : l'IA l'utilise si pertinent, sans réciter les chiffres.
+function contextBlock(ctx?: CrewContext): string {
+  if (!ctx) return "";
+  const facts: string[] = [];
+  if (ctx.activeMembers) facts.push(`${ctx.activeMembers} membres actifs`);
+  if (ctx.nextRunTitle) facts.push(`prochain run : « ${ctx.nextRunTitle} »${ctx.nextRunDate ? ` (${ctx.nextRunDate})` : ""}`);
+  if (ctx.lastRunTitle) facts.push(`dernier run : « ${ctx.lastRunTitle} »${ctx.lastRunDate ? ` (${ctx.lastRunDate})` : ""}${ctx.lastRunCount != null ? `, ${ctx.lastRunCount} présents` : ""}`);
+  if (ctx.iceRate != null) facts.push(`fiches ICE remplies à ${ctx.iceRate}%`);
+  if (!facts.length) return "";
+  return `\n\nContexte du crew (utilise UNIQUEMENT ce qui est pertinent pour ce message, intègre-le naturellement sans lister les stats, n'invente aucun autre chiffre) :\n- ${facts.join("\n- ")}`;
 }
 
 const SYSTEM = `Tu es le Copilote de CAPTEN, l'assistant d'un fondateur de run club (son "crew").
@@ -70,7 +84,7 @@ export async function generateCopiloteMessage(g: GenerateInput): Promise<Generat
   try {
     const genAI = new GoogleGenerativeAI(key);
     const model = genAI.getGenerativeModel({ model: MODEL, systemInstruction: SYSTEM });
-    const result = await model.generateContent(userPrompt(g));
+    const result = await model.generateContent(userPrompt(g) + contextBlock(g.context));
     const text = (result.response.text() || "").trim();
     if (!text) return { text: fallback(g), aiUsed: false };
     return { text, aiUsed: true };
