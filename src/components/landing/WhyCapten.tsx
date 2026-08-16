@@ -10,7 +10,7 @@ const FEATURES = [
   "Rappels automatiques avant chaque départ",
   "1 seul lien fixe partagé dans le groupe",
   "100 % Web (0 application à installer)",
-  "Historique complet et archives des sorties",
+  "Historique complet et archives des runs",
   "Les Spots du Crew — Tes adresses, tes avantages",
 ];
 
@@ -60,7 +60,7 @@ export function WhyCapten() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.1 }}
-          className="flex items-start mx-auto"
+          className="hidden lg:flex items-start mx-auto"
           style={{ maxWidth: "960px" }}
         >
           {/* LEFT — feature name column */}
@@ -249,6 +249,39 @@ export function WhyCapten() {
             ))}
           </div>
         </motion.div>
+
+        {/* Version mobile — liste empilée (hauteurs auto, zéro chevauchement) */}
+        <div className="lg:hidden max-w-md mx-auto">
+          <div style={{ background: "rgb(28,27,24)", borderRadius: "24px", boxShadow: SHADOW }} className="p-6">
+            <div className="flex items-center justify-center mb-5">
+              <img
+                src="/logo.png"
+                alt="CAPTEN"
+                style={{ height: "34px", width: "auto", filter: "brightness(0) invert(1)" }}
+              />
+            </div>
+            <ul className="space-y-3.5">
+              {FEATURES.map((feat) => (
+                <li key={feat} className="flex items-start gap-3">
+                  <span
+                    style={{ background: "#FF5500" }}
+                    className="w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5"
+                  >
+                    <Check style={{ width: "13px", height: "13px", color: "white", strokeWidth: 2.5 }} />
+                  </span>
+                  <span className="text-white text-[15px] font-medium leading-snug">{feat}</span>
+                </li>
+              ))}
+            </ul>
+            <a
+              href="/login?mode=signup"
+              style={{ background: "#EEEEE4", color: "#1C1B18" }}
+              className="mt-6 block text-center rounded-xl py-3.5 text-[17px] font-medium"
+            >
+              Lancer mon crew
+            </a>
+          </div>
+        </div>
       </div>
     </section>
   );
