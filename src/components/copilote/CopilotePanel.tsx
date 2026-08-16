@@ -11,6 +11,7 @@ import { getSupabase } from "@/lib/supabase";
 import { useAuth } from "@/context/AuthContext";
 import { detectAlertsForClub, alertsToRows } from "@/lib/copilote/detectors";
 import CopiloteAssist from "@/components/copilote/CopiloteAssist";
+import { hasProAccess } from "@/lib/plan-access";
 
 interface Alert {
   id: string;
@@ -50,7 +51,7 @@ export default function CopilotePanel({
   onCount?: (n: number) => void;
 } = {}) {
   const { club, isMock } = useAuth();
-  const isPro = (club?.stripe_plan || "").toUpperCase() === "CAPTEN";
+  const isPro = hasProAccess(club);
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [loading, setLoading] = useState(true);
 

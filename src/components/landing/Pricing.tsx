@@ -8,22 +8,22 @@ const SHADOW =
   "rgba(37,38,29,0.15) 0px 0.84px 0.84px -0.47px, rgba(37,38,29,0.15) 0px 1.99px 1.99px -0.94px, rgba(37,38,29,0.14) 0px 3.63px 3.63px -1.41px, rgba(37,38,29,0.14) 0px 6.04px 6.04px -1.88px, rgba(37,38,29,0.13) 0px 9.75px 9.75px -2.34px, rgba(37,38,29,0.12) 0px 15.96px 15.96px -2.81px, rgba(37,38,29,0.1) 0px 27.48px 27.48px -3.28px, rgba(37,38,29,0.05) 0px 50px 50px -3.75px";
 
 const FREE: { label: string; ok: boolean }[] = [
-  { label: "1 session par mois", ok: true },
-  { label: "Jusqu'à 20 membres", ok: true },
-  { label: "Lien d'inscription unique", ok: true },
-  { label: "Tableau de bord basique", ok: true },
-  { label: "Check-in GPS", ok: false },
-  { label: "WhatsApp automatisé", ok: false },
-  { label: "Les Spots du Crew", ok: false },
+  { label: "Runs & membres illimités", ok: true },
+  { label: "Check-in par QR Code", ok: true },
+  { label: "Fiches ICE & décharges", ok: true },
+  { label: "Messages WhatsApp (templates)", ok: true },
+  { label: "Check-in GPS automatique", ok: false },
+  { label: "Visuels & Copilote IA", ok: false },
+  { label: "Export registre PDF", ok: false },
 ];
 
 const PRO = [
-  "Membres & sessions illimités",
-  "Check-in GPS natif",
-  "WhatsApp automatisé (200 msg/mois)",
-  "Fiches ICE",
-  "Registre légal horodaté (PDF/CSV)",
-  "Les Spots du Crew illimités",
+  "Tout le gratuit, sans limite",
+  "Check-in GPS automatique",
+  "Visuels du Crew (stories & affiches)",
+  "Copilote IA",
+  "Export du registre (PDF/CSV)",
+  "Stats avancées & Spots VIP",
   "Support prioritaire",
 ];
 
@@ -196,11 +196,11 @@ export function Pricing() {
           className="max-w-[860px] mx-auto mt-5 rounded-2xl border border-[#EBEBEB] bg-[#FAFAF8] px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-3"
         >
           <p className="text-[#6B6A6A]" style={{ fontSize: "14px", fontWeight: 500 }}>
-            Le paywall se déclenche au <strong className="text-[#1C1B18]">21ème membre</strong> ou à la <strong className="text-[#1C1B18]">première activation GPS</strong> — tu découvres la valeur avant de payer.
+            <strong className="text-[#1C1B18]">14 jours de Captain Pro offerts</strong> à la création de ton crew — GPS, Visuels et Copilote inclus, sans carte bancaire. Ensuite le gratuit reste 100% fonctionnel.
           </p>
           <div className="flex gap-2 shrink-0">
-            <span className="bg-[#EEEEE4] text-[#6B6A6A] px-2.5 py-1 rounded-lg text-xs font-bold">21e membre</span>
-            <span className="bg-[#EEEEE4] text-[#6B6A6A] px-2.5 py-1 rounded-lg text-xs font-bold">GPS activé</span>
+            <span className="bg-[#EEEEE4] text-[#6B6A6A] px-2.5 py-1 rounded-lg text-xs font-bold">14 jours offerts</span>
+            <span className="bg-[#EEEEE4] text-[#6B6A6A] px-2.5 py-1 rounded-lg text-xs font-bold">Sans CB</span>
           </div>
         </motion.div>
 

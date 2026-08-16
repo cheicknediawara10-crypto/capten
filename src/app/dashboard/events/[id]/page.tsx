@@ -13,6 +13,7 @@ import Link from "next/link";
 import { formatDateShort } from "@/lib/utils/format";
 import dynamic from "next/dynamic";
 import CrewVisualModal from "@/components/visuals/CrewVisualModal";
+import { hasProAccess } from "@/lib/plan-access";
 
 const QRCodeSVG = dynamic(() => import("qrcode.react").then((m) => ({ default: m.QRCodeSVG })), { ssr: false });
 
@@ -189,7 +190,7 @@ export default function EventDetailPage() {
 
   // ── Visuels du Crew ──
   const runDate = new Date(event.event_date);
-  const isPro = (club?.stripe_plan || "").toUpperCase() === "CAPTEN";
+  const isPro = hasProAccess(club);
   const crewName = club?.name || "Mon Crew";
   const logoUrl = clubMeta.logo_url || (club?.branding as any)?.logo || null;
   const slugSafe = clubMeta.slug || "crew";

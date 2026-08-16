@@ -11,6 +11,7 @@ import { getSupabase } from '@/lib/supabase';
 import { useAuth } from '@/context/AuthContext';
 import { getAppUrl } from '@/lib/domain';
 import { getCommunityLabels } from '@/lib/community-labels';
+import { hasProAccess, isOnTrial, trialDaysLeft } from '@/lib/plan-access';
 
 interface UpcomingEvent {
   id: string;
@@ -112,8 +113,10 @@ export default function DashboardPage() {
 
   const firstName = (user?.email?.split('@')[0] || 'Captain').replace(/[^a-zA-ZÀ-ÿ]/g, ' ').trim().split(' ')[0];
   const joinUrl = slug ? `${getAppUrl()}/join/${slug}` : null;
-  const isPro = club?.plan === 'pro' || club?.stripe_subscription_status === 'active';
-  const goal = isPro ? 50 : 20;
+  const isPro = hasProAccess(club);
+  const onTrial = isOnTrial(club);
+  const daysLeft = trialDaysLeft(club);
+  const goal = Math.max(50, Math.ceil(Math.max(memberCount, 1) / 50) * 50);
   const maxWeek = Math.max(...weekly, 1);
   const assiduite = memberCount > 0 ? regulars / memberCount : 0;
   const nextRun = upcoming[0] || null;
@@ -148,11 +151,11 @@ export default function DashboardPage() {
             {club?.name || 'Mon crew'}
           </h1>
         </div>
-        <span className={`inline-flex items-center gap-1.5 self-start px-3.5 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider ${
-          isPro ? 'bg-[var(--app-accent-soft)] text-[#FF5C00]' : 'bg-[var(--app-surface-2)] text-[color:var(--app-text-muted)]'
+        <Link href="/plan" className={`inline-flex items-center gap-1.5 self-start px-3.5 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider transition-colors ${
+          isPro ? 'bg-[var(--app-accent-soft)] text-[#FF5C00]' : 'bg-[var(--app-surface-2)] text-[color:var(--app-text-muted)] hover:text-[#FF5C00]'
         }`}>
-          <Flame size={13} /> {isPro ? 'Captain Pro' : 'Découverte'}
-        </span>
+          <Flame size={13} /> {onTrial ? `Essai Pro · J-${daysLeft}` : isPro ? 'Captain Pro' : 'Découverte'}
+        </Link>
       </div>
 
       {/* Onboarding */}
@@ -201,7 +204,7 @@ export default function DashboardPage() {
           <Link href="/dashboard/members">
             <Ring pct={memberCount / goal}>
               <span className="text-[40px] font-display italic font-black text-[color:var(--app-text)] leading-none">{loading ? '—' : memberCount}</span>
-              <span className="text-[10px] uppercase tracking-widest text-[color:var(--app-text-muted)] mt-1.5">sur {goal} membres</span>
+              <span className="text-[10px] uppercase tracking-widest text-[color:var(--app-text-muted)] mt-1.5">membres actifs</span>
             </Ring>
           </Link>
           <div className="hidden sm:block w-px self-stretch bg-[color:var(--app-border)]" />
@@ -209,7 +212,7 @@ export default function DashboardPage() {
             {[
               { v: sessionCount, l: 'Runs', href: '/dashboard/events' },
               { v: checkinCount, l: 'Check-ins', href: '/dashboard/stats' },
-              { v: isPro ? '∞' : Math.max(goal - memberCount, 0), l: isPro ? 'Membres' : 'Places libres', href: '/dashboard/members' },
+              { v: memberCount, l: 'Membres', href: '/dashboard/members' },
             ].map((m) => (
               <Link key={m.l} href={m.href} className="group">
                 <p className="text-[30px] font-display italic font-black text-[color:var(--app-text)] leading-none group-hover:text-[#FF5C00] transition-colors">{loading ? '—' : m.v}</p>

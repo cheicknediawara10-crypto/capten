@@ -8,23 +8,24 @@ La proposition de valeur est binaire : Éliminer 100% de la charge mentale logis
 
 ## 💰 Modèle Économique — Freemium + Hard Paywall
 
-### Plan Découverte : GRATUIT (0€)
-* 1 session par mois
-* 20 membres maximum
-* Pas de check-in GPS
-* Pas d'automatisation WhatsApp
-* Objectif : permettre au fondateur d'atteindre l'Aha Moment
+### Modèle : Freemium + Essai 14 jours (Product-Led Growth)
+**Aucun mur sur la croissance.** Runs & membres **illimités pour tous**. On monétise le **confort, la sécurité et le style**, jamais le nombre.
+**Essai** : à la création du crew, 14 jours de Captain Pro complet débloqués automatiquement (sans carte bancaire), puis bascule auto en gratuit. Gating central : `hasProAccess(club)` = payant OU essai actif (`clubs.created_at` + 14 j).
 
-### Plan Captain Pro : 29€ / mois
-* Membres illimités
-* Sessions illimitées
-* Check-in GPS natif
-* WhatsApp automatisé (200 msg/mois — garde-fou Twilio)
-* Fiches ICE, liste d'attente, anti-fantôme
-* Registre légal horodaté (export PDF/CSV)
-* Capten Spots (cagnotte, partenaires, retrait IBAN)
-* Support prioritaire
-* **Hard Paywall déclenché au Aha Moment** (21ème membre OU tentative GPS)
+### Plan Découverte : GRATUIT (0€) — 100% fonctionnel
+* Runs & membres illimités
+* Check-in par **QR Code**
+* Fiches ICE & décharges signées
+* Messages WhatsApp (templates copier-coller)
+* Spots du Crew (basique)
+
+### Plan Captain Pro : 29,99€ / mois (débloqué aussi pendant l'essai)
+* **Check-in GPS automatique** (le meilleur levier de conversion — loss aversion)
+* Visuels du Crew (stories & affiches Instagram)
+* Copilote IA
+* Export du registre horodaté (PDF/CSV)
+* Stats avancées de présence & rétention
+* Spots VIP (avantages négociés)
 
 ### Capten Spots — Répartition des revenus :
 * 85% → commerce / organisateur
@@ -49,7 +50,7 @@ Pour protéger la marge brute face aux coûts de session Meta, le plan Pro inclu
 
 ### 🟢 SPRINT REQUIS POUR LA PHASE 1 :
 1. **Table `clubs` (Supabase) :** Champs `stripe_subscription_status` (Text), `plan` (enum: 'discovery'|'pro'), `whatsapp_messages_sent_this_month` (Integer).
-2. **Hard Paywall Middleware :** Quand un club en plan Découverte dépasse 20 membres OU tente d'activer le GPS → redirection vers la page de conversion Captain Pro (29€/mois).
+2. **Gating par entitlement (`hasProAccess` dans `src/lib/plan-access.ts`) :** essai 14 j depuis `clubs.created_at`, sinon plan payant. Features Pro gatées dessus (GPS, Visuels, Copilote, export PDF, stats, Spots VIP). AUCUN mur sur runs/membres.
 3. **Côté membre — Authentification sans token :**
    - **Flux d'accès :** Lien public `/membre` (ou depuis la landing) → formulaire `Prénom + Nom + Date de naissance + Code PIN 4 chiffres` → page membre dédiée
    - **Pourquoi pas magic link / SMS :** Rien à sauvegarder. Le membre se souvient juste de son nom, sa DDN, et son PIN. Zéro friction, zéro app.

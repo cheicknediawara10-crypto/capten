@@ -1453,7 +1453,8 @@ export default function MessagesPage() {
     return hasSpot || hasPartner;
   }, [selectedTemplate]);
 
-  const isLocked = club?.stripe_plan === 'GRATUIT';
+  // Messages (templates copier-coller) = GRATUIT : hook quotidien, zéro coût Twilio.
+  const isLocked = false;
 
   return (
     <div className="bg-[var(--app-surface)] text-[color:var(--app-text)] border border-[color:var(--app-border)] rounded-[24px] overflow-hidden shadow-sm relative p-6 sm:p-10 animate-fade-in select-none">

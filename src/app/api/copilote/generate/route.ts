@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { generateCopiloteMessage, type CopiloteIntent } from "@/lib/ai/copilote";
 import { fetchCrewContext } from "@/lib/copilote/context";
+import { hasProAccess } from "@/lib/plan-access";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 30;
@@ -28,12 +29,12 @@ export async function POST(req: NextRequest) {
   // 2. Club + gating (réservé au plan Capten)
   const { data: club } = await admin
     .from("clubs")
-    .select("id, whatsapp_display_name, name, stripe_plan")
+    .select("id, whatsapp_display_name, name, stripe_plan, stripe_subscription_status, plan, created_at")
     .or(`id.eq.${user.id},owner_id.eq.${user.id}`)
     .limit(1)
     .maybeSingle();
   if (!club) return Response.json({ error: "no_club" }, { status: 404 });
-  if (String((club as any).stripe_plan || "").toUpperCase() !== "CAPTEN") {
+  if (!hasProAccess(club as any)) {
     return Response.json({ error: "locked" }, { status: 403 });
   }
   const clubId = (club as any).id as string;

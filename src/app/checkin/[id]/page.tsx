@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { MapPin, QrCode, Loader2, CheckCircle2, XCircle, Wifi } from "lucide-react";
 import { getSupabase } from "@/lib/supabase";
+import { hasProAccess } from "@/lib/plan-access";
 import { isWithinRadius } from "@/lib/utils/geo";
 import { checkAndAwardBadges } from "@/lib/utils/badges";
 import { BadgeUnlockAnimation } from "@/components/badges/BadgeUnlockAnimation";
@@ -35,6 +36,7 @@ export default function CheckinPage() {
   const [errorMsg, setErrorMsg] = useState("");
   const [userId, setUserId] = useState<string | null>(null);
   const [newBadge, setNewBadge] = useState<{ slug: string; name: string } | null>(null);
+  const [gpsEnabled, setGpsEnabled] = useState(true); // GPS = feature Pro (+ essai) du club
 
   useEffect(() => {
     async function init() {
@@ -48,6 +50,14 @@ export default function CheckinPage() {
 
       setEvent(ev);
       setUserId(user?.id || null);
+      if (ev?.club_id) {
+        const { data: club } = await supabase
+          .from("clubs")
+          .select("stripe_plan, stripe_subscription_status, plan, created_at")
+          .eq("id", ev.club_id)
+          .maybeSingle();
+        setGpsEnabled(hasProAccess(club as any));
+      }
       setLoading(false);
     }
     init();
@@ -305,17 +315,23 @@ export default function CheckinPage() {
             </div>
 
             <div className="space-y-3">
-              <button
-                onClick={gpsCheckin}
-                className="w-full flex items-center justify-center gap-3 bg-[#FF5500] text-white h-14 rounded-full text-[13px] font-black uppercase tracking-widest hover:bg-white hover:text-black transition-all active:scale-95"
-              >
-                <MapPin size={18} />
-                Check-in par GPS
-              </button>
+              {gpsEnabled && (
+                <button
+                  onClick={gpsCheckin}
+                  className="w-full flex items-center justify-center gap-3 bg-[#FF5500] text-white h-14 rounded-full text-[13px] font-black uppercase tracking-widest hover:bg-white hover:text-black transition-all active:scale-95"
+                >
+                  <MapPin size={18} />
+                  Check-in par GPS
+                </button>
+              )}
 
               <button
                 onClick={() => setState("scanning")}
-                className="w-full flex items-center justify-center gap-3 border border-white/20 text-white h-14 rounded-full text-[13px] font-black uppercase tracking-widest hover:border-white hover:bg-white/5 transition-all"
+                className={`w-full flex items-center justify-center gap-3 h-14 rounded-full text-[13px] font-black uppercase tracking-widest transition-all active:scale-95 ${
+                  gpsEnabled
+                    ? "border border-white/20 text-white hover:border-white hover:bg-white/5"
+                    : "bg-[#FF5500] text-white hover:bg-white hover:text-black"
+                }`}
               >
                 <QrCode size={18} />
                 Scanner le QR Code
@@ -323,7 +339,9 @@ export default function CheckinPage() {
             </div>
 
             <p className="text-[10px] text-[#555555] mt-6">
-              Le GPS est recommandé. Le QR Code est disponible auprès de l'organisateur.
+              {gpsEnabled
+                ? "Le GPS est recommandé. Le QR Code est disponible auprès de l'organisateur."
+                : "Scanne le QR Code affiché par ton organisateur pour valider ta présence."}
             </p>
           </motion.div>
         )}
