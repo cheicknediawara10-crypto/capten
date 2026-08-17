@@ -3,6 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { detectAlertsForClub, alertsToRows } from "@/lib/copilote/detectors";
 import { isOnTrial, trialDaysLeft } from "@/lib/plan-access";
 import { sendTrialEndingEmail } from "@/lib/copilote/trial-email";
+import { sendCopiloteBriefEmail } from "@/lib/copilote/brief-email";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -25,9 +26,13 @@ export async function GET(req: NextRequest) {
 
   const { data: clubs } = await admin
     .from("clubs")
-    .select("id, owner_id, created_at, stripe_plan, stripe_subscription_status, plan, whatsapp_display_name, name");
+    .select("id, owner_id, created_at, stripe_plan, stripe_subscription_status, plan, whatsapp_display_name, name, branding");
   let alerts = 0;
   let emails = 0;
+  let briefs = 0;
+  const nowIso = new Date().toISOString();
+  const today = nowIso.slice(0, 10);
+  const isMonday = new Date().getDay() === 1;
 
   for (const c of (clubs || []) as any[]) {
     // ── (1) Détection des alertes ──
@@ -78,7 +83,51 @@ export async function GET(req: NextRequest) {
     } catch (e) {
       console.error("trial-email club error", c.id, e);
     }
+
+    // ── (3) Brief email (quotidien / hebdo), 1× par jour, si ≥1 alerte ──
+    try {
+      const freq = (c.branding?.copilot_email_freq as string) || "hebdo"; // défaut : hebdo (anti-spam)
+      const shouldSend = freq === "quotidien" || (freq === "hebdo" && isMonday);
+      if (shouldSend) {
+        const { data: topAlerts } = await admin
+          .from("copilot_alerts")
+          .select("title, message, cta_label, cta_href")
+          .eq("club_id", c.id)
+          .eq("status", "new")
+          .or(`expires_at.is.null,expires_at.gt.${nowIso}`)
+          .order("priority", { ascending: true })
+          .order("created_at", { ascending: false })
+          .limit(3);
+        if (topAlerts && (topAlerts as any[]).length > 0) {
+          const { data: marker } = await admin
+            .from("copilot_alerts")
+            .upsert(
+              {
+                club_id: c.id,
+                category: "admin",
+                priority: 3,
+                title: "Brief envoyé",
+                message: "brief-email",
+                dedup_key: `copilot_brief_${c.id}_${today}`,
+                status: "done",
+              } as any,
+              { onConflict: "club_id,dedup_key", ignoreDuplicates: true }
+            )
+            .select("id");
+          if (marker && (marker as any[]).length > 0) {
+            const { data: userRes } = await admin.auth.admin.getUserById(c.owner_id || c.id);
+            const email = userRes?.user?.email;
+            if (email) {
+              const crewName = c.whatsapp_display_name || c.name || "ton crew";
+              if (await sendCopiloteBriefEmail(email, crewName, topAlerts as any, freq === "quotidien" ? "quotidien" : "hebdo")) briefs += 1;
+            }
+          }
+        }
+      }
+    } catch (e) {
+      console.error("brief-email club error", c.id, e);
+    }
   }
 
-  return Response.json({ ok: true, clubs: clubs?.length || 0, alerts, emails });
+  return Response.json({ ok: true, clubs: clubs?.length || 0, alerts, emails, briefs });
 }
