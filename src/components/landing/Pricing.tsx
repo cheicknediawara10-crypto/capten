@@ -14,7 +14,7 @@ const FREE: { label: string; ok: boolean }[] = [
   { label: "Messages WhatsApp (templates)", ok: true },
   { label: "Check-in GPS automatique", ok: false },
   { label: "Visuels & Copilote IA", ok: false },
-  { label: "Export registre PDF", ok: false },
+  { label: "Export registre (CSV)", ok: false },
 ];
 
 const PRO = [
@@ -22,7 +22,7 @@ const PRO = [
   "Check-in GPS automatique",
   "Visuels du Crew (stories & affiches)",
   "Copilote IA",
-  "Export du registre (PDF/CSV)",
+  "Export du registre horodaté (CSV)",
   "Stats avancées & Spots VIP",
   "Support prioritaire",
 ];

@@ -224,6 +224,34 @@ export default function EventDetailPage() {
     setEvent((e) => (e ? { ...e, [field]: true } : e));
   };
 
+  // Export du registre horodaté (CSV) — preuve légale de présence.
+  const exportRegistreCSV = () => {
+    const header = ["Prénom", "Nom", "Téléphone", "Date", "Heure", "Méthode", "Présence validée"];
+    const lines = [header, ...checkins.map((c) => {
+      const d = new Date(c.checked_in_at);
+      const meth = c.method === "qr_code" ? "QR Code" : c.method === "manual" ? "Manuel" : "GPS";
+      return [
+        c.membre_profiles?.first_name || "",
+        c.membre_profiles?.last_name || "",
+        c.membre_profiles?.phone || "",
+        d.toLocaleDateString("fr-FR"),
+        d.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" }),
+        meth,
+        c.is_valid ? "Oui" : "Non",
+      ];
+    })];
+    const csv = lines.map((r) => r.map((f) => `"${String(f).replace(/"/g, '""')}"`).join(";")).join("\n");
+    const blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `registre-${(event.title || "run").replace(/\s+/g, "-").toLowerCase()}-${isoDay}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="pb-20 space-y-6">
       {/* Header */}
@@ -280,6 +308,17 @@ export default function EventDetailPage() {
               }`}
             >
               <Camera size={13} /> Story
+            </button>
+          )}
+          {liveCount >= 1 && (
+            <button
+              onClick={() => (isPro ? exportRegistreCSV() : router.push("/plan"))}
+              title={!isPro ? "Disponible sur le plan Capten" : "Exporter le registre horodaté (CSV)"}
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-[11px] font-black uppercase tracking-widest transition-all border border-[color:var(--app-border)] ${
+                !isPro ? "opacity-40 cursor-not-allowed text-[color:var(--app-text-muted)]" : "text-[color:var(--app-text)] hover:border-[#FF5C00] hover:text-[#FF5C00]"
+              }`}
+            >
+              <Download size={13} /> Registre
             </button>
           )}
           <button

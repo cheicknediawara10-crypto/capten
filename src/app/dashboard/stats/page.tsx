@@ -6,9 +6,11 @@ import {
   LineChart, Line, BarChart, Bar,
   XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
 } from "recharts";
-import { Users, TrendingUp, CheckSquare, Calendar, Loader2 } from "lucide-react";
+import { Users, TrendingUp, CheckSquare, Calendar, Loader2, Lock } from "lucide-react";
+import Link from "next/link";
 import { getSupabase } from "@/lib/supabase";
 import { useAuth } from "@/context/AuthContext";
+import { hasProAccess } from "@/lib/plan-access";
 
 interface MonthData {
   month: string;
@@ -91,6 +93,27 @@ export default function StatsPage() {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <Loader2 className="animate-spin text-[#FF5C00]" size={32} />
+      </div>
+    );
+  }
+
+  if (!hasProAccess(club)) {
+    return (
+      <div className="space-y-6 pb-20">
+        <div>
+          <h1 className="text-[30px] sm:text-[40px] font-display italic font-black uppercase text-[color:var(--app-text)] leading-none tracking-tighter">
+            Statistiques
+          </h1>
+          <p className="text-[13px] text-[color:var(--app-text-muted)] mt-1">L'activité de ton crew en un coup d'œil.</p>
+        </div>
+        <div className="rounded-3xl border border-[color:var(--app-border)] bg-[var(--app-surface)] p-8 sm:p-12 text-center flex flex-col items-center gap-3">
+          <span className="w-12 h-12 rounded-2xl bg-[var(--app-accent-soft)] flex items-center justify-center"><Lock size={22} className="text-[#FF5C00]" /></span>
+          <h2 className="text-[18px] font-black uppercase tracking-tight text-[color:var(--app-text)]">Stats avancées — Captain Pro</h2>
+          <p className="text-[13px] text-[color:var(--app-text-muted)] max-w-sm leading-snug">Présence, assiduité, rétention, tendances sur 6 mois — débloque tes stats pour piloter la croissance de ton crew.</p>
+          <Link href="/plan" className="mt-3 inline-flex items-center gap-2 h-11 px-5 rounded-full bg-[#FF5C00] text-white text-[12px] font-black uppercase tracking-widest hover:bg-[#E04B00] transition-colors">
+            Débloquer
+          </Link>
+        </div>
       </div>
     );
   }

@@ -309,7 +309,7 @@ export default function PlanPage() {
         { t: "Check-in GPS automatique", d: "", included: true },
         { t: "Visuels du Crew (stories & affiches)", d: "", included: true },
         { t: "Copilote IA", d: "", included: true },
-        { t: "Export du registre (PDF/CSV)", d: "", included: true },
+        { t: "Export du registre horodaté (CSV)", d: "", included: true },
         { t: "Stats avancées", d: "", included: true },
         { t: "Spots VIP & avantages négociés", d: "", included: true },
       ],

@@ -7,7 +7,9 @@ import {
   MoreHorizontal, X, Check, ArrowUp, ArrowDown, Gift,
 } from "lucide-react";
 import { getSupabase } from "@/lib/supabase";
+import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
+import { hasProAccess } from "@/lib/plan-access";
 import { SPOT_CATEGORIES, getSpotCategory, type SpotCategorie } from "@/lib/spot-categories";
 
 // ── Types ───────────────────────────────────────────────────────────────────
@@ -49,10 +51,12 @@ function SpotModal({
   initial,
   onSave,
   onClose,
+  isPro,
 }: {
   initial?: CrewSpot;
   onSave: (data: typeof EMPTY_FORM) => Promise<void>;
   onClose: () => void;
+  isPro: boolean;
 }) {
   const [form, setForm] = useState(
     initial
@@ -176,16 +180,27 @@ function SpotModal({
             <label className="text-[10px] font-black uppercase tracking-widest text-[color:var(--app-text-muted)]">
               Avantage pour le crew (optionnel)
             </label>
-            <input
-              type="text"
-              value={form.avantage}
-              onChange={(e) => set("avantage", e.target.value)}
-              placeholder="-10% sur présentation de la page Capten"
-              className="w-full bg-[var(--app-surface-2)] border border-transparent focus:border-[#FF5C00] focus:bg-[var(--app-surface)] rounded-[14px] px-4 py-3 text-[14px] text-[color:var(--app-text)] outline-none transition-all"
-            />
-            <p className="text-[11px] text-[color:var(--app-text-muted)]">
-              Texte libre — c'est toi qui l'as négocié avec le commerçant. Capten affiche juste l'info.
-            </p>
+            {isPro ? (
+              <>
+                <input
+                  type="text"
+                  value={form.avantage}
+                  onChange={(e) => set("avantage", e.target.value)}
+                  placeholder="-10% sur présentation de la page Capten"
+                  className="w-full bg-[var(--app-surface-2)] border border-transparent focus:border-[#FF5C00] focus:bg-[var(--app-surface)] rounded-[14px] px-4 py-3 text-[14px] text-[color:var(--app-text)] outline-none transition-all"
+                />
+                <p className="text-[11px] text-[color:var(--app-text-muted)]">
+                  Texte libre — c'est toi qui l'as négocié avec le commerçant. Capten affiche juste l'info.
+                </p>
+              </>
+            ) : (
+              <Link
+                href="/plan"
+                className="flex items-center gap-2 rounded-[14px] border border-dashed border-[color:var(--app-border)] px-4 py-3 text-[13px] text-[color:var(--app-text-muted)] hover:border-[#FF5C00] hover:text-[#FF5C00] transition-colors"
+              >
+                🔒 Avantages VIP — réservé à Captain Pro. Débloque pour afficher les perks négociés (‑10% café, deals shop…).
+              </Link>
+            )}
           </div>
 
           {err && <p className="text-[12px] text-red-500 font-medium">{err}</p>}
@@ -518,6 +533,7 @@ export default function CrewSpotsPage() {
             initial={modal.editing}
             onSave={handleSave}
             onClose={() => setModal({ open: false })}
+            isPro={hasProAccess(club)}
           />
         )}
       </AnimatePresence>

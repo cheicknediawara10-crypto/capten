@@ -23,7 +23,7 @@ La proposition de valeur est binaire : Éliminer 100% de la charge mentale logis
 * **Check-in GPS automatique** (le meilleur levier de conversion — loss aversion)
 * Visuels du Crew (stories & affiches Instagram)
 * Copilote IA
-* Export du registre horodaté (PDF/CSV)
+* Export du registre horodaté (CSV)
 * Stats avancées de présence & rétention
 * Spots VIP (avantages négociés)
 
