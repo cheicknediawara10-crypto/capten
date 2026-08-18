@@ -91,12 +91,21 @@ export default function ClubSettingsPage() {
 
   async function save() {
     if (!club) return;
-    const clubId = club.id || user?.id;
-    if (!clubId) { alert("Session introuvable, reconnecte-toi."); return; }
     if (!club.name?.trim()) { alert("Donne un nom à ton crew pour générer ton lien d'inscription."); return; }
-    setSaving(true);
+
     const supabase = getSupabase();
-    if (!supabase) { setSaving(false); return; }
+    if (!supabase) { alert("Service indisponible, réessaie."); return; }
+
+    // Résout l'id de façon fiable, même si le contexte client n'est pas encore hydraté :
+    // on retombe sur la session Supabase (source de vérité) avant d'abandonner.
+    let clubId = club.id || user?.id || "";
+    if (!clubId) {
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      clubId = authUser?.id || "";
+    }
+    if (!clubId) { alert("Session introuvable, reconnecte-toi."); return; }
+
+    setSaving(true);
 
     // Génère un slug unique si le crew n'en a pas encore → sans lui, le lien /join est mort.
     let slug = club.slug?.trim() || "";
