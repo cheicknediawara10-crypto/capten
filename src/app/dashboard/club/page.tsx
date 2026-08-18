@@ -17,6 +17,17 @@ interface Club {
   website_url: string | null;
 }
 
+// Génère un slug d'URL propre à partir du nom du crew.
+function slugify(s: string): string {
+  return (s || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 40);
+}
+
 export default function ClubSettingsPage() {
   const { user, club: authClub } = useAuth();
   const [club, setClub] = useState<Club | null>(null);
@@ -81,15 +92,26 @@ export default function ClubSettingsPage() {
     if (!club) return;
     const clubId = club.id || user?.id;
     if (!clubId) { alert("Session introuvable, reconnecte-toi."); return; }
+    if (!club.name?.trim()) { alert("Donne un nom à ton crew pour générer ton lien d'inscription."); return; }
     setSaving(true);
     const supabase = getSupabase();
     if (!supabase) { setSaving(false); return; }
+
+    // Génère un slug unique si le crew n'en a pas encore → sans lui, le lien /join est mort.
+    let slug = club.slug?.trim() || "";
+    if (!slug) {
+      const base = slugify(club.name) || "crew";
+      const { data: taken } = await supabase
+        .from("clubs").select("id").eq("slug", base).neq("id", clubId).maybeSingle();
+      slug = taken ? `${base}-${clubId.slice(0, 4)}` : base;
+    }
 
     // Upsert : crée la ligne du crew si elle n'existe pas encore (crew tout neuf)
     const { error } = await supabase.from("clubs").upsert({
       id: clubId,
       owner_id: clubId,
       name: club.name,
+      slug,
       description: club.description,
       logo_url: club.logo_url,
       city: club.city,
@@ -97,15 +119,18 @@ export default function ClubSettingsPage() {
     }, { onConflict: "id" });
 
     if (error) alert("Erreur : " + error.message);
-    else showSaved();
+    else { update("slug", slug); showSaved(); }
     setSaving(false);
   }
 
   const [saved, setSaved] = useState(false);
   const showSaved = () => { setSaved(true); setTimeout(() => setSaved(false), 2000); };
 
-  const joinLink = typeof window !== "undefined" && club
-    ? `${window.location.origin}/join/${club.slug}`
+  // Aperçu : slug enregistré, sinon dérivé du nom (généré définitivement à l'enregistrement).
+  const previewSlug = club?.slug?.trim() || (club?.name?.trim() ? slugify(club.name) : "");
+  const slugReady = !!club?.slug?.trim();
+  const joinLink = typeof window !== "undefined" && previewSlug
+    ? `${window.location.origin}/join/${previewSlug}`
     : "";
 
   const copyLink = () => {
@@ -159,7 +184,7 @@ export default function ClubSettingsPage() {
             <button
               onClick={() => fileRef.current?.click()}
               disabled={logoUploading}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-full border border-[color:var(--app-border)] text-[11px] font-black uppercase tracking-widest text-[color:var(--app-text-muted)] hover:border-black hover:text-[color:var(--app-text)] transition-all disabled:opacity-50"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-full border border-[color:var(--app-border)] text-[11px] font-black uppercase tracking-widest text-[color:var(--app-text-muted)] hover:border-[#FF5C00] hover:text-[color:var(--app-text)] transition-all disabled:opacity-50"
             >
               {logoUploading ? <Loader2 size={12} className="animate-spin" /> : <Upload size={12} />}
               {logoUploading ? "Envoi…" : "Changer le logo"}
@@ -179,11 +204,12 @@ export default function ClubSettingsPage() {
         <h2 className="text-[11px] font-black uppercase tracking-widest text-[color:var(--app-text-muted)]">Informations</h2>
 
         <div className="space-y-1">
-          <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--app-text-muted)]">Nom du club</label>
+          <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--app-text-muted)]">Nom du crew</label>
           <input
             type="text"
             value={club.name}
             onChange={(e) => update("name", e.target.value)}
+            placeholder="Paris Night Runners"
             className="w-full h-11 px-4 rounded-[12px] border border-[color:var(--app-border)] text-sm font-medium focus:border-[#FF5C00] focus:ring-2 focus:ring-[#FF5C00]/20 outline-none transition-all"
           />
         </div>
@@ -237,21 +263,33 @@ export default function ClubSettingsPage() {
           <Link2 size={12} />
           Lien d'inscription membres
         </h2>
-        <div className="flex items-center gap-2">
-          <p className="flex-1 text-[12px] font-mono text-[color:var(--app-text-muted)] bg-[var(--app-surface-2)] rounded-[12px] px-4 py-2.5 truncate">
-            {joinLink}
+        {joinLink ? (
+          <>
+            <div className="flex items-center gap-2">
+              <p className="flex-1 text-[12px] font-mono text-[color:var(--app-text-muted)] bg-[var(--app-surface-2)] rounded-[12px] px-4 py-2.5 truncate">
+                {joinLink}
+              </p>
+              <button
+                onClick={copyLink}
+                disabled={!slugReady}
+                title={slugReady ? "" : "Enregistre d'abord pour activer le lien"}
+                className="flex items-center gap-1.5 px-4 py-2.5 rounded-[12px] bg-[#FF5C00] text-white text-[11px] font-black uppercase tracking-widest hover:bg-[#E04B00] transition-all shrink-0 disabled:opacity-40"
+              >
+                {copied ? <Check size={12} /> : <Copy size={12} />}
+                {copied ? "Copié" : "Copier"}
+              </button>
+            </div>
+            <p className="text-[10px] text-[color:var(--app-text-muted)] mt-2">
+              {slugReady
+                ? "Partage ce lien pour que les coureurs rejoignent ton crew et remplissent leur fiche."
+                : "Aperçu du lien. Clique sur « Enregistrer » ci-dessous pour l'activer définitivement."}
+            </p>
+          </>
+        ) : (
+          <p className="text-[12px] text-[color:var(--app-text-muted)] leading-relaxed">
+            Donne un nom à ton crew puis enregistre : ton lien d&apos;inscription se génère automatiquement.
           </p>
-          <button
-            onClick={copyLink}
-            className="flex items-center gap-1.5 px-4 py-2.5 rounded-[12px] bg-black text-white text-[11px] font-black uppercase tracking-widest hover:bg-[#FF5C00] transition-all shrink-0"
-          >
-            {copied ? <Check size={12} /> : <Copy size={12} />}
-            {copied ? "Copié" : "Copier"}
-          </button>
-        </div>
-        <p className="text-[10px] text-[color:var(--app-text-muted)] mt-2">
-          Partage ce lien pour que les membres rejoignent ton club et remplissent leur fiche.
-        </p>
+        )}
       </motion.div>
 
       {/* Save */}
