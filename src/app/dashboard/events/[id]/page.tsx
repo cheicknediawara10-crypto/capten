@@ -8,12 +8,12 @@ import {
   Download, Globe, Lock, Trash2, Loader2, Wifi, Megaphone, Camera
 } from "lucide-react";
 import { getSupabase } from "@/lib/supabase";
-import { useAuth } from "@/context/AuthContext";
 import Link from "next/link";
 import { formatDateShort } from "@/lib/utils/format";
 import dynamic from "next/dynamic";
 import CrewVisualModal from "@/components/visuals/CrewVisualModal";
 import { hasProAccess } from "@/lib/plan-access";
+import { getRunDetail, setRunStatus, deleteRun, setRunFlag } from "../actions";
 
 const QRCodeSVG = dynamic(() => import("qrcode.react").then((m) => ({ default: m.QRCodeSVG })), { ssr: false });
 
@@ -66,7 +66,7 @@ interface Checkin {
 export default function EventDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
-  const { club } = useAuth();
+  const [club, setClub] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<Tab>("details");
   const [event, setEvent] = useState<Event | null>(null);
   const [registrations, setRegistrations] = useState<Registration[]>([]);
@@ -75,41 +75,22 @@ export default function EventDetailPage() {
   const [liveCount, setLiveCount] = useState(0);
   const [isPublishing, setIsPublishing] = useState(false);
   const [visualModal, setVisualModal] = useState<null | "affiche" | "story">(null);
-  const [clubMeta, setClubMeta] = useState<{ slug: string | null; logo_url: string | null }>({ slug: null, logo_url: null });
 
   const checkinUrl = typeof window !== "undefined"
     ? `${window.location.origin}/checkin/${id}`
     : `https://capten.run/checkin/${id}`;
 
   const loadEvent = useCallback(async () => {
-    const supabase = getSupabase();
-    if (!supabase) return;
+    // Via server action (session cookies) → borné au crew, fiable sans contexte client.
+    const res = await getRunDetail(id);
+    if ("error" in res) { setLoading(false); return; }
 
-    const { data: ev } = await supabase.from("events").select("*").eq("id", id).single();
-    if (!ev) { setLoading(false); return; }
-
-    const [{ data: regs }, { data: chks }] = await Promise.all([
-      supabase.from("membre_club")
-        .select("id, membre_profiles(first_name, last_name, phone)")
-        .eq("club_id", ev.club_id).eq("is_active", true),
-      supabase.from("membre_checkins")
-        .select("id, checked_in_at, is_valid, method, membre_profiles(first_name, last_name, phone)")
-        .eq("event_id", id).order("checked_in_at", { ascending: false }),
-    ]);
-
-    setEvent(ev);
-    setRegistrations((regs as unknown as Registration[]) || []);
-    setCheckins((chks as unknown as Checkin[]) || []);
-    setLiveCount(((chks as unknown as Checkin[]) || []).filter((c) => c.is_valid).length);
+    setEvent(res.event as Event);
+    setRegistrations((res.registrations as unknown as Registration[]) || []);
+    setCheckins((res.checkins as unknown as Checkin[]) || []);
+    setLiveCount(((res.checkins as unknown as Checkin[]) || []).filter((c) => c.is_valid).length);
+    setClub(res.club);
     setLoading(false);
-
-    // Métadonnées du crew (slug + logo) pour les visuels partageables
-    const { data: cm } = await supabase
-      .from("clubs")
-      .select("slug, logo_url")
-      .eq("id", ev.club_id)
-      .maybeSingle();
-    if (cm) setClubMeta({ slug: cm.slug ?? null, logo_url: cm.logo_url ?? null });
   }, [id]);
 
   useEffect(() => {
@@ -145,21 +126,17 @@ export default function EventDetailPage() {
   async function togglePublish() {
     if (!event) return;
     setIsPublishing(true);
-    const supabase = getSupabase();
-    if (!supabase) { setIsPublishing(false); return; }
-
     const newStatus = event.status === "published" ? "draft" : "published";
-    const { data } = await supabase.from("events").update({ status: newStatus }).eq("id", event.id).select().single();
-    if (data) setEvent(data);
+    const res = await setRunStatus(event.id, newStatus);
+    if (!("error" in res) && res.event) setEvent(res.event as Event);
     setIsPublishing(false);
   }
 
   async function deleteEvent() {
-    if (!confirm("Supprimer cette sortie ? Cette action est irréversible.")) return;
-    const supabase = getSupabase();
-    if (!supabase) return;
-    await supabase.from("events").delete().eq("id", id);
-    router.push("/dashboard/events");
+    if (!confirm("Supprimer ce run ? Cette action est irréversible.")) return;
+    const res = await deleteRun(id);
+    if (!("error" in res)) router.push("/dashboard/events");
+    else alert(res.error);
   }
 
   const TABS: { key: Tab; label: string; icon: React.ReactNode }[] = [
@@ -191,9 +168,9 @@ export default function EventDetailPage() {
   // ── Visuels du Crew ──
   const runDate = new Date(event.event_date);
   const isPro = hasProAccess(club);
-  const crewName = club?.name || "Mon Crew";
-  const logoUrl = clubMeta.logo_url || (club?.branding as any)?.logo || null;
-  const slugSafe = clubMeta.slug || "crew";
+  const crewName = club?.name || club?.whatsapp_display_name || "Mon Crew";
+  const logoUrl = club?.logo_url || (club?.branding as any)?.logo || null;
+  const slugSafe = club?.slug || "crew";
   const mins = runDate.getMinutes();
   const dayTime = `${runDate.toLocaleDateString("fr-FR", { weekday: "long" })} ${runDate.getHours()}H${mins ? String(mins).padStart(2, "0") : ""}`;
   const dateLabel = runDate.toLocaleDateString("fr-FR", { day: "numeric", month: "long" });
@@ -217,10 +194,8 @@ export default function EventDetailPage() {
   };
 
   const markDownloaded = async (which: "affiche" | "story") => {
-    const supabase = getSupabase();
-    if (!supabase) return;
     const field = which === "affiche" ? "affiche_telechargee" : "story_telechargee";
-    await supabase.from("events").update({ [field]: true }).eq("id", event.id);
+    await setRunFlag(event.id, field);
     setEvent((e) => (e ? { ...e, [field]: true } : e));
   };
 

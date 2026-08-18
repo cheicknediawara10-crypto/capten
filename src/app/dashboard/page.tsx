@@ -7,7 +7,7 @@ import {
   Copy, Check, ShieldCheck, Clock, ChevronRight, Rocket, Settings2,
   CheckCircle2, Circle, X, TrendingUp, Flame,
 } from 'lucide-react';
-import { getSupabase } from '@/lib/supabase';
+import { getDashboardData } from './actions';
 import { useAuth } from '@/context/AuthContext';
 import { getAppUrl } from '@/lib/domain';
 import { getCommunityLabels } from '@/lib/community-labels';
@@ -42,7 +42,8 @@ function Ring({ pct, size = 150, stroke = 13, color = '#FF5C00', children }: {
 }
 
 export default function DashboardPage() {
-  const { user, club, isMock } = useAuth();
+  const { user, isMock } = useAuth();
+  const [club, setClub] = useState<any>(null);
   const L = getCommunityLabels(club?.community_type, club?.community_type_custom);
 
   const [loading, setLoading] = useState(true);
@@ -59,57 +60,22 @@ export default function DashboardPage() {
   useEffect(() => { setObDismissed(localStorage.getItem('capten_onboarding_done') === '1'); }, []);
 
   useEffect(() => {
-    async function load() {
-      const supabase = getSupabase();
-      if (!supabase || !club || isMock) { setLoading(false); return; }
-
-      const [
-        { data: membreRows },
-        { data: clubRow },
-        { data: events },
-        { count: sessions },
-      ] = await Promise.all([
-        supabase.from('membre_club').select('membre_id').eq('club_id', club.id).eq('is_active', true),
-        supabase.from('clubs').select('slug').eq('id', club.id).single(),
-        supabase.from('events').select('id, title, event_date, meeting_point_address')
-          .eq('club_id', club.id).eq('status', 'published')
-          .gte('event_date', new Date().toISOString()).order('event_date').limit(3),
-        supabase.from('events').select('*', { count: 'exact', head: true }).eq('club_id', club.id),
-      ]);
-
-      const membreIds = (membreRows || []).map((m: any) => m.membre_id).filter(Boolean);
-      setMemberCount(membreIds.length);
-      setSlug((clubRow as any)?.slug ?? null);
-      setUpcoming((events as UpcomingEvent[]) || []);
-      setSessionCount(sessions || 0);
-
-      if (membreIds.length) {
-        const eightWeeksAgo = new Date(Date.now() - 8 * 7 * 86400000).toISOString();
-        const { data: chk } = await supabase.from('membre_checkins')
-          .select('membre_id, checked_in_at')
-          .in('membre_id', membreIds).eq('is_valid', true)
-          .gte('checked_in_at', eightWeeksAgo);
-
-        const rows = (chk || []) as { membre_id: string; checked_in_at: string }[];
-        setCheckinCount(rows.length);
-
-        const buckets = Array(8).fill(0);
-        const now = Date.now();
-        const recent = new Set<string>();
-        const fourWeeks = now - 4 * 7 * 86400000;
-        for (const r of rows) {
-          const t = new Date(r.checked_in_at).getTime();
-          const wk = Math.floor((now - t) / (7 * 86400000));
-          if (wk >= 0 && wk < 8) buckets[7 - wk]++;
-          if (t >= fourWeeks) recent.add(r.membre_id);
-        }
-        setWeekly(buckets);
-        setRegulars(recent.size);
+    if (isMock) { setLoading(false); return; }
+    (async () => {
+      const res = await getDashboardData();
+      if (!("error" in res)) {
+        setClub(res.club);
+        setMemberCount(res.memberCount);
+        setSlug(res.slug);
+        setUpcoming((res.upcoming as UpcomingEvent[]) || []);
+        setSessionCount(res.sessionCount);
+        setCheckinCount(res.checkinCount);
+        setWeekly(res.weekly);
+        setRegulars(res.regulars);
       }
       setLoading(false);
-    }
-    load();
-  }, [club, isMock]);
+    })();
+  }, [isMock]);
 
   const firstName = (user?.email?.split('@')[0] || 'Captain').replace(/[^a-zA-ZÀ-ÿ]/g, ' ').trim().split(' ')[0];
   const joinUrl = slug ? `${getAppUrl()}/join/${slug}` : null;

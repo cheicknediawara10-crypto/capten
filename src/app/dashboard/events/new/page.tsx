@@ -4,13 +4,11 @@ import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { ArrowLeft, MapPin, Calendar, Clock, Users, Repeat, Save, Send, Loader2 } from "lucide-react";
-import { getSupabase } from "@/lib/supabase";
-import { useAuth } from "@/context/AuthContext";
 import Link from "next/link";
+import { createRun } from "../actions";
 
 export default function NewEventPage() {
   const router = useRouter();
-  const { club } = useAuth();
   const [saving, setSaving] = useState(false);
   const [publishing, setPublishing] = useState(false);
 
@@ -32,70 +30,35 @@ export default function NewEventPage() {
     setForm((prev) => ({ ...prev, [key]: value }));
 
   async function submit(status: "draft" | "published") {
-    if (!club) return;
-    if (status === "published") setPublishing(true);
-    else setSaving(true);
-
-    const supabase = getSupabase();
-    if (!supabase) { setSaving(false); setPublishing(false); return; }
-
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) { setSaving(false); setPublishing(false); return; }
-
     const eventDatetime = form.event_date && form.event_time
       ? new Date(`${form.event_date}T${form.event_time}`).toISOString()
       : null;
 
     if (!eventDatetime && status === "published") {
       alert("Veuillez sélectionner une date et heure.");
-      setPublishing(false);
       return;
     }
 
-    // Géolocalise l'adresse pour le check-in GPS (OpenStreetMap, sans clé).
-    // Silencieux en cas d'échec : le check-in fonctionne alors sans géofence.
-    let lat: number | null = null;
-    let lng: number | null = null;
-    const addr = form.meeting_point_address.trim();
-    if (addr) {
-      try {
-        const res = await fetch(
-          `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(addr)}`,
-          { headers: { "Accept-Language": "fr" } }
-        );
-        const j = await res.json();
-        if (Array.isArray(j) && j[0]) {
-          lat = parseFloat(j[0].lat);
-          lng = parseFloat(j[0].lon);
-        }
-      } catch {
-        /* pas de géofence — check-in en mode présence */
-      }
-    }
+    if (status === "published") setPublishing(true);
+    else setSaving(true);
 
-    const payload = {
-      club_id: club.id,
-      created_by: user.id,
-      title: form.title || "Nouveau run",
+    // Création via server action : auth (cookies) + géocodage + insert côté serveur.
+    const res = await createRun({
+      title: form.title,
       description: form.description || null,
       event_date: eventDatetime || new Date().toISOString(),
       meeting_point_address: form.meeting_point_address || null,
-      meeting_point_lat: lat,
-      meeting_point_lng: lng,
       max_participants: form.max_participants ? parseInt(form.max_participants) : null,
       distance_km: form.distance_km ? parseFloat(form.distance_km) : null,
       is_recurring: form.is_recurring,
       checkin_radius_meters: form.checkin_radius_meters,
       status,
-    };
+    });
 
-    const { data, error } = await supabase.from("events").insert(payload).select().single();
-
-    if (error) {
-      console.error(error);
-      alert("Erreur lors de la création : " + error.message);
+    if ("error" in res) {
+      alert("Erreur lors de la création : " + res.error);
     } else {
-      router.push(`/dashboard/events/${data.id}`);
+      router.push(`/dashboard/events/${res.id}`);
     }
 
     setSaving(false);

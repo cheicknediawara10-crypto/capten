@@ -6,11 +6,10 @@ import {
   MapPin, Plus, Pencil, Trash2, Loader2, ExternalLink,
   MoreHorizontal, X, Check, ArrowUp, ArrowDown, Gift,
 } from "lucide-react";
-import { getSupabase } from "@/lib/supabase";
 import Link from "next/link";
-import { useAuth } from "@/context/AuthContext";
 import { hasProAccess } from "@/lib/plan-access";
 import { SPOT_CATEGORIES, getSpotCategory, type SpotCategorie } from "@/lib/spot-categories";
+import { getMySpots, saveSpot, deleteSpot, reorderSpots } from "./actions";
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
@@ -354,64 +353,41 @@ function SpotCard({
 // ── Page principale ──────────────────────────────────────────────────────────
 
 export default function CrewSpotsPage() {
-  const { club } = useAuth();
+  const [club, setClub] = useState<any>(null);
   const [spots, setSpots] = useState<CrewSpot[]>([]);
   const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState<{ open: boolean; editing?: CrewSpot }>({ open: false });
 
   const load = useCallback(async () => {
-    const supabase = getSupabase();
-    if (!supabase || !club) { setLoading(false); return; }
-    const { data } = await supabase
-      .from("crew_spots")
-      .select("*")
-      .eq("club_id", club.id)
-      .order("ordre")
-      .order("created_at");
-    setSpots((data as CrewSpot[]) || []);
+    const res = await getMySpots();
+    if (!("error" in res)) {
+      setSpots((res.spots as CrewSpot[]) || []);
+      setClub(res.club);
+    }
     setLoading(false);
-  }, [club]);
+  }, []);
 
   useEffect(() => { load(); }, [load]);
 
   async function handleSave(form: typeof EMPTY_FORM) {
-    const supabase = getSupabase();
-    if (!supabase || !club) return;
-
-    if (modal.editing) {
-      await supabase
-        .from("crew_spots")
-        .update({
-          nom: form.nom.trim(),
-          categorie: form.categorie,
-          adresse: form.adresse.trim() || null,
-          lien_maps: form.lien_maps.trim() || null,
-          mot_du_fondateur: form.mot_du_fondateur.trim() || null,
-          avantage: form.avantage.trim() || null,
-        })
-        .eq("id", modal.editing.id);
-    } else {
-      await supabase
-        .from("crew_spots")
-        .insert({
-          club_id: club.id,
-          nom: form.nom.trim(),
-          categorie: form.categorie,
-          adresse: form.adresse.trim() || null,
-          lien_maps: form.lien_maps.trim() || null,
-          mot_du_fondateur: form.mot_du_fondateur.trim() || null,
-          avantage: form.avantage.trim() || null,
-          ordre: spots.length,
-        });
-    }
+    await saveSpot(
+      {
+        nom: form.nom,
+        categorie: form.categorie,
+        adresse: form.adresse,
+        lien_maps: form.lien_maps,
+        mot_du_fondateur: form.mot_du_fondateur,
+        avantage: form.avantage,
+        ordre: spots.length,
+      },
+      modal.editing?.id
+    );
     setModal({ open: false });
     load();
   }
 
   async function handleDelete(id: string) {
-    const supabase = getSupabase();
-    if (!supabase) return;
-    await supabase.from("crew_spots").delete().eq("id", id);
+    await deleteSpot(id);
     setSpots((s) => s.filter((x) => x.id !== id));
   }
 
@@ -424,14 +400,7 @@ export default function CrewSpotsPage() {
     [reordered[index], reordered[target]] = [reordered[target], reordered[index]];
     setSpots(reordered);
 
-    // Persist new ordre for both affected rows
-    const supabase = getSupabase();
-    if (!supabase) return;
-    await Promise.all(
-      reordered.map((s, i) =>
-        supabase.from("crew_spots").update({ ordre: i }).eq("id", s.id)
-      )
-    );
+    await reorderSpots(reordered.map((s) => s.id));
   }
 
   return (

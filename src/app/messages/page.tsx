@@ -6,7 +6,7 @@ import {
   MessageSquare, Zap, Smartphone, CheckCircle2, Clock, X, Check,
   Copy, Search, Sliders, ArrowRight, Share2, Sparkles, HelpCircle, Lock, MapPin,
 } from 'lucide-react';
-import { getSupabase } from '@/lib/supabase';
+import { getMySpots } from '@/app/dashboard/spots/actions';
 import { useAuth } from '@/context/AuthContext';
 import { getCommunityLabels } from '@/lib/community-labels';
 
@@ -1030,15 +1030,10 @@ export default function MessagesPage() {
   // Crew spots (for pre-filling {{spot_*}} in after-run templates)
   const [crewSpots, setCrewSpots] = useState<CrewSpotOption[]>([]);
   useEffect(() => {
-    const supabase = getSupabase();
-    if (!supabase || !club?.id) return;
-    supabase
-      .from("crew_spots")
-      .select("id, nom, adresse, avantage")
-      .eq("club_id", club.id)
-      .order("ordre")
-      .then(({ data }) => setCrewSpots((data as CrewSpotOption[]) || []));
-  }, [club?.id]);
+    getMySpots().then((res) => {
+      if (!("error" in res)) setCrewSpots((res.spots as CrewSpotOption[]) || []);
+    });
+  }, []);
 
   const selectedRun = useMemo(() => {
     return runsList.find(r => r.id === selectedRunId) || null;

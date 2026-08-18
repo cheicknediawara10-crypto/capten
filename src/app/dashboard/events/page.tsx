@@ -4,9 +4,8 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Plus, Calendar, MapPin, Users, ChevronRight, Clock, Filter } from "lucide-react";
-import { getSupabase } from "@/lib/supabase";
-import { useAuth } from "@/context/AuthContext";
 import { formatDate, formatDateShort } from "@/lib/utils/format";
+import { getMyRuns } from "./actions";
 
 type EventStatus = "all" | "published" | "draft" | "completed" | "cancelled";
 
@@ -30,28 +29,17 @@ const STATUS_LABELS: Record<string, { label: string; color: string; bg: string }
 };
 
 export default function EventsPage() {
-  const { club } = useAuth();
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<EventStatus>("all");
 
   useEffect(() => {
-    async function loadEvents() {
-      const supabase = getSupabase();
-      if (!supabase || !club) { setLoading(false); return; }
-
-      const query = supabase
-        .from("events")
-        .select("*")
-        .eq("club_id", club.id)
-        .order("event_date", { ascending: false });
-
-      const { data } = await query;
-      setEvents(data || []);
+    (async () => {
+      const res = await getMyRuns();
+      if (!("error" in res)) setEvents(res.runs as Event[]);
       setLoading(false);
-    }
-    loadEvents();
-  }, [club]);
+    })();
+  }, []);
 
   const filtered = events.filter((e) => {
     if (activeTab === "all") return true;

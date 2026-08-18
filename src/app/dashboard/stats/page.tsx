@@ -8,9 +8,8 @@ import {
 } from "recharts";
 import { Users, TrendingUp, CheckSquare, Calendar, Loader2, Lock } from "lucide-react";
 import Link from "next/link";
-import { getSupabase } from "@/lib/supabase";
-import { useAuth } from "@/context/AuthContext";
 import { hasProAccess } from "@/lib/plan-access";
+import { getMyStats } from "./actions";
 
 interface MonthData {
   month: string;
@@ -19,35 +18,22 @@ interface MonthData {
 }
 
 export default function StatsPage() {
-  const { club } = useAuth();
+  const [club, setClub] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [kpis, setKpis] = useState({ members: 0, events: 0, checkins: 0, avgPerEvent: 0 });
   const [monthlyData, setMonthlyData] = useState<MonthData[]>([]);
 
   useEffect(() => {
-    async function load() {
-      const supabase = getSupabase();
-      if (!supabase || !club) { setLoading(false); return; }
+    (async () => {
+      const res = await getMyStats();
+      if ("error" in res) { setLoading(false); return; }
 
-      const [
-        { count: memberCount },
-        { count: eventCount },
-        { count: checkinCount },
-        { data: eventsData },
-        { data: checkinsData },
-      ] = await Promise.all([
-        supabase.from("membre_club").select("*", { count: "exact", head: true }).eq("club_id", club.id).eq("is_active", true),
-        supabase.from("events").select("*", { count: "exact", head: true }).eq("club_id", club.id),
-        supabase.from("membre_checkins").select("*, events!inner(club_id)", { count: "exact", head: true }).eq("events.club_id", club.id).eq("is_valid", true),
-        supabase.from("events").select("event_date, status").eq("club_id", club.id).order("event_date"),
-        supabase.from("membre_checkins").select("checked_in_at, events!inner(club_id)").eq("events.club_id", club.id).eq("is_valid", true),
-      ]);
-
+      setClub(res.club);
       setKpis({
-        members: memberCount || 0,
-        events: eventCount || 0,
-        checkins: checkinCount || 0,
-        avgPerEvent: eventCount ? Math.round((checkinCount || 0) / eventCount) : 0,
+        members: res.members,
+        events: res.events,
+        checkins: res.checkins,
+        avgPerEvent: res.events ? Math.round(res.checkins / res.events) : 0,
       });
 
       // Build monthly data for last 6 months
@@ -57,15 +43,14 @@ export default function StatsPage() {
         const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
         const label = d.toLocaleDateString("fr-FR", { month: "short" });
         const monthStr = d.toISOString().slice(0, 7);
-        const evs = (eventsData || []).filter((e: any) => e.event_date?.startsWith(monthStr)).length;
-        const chks = (checkinsData || []).filter((c: any) => c.checked_in_at?.startsWith(monthStr)).length;
+        const evs = (res.eventsData || []).filter((e: any) => e.event_date?.startsWith(monthStr)).length;
+        const chks = (res.checkinsData || []).filter((c: any) => c.checked_in_at?.startsWith(monthStr)).length;
         months.push({ month: label, checkins: chks, events: evs });
       }
       setMonthlyData(months);
       setLoading(false);
-    }
-    load();
-  }, [club]);
+    })();
+  }, []);
 
   const KPI_CARDS = [
     { label: "Membres", value: kpis.members, icon: <Users size={18} className="text-[#FF5C00]" /> },
