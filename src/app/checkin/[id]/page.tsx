@@ -282,6 +282,11 @@ function IdentifyForm({ onCancel, onSuccess }: { onCancel: () => void; onSuccess
         <div>
           <label className="block text-[11px] font-bold uppercase tracking-wider text-white/50 mb-1.5">Code PIN</label>
           <input value={pin} onChange={(e) => setPin(e.target.value.replace(/\D/g, "").slice(0, 4))} inputMode="numeric" placeholder="• • • •" className={`${input} text-center tracking-[0.5em] font-bold`} />
+          <div className="text-right mt-2">
+            <a href="/mon-espace/pin-oublie" className="text-[12px] font-semibold text-white/45 hover:text-[#FF5500] transition-colors">
+              J&apos;ai oublié mon PIN
+            </a>
+          </div>
         </div>
       </div>
 
