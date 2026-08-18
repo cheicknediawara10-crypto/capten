@@ -4,9 +4,8 @@ import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, Phone, Shield, FileCheck, ChevronRight, Users, UserPlus, X, Loader2, CheckCircle2, Copy, Link2, Settings } from "lucide-react";
-import { getSupabase } from "@/lib/supabase";
-import { useAuth } from "@/context/AuthContext";
-import { addMemberManually } from "./actions";
+import { addMemberManually, getMyMembers } from "./actions";
+import { getMyClub } from "../club/actions";
 
 interface MembreProfile {
   id: string;
@@ -32,7 +31,6 @@ const fullName = (p: MembreProfile | null) =>
   [p?.first_name, p?.last_name].filter(Boolean).join(" ").trim();
 
 export default function MembersPage() {
-  const { club } = useAuth();
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -42,11 +40,13 @@ export default function MembersPage() {
   const [linkCopied, setLinkCopied] = useState(false);
 
   useEffect(() => {
-    const supabase = getSupabase();
-    if (!supabase || !club) return;
-    supabase.from("clubs").select("slug, name").eq("id", club.id).maybeSingle()
-      .then(({ data }) => setClubMeta(data as { slug: string | null; name: string | null } | null));
-  }, [club]);
+    // Via server action (session cookies) → fiable même si le contexte client n'est pas hydraté.
+    getMyClub().then((res) => {
+      if ("error" in res) return;
+      const c = res.club as { slug: string | null; name: string | null } | null;
+      setClubMeta(c ? { slug: c.slug, name: c.name } : null);
+    });
+  }, []);
 
   const joinLink = clubMeta?.slug && typeof window !== "undefined"
     ? `${window.location.origin}/join/${clubMeta.slug}`
@@ -60,42 +60,11 @@ export default function MembersPage() {
   };
 
   const load = useCallback(async () => {
-      const supabase = getSupabase();
-      if (!supabase || !club) { setLoading(false); return; }
-
-      const { data } = await supabase
-        .from("membre_club")
-        .select("id, membre_id, joined_at, membre_profiles(id, first_name, last_name, phone, email)")
-        .eq("club_id", club.id)
-        .eq("is_active", true)
-        .order("joined_at", { ascending: false });
-
-      if (!data) { setLoading(false); return; }
-
-      const ids = (data as any[]).map((m) => m.membre_id).filter(Boolean);
-      const [{ data: iceData }, { data: waiverData }, { data: checkinData }] = await Promise.all([
-        supabase.from("membre_ice").select("membre_id").in("membre_id", ids),
-        supabase.from("membre_waivers").select("membre_id").eq("club_id", club.id).in("membre_id", ids),
-        supabase.from("membre_checkins").select("membre_id").in("membre_id", ids).eq("is_valid", true),
-      ]);
-
-      const iceSet = new Set((iceData || []).map((i: any) => i.membre_id));
-      const waiverSet = new Set((waiverData || []).map((w: any) => w.membre_id));
-      const checkinCounts: Record<string, number> = {};
-      for (const c of (checkinData || [])) {
-        checkinCounts[c.membre_id] = (checkinCounts[c.membre_id] || 0) + 1;
-      }
-
-      const enriched = (data as any[]).map((m) => ({
-        ...m,
-        _has_ice: iceSet.has(m.membre_id),
-        _has_waiver: waiverSet.has(m.membre_id),
-        _checkins: checkinCounts[m.membre_id] || 0,
-      })) as Member[];
-
-      setMembers(enriched);
+      // Via server action (session cookies) → liste fiable, indépendante du contexte client.
+      const res = await getMyMembers();
+      if (!("error" in res)) setMembers(res.members as Member[]);
       setLoading(false);
-  }, [club]);
+  }, []);
 
   useEffect(() => { load(); }, [load]);
 

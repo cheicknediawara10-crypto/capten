@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { Upload, Save, Loader2, Globe, Copy, Check, Link2, ArrowLeft } from "lucide-react";
 import { getSupabase } from "@/lib/supabase";
-import { useAuth } from "@/context/AuthContext";
+import { getMyClub, saveMyClub } from "./actions";
 
 interface Club {
   id: string;
@@ -30,7 +30,6 @@ function slugify(s: string): string {
 }
 
 export default function ClubSettingsPage() {
-  const { user, club: authClub } = useAuth();
   const [club, setClub] = useState<Club | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -39,35 +38,19 @@ export default function ClubSettingsPage() {
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    async function load() {
-      const supabase = getSupabase();
-      // Id fiable : contexte client, sinon session Supabase (évite un formulaire vide
-      // alors que le crew existe déjà en base quand le contexte n'est pas hydraté).
-      let clubId = authClub?.id || user?.id || "";
-      if (!clubId && supabase) {
-        const { data: { user: authUser } } = await supabase.auth.getUser();
-        clubId = authUser?.id || "";
-      }
+    (async () => {
       const emptyClub: Club = {
-        id: clubId,
-        name: (authClub?.name && !["MON RUN CLUB", "Mon Run Club"].includes(authClub.name)) ? authClub.name : "",
-        slug: (authClub as any)?.slug || "",
-        description: null,
-        logo_url: (authClub?.branding as any)?.logo || null,
-        city: null,
-        sport_type: null,
-        website_url: null,
+        id: "", name: "", slug: "", description: null,
+        logo_url: null, city: null, sport_type: null, website_url: null,
       };
-
-      // On rend toujours un formulaire éditable, même sans ligne clubs encore créée.
-      if (!supabase || !clubId) { setClub(emptyClub); setLoading(false); return; }
-
-      const { data } = await supabase.from("clubs").select("*").eq("id", clubId).maybeSingle();
-      setClub((data as Club) || emptyClub);
+      // L'id + les données viennent de la SESSION (server action, cookies) —
+      // fiable même si le contexte client n'est pas hydraté.
+      const res = await getMyClub();
+      if ("error" in res) { setClub(emptyClub); setLoading(false); return; }
+      setClub((res.club as Club) ?? { ...emptyClub, id: res.id });
       setLoading(false);
-    }
-    load();
-  }, [authClub, user]);
+    })();
+  }, []);
 
   const update = (key: keyof Club, value: string) =>
     setClub((prev) => prev ? { ...prev, [key]: value } : prev);
@@ -99,43 +82,19 @@ export default function ClubSettingsPage() {
     if (!club) return;
     if (!club.name?.trim()) { alert("Donne un nom à ton crew pour générer ton lien d'inscription."); return; }
 
-    const supabase = getSupabase();
-    if (!supabase) { alert("Service indisponible, réessaie."); return; }
-
-    // Résout l'id de façon fiable, même si le contexte client n'est pas encore hydraté :
-    // on retombe sur la session Supabase (source de vérité) avant d'abandonner.
-    let clubId = club.id || user?.id || "";
-    if (!clubId) {
-      const { data: { user: authUser } } = await supabase.auth.getUser();
-      clubId = authUser?.id || "";
-    }
-    if (!clubId) { alert("Session introuvable, reconnecte-toi."); return; }
-
     setSaving(true);
-
-    // Génère un slug unique si le crew n'en a pas encore → sans lui, le lien /join est mort.
-    let slug = club.slug?.trim() || "";
-    if (!slug) {
-      const base = slugify(club.name) || "crew";
-      const { data: taken } = await supabase
-        .from("clubs").select("id").eq("slug", base).neq("id", clubId).maybeSingle();
-      slug = taken ? `${base}-${clubId.slice(0, 4)}` : base;
-    }
-
-    // Upsert : crée la ligne du crew si elle n'existe pas encore (crew tout neuf)
-    const { error } = await supabase.from("clubs").upsert({
-      id: clubId,
-      owner_id: clubId,
+    // Enregistrement via server action : l'auth (cookies) + l'écriture se font
+    // côté serveur → ne dépend plus de la session client.
+    const res = await saveMyClub({
       name: club.name,
-      slug,
       description: club.description,
       logo_url: club.logo_url,
       city: club.city,
       website_url: club.website_url,
-    }, { onConflict: "id" });
+    });
 
-    if (error) alert("Erreur : " + error.message);
-    else { update("slug", slug); showSaved(); }
+    if ("error" in res) alert(res.error);
+    else { update("slug", res.slug); showSaved(); }
     setSaving(false);
   }
 
