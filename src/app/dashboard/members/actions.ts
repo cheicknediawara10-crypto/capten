@@ -9,6 +9,39 @@ function ub(supabase: ReturnType<typeof createAdminClient>, table: string): any 
   return supabase.from(table as Parameters<ReturnType<typeof createAdminClient>["from"]>[0]);
 }
 
+/**
+ * Réinitialise le PIN d'un membre (le fondateur dépanne un coureur qui a oublié).
+ * Le PIN est haché (irréversible) : on ne peut pas le lire, seulement en générer
+ * un nouveau. Retourne le code en clair une seule fois, à communiquer au coureur.
+ * Borné au crew : le membre doit appartenir au crew du fondateur connecté.
+ */
+export async function resetMemberPin(membreId: string): Promise<{ pin: string } | { error: string }> {
+  const club_id = await getAuthenticatedCaptainId();
+  if (!club_id) return { error: "Session expirée. Reconnecte-toi." };
+  if (!membreId) return { error: "Membre introuvable." };
+
+  let supabase: ReturnType<typeof createAdminClient>;
+  try {
+    supabase = createAdminClient();
+  } catch {
+    return { error: "Service indisponible." };
+  }
+
+  const { data: membership } = await ub(supabase, "membre_club")
+    .select("id").eq("membre_id", membreId).eq("club_id", club_id).maybeSingle();
+  if (!membership) return { error: "Ce membre ne fait pas partie de ton crew." };
+
+  const pin = String(Math.floor(1000 + Math.random() * 9000));
+  const { hash, salt } = hashPin(pin);
+
+  const { error } = await ub(supabase, "membre_profiles")
+    .update({ pin_hash: hash, pin_salt: salt })
+    .eq("id", membreId);
+  if (error) return { error: "Erreur lors de la réinitialisation. Réessaie." };
+
+  return { pin };
+}
+
 export interface MemberRow {
   id: string;
   membre_id: string;

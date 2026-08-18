@@ -5,11 +5,11 @@ import { useParams } from "next/navigation";
 import { motion } from "framer-motion";
 import {
   ArrowLeft, Phone, Shield, FileCheck, Calendar, CheckCircle2,
-  Loader2, AlertTriangle, Cake,
+  Loader2, AlertTriangle, Cake, KeyRound, Copy, RotateCcw,
 } from "lucide-react";
 import Link from "next/link";
 import { formatDateShort } from "@/lib/utils/format";
-import { getMemberDetail } from "../actions";
+import { getMemberDetail, resetMemberPin } from "../actions";
 
 interface MembreProfile {
   id: string;
@@ -41,6 +41,18 @@ export default function MemberDetailPage() {
   const [hasWaiver, setHasWaiver] = useState(false);
   const [checkins, setCheckins] = useState<Checkin[]>([]);
   const [loading, setLoading] = useState(true);
+  const [newPin, setNewPin] = useState<string | null>(null);
+  const [resetting, setResetting] = useState(false);
+  const [pinCopied, setPinCopied] = useState(false);
+
+  async function handleResetPin() {
+    if (!confirm("Générer un nouveau code PIN pour ce membre ? L'ancien ne fonctionnera plus.")) return;
+    setResetting(true);
+    const res = await resetMemberPin(id);
+    setResetting(false);
+    if ("error" in res) { alert(res.error); return; }
+    setNewPin(res.pin);
+  }
 
   useEffect(() => {
     async function load() {
@@ -130,6 +142,44 @@ export default function MemberDetailPage() {
             <p className="text-[10px] text-[color:var(--app-text-muted)] uppercase tracking-wider mt-0.5">Membre depuis</p>
           </div>
         </div>
+      </motion.div>
+
+      {/* Code PIN — dépannage : le PIN est haché, on ne peut que le régénérer */}
+      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.04 }}
+        className="bg-[var(--app-surface)] rounded-[24px] border border-[color:var(--app-border)] p-6">
+        <div className="flex items-center justify-between gap-3 flex-wrap">
+          <div className="flex items-center gap-2.5">
+            <span className="w-9 h-9 rounded-xl bg-[var(--app-accent-soft)] flex items-center justify-center shrink-0">
+              <KeyRound size={16} className="text-[#FF5C00]" />
+            </span>
+            <div>
+              <h2 className="text-[13px] font-black uppercase tracking-tight text-[color:var(--app-text)]">Code PIN</h2>
+              <p className="text-[11px] text-[color:var(--app-text-muted)]">Oublié ? Génère-en un nouveau à lui transmettre.</p>
+            </div>
+          </div>
+          {!newPin && (
+            <button onClick={handleResetPin} disabled={resetting}
+              className="flex items-center gap-2 px-4 h-10 rounded-full border border-[color:var(--app-border)] text-[11px] font-black uppercase tracking-widest text-[color:var(--app-text-muted)] hover:border-[#FF5C00] hover:text-[color:var(--app-text)] transition-all disabled:opacity-50">
+              {resetting ? <Loader2 size={13} className="animate-spin" /> : <RotateCcw size={13} />}
+              Réinitialiser
+            </button>
+          )}
+        </div>
+
+        {newPin && (
+          <div className="mt-4 flex items-center justify-between gap-3 bg-[var(--app-surface-2)] border border-[color:var(--app-border)] rounded-[16px] px-5 py-4">
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--app-text-muted)] mb-1">Nouveau code — à communiquer</p>
+              <span className="text-[34px] font-display font-black italic tracking-[0.3em] text-[color:var(--app-text)] leading-none">{newPin}</span>
+            </div>
+            <button
+              onClick={() => { navigator.clipboard?.writeText(newPin); setPinCopied(true); setTimeout(() => setPinCopied(false), 1600); }}
+              className="flex items-center gap-1.5 px-3 h-9 rounded-full border border-[color:var(--app-border)] text-[11px] font-bold uppercase tracking-wider text-[color:var(--app-text-muted)] hover:border-[#FF5C00] hover:text-[color:var(--app-text)] transition-all shrink-0">
+              {pinCopied ? <CheckCircle2 size={13} className="text-[#22C55E]" /> : <Copy size={13} />}
+              {pinCopied ? "Copié" : "Copier"}
+            </button>
+          </div>
+        )}
       </motion.div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
