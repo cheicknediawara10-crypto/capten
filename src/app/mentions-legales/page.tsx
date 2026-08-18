@@ -38,12 +38,12 @@ export default function MentionsLegalesPage() {
           <section className="space-y-4">
             <h2 className="text-xl font-bold uppercase tracking-wide text-black border-b border-black/5 pb-2">1. Éditeur de la plateforme</h2>
             <p>
-              Le site et l'application **CAPTEN** sont édités par la société **CAPTEN SAS**, société par actions simplifiée au capital social de 1 000 €, immatriculée au Registre du Commerce et des Sociétés (RCS) de Paris sous le numéro **999 888 777 RCS Paris**.
+              Le site et l'application CAPTEN sont édités par la société CAPTEN SAS, société par actions simplifiée au capital social de 1 000 €, immatriculée au Registre du Commerce et des Sociétés (RCS) de Paris sous le numéro 999 888 777 RCS Paris.
             </p>
             <p>
               <strong>Siège social :</strong> 10 Rue de la Paix, 75002 Paris, France.<br />
               <strong>Directeur de la publication :</strong> Alexandre Dupont, Président de CAPTEN SAS.<br />
-              <strong>Contact e-mail :</strong> contact@capten.app
+              <strong>Contact e-mail :</strong> info.captenfr@gmail.com
             </p>
           </section>
 

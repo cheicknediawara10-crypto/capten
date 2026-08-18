@@ -41,7 +41,7 @@ export async function GET(request: Request) {
       // Créer un compte Stripe Connect Express pour le club
       const account = await stripe.accounts.create({
         type: 'express',
-        email: club.contact_email || 'contact@capten.app',
+        email: club.contact_email || 'info.captenfr@gmail.com',
         capabilities: {
           transfers: { requested: true },
         },

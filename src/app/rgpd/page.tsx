@@ -38,7 +38,7 @@ export default function RGPDPage() {
           <section className="space-y-4">
             <h2 className="text-xl font-bold uppercase tracking-wide text-black border-b border-black/5 pb-2">1. Nature des données collectées</h2>
             <p>
-              Dans le cadre de l'utilisation de **CAPTEN**, nous collectons les types d'informations suivantes pour assurer la sécurité des sorties de course à pied :
+              Dans le cadre de l'utilisation de CAPTEN, nous collectons les types d'informations suivantes pour assurer la sécurité des runs :
             </p>
             <ul className="list-disc pl-6 space-y-2">
               <li><strong>Données du profil :</strong> Prénom, nom, adresse e-mail et numéro de téléphone portable.</li>
@@ -86,7 +86,7 @@ export default function RGPDPage() {
               <li>Droit de retirer votre consentement pour la collecte de vos fiches de sécurité à tout moment.</li>
             </ul>
             <p>
-              Pour exercer vos droits, vous pouvez contacter le délégué à la protection des données à l'adresse e-mail : **privacy@capten.app**.
+              Pour exercer vos droits, vous pouvez contacter le délégué à la protection des données à l'adresse e-mail : info.captenfr@gmail.com.
             </p>
           </section>
         </div>

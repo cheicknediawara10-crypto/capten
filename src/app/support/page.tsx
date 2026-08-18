@@ -128,12 +128,12 @@ export default function SupportPage() {
               <h3 className="text-[20px] font-display italic font-black uppercase text-[color:var(--app-text)] mt-1">EMAIL DIRECT</h3>
             </div>
             <p className="text-[11px] text-[color:var(--app-text-muted)] leading-relaxed font-medium">
-              Questions admin, factures ou suggestions à <span className="font-mono text-[color:var(--app-text)] font-bold">support@capten.app</span>.
+              Questions admin, factures ou suggestions à <span className="font-mono text-[color:var(--app-text)] font-bold">info.captenfr@gmail.com</span>.
             </p>
           </div>
           <div className="pt-6 mt-4 border-t border-[color:var(--app-border)]">
             <a
-              href="mailto:support@capten.app?subject=Demande%20Capitaine%20Capten"
+              href="mailto:info.captenfr@gmail.com?subject=Demande%20Capitaine%20Capten"
               className="w-full bg-black text-white hover:bg-black/80 py-3 rounded-control text-[10px] font-black uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm font-sans"
             >
               Écrire par email <Mail size={14} />

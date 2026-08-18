@@ -410,7 +410,7 @@ export default function ApercuPage() {
               <div className="w-10 h-10 rounded-2xl flex items-center justify-center mb-4" style={{ background: SURF2, color: TXT }}><Mail size={22} /></div>
               <span className="text-[9px] font-black uppercase tracking-widest" style={{ color: MUT }}>Support formel</span>
               <h3 className="text-[20px] font-display italic font-black uppercase mt-1" style={{ color: TXT }}>Email direct</h3>
-              <p className="text-[11px] mt-3 leading-relaxed" style={{ color: MUT }}>Questions admin, factures ou suggestions à <span style={{ color: TXT }}>support@capten.app</span>.</p>
+              <p className="text-[11px] mt-3 leading-relaxed" style={{ color: MUT }}>Questions admin, factures ou suggestions à <span style={{ color: TXT }}>info.captenfr@gmail.com</span>.</p>
             </div>
             <span className="mt-6 h-11 rounded-xl flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-wider text-white" style={{ background: "#000" }}>Écrire par email <Mail size={14} /></span>
           </div>

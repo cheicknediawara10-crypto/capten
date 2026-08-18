@@ -114,14 +114,14 @@ export default function SettingsPage() {
           setCoaches(JSON.parse(savedCoaches));
         } catch (e) {
           setCoaches([
-            { name: "Moi (Propriétaire)", email: "contact@capten.app", role: "Créateur" },
+            { name: "Moi (Propriétaire)", email: "info.captenfr@gmail.com", role: "Créateur" },
             { name: "Alexandre Dupont", email: "alex@capten.app", role: "Coach Principal" },
             { name: "Julie Martin", email: "julie@capten.app", role: "Meneuse d'Allure" }
           ]);
         }
       } else {
         const defaultCoaches = [
-          { name: "Moi (Propriétaire)", email: "contact@capten.app", role: "Créateur" },
+          { name: "Moi (Propriétaire)", email: "info.captenfr@gmail.com", role: "Créateur" },
           { name: "Alexandre Dupont", email: "alex@capten.app", role: "Coach Principal" },
           { name: "Julie Martin", email: "julie@capten.app", role: "Meneuse d'Allure" }
         ];

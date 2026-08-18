@@ -38,7 +38,7 @@ export default function CGUPage() {
           <section className="space-y-4">
             <h2 className="text-xl font-bold uppercase tracking-wide text-black border-b border-black/5 pb-2">1. Objet des CGU</h2>
             <p>
-              Les présentes Conditions Générales d'Utilisation (ci-après « CGU ») ont pour objet de définir les conditions dans lesquelles la plateforme **CAPTEN** met à la disposition des fondateurs de run clubs (ci-après « Captains ») des outils d'inscription, de décharges juridiques, de pointage GPS et de gestion de cagnottes.
+              Les présentes Conditions Générales d'Utilisation (ci-après « CGU ») ont pour objet de définir les conditions dans lesquelles la plateforme CAPTEN met à la disposition des fondateurs de run clubs (ci-après « Captains ») des outils d'inscription, de décharges juridiques, de pointage GPS et de gestion de cagnottes.
             </p>
             <p>
               Toute utilisation de la plateforme implique l'acceptation sans réserve des présentes conditions par l'utilisateur.
