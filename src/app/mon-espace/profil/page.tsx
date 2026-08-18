@@ -3,7 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import {
   Phone, Shield, Calendar, MapPin, CheckCircle2,
-  FileText, LogOut, ChevronRight, ExternalLink
+  FileText, LogOut, ChevronRight, ExternalLink, ArrowRight, AlertTriangle
 } from "lucide-react";
 import { requireMembreSession } from "@/lib/membre-session";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -123,6 +123,10 @@ export default async function ProfilPage({
   const initials = `${membre.first_name[0] ?? ""}${membre.last_name[0] ?? ""}`.toUpperCase();
   const primaryClub = (clubs[0] as any)?.clubs;
 
+  // Ce qui compte pour le coureur : est-il prêt à courir, et c'est quand le prochain run ?
+  const isReady = waivers.length > 0 && !!ice;
+  const nextRun = upcomingEvents[0] as any | undefined;
+
   const TABS = [
     { key: "profil",    label: "Profil",    icon: CheckCircle2 },
     { key: "ice",       label: "ICE",       icon: Shield },
@@ -167,16 +171,28 @@ export default async function ProfilPage({
             </p>
           )}
 
+          {/* Statut "prêt à courir" — l'info n°1 pour le coureur */}
+          <div
+            className={`mt-4 inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[12px] font-bold ${
+              isReady
+                ? "bg-[#22C55E]/15 text-[#22C55E] border border-[#22C55E]/30"
+                : "bg-[#F59E0B]/15 text-[#F59E0B] border border-[#F59E0B]/30"
+            }`}
+          >
+            {isReady ? <CheckCircle2 className="w-3.5 h-3.5" /> : <Shield className="w-3.5 h-3.5" />}
+            {isReady ? "Prêt à courir" : "Complète ta fiche"}
+          </div>
+
           {/* Stats */}
           <div className="flex gap-8 mt-6">
             <div className="text-center">
               <p className="text-3xl font-extrabold text-[#FF5500] leading-none">{checkinCount}</p>
-              <p className="text-[10px] text-white/40 uppercase tracking-widest mt-1">Check-ins</p>
+              <p className="text-[10px] text-white/40 uppercase tracking-widest mt-1">Run{checkinCount > 1 ? "s" : ""} couru{checkinCount > 1 ? "s" : ""}</p>
             </div>
             <div className="w-px bg-white/10" />
             <div className="text-center">
               <p className="text-3xl font-extrabold text-[#FF5500] leading-none">{clubs.length}</p>
-              <p className="text-[10px] text-white/40 uppercase tracking-widest mt-1">Club{clubs.length > 1 ? "s" : ""}</p>
+              <p className="text-[10px] text-white/40 uppercase tracking-widest mt-1">Crew{clubs.length > 1 ? "s" : ""}</p>
             </div>
             <div className="w-px bg-white/10" />
             <div className="text-center">
@@ -211,29 +227,61 @@ export default async function ProfilPage({
         {/* ── PROFIL ── */}
         {tab === "profil" && (
           <>
+            {/* Prochain run — l'action que le coureur cherche */}
+            {nextRun ? (
+              <Link
+                href={`/checkin/${nextRun.id}`}
+                className="block rounded-2xl overflow-hidden bg-gradient-to-br from-[#FF5500] to-[#E04B00] text-white p-5 active:scale-[0.99] transition-transform shadow-[0_8px_24px_rgba(255,85,0,0.28)]"
+              >
+                <p className="text-[10px] font-bold uppercase tracking-widest text-white/70">Ton prochain run</p>
+                <p className="text-[11px] font-bold uppercase tracking-wider text-white/90 mt-2">
+                  {formatDateShort(nextRun.event_date)}
+                </p>
+                <p className="text-lg font-extrabold leading-tight mt-0.5">{nextRun.title}</p>
+                {nextRun.meeting_point_address && (
+                  <p className="text-xs text-white/80 flex items-center gap-1 mt-1">
+                    <MapPin className="w-3 h-3" />
+                    {nextRun.meeting_point_address}
+                  </p>
+                )}
+                <span className="inline-flex items-center gap-1.5 mt-4 bg-white text-[#FF5500] text-[11px] font-black uppercase tracking-widest px-3.5 py-2 rounded-full">
+                  Voir le run <ArrowRight className="w-3.5 h-3.5" />
+                </span>
+              </Link>
+            ) : (
+              <Link
+                href="/mon-espace/profil?tab=agenda"
+                className="block bg-white rounded-2xl border border-[#E8E8E8] p-6 text-center hover:border-[#D0D0D0] transition-colors"
+              >
+                <Calendar className="w-8 h-8 text-[#E8E8E8] mx-auto mb-2" />
+                <p className="text-sm font-bold text-[#111111]">Aucun run prévu</p>
+                <p className="text-xs text-[#9CA3AF] mt-0.5">Ton crew publiera bientôt le prochain.</p>
+              </Link>
+            )}
+
+            {/* Ta fiche — statut prêt à courir en un coup d'œil */}
             <div className="bg-white rounded-2xl border border-[#E8E8E8] p-5">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-[#9CA3AF] mb-4">
-                Informations
-              </p>
-              <div className="space-y-3">
-                <Row label="Prénom" value={membre.first_name} />
-                <Row label="Nom" value={membre.last_name} />
-                <Row label="Date de naissance" value={new Date(membre.date_of_birth).toLocaleDateString("fr-FR")} />
-                {membre.phone && <Row label="Téléphone" value={membre.phone} />}
-                <Row label="Membre depuis" value={new Date(membre.created_at).toLocaleDateString("fr-FR", { month: "long", year: "numeric" })} />
+              <p className="text-[10px] font-bold uppercase tracking-widest text-[#9CA3AF] mb-3">Ta fiche</p>
+              <div className="space-y-2">
+                <ReadyRow ok={waivers.length > 0} label="Décharge de responsabilité" okText="Signée" koText="À signer avec ton crew" />
+                <Link href="/mon-espace/profil?tab=ice" className="block">
+                  <ReadyRow ok={!!ice} label="Contact d'urgence (ICE)" okText="Renseigné" koText="À compléter" chevron />
+                </Link>
               </div>
             </div>
 
             {clubs.length > 0 && (
               <div className="bg-white rounded-2xl border border-[#E8E8E8] p-5">
                 <p className="text-[10px] font-bold uppercase tracking-widest text-[#9CA3AF] mb-4">
-                  Mes clubs
+                  Mes crews
                 </p>
                 <div className="space-y-3">
                   {clubs.map((mc: any) => (
                     <div key={mc.club_id} className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-xl bg-[#FF5500]/10 flex items-center justify-center text-sm font-bold text-[#FF5500] shrink-0">
-                        {mc.clubs?.name?.[0] ?? "C"}
+                      <div className="w-9 h-9 rounded-xl bg-[#FF5500]/10 flex items-center justify-center text-sm font-bold text-[#FF5500] shrink-0 overflow-hidden">
+                        {mc.clubs?.logo_url
+                          ? <img src={mc.clubs.logo_url} alt="" className="w-full h-full object-cover" />
+                          : (mc.clubs?.name?.[0] ?? "C")}
                       </div>
                       <div>
                         <p className="text-sm font-bold text-[#111111]">{mc.clubs?.name}</p>
@@ -247,6 +295,21 @@ export default async function ProfilPage({
                 </div>
               </div>
             )}
+
+            {/* Infos — replié en bas, secondaire */}
+            <details className="group bg-white rounded-2xl border border-[#E8E8E8] overflow-hidden">
+              <summary className="flex items-center justify-between p-5 cursor-pointer list-none">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-[#9CA3AF]">Mes informations</p>
+                <ChevronRight className="w-4 h-4 text-[#9CA3AF] group-open:rotate-90 transition-transform" />
+              </summary>
+              <div className="px-5 pb-5 space-y-3">
+                <Row label="Prénom" value={membre.first_name} />
+                <Row label="Nom" value={membre.last_name} />
+                <Row label="Date de naissance" value={new Date(membre.date_of_birth).toLocaleDateString("fr-FR")} />
+                {membre.phone && <Row label="Téléphone" value={membre.phone} />}
+                <Row label="Membre depuis" value={new Date(membre.created_at).toLocaleDateString("fr-FR", { month: "long", year: "numeric" })} />
+              </div>
+            </details>
 
             <Link
               href="/mon-espace/pin-oublie"
@@ -312,7 +375,7 @@ export default async function ProfilPage({
             {upcomingEvents.length === 0 ? (
               <div className="text-center py-12 px-5">
                 <Calendar className="w-10 h-10 text-[#E8E8E8] mx-auto mb-3" />
-                <p className="text-sm font-semibold text-[#374151]">Aucune sortie prévue</p>
+                <p className="text-sm font-semibold text-[#374151]">Aucun run prévu</p>
                 <p className="text-xs text-[#9CA3AF] mt-1">Les prochains runs apparaîtront ici.</p>
               </div>
             ) : (
@@ -425,6 +488,23 @@ function Row({ label, value }: { label: string; value: string }) {
     <div className="flex items-start justify-between gap-3">
       <span className="text-xs text-[#9CA3AF] font-medium shrink-0">{label}</span>
       <span className="text-xs font-bold text-[#111111] text-right">{value}</span>
+    </div>
+  );
+}
+
+function ReadyRow({
+  ok, label, okText, koText, chevron,
+}: { ok: boolean; label: string; okText: string; koText: string; chevron?: boolean }) {
+  return (
+    <div className="flex items-center gap-3">
+      <span className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${ok ? "bg-[#DCFCE7]" : "bg-[#FEF3C7]"}`}>
+        {ok ? <CheckCircle2 className="w-4 h-4 text-[#22C55E]" /> : <AlertTriangle className="w-4 h-4 text-[#F59E0B]" />}
+      </span>
+      <div className="flex-1 min-w-0">
+        <p className="text-[13px] font-bold text-[#111111] leading-tight">{label}</p>
+        <p className={`text-[11px] font-semibold ${ok ? "text-[#22C55E]" : "text-[#F59E0B]"}`}>{ok ? okText : koText}</p>
+      </div>
+      {chevron && <ChevronRight className="w-4 h-4 text-[#9CA3AF] shrink-0" />}
     </div>
   );
 }
