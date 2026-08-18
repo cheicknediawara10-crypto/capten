@@ -1,4 +1,5 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { createBrowserClient } from '@supabase/ssr';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
@@ -6,12 +7,23 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 
 // Create lazy Supabase clients
 let _supabase: SupabaseClient | null = null;
+let _browser: SupabaseClient | null = null;
 let _supabaseAdmin: SupabaseClient | null = null;
 
 export function getSupabase(): SupabaseClient | null {
   if (!supabaseUrl || !supabaseAnonKey || supabaseUrl.includes('votre-projet')) {
     return null;
   }
+  // Dans le navigateur : client basé sur les COOKIES (@supabase/ssr) pour partager
+  // la session posée par le login (server action) + le middleware. Le client
+  // localStorage classique ne voit pas ces cookies → auth.getUser() = null.
+  if (typeof window !== 'undefined') {
+    if (!_browser) {
+      _browser = createBrowserClient(supabaseUrl, supabaseAnonKey) as unknown as SupabaseClient;
+    }
+    return _browser;
+  }
+  // Côté serveur (routes API) : client classique.
   if (!_supabase) {
     _supabase = createClient(supabaseUrl, supabaseAnonKey);
   }
