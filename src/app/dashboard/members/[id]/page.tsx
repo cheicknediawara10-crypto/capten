@@ -7,9 +7,9 @@ import {
   ArrowLeft, Phone, Shield, FileCheck, Calendar, CheckCircle2,
   Loader2, AlertTriangle, Cake,
 } from "lucide-react";
-import { getSupabase } from "@/lib/supabase";
 import Link from "next/link";
 import { formatDateShort } from "@/lib/utils/format";
+import { getMemberDetail } from "../actions";
 
 interface MembreProfile {
   id: string;
@@ -44,21 +44,14 @@ export default function MemberDetailPage() {
 
   useEffect(() => {
     async function load() {
-      const supabase = getSupabase();
-      if (!supabase) { setLoading(false); return; }
-
-      const [{ data: prof }, { data: iceData }, { data: waiverData }, { data: checkinsData }] = await Promise.all([
-        supabase.from("membre_profiles").select("*").eq("id", id).single(),
-        supabase.from("membre_ice").select("contact_name, contact_phone, relationship").eq("membre_id", id).single(),
-        supabase.from("membre_waivers").select("id").eq("membre_id", id).limit(1),
-        supabase.from("membre_checkins").select("id, checked_in_at, is_valid, events(title, event_date)")
-          .eq("membre_id", id).order("checked_in_at", { ascending: false }).limit(20),
-      ]);
-
-      setProfile(prof as MembreProfile | null);
-      setIce((iceData as IceContact) || null);
-      setHasWaiver(!!(waiverData && waiverData.length));
-      setCheckins((checkinsData as unknown as Checkin[]) || []);
+      // Via server action (session cookies) → borné au crew, fiable sans contexte client.
+      const res = await getMemberDetail(id);
+      if (!("error" in res)) {
+        setProfile(res.profile as MembreProfile | null);
+        setIce((res.ice as IceContact) || null);
+        setHasWaiver(res.hasWaiver);
+        setCheckins((res.checkins as unknown as Checkin[]) || []);
+      }
       setLoading(false);
     }
     load();

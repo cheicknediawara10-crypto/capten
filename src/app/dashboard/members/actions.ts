@@ -70,6 +70,54 @@ export async function getMyMembers(): Promise<{ members: MemberRow[] } | { error
   return { members };
 }
 
+export interface MemberDetail {
+  profile: {
+    id: string; first_name: string | null; last_name: string | null;
+    phone: string | null; email: string | null; date_of_birth: string | null; created_at: string;
+  } | null;
+  ice: { contact_name: string; contact_phone: string; relationship: string | null } | null;
+  hasWaiver: boolean;
+  checkins: { id: string; checked_in_at: string; is_valid: boolean; events: { title: string; event_date: string } | null }[];
+}
+
+/**
+ * Détail d'un membre, borné au crew du fondateur connecté (on vérifie que le
+ * membre appartient bien au crew avant de renvoyer quoi que ce soit).
+ */
+export async function getMemberDetail(membreId: string): Promise<MemberDetail | { error: string }> {
+  const club_id = await getAuthenticatedCaptainId();
+  if (!club_id) return { error: "unauth" };
+  if (!membreId) return { error: "not_found" };
+
+  let supabase: ReturnType<typeof createAdminClient>;
+  try {
+    supabase = createAdminClient();
+  } catch {
+    return { error: "Service indisponible." };
+  }
+
+  // Le membre doit appartenir à CE crew.
+  const { data: membership } = await ub(supabase, "membre_club")
+    .select("id").eq("membre_id", membreId).eq("club_id", club_id).maybeSingle();
+  if (!membership) return { error: "not_found" };
+
+  const [{ data: prof }, { data: iceData }, { data: waiverData }, { data: checkinsData }] = await Promise.all([
+    ub(supabase, "membre_profiles").select("*").eq("id", membreId).maybeSingle(),
+    ub(supabase, "membre_ice").select("contact_name, contact_phone, relationship").eq("membre_id", membreId).maybeSingle(),
+    ub(supabase, "membre_waivers").select("id").eq("membre_id", membreId).eq("club_id", club_id).limit(1),
+    ub(supabase, "membre_checkins")
+      .select("id, checked_in_at, is_valid, events(title, event_date)")
+      .eq("membre_id", membreId).order("checked_in_at", { ascending: false }).limit(20),
+  ]);
+
+  return {
+    profile: (prof as MemberDetail["profile"]) ?? null,
+    ice: (iceData as MemberDetail["ice"]) ?? null,
+    hasWaiver: !!(waiverData && (waiverData as any[]).length),
+    checkins: (checkinsData as unknown as MemberDetail["checkins"]) ?? [],
+  };
+}
+
 type AddResult =
   | { success: true; membreId: string; pin: string; linkedExisting: boolean }
   | { error: string };
