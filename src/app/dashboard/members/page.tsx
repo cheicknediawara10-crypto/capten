@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
-import { Search, Phone, Shield, FileCheck, ChevronRight, Users } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Search, Phone, Shield, FileCheck, ChevronRight, Users, UserPlus, X, Loader2, CheckCircle2, Copy } from "lucide-react";
 import { getSupabase } from "@/lib/supabase";
 import { useAuth } from "@/context/AuthContext";
+import { addMemberManually } from "./actions";
 
 interface MembreProfile {
   id: string;
@@ -36,9 +37,9 @@ export default function MembersPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<Filter>("all");
+  const [showAdd, setShowAdd] = useState(false);
 
-  useEffect(() => {
-    async function load() {
+  const load = useCallback(async () => {
       const supabase = getSupabase();
       if (!supabase || !club) { setLoading(false); return; }
 
@@ -74,9 +75,9 @@ export default function MembersPage() {
 
       setMembers(enriched);
       setLoading(false);
-    }
-    load();
   }, [club]);
+
+  useEffect(() => { load(); }, [load]);
 
   const filtered = members.filter((m) => {
     const name = fullName(m.membre_profiles).toLowerCase();
@@ -101,13 +102,22 @@ export default function MembersPage() {
   return (
     <div className="space-y-8 pb-20">
       {/* Header */}
-      <div>
-        <h1 className="text-[30px] sm:text-[40px] font-display italic font-black uppercase text-[color:var(--app-text)] leading-none tracking-tighter">
-          Les Membres
-        </h1>
-        <p className="text-[13px] text-[color:var(--app-text-muted)] font-sans mt-1">
-          {members.length} membre{members.length > 1 ? "s" : ""} dans ton crew
-        </p>
+      <div className="flex items-end justify-between gap-4">
+        <div>
+          <h1 className="text-[30px] sm:text-[40px] font-display italic font-black uppercase text-[color:var(--app-text)] leading-none tracking-tighter">
+            Les Membres
+          </h1>
+          <p className="text-[13px] text-[color:var(--app-text-muted)] font-sans mt-1">
+            {members.length} membre{members.length > 1 ? "s" : ""} dans ton crew
+          </p>
+        </div>
+        <button
+          onClick={() => setShowAdd(true)}
+          className="shrink-0 flex items-center gap-2 px-4 sm:px-5 h-11 rounded-full bg-[#FF5C00] text-white text-[11px] font-black uppercase tracking-widest hover:bg-[#E04B00] transition-all active:scale-95"
+        >
+          <UserPlus size={15} />
+          <span className="hidden sm:inline">Ajouter</span>
+        </button>
       </div>
 
       {/* Search + Filters */}
@@ -174,9 +184,18 @@ export default function MembersPage() {
           </p>
           <p className="text-[12px] text-[color:var(--app-text-muted)] max-w-xs">
             {members.length === 0
-              ? "Partage ton lien d'inscription pour que ton crew rejoigne."
+              ? "Partage ton lien d'inscription, ou ajoute un membre à la main."
               : "Essaie un autre filtre ou terme de recherche."}
           </p>
+          {members.length === 0 && (
+            <button
+              onClick={() => setShowAdd(true)}
+              className="mt-2 flex items-center gap-2 px-5 h-11 rounded-full bg-[#FF5C00] text-white text-[11px] font-black uppercase tracking-widest hover:bg-[#E04B00] transition-all active:scale-95"
+            >
+              <UserPlus size={15} />
+              Ajouter un membre
+            </button>
+          )}
         </motion.div>
       ) : (
         <div className={`${card} rounded-2xl overflow-hidden`}>
@@ -229,6 +248,178 @@ export default function MembersPage() {
           </div>
         </div>
       )}
+
+      <AddMemberModal
+        open={showAdd}
+        onClose={() => setShowAdd(false)}
+        onAdded={() => load()}
+      />
     </div>
+  );
+}
+
+// ── Ajout manuel d'un membre ────────────────────────────────────────────────
+
+function AddMemberModal({
+  open, onClose, onAdded,
+}: { open: boolean; onClose: () => void; onAdded: () => void }) {
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [dob, setDob] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [done, setDone] = useState<{ pin: string; name: string; linked: boolean } | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  function reset() {
+    setFirstName(""); setLastName(""); setDob(""); setPhone(""); setEmail("");
+    setError(""); setDone(null); setCopied(false); setSaving(false);
+  }
+
+  function close() { reset(); onClose(); }
+
+  async function submit() {
+    if (!firstName.trim() || !lastName.trim()) {
+      setError("Prénom et nom sont requis."); return;
+    }
+    setError(""); setSaving(true);
+    const res = await addMemberManually({
+      first_name: firstName, last_name: lastName,
+      date_of_birth: dob, phone, email,
+    });
+    setSaving(false);
+    if ("error" in res) { setError(res.error); return; }
+    onAdded();
+    setDone({ pin: res.pin, name: firstName.trim(), linked: res.linkedExisting });
+  }
+
+  const input =
+    "w-full h-11 px-4 rounded-[12px] border border-[color:var(--app-border)] bg-[var(--app-surface-2)] text-sm font-medium text-[color:var(--app-text)] placeholder:text-[color:var(--app-text-muted)] focus:border-[#FF5C00] focus:ring-2 focus:ring-[#FF5C00]/20 outline-none transition-all";
+  const lbl = "text-[10px] font-bold uppercase tracking-widest text-[color:var(--app-text-muted)] block mb-1";
+
+  return (
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+          onClick={close}
+          className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4"
+        >
+          <motion.div
+            initial={{ opacity: 0, y: 24, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 24, scale: 0.98 }}
+            onClick={(e) => e.stopPropagation()}
+            className="w-full sm:max-w-md bg-[var(--app-surface)] border border-[color:var(--app-border)] rounded-t-3xl sm:rounded-3xl p-6 space-y-5 max-h-[92vh] overflow-y-auto"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <span className="w-9 h-9 rounded-xl bg-[var(--app-accent-soft)] flex items-center justify-center">
+                  <UserPlus size={17} className="text-[#FF5C00]" />
+                </span>
+                <h2 className="text-[17px] font-display italic font-black uppercase text-[color:var(--app-text)] leading-none">
+                  {done ? "Membre ajouté" : "Ajouter un membre"}
+                </h2>
+              </div>
+              <button onClick={close} className="w-8 h-8 rounded-full flex items-center justify-center text-[color:var(--app-text-muted)] hover:bg-[var(--app-hover)] transition-colors">
+                <X size={17} />
+              </button>
+            </div>
+
+            {done ? (
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 text-[#22C55E]">
+                  <CheckCircle2 size={18} />
+                  <p className="text-[14px] font-semibold text-[color:var(--app-text)]">
+                    {done.name} fait partie de ton crew.
+                  </p>
+                </div>
+
+                {done.linked ? (
+                  <p className="text-[12px] text-[color:var(--app-text-muted)] leading-relaxed">
+                    Ce membre avait déjà un compte Capten : il garde son code PIN existant pour accéder à son espace.
+                  </p>
+                ) : (
+                  <>
+                    <p className="text-[12px] text-[color:var(--app-text-muted)] leading-relaxed">
+                      Communique ce code PIN provisoire à {done.name} (par WhatsApp). Il accède à son espace avec son nom, sa date de naissance et ce PIN.
+                    </p>
+                    <div className="flex items-center justify-between gap-3 bg-[var(--app-surface-2)] border border-[color:var(--app-border)] rounded-[16px] px-5 py-4">
+                      <span className="text-[34px] font-display font-black italic tracking-[0.3em] text-[color:var(--app-text)] leading-none">
+                        {done.pin}
+                      </span>
+                      <button
+                        onClick={() => { navigator.clipboard?.writeText(done.pin); setCopied(true); setTimeout(() => setCopied(false), 1600); }}
+                        className="flex items-center gap-1.5 px-3 h-9 rounded-full border border-[color:var(--app-border)] text-[11px] font-bold uppercase tracking-wider text-[color:var(--app-text-muted)] hover:border-[#FF5C00] hover:text-[color:var(--app-text)] transition-all"
+                      >
+                        {copied ? <CheckCircle2 size={13} className="text-[#22C55E]" /> : <Copy size={13} />}
+                        {copied ? "Copié" : "Copier"}
+                      </button>
+                    </div>
+                    {!dob && (
+                      <p className="text-[11px] text-[#F59E0B] leading-snug">
+                        Astuce : sans date de naissance, le membre ne pourra pas se connecter seul. Ajoute-la depuis sa fiche si besoin.
+                      </p>
+                    )}
+                  </>
+                )}
+
+                <div className="flex gap-3 pt-1">
+                  <button onClick={reset} className="flex-1 h-11 rounded-full border border-[color:var(--app-border)] text-[11px] font-black uppercase tracking-widest text-[color:var(--app-text-muted)] hover:border-[#FF5C00] hover:text-[color:var(--app-text)] transition-all">
+                    Ajouter un autre
+                  </button>
+                  <button onClick={close} className="flex-1 h-11 rounded-full bg-[#FF5C00] text-white text-[11px] font-black uppercase tracking-widest hover:bg-[#E04B00] transition-all">
+                    Terminé
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className={lbl}>Prénom</label>
+                    <input value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="Ahmed" className={input} autoFocus />
+                  </div>
+                  <div>
+                    <label className={lbl}>Nom</label>
+                    <input value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder="Diallo" className={input} />
+                  </div>
+                </div>
+
+                <div>
+                  <label className={lbl}>Date de naissance (recommandé)</label>
+                  <input type="date" value={dob} onChange={(e) => setDob(e.target.value)} max={new Date().toISOString().split("T")[0]} className={input} />
+                </div>
+
+                <div>
+                  <label className={lbl}>Téléphone (optionnel)</label>
+                  <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="06 12 34 56 78" className={input} />
+                </div>
+
+                <div>
+                  <label className={lbl}>E-mail (optionnel)</label>
+                  <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="ahmed@exemple.fr" className={input} />
+                </div>
+
+                {error && (
+                  <p className="text-[12px] text-[#EF4444] font-medium">{error}</p>
+                )}
+
+                <button
+                  onClick={submit}
+                  disabled={saving}
+                  className="w-full h-12 rounded-full bg-[#FF5C00] text-white text-[12px] font-black uppercase tracking-widest hover:bg-[#E04B00] transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {saving ? <Loader2 size={15} className="animate-spin" /> : <UserPlus size={15} />}
+                  Ajouter au crew
+                </button>
+              </div>
+            )}
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }

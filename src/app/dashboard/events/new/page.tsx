@@ -7,13 +7,6 @@ import { ArrowLeft, MapPin, Calendar, Clock, Users, Repeat, Save, Send, Loader2 
 import { getSupabase } from "@/lib/supabase";
 import { useAuth } from "@/context/AuthContext";
 import Link from "next/link";
-import dynamic from "next/dynamic";
-
-// Dynamically import the map (no SSR — Leaflet requires browser)
-const EventLocationPicker = dynamic(
-  () => import("@/components/dashboard/EventLocationPicker"),
-  { ssr: false, loading: () => <div className="h-64 bg-[var(--app-surface-2)] rounded-[16px] animate-pulse" /> }
-);
 
 export default function NewEventPage() {
   const router = useRouter();
@@ -38,12 +31,6 @@ export default function NewEventPage() {
   const update = (key: string, value: any) =>
     setForm((prev) => ({ ...prev, [key]: value }));
 
-  const handleLocationSelect = (lat: number, lng: number, address: string) => {
-    update("meeting_point_lat", lat);
-    update("meeting_point_lng", lng);
-    update("meeting_point_address", address);
-  };
-
   async function submit(status: "draft" | "published") {
     if (!club) return;
     if (status === "published") setPublishing(true);
@@ -65,15 +52,36 @@ export default function NewEventPage() {
       return;
     }
 
+    // Géolocalise l'adresse pour le check-in GPS (OpenStreetMap, sans clé).
+    // Silencieux en cas d'échec : le check-in fonctionne alors sans géofence.
+    let lat: number | null = null;
+    let lng: number | null = null;
+    const addr = form.meeting_point_address.trim();
+    if (addr) {
+      try {
+        const res = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(addr)}`,
+          { headers: { "Accept-Language": "fr" } }
+        );
+        const j = await res.json();
+        if (Array.isArray(j) && j[0]) {
+          lat = parseFloat(j[0].lat);
+          lng = parseFloat(j[0].lon);
+        }
+      } catch {
+        /* pas de géofence — check-in en mode présence */
+      }
+    }
+
     const payload = {
       club_id: club.id,
       created_by: user.id,
-      title: form.title || "Nouvelle sortie",
+      title: form.title || "Nouveau run",
       description: form.description || null,
       event_date: eventDatetime || new Date().toISOString(),
       meeting_point_address: form.meeting_point_address || null,
-      meeting_point_lat: form.meeting_point_lat,
-      meeting_point_lng: form.meeting_point_lng,
+      meeting_point_lat: lat,
+      meeting_point_lng: lng,
       max_participants: form.max_participants ? parseInt(form.max_participants) : null,
       distance_km: form.distance_km ? parseFloat(form.distance_km) : null,
       is_recurring: form.is_recurring,
@@ -106,7 +114,7 @@ export default function NewEventPage() {
           Retour
         </Link>
         <h1 className="text-[24px] font-display italic font-black uppercase text-[color:var(--app-text)] leading-none">
-          Nouvelle Sortie
+          Nouveau Run
         </h1>
       </div>
 
@@ -123,7 +131,7 @@ export default function NewEventPage() {
 
           <div className="space-y-1">
             <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--app-text-muted)]">
-              Titre de la sortie
+              Titre du run
             </label>
             <input
               type="text"
@@ -212,17 +220,10 @@ export default function NewEventPage() {
             />
           </div>
 
-          <EventLocationPicker
-            onSelect={handleLocationSelect}
-            initialLat={form.meeting_point_lat || 48.8566}
-            initialLng={form.meeting_point_lng || 2.3522}
-          />
-
-          {form.meeting_point_lat && (
-            <p className="text-[11px] text-[#22C55E] font-medium">
-              ✓ Coordonnées: {form.meeting_point_lat.toFixed(5)}, {form.meeting_point_lng?.toFixed(5)}
-            </p>
-          )}
+          <p className="text-[12px] text-[color:var(--app-text-muted)] leading-snug flex items-start gap-1.5">
+            <MapPin size={13} className="text-[#FF5C00] shrink-0 mt-0.5" />
+            L&apos;adresse suffit — Capten géolocalise le point tout seul pour le check-in GPS de tes coureurs.
+          </p>
         </motion.div>
 
         {/* Options */}
@@ -290,7 +291,7 @@ export default function NewEventPage() {
               type="button"
               onClick={() => update("is_recurring", !form.is_recurring)}
               className={`w-10 h-6 rounded-full transition-all relative ${
-                form.is_recurring ? "bg-[#FF5C00]" : "bg-[#E5E7EB]"
+                form.is_recurring ? "bg-[#FF5C00]" : "bg-[var(--app-surface-2)]"
               }`}
             >
               <span
@@ -312,7 +313,7 @@ export default function NewEventPage() {
         <button
           onClick={() => submit("draft")}
           disabled={saving || publishing}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-[color:var(--app-border)] text-[11px] font-black uppercase tracking-widest text-[color:var(--app-text-muted)] hover:border-black hover:text-[color:var(--app-text)] transition-all disabled:opacity-50"
+          className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-[color:var(--app-border)] text-[11px] font-black uppercase tracking-widest text-[color:var(--app-text-muted)] hover:border-[#FF5C00] hover:text-[color:var(--app-text)] transition-all disabled:opacity-50"
         >
           {saving ? <Loader2 size={13} className="animate-spin" /> : <Save size={13} />}
           Brouillon
@@ -320,7 +321,7 @@ export default function NewEventPage() {
         <button
           onClick={() => submit("published")}
           disabled={saving || publishing || !form.title}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#FF5C00] text-white text-[11px] font-black uppercase tracking-widest hover:bg-black transition-all active:scale-95 disabled:opacity-50"
+          className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#FF5C00] text-white text-[11px] font-black uppercase tracking-widest hover:bg-[#E04B00] transition-all active:scale-95 disabled:opacity-50"
         >
           {publishing ? <Loader2 size={13} className="animate-spin" /> : <Send size={13} />}
           Publier
