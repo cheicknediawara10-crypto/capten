@@ -5,11 +5,11 @@ import { useParams } from "next/navigation";
 import { motion } from "framer-motion";
 import {
   ArrowLeft, Phone, Shield, FileCheck, Calendar, CheckCircle2,
-  Loader2, AlertTriangle, Cake, KeyRound, Copy, RotateCcw,
+  Loader2, AlertTriangle, Cake, KeyRound, Copy, RotateCcw, Mail, Save,
 } from "lucide-react";
 import Link from "next/link";
 import { formatDateShort } from "@/lib/utils/format";
-import { getMemberDetail, resetMemberPin } from "../actions";
+import { getMemberDetail, resetMemberPin, updateMemberContact } from "../actions";
 
 interface MembreProfile {
   id: string;
@@ -44,6 +44,10 @@ export default function MemberDetailPage() {
   const [newPin, setNewPin] = useState<string | null>(null);
   const [resetting, setResetting] = useState(false);
   const [pinCopied, setPinCopied] = useState(false);
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [savingContact, setSavingContact] = useState(false);
+  const [contactSaved, setContactSaved] = useState(false);
 
   async function handleResetPin() {
     if (!confirm("Générer un nouveau code PIN pour ce membre ? L'ancien ne fonctionnera plus.")) return;
@@ -54,12 +58,23 @@ export default function MemberDetailPage() {
     setNewPin(res.pin);
   }
 
+  async function handleSaveContact() {
+    setSavingContact(true);
+    const res = await updateMemberContact(id, { email, phone });
+    setSavingContact(false);
+    if ("error" in res) { alert(res.error); return; }
+    setContactSaved(true);
+    setTimeout(() => setContactSaved(false), 2000);
+  }
+
   useEffect(() => {
     async function load() {
       // Via server action (session cookies) → borné au crew, fiable sans contexte client.
       const res = await getMemberDetail(id);
       if (!("error" in res)) {
         setProfile(res.profile as MembreProfile | null);
+        setEmail(res.profile?.email ?? "");
+        setPhone(res.profile?.phone ?? "");
         setIce((res.ice as IceContact) || null);
         setHasWaiver(res.hasWaiver);
         setCheckins((res.checkins as unknown as Checkin[]) || []);
@@ -141,6 +156,37 @@ export default function MemberDetailPage() {
             <p className="text-[13px] font-black text-[color:var(--app-text)] leading-none mt-1">{formatDateShort(profile.created_at)}</p>
             <p className="text-[10px] text-[color:var(--app-text-muted)] uppercase tracking-wider mt-0.5">Membre depuis</p>
           </div>
+        </div>
+      </motion.div>
+
+      {/* Coordonnées — e-mail (sert au reset PIN par lien) + téléphone */}
+      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.03 }}
+        className="bg-[var(--app-surface)] rounded-[24px] border border-[color:var(--app-border)] p-6">
+        <div className="flex items-center gap-2.5 mb-4">
+          <span className="w-9 h-9 rounded-xl bg-[var(--app-accent-soft)] flex items-center justify-center shrink-0">
+            <Mail size={16} className="text-[#FF5C00]" />
+          </span>
+          <div>
+            <h2 className="text-[13px] font-black uppercase tracking-tight text-[color:var(--app-text)]">Coordonnées</h2>
+            <p className="text-[11px] text-[color:var(--app-text-muted)]">L&apos;e-mail permet au coureur de réinitialiser son PIN par lien.</p>
+          </div>
+        </div>
+        <div className="space-y-3">
+          <div>
+            <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--app-text-muted)] block mb-1">E-mail</label>
+            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="coureur@exemple.fr"
+              className="w-full h-11 px-4 rounded-[12px] border border-[color:var(--app-border)] bg-[var(--app-surface-2)] text-sm font-medium text-[color:var(--app-text)] placeholder:text-[color:var(--app-text-muted)] focus:border-[#FF5C00] focus:ring-2 focus:ring-[#FF5C00]/20 outline-none transition-all" />
+          </div>
+          <div>
+            <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--app-text-muted)] block mb-1">Téléphone</label>
+            <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="06 12 34 56 78"
+              className="w-full h-11 px-4 rounded-[12px] border border-[color:var(--app-border)] bg-[var(--app-surface-2)] text-sm font-medium text-[color:var(--app-text)] placeholder:text-[color:var(--app-text-muted)] focus:border-[#FF5C00] focus:ring-2 focus:ring-[#FF5C00]/20 outline-none transition-all" />
+          </div>
+          <button onClick={handleSaveContact} disabled={savingContact}
+            className="flex items-center gap-2 px-5 h-10 rounded-full bg-[#FF5C00] text-white text-[11px] font-black uppercase tracking-widest hover:bg-[#E04B00] transition-all active:scale-95 disabled:opacity-50">
+            {savingContact ? <Loader2 size={13} className="animate-spin" /> : contactSaved ? <CheckCircle2 size={13} /> : <Save size={13} />}
+            {contactSaved ? "Enregistré" : "Enregistrer"}
+          </button>
         </div>
       </motion.div>
 

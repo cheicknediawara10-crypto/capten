@@ -42,6 +42,40 @@ export async function resetMemberPin(membreId: string): Promise<{ pin: string } 
   return { pin };
 }
 
+/**
+ * Met à jour les coordonnées d'un coureur (e-mail / téléphone) depuis sa fiche.
+ * L'e-mail sert notamment à la réinitialisation du PIN par lien. Borné au crew.
+ */
+export async function updateMemberContact(
+  membreId: string,
+  input: { email?: string; phone?: string }
+): Promise<{ ok: true } | { error: string }> {
+  const club_id = await getAuthenticatedCaptainId();
+  if (!club_id) return { error: "Session expirée. Reconnecte-toi." };
+  if (!membreId) return { error: "Membre introuvable." };
+
+  const email = input.email?.trim().toLowerCase() || null;
+  const phone = input.phone?.trim() || null;
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return { error: "Adresse e-mail invalide." };
+
+  let supabase: ReturnType<typeof createAdminClient>;
+  try {
+    supabase = createAdminClient();
+  } catch {
+    return { error: "Service indisponible." };
+  }
+
+  const { data: membership } = await ub(supabase, "membre_club")
+    .select("id").eq("membre_id", membreId).eq("club_id", club_id).maybeSingle();
+  if (!membership) return { error: "Ce membre ne fait pas partie de ton crew." };
+
+  const { error } = await ub(supabase, "membre_profiles")
+    .update({ email, phone }).eq("id", membreId);
+  if (error) return { error: "Erreur lors de l'enregistrement. Réessaie." };
+
+  return { ok: true };
+}
+
 export interface MemberRow {
   id: string;
   membre_id: string;
