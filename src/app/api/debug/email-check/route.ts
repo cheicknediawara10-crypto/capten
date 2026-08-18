@@ -16,7 +16,7 @@ export async function GET(request: Request) {
   }
 
   const hasResendKey = !!process.env.RESEND_API_KEY;
-  const from = process.env.RESEND_FROM ?? "CAPTEN <noreply@capten.io>";
+  const from = process.env.RESEND_FROM ?? "CAPTEN <noreply@capten.app>";
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? process.env.NEXT_PUBLIC_SITE_URL ?? "https://capten.app";
   const base = { hasResendKey, from, appUrl };
 

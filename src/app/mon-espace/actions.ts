@@ -233,7 +233,7 @@ export async function requestPinReset(email: string): Promise<ResetRequestResult
   try {
     const resend = new Resend(process.env.RESEND_API_KEY);
     const { error: sendErr } = await resend.emails.send({
-      from: process.env.RESEND_FROM ?? "CAPTEN <noreply@capten.io>",
+      from: process.env.RESEND_FROM ?? "CAPTEN <noreply@capten.app>",
       to: email.trim(),
       subject: "Réinitialisation de ton code PIN CAPTEN",
       html: `

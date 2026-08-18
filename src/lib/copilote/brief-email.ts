@@ -1,6 +1,6 @@
 import { resend } from "@/lib/resend";
 
-const FROM = "CAPTEN <noreply@capten.io>";
+const FROM = "CAPTEN <noreply@capten.app>";
 const SITE = process.env.NEXT_PUBLIC_SITE_URL || "https://capten.app";
 
 export interface BriefAlert {
