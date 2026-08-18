@@ -202,7 +202,10 @@ export async function requestPinReset(email: string): Promise<ResetRequestResult
     .maybeSingle();
 
   // Always return success — do not reveal whether email exists
-  if (!membreRaw) return { success: true };
+  if (!membreRaw) {
+    console.warn(`[pin-reset] aucun membre avec l'e-mail "${email.trim()}" — aucun envoi.`);
+    return { success: true };
+  }
 
   const membre = membreRaw as { id: string; first_name: string };
 
@@ -219,13 +222,18 @@ export async function requestPinReset(email: string): Promise<ResetRequestResult
     expires_at: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
   });
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://capten.io";
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? process.env.NEXT_PUBLIC_SITE_URL ?? "https://capten.app";
   const resetUrl = `${appUrl}/mon-espace/reset-pin/${token}`;
+
+  if (!process.env.RESEND_API_KEY) {
+    console.error("[pin-reset] RESEND_API_KEY manquante — e-mail non envoyé.");
+    return { success: true };
+  }
 
   try {
     const resend = new Resend(process.env.RESEND_API_KEY);
-    await resend.emails.send({
-      from: "CAPTEN <noreply@capten.io>",
+    const { error: sendErr } = await resend.emails.send({
+      from: process.env.RESEND_FROM ?? "CAPTEN <noreply@capten.io>",
       to: email.trim(),
       subject: "Réinitialisation de ton code PIN CAPTEN",
       html: `
@@ -253,8 +261,9 @@ export async function requestPinReset(email: string): Promise<ResetRequestResult
         </div>
       `,
     });
-  } catch {
-    // Log silently — still return success to user
+    if (sendErr) console.error("[pin-reset] Resend a refusé l'envoi (domaine expéditeur non vérifié ?):", sendErr);
+  } catch (e) {
+    console.error("[pin-reset] Exception à l'envoi de l'e-mail:", e);
   }
 
   return { success: true };
