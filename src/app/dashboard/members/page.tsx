@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, Phone, Shield, FileCheck, ChevronRight, Users, UserPlus, X, Loader2, CheckCircle2, Copy } from "lucide-react";
+import { Search, Phone, Shield, FileCheck, ChevronRight, Users, UserPlus, X, Loader2, CheckCircle2, Copy, Link2, Settings } from "lucide-react";
 import { getSupabase } from "@/lib/supabase";
 import { useAuth } from "@/context/AuthContext";
 import { addMemberManually } from "./actions";
@@ -38,6 +38,26 @@ export default function MembersPage() {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<Filter>("all");
   const [showAdd, setShowAdd] = useState(false);
+  const [clubMeta, setClubMeta] = useState<{ slug: string | null; name: string | null } | null>(null);
+  const [linkCopied, setLinkCopied] = useState(false);
+
+  useEffect(() => {
+    const supabase = getSupabase();
+    if (!supabase || !club) return;
+    supabase.from("clubs").select("slug, name").eq("id", club.id).maybeSingle()
+      .then(({ data }) => setClubMeta(data as { slug: string | null; name: string | null } | null));
+  }, [club]);
+
+  const joinLink = clubMeta?.slug && typeof window !== "undefined"
+    ? `${window.location.origin}/join/${clubMeta.slug}`
+    : "";
+
+  const copyJoinLink = () => {
+    if (!joinLink) return;
+    navigator.clipboard?.writeText(joinLink);
+    setLinkCopied(true);
+    setTimeout(() => setLinkCopied(false), 1800);
+  };
 
   const load = useCallback(async () => {
       const supabase = getSupabase();
@@ -118,6 +138,61 @@ export default function MembersPage() {
           <UserPlus size={15} />
           <span className="hidden sm:inline">Ajouter</span>
         </button>
+      </div>
+
+      {/* Invite — lien d'inscription du crew */}
+      <div className={`${card} rounded-2xl p-5`}>
+        <div className="flex items-center gap-2 mb-3">
+          <span className="w-7 h-7 rounded-lg bg-[var(--app-accent-soft)] flex items-center justify-center shrink-0">
+            <Link2 size={14} className="text-[#FF5C00]" />
+          </span>
+          <h2 className="text-[11px] font-black uppercase tracking-widest text-[color:var(--app-text-muted)]">
+            Inviter des coureurs
+          </h2>
+        </div>
+
+        {joinLink ? (
+          <>
+            <div className="flex items-center gap-2">
+              <p className="flex-1 text-[12px] font-mono text-[color:var(--app-text-muted)] bg-[var(--app-surface-2)] rounded-[12px] px-4 py-2.5 truncate">
+                {joinLink}
+              </p>
+              <button
+                onClick={copyJoinLink}
+                className="flex items-center gap-1.5 px-4 py-2.5 rounded-[12px] bg-[#FF5C00] text-white text-[11px] font-black uppercase tracking-widest hover:bg-[#E04B00] transition-all shrink-0"
+              >
+                {linkCopied ? <CheckCircle2 size={12} /> : <Copy size={12} />}
+                {linkCopied ? "Copié" : "Copier"}
+              </button>
+            </div>
+            <p className="text-[11px] text-[color:var(--app-text-muted)] mt-2">
+              Partage-le (WhatsApp, Insta, QR) : le coureur remplit sa fiche et rejoint ton crew.
+            </p>
+          </>
+        ) : (
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-[12px] text-[color:var(--app-text-muted)] leading-snug">
+              Nomme ton crew pour activer ton lien d&apos;inscription public.
+            </p>
+            <Link
+              href="/dashboard/club"
+              className="shrink-0 flex items-center gap-1.5 px-4 h-9 rounded-full border border-[color:var(--app-border)] text-[10px] font-black uppercase tracking-widest text-[color:var(--app-text-muted)] hover:border-[#FF5C00] hover:text-[color:var(--app-text)] transition-all"
+            >
+              <Settings size={13} /> Configurer
+            </Link>
+          </div>
+        )}
+
+        {joinLink && (
+          <div className="mt-3 pt-3 border-t border-[color:var(--app-border)]">
+            <Link
+              href="/dashboard/club"
+              className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-[color:var(--app-text-muted)] hover:text-[#FF5C00] transition-colors"
+            >
+              <Settings size={12} /> Personnaliser la page d&apos;inscription (nom, logo, ville)
+            </Link>
+          </div>
+        )}
       </div>
 
       {/* Search + Filters */}

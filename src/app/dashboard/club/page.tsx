@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { Upload, Save, Loader2, Globe, Copy, Check, Link2 } from "lucide-react";
+import Link from "next/link";
+import { Upload, Save, Loader2, Globe, Copy, Check, Link2, ArrowLeft } from "lucide-react";
 import { getSupabase } from "@/lib/supabase";
 import { useAuth } from "@/context/AuthContext";
 
@@ -152,6 +153,13 @@ export default function ClubSettingsPage() {
   return (
     <div className="pb-20 space-y-6 max-w-2xl">
       <div>
+        <Link
+          href="/dashboard/members"
+          className="inline-flex items-center gap-2 text-[color:var(--app-text-muted)] hover:text-[color:var(--app-text)] transition-colors text-[13px] font-medium mb-4"
+        >
+          <ArrowLeft size={15} />
+          Membres
+        </Link>
         <h1 className="text-[28px] sm:text-[36px] font-display italic font-black uppercase text-[color:var(--app-text)] leading-none tracking-tighter">
           Mon Crew
         </h1>

@@ -6,7 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { 
   Map, MapPin, Users, Globe, Wallet, Store,
   BarChart3, Sparkles, Ticket, ShieldCheck, 
-  LogOut, Zap, LayoutDashboard, Settings, HelpCircle,
+  LogOut, Zap, LayoutDashboard, HelpCircle,
   MessageSquare, CreditCard, Shield, Plus, History, CloudRain, Wind, Droplets, Activity, Lock, PlayCircle
 } from "lucide-react";
 import { logout } from "@/app/login/actions";
@@ -67,7 +67,6 @@ export default function Sidebar() {
     {
       title: "COMPTE",
       items: [
-        { name: "Mon Crew", icon: <Settings size={18} strokeWidth={1.5} />, href: "/dashboard/club" },
         { name: "Abonnement", icon: <CreditCard size={18} strokeWidth={1.5} />, href: "/plan" },
         { name: "Support & Aide", icon: <HelpCircle size={18} strokeWidth={1.5} />, href: "/support" },
       ]

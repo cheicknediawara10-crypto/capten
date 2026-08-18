@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   Menu, X, LayoutDashboard, Users, Map, BarChart3, MapPin,
-  MessageSquare, ShieldCheck, CreditCard, Settings, LogOut, HelpCircle
+  MessageSquare, ShieldCheck, CreditCard, LogOut, HelpCircle
 } from "lucide-react";
 import { logout } from "@/app/login/actions";
 
@@ -53,7 +53,6 @@ export default function MobileHeader() {
     {
       title: "Compte",
       items: [
-        { name: "Mon Crew", icon: <Settings size={18} strokeWidth={1.5} />, href: "/dashboard/club" },
         { name: "Abonnement", icon: <CreditCard size={18} strokeWidth={1.5} />, href: "/plan" },
         { name: "Support", icon: <HelpCircle size={18} strokeWidth={1.5} />, href: "/support" },
       ]
