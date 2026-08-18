@@ -275,8 +275,14 @@ function IdentifyForm({ onCancel, onSuccess }: { onCancel: () => void; onSuccess
           <input value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="Prénom" autoComplete="given-name" className={input} />
           <input value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder="Nom" autoComplete="family-name" className={input} />
         </div>
-        <input type="date" value={dob} onChange={(e) => setDob(e.target.value)} max={new Date().toISOString().split("T")[0]} className={input} />
-        <input value={pin} onChange={(e) => setPin(e.target.value.replace(/\D/g, "").slice(0, 4))} inputMode="numeric" placeholder="Code PIN (4 chiffres)" className={`${input} text-center tracking-[0.5em] font-bold`} />
+        <div>
+          <label className="block text-[11px] font-bold uppercase tracking-wider text-white/50 mb-1.5">Date de naissance</label>
+          <input type="date" value={dob} onChange={(e) => setDob(e.target.value)} max={new Date().toISOString().split("T")[0]} style={{ colorScheme: "dark" }} className={input} />
+        </div>
+        <div>
+          <label className="block text-[11px] font-bold uppercase tracking-wider text-white/50 mb-1.5">Code PIN</label>
+          <input value={pin} onChange={(e) => setPin(e.target.value.replace(/\D/g, "").slice(0, 4))} inputMode="numeric" placeholder="• • • •" className={`${input} text-center tracking-[0.5em] font-bold`} />
+        </div>
       </div>
 
       {error && <p className="text-[#EF4444] text-[12px] mt-3 text-center">{error}</p>}
