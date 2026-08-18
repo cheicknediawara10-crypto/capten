@@ -68,10 +68,13 @@ export async function saveMyClub(input: {
     slug = taken ? `${base}-${id.slice(0, 4)}` : base;
   }
 
+  const displayName = input.name.trim();
   const { error } = await ub(supabase, "clubs").upsert({
     id,
     owner_id: id,
-    name: input.name.trim(),
+    name: displayName,
+    // Colonne NOT NULL + source du nom d'affichage (lu par l'AuthContext).
+    whatsapp_display_name: displayName,
     slug,
     description: input.description ?? null,
     logo_url: input.logo_url ?? null,

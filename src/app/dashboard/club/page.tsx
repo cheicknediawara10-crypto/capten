@@ -47,7 +47,13 @@ export default function ClubSettingsPage() {
       // fiable même si le contexte client n'est pas hydraté.
       const res = await getMyClub();
       if ("error" in res) { setClub(emptyClub); setLoading(false); return; }
-      setClub((res.club as Club) ?? { ...emptyClub, id: res.id });
+      if (res.club) {
+        const c = res.club as Club & { whatsapp_display_name?: string | null };
+        const defaultName = ["MON RUN CLUB", "Mon Run Club"].includes(c.whatsapp_display_name || "");
+        setClub({ ...c, name: c.name || (defaultName ? "" : (c.whatsapp_display_name || "")) });
+      } else {
+        setClub({ ...emptyClub, id: res.id });
+      }
       setLoading(false);
     })();
   }, []);
