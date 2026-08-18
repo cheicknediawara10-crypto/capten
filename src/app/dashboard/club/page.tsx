@@ -40,7 +40,14 @@ export default function ClubSettingsPage() {
 
   useEffect(() => {
     async function load() {
-      const clubId = authClub?.id || user?.id || "";
+      const supabase = getSupabase();
+      // Id fiable : contexte client, sinon session Supabase (évite un formulaire vide
+      // alors que le crew existe déjà en base quand le contexte n'est pas hydraté).
+      let clubId = authClub?.id || user?.id || "";
+      if (!clubId && supabase) {
+        const { data: { user: authUser } } = await supabase.auth.getUser();
+        clubId = authUser?.id || "";
+      }
       const emptyClub: Club = {
         id: clubId,
         name: (authClub?.name && !["MON RUN CLUB", "Mon Run Club"].includes(authClub.name)) ? authClub.name : "",
@@ -52,7 +59,6 @@ export default function ClubSettingsPage() {
         website_url: null,
       };
 
-      const supabase = getSupabase();
       // On rend toujours un formulaire éditable, même sans ligne clubs encore créée.
       if (!supabase || !clubId) { setClub(emptyClub); setLoading(false); return; }
 
