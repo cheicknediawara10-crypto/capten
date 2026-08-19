@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 const SECRET =
-  process.env.MEMBRE_SESSION_SECRET ?? "capten-membre-dev-secret-change-in-prod";
+  process.env.MEMBRE_SESSION_SECRET ?? process.env.HMAC_SECRET ?? "capten-membre-dev-secret-change-in-prod";
 export const COOKIE_NAME = "capten_membre";
 const MAX_AGE = 60 * 60 * 24 * 30; // 30 days
 
