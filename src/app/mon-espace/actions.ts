@@ -7,6 +7,7 @@ import { rateLimit } from "@/lib/rate-limit";
 import { headers } from "next/headers";
 import { randomBytes } from "crypto";
 import { Resend } from "resend";
+import { getAppUrl } from "@/lib/domain";
 
 // Tables not yet in generated Supabase types. Remove after: supabase gen types typescript > src/lib/supabase/types.ts
 function ub(supabase: ReturnType<typeof createAdminClient>, table: string): any { // any bypasses builder generics for untyped tables
@@ -222,7 +223,7 @@ export async function requestPinReset(email: string): Promise<ResetRequestResult
     expires_at: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
   });
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? process.env.NEXT_PUBLIC_SITE_URL ?? "https://capten.app";
+  const appUrl = getAppUrl();
   const resetUrl = `${appUrl}/mon-espace/reset-pin/${token}`;
 
   if (!process.env.RESEND_API_KEY) {

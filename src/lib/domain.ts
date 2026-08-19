@@ -11,5 +11,9 @@ export function getAppUrl(): string {
     }
     return 'https://capten.app';
   }
-  return process.env.NEXT_PUBLIC_APP_URL || 'https://capten.app';
+  const envUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL;
+  if (envUrl && (envUrl.includes('localhost') || envUrl.includes('127.0.0.1'))) {
+    return envUrl;
+  }
+  return 'https://capten.app';
 }
