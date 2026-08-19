@@ -7,11 +7,9 @@ import {
   Compass, Users, CalendarPlus, Megaphone, Trophy, ShieldAlert, Activity,
   Settings, ArrowRight, Check, X, Loader2, Lock, Sparkles,
 } from "lucide-react";
-import { getSupabase } from "@/lib/supabase";
 import { useAuth } from "@/context/AuthContext";
-import { detectAlertsForClub, alertsToRows } from "@/lib/copilote/detectors";
 import CopiloteAssist from "@/components/copilote/CopiloteAssist";
-import { hasProAccess } from "@/lib/plan-access";
+import { getCopiloteState, resolveCopiloteAlert } from "@/lib/copilote/actions";
 
 interface Alert {
   id: string;
@@ -33,8 +31,6 @@ const CAT: Record<string, { Icon: any; color: string }> = {
   admin: { Icon: Settings, color: "#918D85" },
 };
 
-const THROTTLE_MS = 60 * 60 * 1000; // 1h
-
 const MOCK_ALERTS: Alert[] = [
   { id: "m1", category: "visuels", priority: 3, title: "Affiche à partager", message: "📢 Ton run « Run République » (jeudi) approche. Crée l'affiche pour le partager.", cta_label: "Créer l'affiche", cta_href: "/dashboard/events" },
   { id: "m2", category: "accueil", priority: 2, title: "Nouveaux dans le crew", message: "Léa et Thomas ont rejoint le crew cette semaine. Accueille-les 🖤", cta_label: "Écrire un mot", cta_href: "/messages" },
@@ -50,8 +46,8 @@ export default function CopilotePanel({
   embedded?: boolean;
   onCount?: (n: number) => void;
 } = {}) {
-  const { club, isMock } = useAuth();
-  const isPro = hasProAccess(club);
+  const { isMock } = useAuth();
+  const [isPro, setIsPro] = useState(false);
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -62,61 +58,29 @@ export default function CopilotePanel({
 
   useEffect(() => {
     let cancelled = false;
-    async function run() {
+    (async () => {
       if (preview || isMock) {
+        setIsPro(true);
         setAlerts(MOCK_ALERTS);
         setLoading(false);
         return;
       }
-      const supabase = getSupabase();
-      if (!supabase || !club?.id || !isPro) {
-        setLoading(false);
-        return;
+      // Via server action (cookies) : détection + lecture, bornées au crew.
+      const res = await getCopiloteState();
+      if (cancelled) return;
+      if (!("error" in res)) {
+        setIsPro(res.isPro);
+        setAlerts((res.alerts as Alert[]) || []);
       }
-      // Détection (throttlée à 1×/h pour ne pas rejouer les requêtes à chaque nav)
-      try {
-        const key = `copilot_detect_${club.id}`;
-        const last = Number(localStorage.getItem(key) || 0);
-        if (Date.now() - last > THROTTLE_MS) {
-          const cands = await detectAlertsForClub(supabase, { id: club.id });
-          if (cands.length) {
-            await supabase
-              .from("copilot_alerts")
-              .upsert(alertsToRows(club.id, cands), {
-                onConflict: "club_id,dedup_key",
-                ignoreDuplicates: true,
-              });
-          }
-          localStorage.setItem(key, String(Date.now()));
-        }
-      } catch (e) {
-        console.error("copilot detect", e);
-      }
-      // Lecture des alertes actives
-      const { data } = await supabase
-        .from("copilot_alerts")
-        .select("id, category, priority, title, message, cta_label, cta_href")
-        .eq("club_id", club.id)
-        .eq("status", "new")
-        .or(`expires_at.is.null,expires_at.gt.${new Date().toISOString()}`)
-        .order("priority", { ascending: true })
-        .order("created_at", { ascending: false });
-      if (!cancelled) {
-        setAlerts((data as Alert[]) || []);
-        setLoading(false);
-      }
-    }
-    run();
-    return () => {
-      cancelled = true;
-    };
-  }, [club?.id, isPro, isMock, preview]);
+      setLoading(false);
+    })();
+    return () => { cancelled = true; };
+  }, [isMock, preview]);
 
   async function resolve(id: string, status: "done" | "dismissed") {
     setAlerts((a) => a.filter((x) => x.id !== id));
     if (isMock || id.startsWith("m")) return;
-    const supabase = getSupabase();
-    if (supabase) await supabase.from("copilot_alerts").update({ status }).eq("id", id);
+    await resolveCopiloteAlert(id, status);
   }
 
   const card = "bg-[var(--app-surface)] border border-[color:var(--app-border)] rounded-3xl";

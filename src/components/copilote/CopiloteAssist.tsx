@@ -2,8 +2,7 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import { PenLine, PartyPopper, Hand, MessageCircle, Sparkles, Copy, Check, Loader2, RefreshCw } from "lucide-react";
-import { getSupabase } from "@/lib/supabase";
-import { useAuth } from "@/context/AuthContext";
+import { generateCopilote, getCopiloteUsage } from "@/lib/copilote/actions";
 
 type Intent = "annonce" | "motivation" | "mot" | "situation";
 
@@ -22,7 +21,6 @@ const DEMO: Record<Intent, string> = {
 };
 
 export default function CopiloteAssist({ preview = false }: { preview?: boolean }) {
-  const { club } = useAuth();
   const [intent, setIntent] = useState<Intent>("annonce");
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -37,17 +35,8 @@ export default function CopiloteAssist({ preview = false }: { preview?: boolean 
 
   useEffect(() => {
     if (preview) return;
-    const supabase = getSupabase();
-    if (!supabase || !club?.id) return;
-    const today = new Date().toISOString().slice(0, 10);
-    supabase
-      .from("copilot_ai_usage")
-      .select("count")
-      .eq("club_id", club.id)
-      .eq("day", today)
-      .maybeSingle()
-      .then(({ data }: any) => setUsed(data?.count || 0));
-  }, [club?.id, preview]);
+    getCopiloteUsage().then((u) => { setUsed(u.used); setLimit(u.limit); });
+  }, [preview]);
 
   async function generate() {
     setErr(null);
@@ -61,16 +50,9 @@ export default function CopiloteAssist({ preview = false }: { preview?: boolean 
         setUsed((u) => Math.min(u + 1, limit));
         return;
       }
-      const supabase = getSupabase();
-      const { data: { session } } = (await supabase!.auth.getSession()) as any;
-      const res = await fetch("/api/copilote/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${session?.access_token}` },
-        body: JSON.stringify({ intent, input }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        if (data.error === "limit") { setUsed(data.used); setLimit(data.limit); setErr("Tu as atteint ta limite du jour. Reviens demain 🖤"); }
+      const data = await generateCopilote(intent, input);
+      if ("error" in data) {
+        if (data.error === "limit") { if (data.used != null) setUsed(data.used); if (data.limit != null) setLimit(data.limit); setErr("Tu as atteint ta limite du jour. Reviens demain 🖤"); }
         else if (data.error === "locked") setErr("Réservé au plan Capten.");
         else setErr("Oups, réessaie dans un instant.");
         return;
