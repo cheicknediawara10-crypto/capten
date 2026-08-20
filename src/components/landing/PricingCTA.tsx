@@ -63,7 +63,7 @@ export function PricingCTA() {
               <div className="text-[42px] font-extrabold text-white leading-none">
                 29,99 <span className="text-white/25 text-2xl font-semibold">€/mois</span>
               </div>
-              <div className="text-sm text-white/30 font-medium mt-2">ou 399 € / an — 2 mois offerts</div>
+              <div className="text-sm text-white/30 font-medium mt-2">Sans engagement, résiliable en 1 clic.</div>
             </div>
 
             <Button href="/login?mode=signup" variant="primary" size="lg">

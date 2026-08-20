@@ -65,7 +65,6 @@ export default function CGUPage() {
             </p>
             <ul className="list-disc pl-6 space-y-2">
               <li><strong>Tarif Mensuel :</strong> 29,99€ par mois, sans engagement, résiliable en 1 clic.</li>
-              <li><strong>Tarif Annuel :</strong> 399€ par an, facturé annuellement (équivalant à 2 mois offerts).</li>
             </ul>
             <p>
               Le paiement est géré de manière sécurisée via notre prestataire Stripe. Toutes les taxes applicables seront ajoutées lors de la facturation.
