@@ -469,7 +469,7 @@ export default function PlanPage() {
                           href="/login?mode=signup&upgrade=true"
                           className="w-full text-center py-4 rounded-xl text-[10px] sm:text-[11px] font-black uppercase tracking-[0.2em] transition-all bg-white text-[#E04B00] hover:bg-white/90 block cursor-pointer"
                         >
-                          {billingInterval === 'yearly' ? "ACTIVER LE PLAN ANNUEL" : "ESSAI 21 JOURS GRATUIT — ACCÈS COMPLET"}
+                          {billingInterval === 'yearly' ? "ACTIVER LE PLAN ANNUEL" : "ESSAI 14 JOURS GRATUIT — ACCÈS COMPLET"}
                         </Link>
                         <Link
                           href="/login?mode=signup&free=true"

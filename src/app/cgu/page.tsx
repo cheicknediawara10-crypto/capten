@@ -61,7 +61,7 @@ export default function CGUPage() {
           <section className="space-y-4">
             <h2 className="text-xl font-bold uppercase tracking-wide text-black border-b border-black/5 pb-2">3. Conditions financières &amp; Abonnement</h2>
             <p>
-              CAPTEN propose un essai gratuit de 21 jours, sans carte bancaire requise. À l'issue de cet essai, l'utilisation de la plateforme nécessite la souscription à notre abonnement PRO unique :
+              CAPTEN propose un essai gratuit de 14 jours, sans carte bancaire requise. À l'issue de cet essai, l'utilisation de la plateforme nécessite la souscription à notre abonnement PRO unique :
             </p>
             <ul className="list-disc pl-6 space-y-2">
               <li><strong>Tarif Mensuel :</strong> 29,99€ par mois, sans engagement, résiliable en 1 clic.</li>

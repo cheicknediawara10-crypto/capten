@@ -310,11 +310,8 @@ function LoginForm() {
         return;
       }
 
-      // Unless free plan URL (free=true), trial signup requires Step 2 (Card) for 21-day trial
-      if (!isFreePlanUrl && signupStep === 1) {
-        setSignupStep(2);
-        return;
-      }
+      // Modèle sans carte : l'inscription se fait en une seule étape (essai 14 j
+      // débloqué automatiquement, sans carte bancaire — voir hasProAccess).
 
       // Submission
       setIsLoading(true);
@@ -344,7 +341,7 @@ function LoginForm() {
           
           if (targetPlan === 'trial') {
             const ends = new Date();
-            ends.setDate(ends.getDate() + 21);
+            ends.setDate(ends.getDate() + 14);
             localStorage.setItem('capten_trial_ends_at', ends.toISOString());
           }
           
@@ -452,10 +449,8 @@ function LoginForm() {
             : <Lock size={10} />}
           {mode === "password" 
             ? "Espace Sécurisé" 
-            : mode === "signup" 
-              ? (!isFreePlanUrl
-                  ? (signupStep === 1 ? "Étape 1 sur 2" : "Étape 2 sur 2")
-                  : "Nouveau Capitaine")
+            : mode === "signup"
+              ? "Nouveau Capitaine"
               : "Réinitialisation"}
         </div>
 
@@ -472,10 +467,8 @@ function LoginForm() {
         }}>
           {mode === "password" 
             ? "CONNEXION" 
-            : mode === "signup" 
-              ? (!isFreePlanUrl
-                  ? (signupStep === 1 ? "INSCRIPTION" : "CARTE BANCAIRE")
-                  : "INSCRIPTION")
+            : mode === "signup"
+              ? "INSCRIPTION"
               : "RÉINITIALISATION"}
         </h1>
 
@@ -488,11 +481,7 @@ function LoginForm() {
           {mode === "password"
             ? "Accède à ton tableau de bord et pilote ton crew."
             : mode === "signup"
-              ? (!isFreePlanUrl
-                  ? (signupStep === 1 
-                      ? "Saisis tes informations de compte pour commencer ton essai."
-                      : "Enregistre ta carte pour activer l'essai de 21 jours. Aucun prélèvement aujourd'hui.")
-                  : "Crée ton compte et lance ton crew en 2 minutes.")
+              ? "Crée ton compte et lance ton crew — 14 jours de Pro offerts, sans carte bancaire."
               : "Saisis ton e-mail pour recevoir un lien de réinitialisation."}
         </p>
       </div>
@@ -870,7 +859,7 @@ function LoginForm() {
                 letterSpacing: 0.5,
                 marginBottom: 10,
               }}>
-                ESSAI CAPTEN — 21 JOURS
+                ESSAI CAPTEN — 14 JOURS
               </h4>
               <ul style={{
                 fontSize: 12,
@@ -1079,9 +1068,7 @@ function LoginForm() {
                 {mode === "password" 
                   ? "Se connecter" 
                   : mode === "signup"
-                    ? (assignedVariant === 'B' && !isFreePlanUrl
-                        ? (signupStep === 1 ? "Continuer vers l'étape 2" : "Démarrer l'essai")
-                        : "Créer mon compte")
+                    ? "Créer mon crew"
                     : "Réinitialiser le mot de passe"}
                 <ArrowRight size={16} />
               </>
@@ -1157,7 +1144,7 @@ function LoginForm() {
               letterSpacing: 1,
             }}>
               {mode === "password" 
-                ? "Essai gratuit de 21 jours"
+                ? "Essai gratuit de 14 jours"
                 : "Déjà un compte ?"}
             </span>
             <div style={{ flex: 1, height: 1, background: C.border }} />
