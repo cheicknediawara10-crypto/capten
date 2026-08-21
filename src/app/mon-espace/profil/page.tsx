@@ -427,40 +427,59 @@ export default async function ProfilPage({
                 Les adresses recommandées par ton crew — café d'après-run, shop, kiné. Les avantages sont à présenter sur place.
               </p>
             </div>
-            {spots.map((s) => (
-              <div key={s.id} className="bg-white rounded-2xl border border-[#E8E8E8] p-4">
-                <div className="flex items-start gap-3">
-                  <span className="text-xl shrink-0 mt-0.5">{CAT_EMOJI[s.categorie] ?? "📍"}</span>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-extrabold text-[#111111] leading-tight">{s.nom}</p>
-                    {s.mot_du_fondateur && (
-                      <p className="text-xs text-[#9CA3AF] italic mt-0.5">« {s.mot_du_fondateur} »</p>
-                    )}
-                    {s.adresse && (
-                      <p className="text-xs text-[#9CA3AF] flex items-center gap-1 mt-1">
-                        <MapPin className="w-3 h-3" />
-                        {s.adresse}
-                      </p>
-                    )}
-                    {s.avantage && (
-                      <span className="inline-block mt-2 px-2.5 py-0.5 rounded-full bg-[#FF5500] text-white text-[11px] font-bold">
-                        🎁 {s.avantage}
-                      </span>
+            {spots.map((s) => {
+              const isSponsor = s.avantage?.toLowerCase().includes("sponsor") || s.mot_du_fondateur?.toLowerCase().includes("sponsor");
+              return (
+                <div
+                  key={s.id}
+                  className={`rounded-2xl border p-4 transition-all ${
+                    isSponsor
+                      ? "bg-gradient-to-br from-amber-500/[0.08] via-white to-white border-amber-500/40 shadow-sm"
+                      : "bg-white border-[#E8E8E8]"
+                  }`}
+                >
+                  <div className="flex items-start gap-3">
+                    <span className="text-xl shrink-0 mt-0.5">{CAT_EMOJI[s.categorie] ?? "📍"}</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <p className="text-sm font-extrabold text-[#111111] leading-tight">{s.nom}</p>
+                        {isSponsor && (
+                          <span className="px-2 py-0.5 rounded-full bg-amber-500 text-black text-[9.5px] font-black uppercase tracking-wider">
+                            ⭐ Sponsor Officiel
+                          </span>
+                        )}
+                      </div>
+                      {s.mot_du_fondateur && (
+                        <p className="text-xs text-[#9CA3AF] italic mt-0.5">« {s.mot_du_fondateur} »</p>
+                      )}
+                      {s.adresse && (
+                        <p className="text-xs text-[#9CA3AF] flex items-center gap-1 mt-1">
+                          <MapPin className="w-3 h-3" />
+                          {s.adresse}
+                        </p>
+                      )}
+                      {s.avantage && (
+                        <span className={`inline-block mt-2 px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
+                          isSponsor ? "bg-amber-500 text-black font-black" : "bg-[#FF5500] text-white"
+                        }`}>
+                          {isSponsor ? "⭐" : "🎁"} {s.avantage}
+                        </span>
+                      )}
+                    </div>
+                    {s.lien_maps && (
+                      <a
+                        href={s.lien_maps}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="shrink-0 w-8 h-8 rounded-full bg-[#F5F5F3] flex items-center justify-center text-[#9CA3AF] hover:bg-[#FF5500] hover:text-white transition-colors"
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                      </a>
                     )}
                   </div>
-                  {s.lien_maps && (
-                    <a
-                      href={s.lien_maps}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="shrink-0 w-8 h-8 rounded-full bg-[#F5F5F3] flex items-center justify-center text-[#9CA3AF] hover:bg-[#FF5500] hover:text-white transition-colors"
-                    >
-                      <ExternalLink className="w-4 h-4" />
-                    </a>
-                  )}
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </>
         )}
 
