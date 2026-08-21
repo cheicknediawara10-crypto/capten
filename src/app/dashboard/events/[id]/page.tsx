@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft, Calendar, MapPin, Users, QrCode, CheckSquare, FileText, List,
   Download, Globe, Lock, Trash2, Loader2, Wifi, Megaphone, Camera, MessageCircle,
-  Luggage, Gauge, Coffee
+  Luggage, Gauge, Coffee, Bell
 } from "lucide-react";
 import { getSupabase } from "@/lib/supabase";
 import Link from "next/link";
@@ -16,7 +16,7 @@ import dynamic from "next/dynamic";
 import CrewVisualModal from "@/components/visuals/CrewVisualModal";
 import { hasProAccess } from "@/lib/plan-access";
 import { getAppUrl } from "@/lib/domain";
-import { getRunDetail, setRunStatus, deleteRun, setRunFlag } from "../actions";
+import { getRunDetail, setRunStatus, deleteRun, setRunFlag, sendRunPushNotification } from "../actions";
 
 const QRCodeSVG = dynamic(() => import("qrcode.react").then((m) => ({ default: m.QRCodeSVG })), { ssr: false });
 
@@ -78,6 +78,21 @@ export default function EventDetailPage() {
   const [liveCount, setLiveCount] = useState(0);
   const [isPublishing, setIsPublishing] = useState(false);
   const [visualModal, setVisualModal] = useState<null | "affiche" | "story">(null);
+  const [notifying, setNotifying] = useState(false);
+  const [notifiedMsg, setNotifiedMsg] = useState<string | null>(null);
+
+  async function handleSendPush() {
+    if (!event) return;
+    setNotifying(true);
+    const res = await sendRunPushNotification(event.id);
+    if ("ok" in res) {
+      setNotifiedMsg(`🔔 ${res.sent} envoyé(s)`);
+      setTimeout(() => setNotifiedMsg(null), 3000);
+    } else {
+      alert("Erreur lors de l'envoi de la notification.");
+    }
+    setNotifying(false);
+  }
 
   const checkinUrl = typeof window !== "undefined"
     ? `${window.location.origin}/checkin/${id}`
@@ -312,6 +327,17 @@ export default function EventDetailPage() {
             >
               <MessageCircle size={13} /> {liveCount > 0 ? "Récap WhatsApp" : "Annoncer"}
             </a>
+          )}
+          {event.status === "published" && (
+            <button
+              onClick={handleSendPush}
+              disabled={notifying}
+              title="Envoyer une notification push sur l'écran des membres"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-full text-[11px] font-black uppercase tracking-widest bg-[var(--app-surface-2)] text-[color:var(--app-text)] hover:border-[#FF5C00] border border-[color:var(--app-border)] transition-all shadow-sm"
+            >
+              {notifying ? <Loader2 size={13} className="animate-spin" /> : <Bell size={13} className="text-[#FF5C00]" />}
+              {notifiedMsg || "Notifier (Push)"}
+            </button>
           )}
           <button
             onClick={togglePublish}

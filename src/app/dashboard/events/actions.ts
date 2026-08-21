@@ -3,6 +3,8 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getAuthenticatedCaptainId } from "@/lib/auth-server";
 
+import { sendClubPushNotification } from "@/lib/push/send";
+
 function ub(supabase: ReturnType<typeof createAdminClient>, table: string): any {
   return supabase.from(table as Parameters<ReturnType<typeof createAdminClient>["from"]>[0]);
 }
@@ -43,7 +45,7 @@ export interface NewRunInput {
   status: "draft" | "published";
 }
 
-/** Crée un run (géocodage de l'adresse côté serveur). */
+/** Crée un run (géocodage de l'adresse côté serveur) + diffuse Web Push. */
 export async function createRun(input: NewRunInput): Promise<{ id: string } | { error: string }> {
   const club_id = await getAuthenticatedCaptainId();
   if (!club_id) return { error: "Session introuvable, reconnecte-toi." };
@@ -69,7 +71,41 @@ export async function createRun(input: NewRunInput): Promise<{ id: string } | { 
   }).select("id").single();
 
   if (error || !data) return { error: error?.message || "Erreur lors de la création." };
+
+  // Diffusion Web Push aux membres si publié
+  if (input.status === "published") {
+    try {
+      await sendClubPushNotification(club_id, {
+        title: `🏃 Nouveau Run : ${input.title || "Prochaine sortie"}`,
+        body: `Inscriptions ouvertes sur Capten !`,
+        url: `/event/${(data as any).id}`,
+      });
+    } catch { /* push non bloquant */ }
+  }
+
   return { id: (data as any).id };
+}
+
+/** Diffuse une notification Web Push aux membres du crew pour un run. */
+export async function sendRunPushNotification(
+  eventId: string,
+  customMessage?: string
+): Promise<{ ok: true; sent: number } | { error: string }> {
+  const club_id = await getAuthenticatedCaptainId();
+  if (!club_id) return { error: "unauth" };
+  let sb: ReturnType<typeof createAdminClient>;
+  try { sb = createAdminClient(); } catch { return { error: "Service indisponible." }; }
+
+  const { data: ev } = await ub(sb, "events").select("*").eq("id", eventId).maybeSingle();
+  if (!ev || (ev as any).club_id !== club_id) return { error: "not_found" };
+
+  const res = await sendClubPushNotification(club_id, {
+    title: `🏃 ${(ev as any).title}`,
+    body: customMessage || `Rappel pour le run ! Rendez-vous au point de départ.`,
+    url: `/event/${eventId}`,
+  });
+
+  return { ok: true, sent: res.sent };
 }
 
 /** Détail d'un run + inscrits + check-ins + crew (pour nom/logo/entitlement Pro). Borné au crew. */
