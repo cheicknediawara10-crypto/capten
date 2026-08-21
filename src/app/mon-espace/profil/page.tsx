@@ -135,8 +135,8 @@ export default async function ProfilPage({
     { key: "profil",    label: "Profil",    icon: CheckCircle2 },
     { key: "ice",       label: "ICE",       icon: Shield },
     { key: "agenda",    label: "Agenda",    icon: Calendar },
+    { key: "spots",     label: "Adresses",  icon: MapPin },
     { key: "decharges", label: "Décharges", icon: FileText },
-    ...(spots.length > 0 ? [{ key: "spots", label: "Spots", icon: MapPin }] : []),
   ];
 
   return (
@@ -347,6 +347,20 @@ export default async function ProfilPage({
             </details>
 
             <Link
+              href="/mon-espace/profil?tab=spots"
+              className="flex items-center gap-3 w-full bg-white rounded-2xl border border-[#E8E8E8] p-5 hover:border-[#D0D0D0] transition-colors"
+            >
+              <span className="w-10 h-10 rounded-xl bg-[#FF5500]/10 flex items-center justify-center shrink-0">
+                <MapPin className="w-5 h-5 text-[#FF5500]" />
+              </span>
+              <div className="flex-1 min-w-0 text-left">
+                <p className="text-sm font-bold text-[#111111]">Les Bonnes Adresses du Crew</p>
+                <p className="text-xs text-[#9CA3AF] mt-0.5">Cafés, boulangeries, kinés &amp; bons plans partagés</p>
+              </div>
+              <ChevronRight className="w-4 h-4 text-[#9CA3AF] shrink-0" />
+            </Link>
+
+            <Link
               href="/mon-espace/signaler"
               className="flex items-center gap-3 w-full bg-white rounded-2xl border border-[#E8E8E8] p-5 hover:border-[#D0D0D0] transition-colors"
             >
@@ -462,6 +476,16 @@ export default async function ProfilPage({
             </div>
 
             <SuggestSpotModal />
+
+            {spots.length === 0 && (
+              <div className="bg-white rounded-2xl border border-[#E8E8E8] p-8 text-center space-y-2">
+                <span className="text-3xl block mb-2">🥐☕👟</span>
+                <p className="text-sm font-extrabold text-[#111111]">Aucune adresse pour l&apos;instant</p>
+                <p className="text-xs text-[#9CA3AF] max-w-xs mx-auto leading-relaxed">
+                  Sois le premier à proposer ton café after-run, ta boulangerie ou ton bon plan avec le bouton ci-dessus !
+                </p>
+              </div>
+            )}
 
             {spots.map((s) => {
               const isSponsor = s.avantage?.toLowerCase().includes("sponsor") || s.mot_du_fondateur?.toLowerCase().includes("sponsor");
