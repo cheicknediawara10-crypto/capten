@@ -3,9 +3,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { ArrowLeft, MapPin, Calendar, Clock, Users, Repeat, Save, Send, Loader2 } from "lucide-react";
+import { ArrowLeft, MapPin, Calendar, Clock, Users, Repeat, Save, Send, Loader2, Luggage, Gauge, Coffee } from "lucide-react";
 import Link from "next/link";
 import { createRun } from "../actions";
+import { formatPracticalDescription } from "@/lib/utils/practical-info";
 
 export default function NewEventPage() {
   const router = useRouter();
@@ -15,6 +16,9 @@ export default function NewEventPage() {
   const [form, setForm] = useState({
     title: "",
     description: "",
+    bag_drop: "",
+    pace: "",
+    after_run: "",
     event_date: "",
     event_time: "",
     meeting_point_address: "",
@@ -42,10 +46,16 @@ export default function NewEventPage() {
     if (status === "published") setPublishing(true);
     else setSaving(true);
 
+    const fullDescription = formatPracticalDescription(form.description, {
+      bagDrop: form.bag_drop,
+      pace: form.pace,
+      afterRun: form.after_run,
+    });
+
     // Création via server action : auth (cookies) + géocodage + insert côté serveur.
     const res = await createRun({
       title: form.title,
-      description: form.description || null,
+      description: fullDescription || null,
       event_date: eventDatetime || new Date().toISOString(),
       meeting_point_address: form.meeting_point_address || null,
       max_participants: form.max_participants ? parseInt(form.max_participants) : null,
@@ -116,6 +126,108 @@ export default function NewEventPage() {
               rows={3}
               className="w-full px-4 py-3 rounded-[12px] border border-[color:var(--app-border)] text-sm font-medium focus:border-[#FF5C00] focus:ring-2 focus:ring-[#FF5C00]/20 outline-none transition-all resize-none"
             />
+          </div>
+        </motion.div>
+
+        {/* Infos Pratiques Anti-Stress */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.03 }}
+          className="bg-[var(--app-surface)] rounded-[24px] border border-[color:var(--app-border)] p-6 space-y-4"
+        >
+          <div className="flex items-center justify-between">
+            <h2 className="text-[11px] font-black uppercase tracking-widest text-[#FF5C00] flex items-center gap-1.5">
+              <Luggage size={14} /> Infos Pratiques (Anti-Stress Coureurs)
+            </h2>
+            <span className="text-[10px] font-bold text-[color:var(--app-text-muted)] uppercase tracking-wider">
+              Recommandé
+            </span>
+          </div>
+          <p className="text-[12px] text-[color:var(--app-text-muted)] leading-snug">
+            Réponds aux 3 questions que tous les nouveaux coureurs se posent pour maximiser les inscriptions.
+          </p>
+
+          {/* Consigne sacs */}
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--app-text-muted)] flex items-center gap-1">
+              <Luggage size={11} /> 1. Consigne sacs (Bag Drop)
+            </label>
+            <input
+              type="text"
+              value={form.bag_drop}
+              onChange={(e) => update("bag_drop", e.target.value)}
+              placeholder="Ex : Consigne possible au Café du coin · ou : Venir en tenue"
+              className="w-full h-11 px-4 rounded-[12px] border border-[color:var(--app-border)] text-sm font-medium focus:border-[#FF5C00] focus:ring-2 focus:ring-[#FF5C00]/20 outline-none transition-all"
+            />
+            <div className="flex flex-wrap gap-1.5 pt-1">
+              {["Consigne possible au QG / café", "Pas de consigne (venir en tenue)"].map((p) => (
+                <button
+                  key={p}
+                  type="button"
+                  onClick={() => update("bag_drop", p)}
+                  className="px-2.5 py-1 rounded-full text-[10.5px] font-semibold bg-[var(--app-surface-2)] text-[color:var(--app-text-muted)] hover:text-[color:var(--app-text)] hover:border-[#FF5C00] border border-[color:var(--app-border)] transition-all"
+                >
+                  {p}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Allure */}
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--app-text-muted)] flex items-center gap-1">
+              <Gauge size={11} /> 2. Allure prévue & Vibe
+            </label>
+            <input
+              type="text"
+              value={form.pace}
+              onChange={(e) => update("pace", e.target.value)}
+              placeholder="Ex : Tous niveaux (6:00/km — personne n'est laissé derrière !)"
+              className="w-full h-11 px-4 rounded-[12px] border border-[color:var(--app-border)] text-sm font-medium focus:border-[#FF5C00] focus:ring-2 focus:ring-[#FF5C00]/20 outline-none transition-all"
+            />
+            <div className="flex flex-wrap gap-1.5 pt-1">
+              {[
+                "Tous niveaux (6:00/km — zéro pression)",
+                "Allure modérée (5:30/km)",
+                "Rythmé (5:00/km)",
+              ].map((p) => (
+                <button
+                  key={p}
+                  type="button"
+                  onClick={() => update("pace", p)}
+                  className="px-2.5 py-1 rounded-full text-[10.5px] font-semibold bg-[var(--app-surface-2)] text-[color:var(--app-text-muted)] hover:text-[color:var(--app-text)] hover:border-[#FF5C00] border border-[color:var(--app-border)] transition-all"
+                >
+                  {p}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* After-run */}
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--app-text-muted)] flex items-center gap-1">
+              <Coffee size={11} /> 3. After-run / Moment convivial
+            </label>
+            <input
+              type="text"
+              value={form.after_run}
+              onChange={(e) => update("after_run", e.target.value)}
+              placeholder="Ex : Verre / café au Spot du Crew après les étirements"
+              className="w-full h-11 px-4 rounded-[12px] border border-[color:var(--app-border)] text-sm font-medium focus:border-[#FF5C00] focus:ring-2 focus:ring-[#FF5C00]/20 outline-none transition-all"
+            />
+            <div className="flex flex-wrap gap-1.5 pt-1">
+              {["Verre & étirements au Spot du Crew", "Café / boisson partagée", "Pas d'after (juste la session)"].map((p) => (
+                <button
+                  key={p}
+                  type="button"
+                  onClick={() => update("after_run", p)}
+                  className="px-2.5 py-1 rounded-full text-[10.5px] font-semibold bg-[var(--app-surface-2)] text-[color:var(--app-text-muted)] hover:text-[color:var(--app-text)] hover:border-[#FF5C00] border border-[color:var(--app-border)] transition-all"
+                >
+                  {p}
+                </button>
+              ))}
+            </div>
           </div>
         </motion.div>
 

@@ -4,10 +4,12 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { motion } from "framer-motion";
 import {
-  Calendar, MapPin, Users, CheckCircle2, Loader2, ArrowRight, Phone, Shield
+  Calendar, MapPin, Users, CheckCircle2, Loader2, ArrowRight, Phone, Shield,
+  Luggage, Gauge, Coffee
 } from "lucide-react";
 import { getSupabase } from "@/lib/supabase";
 import { formatDateShort } from "@/lib/utils/format";
+import { parsePracticalInfo } from "@/lib/utils/practical-info";
 import Link from "next/link";
 
 interface Event {
@@ -116,6 +118,7 @@ export default function PublicEventPage() {
 
   const eventDate = new Date(event.event_date);
   const isPast = eventDate < new Date();
+  const practical = parsePracticalInfo(event.description);
 
   return (
     <div className="min-h-screen bg-[#F4F4EE] pb-32">
@@ -162,15 +165,63 @@ export default function PublicEventPage() {
       </div>
 
       <div className="max-w-lg mx-auto px-5 mt-6 space-y-4">
+        {/* Infos Pratiques Anti-Stress */}
+        {(practical.bagDrop || practical.pace || practical.afterRun) && (
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white rounded-[24px] border border-black/5 p-5 space-y-3 shadow-sm"
+          >
+            <h2 className="text-[11px] font-black uppercase tracking-widest text-[#FF5C00] flex items-center gap-1.5">
+              <Luggage size={13} /> Infos Pratiques du Run
+            </h2>
+            <div className="space-y-2.5 pt-1">
+              {practical.bagDrop && (
+                <div className="flex items-start gap-3 p-3 rounded-2xl bg-[#F8F8F6]">
+                  <span className="w-7 h-7 rounded-xl bg-black/5 flex items-center justify-center text-[#1A1918] shrink-0 mt-0.5">
+                    <Luggage size={14} />
+                  </span>
+                  <div>
+                    <p className="text-[10.5px] font-bold uppercase tracking-wider text-[#666562]">Consigne sacs</p>
+                    <p className="text-[13px] font-semibold text-[#1A1918]">{practical.bagDrop}</p>
+                  </div>
+                </div>
+              )}
+              {practical.pace && (
+                <div className="flex items-start gap-3 p-3 rounded-2xl bg-[#F8F8F6]">
+                  <span className="w-7 h-7 rounded-xl bg-[#FF5C00]/10 text-[#FF5C00] flex items-center justify-center shrink-0 mt-0.5">
+                    <Gauge size={14} />
+                  </span>
+                  <div>
+                    <p className="text-[10.5px] font-bold uppercase tracking-wider text-[#666562]">Allure & Distance</p>
+                    <p className="text-[13px] font-semibold text-[#1A1918]">{practical.pace}</p>
+                  </div>
+                </div>
+              )}
+              {practical.afterRun && (
+                <div className="flex items-start gap-3 p-3 rounded-2xl bg-[#F8F8F6]">
+                  <span className="w-7 h-7 rounded-xl bg-[#22C55E]/10 text-[#22C55E] flex items-center justify-center shrink-0 mt-0.5">
+                    <Coffee size={14} />
+                  </span>
+                  <div>
+                    <p className="text-[10.5px] font-bold uppercase tracking-wider text-[#666562]">After-run</p>
+                    <p className="text-[13px] font-semibold text-[#1A1918]">{practical.afterRun}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+
         {/* Description */}
-        {event.description && (
+        {practical.textDescription && (
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             className="bg-white rounded-[24px] border border-black/5 p-6"
           >
             <h2 className="text-[11px] font-black uppercase tracking-widest text-[#666562] mb-3">Description</h2>
-            <p className="text-[14px] text-[#1A1918] leading-relaxed">{event.description}</p>
+            <p className="text-[14px] text-[#1A1918] leading-relaxed whitespace-pre-wrap">{practical.textDescription}</p>
           </motion.div>
         )}
 

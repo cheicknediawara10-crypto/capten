@@ -5,11 +5,13 @@ import { useParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft, Calendar, MapPin, Users, QrCode, CheckSquare, FileText, List,
-  Download, Globe, Lock, Trash2, Loader2, Wifi, Megaphone, Camera, MessageCircle
+  Download, Globe, Lock, Trash2, Loader2, Wifi, Megaphone, Camera, MessageCircle,
+  Luggage, Gauge, Coffee
 } from "lucide-react";
 import { getSupabase } from "@/lib/supabase";
 import Link from "next/link";
 import { formatDateShort } from "@/lib/utils/format";
+import { parsePracticalInfo } from "@/lib/utils/practical-info";
 import dynamic from "next/dynamic";
 import CrewVisualModal from "@/components/visuals/CrewVisualModal";
 import { hasProAccess } from "@/lib/plan-access";
@@ -388,10 +390,39 @@ export default function EventDetailPage() {
                 </div>
               </div>
 
-              {event.description && (
+              {/* Infos Pratiques Anti-Stress */}
+              {(parsePracticalInfo(event.description).bagDrop || parsePracticalInfo(event.description).pace || parsePracticalInfo(event.description).afterRun) && (
+                <div className="bg-[var(--app-surface)] rounded-[24px] border border-[color:var(--app-border)] p-6 space-y-3">
+                  <h3 className="text-[11px] font-black uppercase tracking-widest text-[#FF5C00] flex items-center gap-1.5">
+                    <Luggage size={14} /> Infos Pratiques du Run
+                  </h3>
+                  <div className="space-y-2 pt-1 text-sm">
+                    {parsePracticalInfo(event.description).bagDrop && (
+                      <div className="flex items-center gap-2 text-[color:var(--app-text)]">
+                        <Luggage size={14} className="text-[#FF5C00] shrink-0" />
+                        <span><b className="text-[color:var(--app-text-muted)] font-normal text-[11px] uppercase tracking-wider block">Consigne :</b> {parsePracticalInfo(event.description).bagDrop}</span>
+                      </div>
+                    )}
+                    {parsePracticalInfo(event.description).pace && (
+                      <div className="flex items-center gap-2 text-[color:var(--app-text)]">
+                        <Gauge size={14} className="text-[#FF5C00] shrink-0" />
+                        <span><b className="text-[color:var(--app-text-muted)] font-normal text-[11px] uppercase tracking-wider block">Allure :</b> {parsePracticalInfo(event.description).pace}</span>
+                      </div>
+                    )}
+                    {parsePracticalInfo(event.description).afterRun && (
+                      <div className="flex items-center gap-2 text-[color:var(--app-text)]">
+                        <Coffee size={14} className="text-[#22C55E] shrink-0" />
+                        <span><b className="text-[color:var(--app-text-muted)] font-normal text-[11px] uppercase tracking-wider block">After-run :</b> {parsePracticalInfo(event.description).afterRun}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {parsePracticalInfo(event.description).textDescription && (
                 <div className="bg-[var(--app-surface)] rounded-[24px] border border-[color:var(--app-border)] p-6">
                   <h3 className="text-[11px] font-black uppercase tracking-widest text-[color:var(--app-text-muted)] mb-3">Description</h3>
-                  <p className="text-sm text-[color:var(--app-text)] leading-relaxed">{event.description}</p>
+                  <p className="text-sm text-[color:var(--app-text)] leading-relaxed whitespace-pre-wrap">{parsePracticalInfo(event.description).textDescription}</p>
                 </div>
               )}
 
