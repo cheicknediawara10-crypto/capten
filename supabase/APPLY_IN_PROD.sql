@@ -635,3 +635,30 @@ DROP POLICY IF EXISTS "fondateur gere les spots de son crew" ON crew_spots;
 CREATE POLICY "fondateur gere les spots de son crew" ON crew_spots FOR ALL
   USING  (club_id IN (SELECT id FROM clubs WHERE owner_id = auth.uid() OR id = auth.uid()))
   WITH CHECK (club_id IN (SELECT id FROM clubs WHERE owner_id = auth.uid() OR id = auth.uid()));
+
+
+-- ─────────────────────────────────────────────
+-- 6. SIGNALEMENTS & RETOURS COUREURS
+-- ─────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS membre_signalements (
+  id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  club_id          UUID NOT NULL REFERENCES clubs(id) ON DELETE CASCADE,
+  membre_id        UUID REFERENCES membre_profiles(id) ON DELETE SET NULL,
+  is_anonymous     BOOLEAN NOT NULL DEFAULT true,
+  type             TEXT NOT NULL DEFAULT 'autre',
+  message          TEXT NOT NULL,
+  event_id         UUID REFERENCES events(id) ON DELETE SET NULL,
+  status           TEXT NOT NULL DEFAULT 'new',
+  created_at       TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_membre_signalements_club ON membre_signalements(club_id);
+CREATE INDEX IF NOT EXISTS idx_membre_signalements_status ON membre_signalements(status);
+
+ALTER TABLE membre_signalements ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Organisateur gere ses signalements" ON membre_signalements;
+CREATE POLICY "Organisateur gere ses signalements" ON membre_signalements FOR ALL
+  USING (club_id IN (SELECT id FROM clubs WHERE owner_id = auth.uid() OR id = auth.uid()))
+  WITH CHECK (club_id IN (SELECT id FROM clubs WHERE owner_id = auth.uid() OR id = auth.uid()));
+
