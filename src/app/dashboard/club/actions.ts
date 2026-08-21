@@ -46,6 +46,8 @@ export async function saveMyClub(input: {
   logo_url?: string | null;
   city?: string | null;
   website_url?: string | null;
+  instagram_url?: string | null;
+  whatsapp_link?: string | null;
 }): Promise<{ ok: true; slug: string } | { error: string }> {
   const id = await getAuthenticatedCaptainId();
   if (!id) return { error: "Session introuvable, reconnecte-toi." };
@@ -80,6 +82,8 @@ export async function saveMyClub(input: {
     logo_url: input.logo_url ?? null,
     city: input.city ?? null,
     website_url: input.website_url ?? null,
+    instagram_url: input.instagram_url ?? null,
+    whatsapp_link: input.whatsapp_link ?? null,
   }, { onConflict: "id" });
 
   if (error) return { error: error.message };

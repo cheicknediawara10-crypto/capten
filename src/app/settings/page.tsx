@@ -1,874 +1,489 @@
-'use client';
+"use client";
 
-import React from 'react';
-import Link from 'next/link';
-import { Settings, Share2, Shield, Wallet, Users, Monitor, Globe, Bell, CheckCircle2, AlertTriangle, Plus, ArrowRight, Smartphone, Sliders, Sparkles, CreditCard, ExternalLink, Check, DollarSign } from 'lucide-react';
-import { getSupabase } from '@/lib/supabase';
-import { useAuth } from '@/context/AuthContext';
-import { COMMUNITY_OPTIONS, CommunityType } from '@/lib/community-labels';
+import React, { useState, useEffect, useRef } from "react";
+import { motion } from "framer-motion";
+import { 
+  Building2, Upload, Globe, Copy, CheckCheck, 
+  ExternalLink, CreditCard, HelpCircle, MessageCircle, 
+  Mail, Shield, Sparkles, Check, ChevronDown, ChevronUp,
+  Instagram, Phone, Share2, AlertCircle, Loader2
+} from "lucide-react";
+import { getMyClub, saveMyClub } from "@/app/dashboard/club/actions";
+import { getSupabase } from "@/lib/supabase";
+import { useAuth } from "@/context/AuthContext";
 
 export default function SettingsPage() {
-  const { user, club, isMock, refreshClub } = useAuth();
-  const [toast, setToast] = React.useState<string | null>(null);
-  const [isSaving, setIsSaving] = React.useState(false);
-  const [whatsappStatus, setWhatsappStatus] = React.useState<'loading' | 'connected' | 'disconnected'>('loading');
-  const [whatsappPhone, setWhatsappPhone] = React.useState<string | null>(null);
-  const [whatsappQr, setWhatsappQr] = React.useState<string | null>(null);
-  const [showWhatsappModal, setShowWhatsappModal] = React.useState(false);
-  const [isDemoMode, setIsDemoMode] = React.useState(false);
-  const [currentPlan, setCurrentPlan] = React.useState("PRO");
+  const { user, refreshClub } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
 
-  // Community Type State
-  const [communityType, setCommunityType] = React.useState<CommunityType>('run_club');
-  const [communityTypeCustom, setCommunityTypeCustom] = React.useState('');
+  // Club identity fields
+  const [clubId, setClubId] = useState("");
+  const [name, setName] = useState("");
+  const [slug, setSlug] = useState("");
+  const [city, setCity] = useState("");
+  const [description, setDescription] = useState("");
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [instagramUrl, setInstagramUrl] = useState("");
+  const [whatsappLink, setWhatsappLink] = useState("");
+  const [logoUploading, setLogoUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Agnostic payments & Profiles states
-  const [profile, setProfile] = React.useState<any>({
-    stripe_subscription_status: 'trialing',
-    subscription_ends_at: null
-  });
-  const [cagnotteUrl, setCagnotteUrl] = React.useState('');
-  const [isSavingCagnotte, setIsSavingCagnotte] = React.useState(false);
+  // FAQ accordion state
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
 
-  // Interactive States for the Club Organizer
-  const [logoUrl, setLogoUrl] = React.useState<string | null>(null);
-  const [primaryColor, setPrimaryColor] = React.useState('#FF5C00');
-  const [sosNumbers, setSosNumbers] = React.useState('17, 18, 112');
-  const [safetyContact, setSafetyContact] = React.useState('+33 6 99 88 77 66 (Adjoint)');
-  const [isSafeZoneActive, setIsSafeZoneActive] = React.useState(true);
-  const [zeroPressureMode, setZeroPressureMode] = React.useState(true);
-  const [autoRound, setAutoRound] = React.useState(true);
-  const [showTeamModal, setShowTeamModal] = React.useState(false);
-  const [coaches, setCoaches] = React.useState<Array<{name: string, email: string, role: string}>>([]);
-  const [copilotEmailFreq, setCopilotEmailFreq] = React.useState<'quotidien' | 'hebdo' | 'jamais'>('quotidien');
-
-  const showToast = (message: string) => {
-    setToast(message);
-    setTimeout(() => {
-      setToast(null);
-    }, 2500);
+  const showToast = (msg: string) => {
+    setToast(msg);
+    setTimeout(() => setToast(null), 2500);
   };
 
-  // L'automatisation WhatsApp arrive en V2 — pas d'endpoint côté serveur pour l'instant.
-  const fetchWhatsappStatus = async () => {
-    setWhatsappStatus('disconnected');
-  };
-
-  const handleDisconnectWhatsapp = async () => {
-    setWhatsappStatus('disconnected');
-    setWhatsappPhone(null);
-  };
-
-  // Sync settings with current club context
-  React.useEffect(() => {
-    if (!isMock && club) {
-      setCagnotteUrl(club.cagnotte_url || '');
-      setLogoUrl(club.branding?.logo || null);
-      setPrimaryColor(club.branding?.primary_color || '#FF5C00');
-      setSosNumbers(club.branding?.sos_numbers || '17, 18, 112');
-      setSafetyContact(club.branding?.safety_contact || '+33 6 99 88 77 66 (Adjoint)');
-      setIsSafeZoneActive(club.branding?.safezone_active !== false);
-      setZeroPressureMode(club.branding?.zero_pressure !== false);
-      setAutoRound(club.branding?.auto_round !== false);
-      setCoaches(club.coaches || []);
-      setCopilotEmailFreq(club.branding?.copilot_email_freq || 'quotidien');
-      setCommunityType((club.community_type as any) || 'run_club');
-      setCommunityTypeCustom(club.community_type_custom || '');
-    } else {
-      // LocalStorage Mode Fallback
-      const savedType = localStorage.getItem('capten_community_type');
-      if (savedType) setCommunityType(savedType as any);
-
-      const savedCustom = localStorage.getItem('capten_community_type_custom');
-      if (savedCustom) setCommunityTypeCustom(savedCustom);
-      const savedLogo = localStorage.getItem('capten_logo');
-      if (savedLogo) setLogoUrl(savedLogo);
-
-      const savedColor = localStorage.getItem('capten_primary_color');
-      if (savedColor) setPrimaryColor(savedColor);
-
-      const savedSos = localStorage.getItem('capten_sos_numbers');
-      if (savedSos) setSosNumbers(savedSos);
-
-      const savedSafety = localStorage.getItem('capten_safety_contact');
-      if (savedSafety) setSafetyContact(savedSafety);
-
-      const savedFreq = localStorage.getItem('capten_copilot_email_freq');
-      if (savedFreq) setCopilotEmailFreq(savedFreq as any);
-
-      const savedSafeZone = localStorage.getItem('capten_safezone_active');
-      if (savedSafeZone !== null) setIsSafeZoneActive(savedSafeZone === 'true');
-
-      const savedZeroPressure = localStorage.getItem('capten_zero_pressure');
-      if (savedZeroPressure !== null) setZeroPressureMode(savedZeroPressure === 'true');
-
-      const savedAutoRound = localStorage.getItem('capten_auto_round');
-      if (savedAutoRound !== null) setAutoRound(savedAutoRound === 'true');
-
-      const savedCagnotte = localStorage.getItem('capten_cagnotte_url');
-      if (savedCagnotte) setCagnotteUrl(savedCagnotte);
-
-      const savedCoaches = localStorage.getItem('capten_coaches');
-      if (savedCoaches) {
-        try {
-          setCoaches(JSON.parse(savedCoaches));
-        } catch (e) {
-          setCoaches([
-            { name: "Moi (Propriétaire)", email: "info.captenfr@gmail.com", role: "Créateur" },
-            { name: "Alexandre Dupont", email: "alex@capten.app", role: "Coach Principal" },
-            { name: "Julie Martin", email: "julie@capten.app", role: "Meneuse d'Allure" }
-          ]);
+  useEffect(() => {
+    (async () => {
+      const res = await getMyClub();
+      if (!("error" in res)) {
+        const c = res.club as any;
+        if (c) {
+          setClubId(c.id || "");
+          setName(c.name || c.whatsapp_display_name || "");
+          setSlug(c.slug || "");
+          setCity(c.city || "");
+          setDescription(c.description || "");
+          setLogoUrl(c.logo_url || null);
+          setInstagramUrl(c.instagram_url || "");
+          setWhatsappLink(c.whatsapp_link || "");
         }
-      } else {
-        const defaultCoaches = [
-          { name: "Moi (Propriétaire)", email: "info.captenfr@gmail.com", role: "Créateur" },
-          { name: "Alexandre Dupont", email: "alex@capten.app", role: "Coach Principal" },
-          { name: "Julie Martin", email: "julie@capten.app", role: "Meneuse d'Allure" }
-        ];
-        setCoaches(defaultCoaches);
-        localStorage.setItem('capten_coaches', JSON.stringify(defaultCoaches));
       }
-    }
+      setLoading(false);
+    })();
+  }, []);
 
-    const savedPlan = localStorage.getItem('capten_plan');
-    if (savedPlan) {
-      setCurrentPlan(savedPlan);
-    } else {
-      localStorage.setItem('capten_plan', 'PRO');
-      setCurrentPlan('PRO');
-    }
-
-    const loadSupabaseData = async () => {
-      try {
-        const supabase = getSupabase();
-        if (user?.email?.toLowerCase() === 'cheicknediawara10@gmail.com') {
-          setCurrentPlan('PRO');
-          localStorage.setItem('capten_plan', 'PRO');
-          document.cookie = "capten_mock_trial_expired=false; path=/; max-age=31536000";
-          setProfile({
-            stripe_subscription_status: 'active',
-            subscription_ends_at: '2099-12-31'
-          });
-          return;
-        }
-        if (supabase && user) {
-          // Fetch Stripe SaaS Profile
-          const { data: prof } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', user.id)
-            .maybeSingle();
-          if (prof) {
-            setProfile(prof);
-          }
-        }
-      } catch (e) {
-        console.error("Error loading profile:", e);
-      }
-    };
-    loadSupabaseData();
-    fetchWhatsappStatus();
-  }, [club, isMock, user]);
-
-  const handleSave = async () => {
-    setIsSaving(true);
-    
-    if (isMock) {
-      // Save to localStorage
-      localStorage.setItem('capten_logo', logoUrl || '');
-      localStorage.setItem('capten_primary_color', primaryColor);
-      localStorage.setItem('capten_sos_numbers', sosNumbers);
-      localStorage.setItem('capten_safety_contact', safetyContact);
-      localStorage.setItem('capten_safezone_active', isSafeZoneActive.toString());
-      localStorage.setItem('capten_zero_pressure', zeroPressureMode.toString());
-      localStorage.setItem('capten_auto_round', autoRound.toString());
-      localStorage.setItem('capten_cagnotte_url', cagnotteUrl);
-      localStorage.setItem('capten_copilot_email_freq', copilotEmailFreq);
-      localStorage.setItem('capten_community_type', communityType);
-      if (communityTypeCustom) {
-        localStorage.setItem('capten_community_type_custom', communityTypeCustom);
-      }
-    } else {
-      // Save to Supabase B2B configs
-      try {
-        await fetch('/api/club/settings', {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            cagnotte_url: cagnotteUrl,
-            community_type: communityType,
-            community_type_custom: communityTypeCustom || null,
-            branding: {
-              logo: logoUrl || '',
-              primary_color: primaryColor,
-              sos_numbers: sosNumbers,
-              safety_contact: safetyContact,
-              safezone_active: isSafeZoneActive,
-              zero_pressure: zeroPressureMode,
-              auto_round: autoRound,
-              copilot_email_freq: copilotEmailFreq
-            }
-          })
-        });
-        await refreshClub();
-      } catch (err) {
-        console.error("Failed saving club B2B settings:", err);
-      }
-    }
-
-    // Dispatch dynamic branding update event
-    if (typeof window !== 'undefined') {
-      window.dispatchEvent(new Event('capten_branding_change'));
-    }
-
-    setTimeout(() => {
-      setIsSaving(false);
-      showToast("SAUVEGARDE RÉUSSIE ! Tous les paramètres du club ont été enregistrés.");
-    }, 1200);
-  };
-
-  const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64String = reader.result as string;
-        setLogoUrl(base64String);
-        localStorage.setItem('capten_logo', base64String);
-        
-        // Dispatch dynamic branding update event
-        if (typeof window !== 'undefined') {
-          window.dispatchEvent(new Event('capten_branding_change'));
-        }
-        
-        showToast("LOGO DU CLUB MIS À JOUR !");
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+    if (!file || !clubId) return;
 
-  const handleCancelTrial = async () => {
-    const isActiveSub = profile?.stripe_subscription_status === 'active';
-    const confirmMessage = isActiveSub 
-      ? "Voulez-vous vraiment résilier votre abonnement CAPTEN PRO ? Vous perdrez l'accès aux fonctionnalités premium et repasserez immédiatement en formule gratuite."
-      : "Voulez-vous vraiment résilier votre essai CAPTEN PRO ? Vous perdrez l'accès aux fonctionnalités premium et repasserez immédiatement en formule gratuite.";
-
-    if (confirm(confirmMessage)) {
-      setIsSaving(true);
-      try {
-        localStorage.setItem('capten_plan', 'GRATUIT');
-        setCurrentPlan('GRATUIT');
-        setProfile((prev: any) => ({
-          ...prev,
-          stripe_subscription_status: 'canceled'
-        }));
-
-        const supabase = getSupabase();
-        if (supabase) {
-          const { data: { user } } = await supabase.auth.getUser();
-          if (user) {
-            await supabase
-              .from('profiles')
-              .update({ stripe_subscription_status: 'canceled' })
-              .eq('id', user.id);
-
-            await supabase
-              .from('clubs')
-              .update({ 
-                plan: 'free',
-                stripe_plan: 'GRATUIT',
-                stripe_subscription_status: 'inactive' 
-              })
-              .eq('id', user.id);
-          }
-        }
-        
-        // Set mock trial expiration cookie
-        document.cookie = "capten_mock_trial_expired=true; path=/; max-age=31536000";
-        document.cookie = "capten_plan=GRATUIT; path=/; max-age=31536000";
-
-        if (typeof window !== 'undefined') {
-          window.dispatchEvent(new Event('capten_branding_change'));
-        }
-
-        await refreshClub();
-
-        const successMessage = isActiveSub ? "ABONNEMENT PRO RÉSILIÉ AVEC SUCCÈS !" : "ESSAI PRO RÉSILIÉ AVEC SUCCÈS !";
-        showToast(successMessage);
-      } catch (err) {
-        console.error(err);
-        showToast("Erreur lors de la résiliation.");
-      } finally {
-        setIsSaving(false);
-      }
-    }
-  };
-
-  const handleRedirectToPortal = async () => {
-    setIsSaving(true);
-    showToast("REDIRECTION PORTAIL DE FACTURATION...");
+    setLogoUploading(true);
     try {
-      const res = await fetch('/api/stripe/portal', { method: 'POST' });
-      const data = await res.json();
-      if (data.url) {
-        window.location.href = data.url;
-      } else {
-        showToast("Impossible d'ouvrir le portail client Stripe.");
-        setIsSaving(false);
+      const supabase = getSupabase();
+      if (!supabase) {
+        // Fallback FileReader preview
+        const reader = new FileReader();
+        reader.onload = () => setLogoUrl(reader.result as string);
+        reader.readAsDataURL(file);
+        setLogoUploading(false);
+        return;
       }
-    } catch (err) {
-      console.error(err);
-      showToast("Erreur de connexion.");
-      setIsSaving(false);
+
+      const ext = file.name.split(".").pop();
+      const path = `clubs/${clubId}/logo_${Date.now()}.${ext}`;
+
+      const { error } = await supabase.storage
+        .from("avatars")
+        .upload(path, file, { upsert: true, contentType: file.type });
+
+      if (!error) {
+        const { data: { publicUrl } } = supabase.storage.from("avatars").getPublicUrl(path);
+        setLogoUrl(publicUrl);
+        showToast("Logo téléversé avec succès !");
+      }
+    } catch {
+      showToast("Erreur lors de l'upload.");
+    } finally {
+      setLogoUploading(false);
     }
   };
 
-  const integrations = [
-    { 
-      name: "WHATSAPP AUTOMATION", 
-      status: whatsappStatus === 'loading' ? 'CHARGEMENT' : (whatsappStatus === 'connected' ? 'CONNECTÉ' : 'DISPONIBLE'), 
-      desc: whatsappStatus === 'connected' ? `Numéro : +${whatsappPhone}` : "Lier votre numéro WhatsApp direct", 
-      color: "text-[#25D366]",
-      action: () => setShowWhatsappModal(true)
+  const handleSaveIdentity = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name.trim()) {
+      showToast("Donne un nom à ton club.");
+      return;
     }
+
+    setSaving(true);
+    const res = await saveMyClub({
+      name: name.trim(),
+      city: city.trim() || null,
+      description: description.trim() || null,
+      logo_url: logoUrl,
+      instagram_url: instagramUrl.trim() || null,
+      whatsapp_link: whatsappLink.trim() || null,
+    });
+
+    if ("ok" in res && res.ok) {
+      setSlug(res.slug);
+      showToast("Réglages enregistrés avec succès !");
+      if (refreshClub) await refreshClub();
+    } else {
+      showToast("Erreur lors de l'enregistrement.");
+    }
+    setSaving(false);
+  };
+
+  const joinUrl = typeof window !== "undefined" && slug 
+    ? `${window.location.origin}/join/${slug}` 
+    : `https://www.capten.app/join/${slug || "ton-crew"}`;
+
+  const copyJoinUrl = () => {
+    navigator.clipboard.writeText(joinUrl);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const FAQS = [
+    {
+      q: "Comment un nouveau coureur s'inscrit à mon crew ?",
+      a: "Partage-lui simplement ton lien d'inscription unique (/join/...). En 30 secondes chrono, il signe la décharge légale du club, renseigne son contact médical d'urgence et crée son passeport coureur.",
+    },
+    {
+      q: "Que faire si un coureur a oublié son code PIN ?",
+      a: "Rends-toi dans l'onglet « Crew », clique sur sa fiche, puis sur « Réinitialiser le code PIN ». Un nouveau code à 4 chiffres sera généré instantanément pour lui.",
+    },
+    {
+      q: "Comment fonctionne la collecte de cotisation ou cagnotte ?",
+      a: "Rends-toi dans l'onglet « Cagnotte », configure ton lien HelloAsso, Lydia ou PayPal. Il s'affichera directement sur le passeport de tes membres et tu pourras suivre qui a cotisé.",
+    },
+    {
+      q: "Où sont stockées les décharges de responsabilité ?",
+      a: "Toutes les signatures sont horodatées et conservées de manière sécurisée dans ta base. Elles sont consultables à tout moment sur la fiche de chaque coureur.",
+    },
   ];
 
-  const inputs = [
-    { label: "Nom du club", key: "club_name", varTag: "{{club_name}}", type: "text" },
-    { label: "Nom du run", key: "run_name", varTag: "{{run_name}}", type: "text" },
-    { label: "Météo textuelle", key: "weather", varTag: "{{weather}}", type: "text" },
-    { label: "URL check-in run", key: "run_url", varTag: "{{run_url}}", type: "text" },
-    { label: "URL stats club", key: "stats_url", varTag: "{{stats_url}}", type: "text" },
-  ];
+  if (loading) {
+    return (
+      <div className="space-y-6 pb-20 max-w-4xl animate-pulse">
+        <div className="h-10 w-48 bg-black/5 rounded-2xl" />
+        <div className="h-96 bg-black/5 rounded-[28px]" />
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-10 pb-20 px-4 sm:px-0">
-      {/* HARMONIZED HEADER */}
-      <header className="flex flex-col gap-3 pb-8 border-b-[0.5px] border-[color:var(--app-border)] mb-10">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 w-full">
-            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 w-full">
-              <h1 className="text-[28px] sm:text-[42px] font-display italic font-black uppercase text-[color:var(--app-text)] leading-none tracking-tight">
-                RÉGLAGES
-              </h1>
-            </div>
-            <button 
-              onClick={handleSave}
-              disabled={isSaving}
-              className="w-full sm:w-auto bg-black text-white px-5 py-3 rounded-[6px] text-[10px] sm:text-[11px] font-black uppercase tracking-wider flex items-center justify-center gap-2 hover:bg-[#FF5C00] transition-all cursor-pointer active:scale-95 disabled:bg-gray-400 shrink-0"
-            >
-              {isSaving ? (
-                <>
-                  <div className="w-3 h-3 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-                  ENREGISTREMENT...
-                </>
-              ) : (
-                "SAUVEGARDER LES PARAMÈTRES"
-              )}
-            </button>
-          </div>
-      </header>
-
-      {/* SETTINGS GRID */}
-      <div className="grid grid-cols-12 gap-6">
-        
-        {/* BRANDING & IDENTITY */}
-        <div className="col-span-12 md:col-span-4 bg-[var(--app-surface)] border-[0.5px] border-[color:var(--app-border)] rounded-card-outer p-6 sm:p-8 space-y-6 shadow-sm">
-           <div className="flex items-center gap-3 border-b-[0.5px] border-[#F4F5F7] pb-4">
-              <Monitor size={18} className="text-[#D1D1D1]" />
-              <h3 className="text-[11px] font-black text-[color:var(--app-text)] uppercase tracking-[0.2em] italic">TON CREW</h3>
-           </div>
-           <div className="space-y-4">
-              <div className="flex items-center gap-6">
-                 <label htmlFor="logo-upload" className="w-16 h-16 bg-[var(--app-surface-2)] border-[0.5px] border-[color:var(--app-border)] rounded-control flex items-center justify-center text-[#D1D1D1] shrink-0 cursor-pointer hover:border-[#FF5C00] hover:bg-black/5 overflow-hidden transition-all relative">
-                    {logoUrl ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={logoUrl} alt="Logo Club" className="w-full h-full object-cover" />
-                    ) : (
-                      <Plus size={24} />
-                    )}
-                 </label>
-                 <input type="file" id="logo-upload" accept="image/*" className="hidden" onChange={handleLogoChange} />
-                 <div className="space-y-1">
-                    <p className="text-[10px] font-black uppercase text-[color:var(--app-text)]">LOGO DU CLUB</p>
-                    <p className="text-[9px] font-medium text-[color:var(--app-text-muted)] uppercase">Format PNG ou SVG (400px)</p>
-                 </div>
-              </div>
-
-              {/* TYPE DE COMMUNAUTÉ */}
-              <div className="pt-4 border-t border-[#F4F5F7] space-y-2">
-                 <p className="text-[10px] font-black uppercase text-[color:var(--app-text)]">TYPE DE COMMUNAUTÉ</p>
-                 <select
-                   value={communityType}
-                   onChange={(e) => setCommunityType(e.target.value as any)}
-                   className="w-full bg-[var(--app-surface-2)] border border-[color:var(--app-border)] rounded-control px-3 py-2 text-[11px] font-mono font-bold text-[color:var(--app-text)] focus:outline-none focus:border-[#FF5C00] focus:bg-[var(--app-surface)] transition-all cursor-pointer"
-                 >
-                   {COMMUNITY_OPTIONS.map((opt) => (
-                     <option key={opt.id} value={opt.id}>
-                       {opt.icon} {opt.label.toUpperCase()}
-                     </option>
-                   ))}
-                 </select>
-                 {communityType === 'other' && (
-                   <input
-                     type="text"
-                     placeholder="Préciser le type (ex: Roller Club)"
-                     value={communityTypeCustom}
-                     onChange={(e) => setCommunityTypeCustom(e.target.value)}
-                     className="w-full mt-2 bg-[var(--app-surface-2)] border border-[color:var(--app-border)] rounded-control px-3 py-2 text-[11px] font-mono text-[color:var(--app-text)] focus:outline-none focus:border-[#FF5C00]"
-                   />
-                 )}
-              </div>
-           </div>
-        </div>
-
-        {/* INTEGRATIONS HUB */}
-        <div className="col-span-12 md:col-span-8 bg-[var(--app-surface)] border-[0.5px] border-[color:var(--app-border)] rounded-card-outer p-6 sm:p-8 space-y-6 shadow-sm">
-           <div className="flex items-center gap-3 border-b-[0.5px] border-[#F4F5F7] pb-4">
-              <Share2 size={18} className="text-[#D1D1D1]" />
-              <h3 className="text-[11px] font-black text-[color:var(--app-text)] uppercase tracking-[0.2em] italic">OUTILS CONNECTÉS</h3>
-           </div>
-           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {/* WHATSAPP AUTOMATION CARD (GRAYED OUT / V2 PROMISE) */}
-              <div className="p-4 bg-[var(--app-surface-2)] border-[0.5px] border-[color:var(--app-border)] rounded-card-inner flex justify-between items-center opacity-60 cursor-default select-none">
-                 <div className="space-y-1">
-                    <p className="text-[12px] font-display italic font-black uppercase text-[color:var(--app-text-muted)]">WHATSAPP AUTOMATION</p>
-                    <p className="text-[9px] font-medium text-[color:var(--app-text-muted)] uppercase tracking-wider">L'automatisation WhatsApp arrive en V2.</p>
-                 </div>
-                 <span className="text-[9px] font-black italic tracking-widest text-[color:var(--app-text-muted)]">
-                    BIENTÔT
-                 </span>
-              </div>
-
-              {/* COPILOT EMAIL BRIEFING */}
-              <div className="p-4 bg-[var(--app-surface)] border-[0.5px] border-[color:var(--app-border)] rounded-card-inner flex flex-col justify-between space-y-3">
-                 <div className="space-y-1 text-left">
-                    <p className="text-[12px] font-display italic font-black uppercase text-[color:var(--app-text)]">BRIEFING COPILOTE (EMAIL)</p>
-                    <p className="text-[9px] font-medium text-[color:var(--app-text-muted)] uppercase tracking-wider">Fréquence d'envoi du brief quotidien par email</p>
-                 </div>
-                 <select 
-                   value={copilotEmailFreq}
-                   onChange={(e) => setCopilotEmailFreq(e.target.value as any)}
-                   className="w-full bg-[var(--app-surface-2)] border border-[color:var(--app-border)] rounded-control px-2.5 py-1.5 text-[11px] font-mono font-bold text-[color:var(--app-text)] focus:outline-none focus:border-[#FF5C00] focus:bg-[var(--app-surface)] transition-all cursor-pointer"
-                 >
-                   <option value="quotidien">QUOTIDIEN</option>
-                   <option value="hebdo">HEBDOMADAIRE</option>
-                   <option value="jamais">JAMAIS</option>
-                 </select>
-              </div>
-           </div>
-        </div>
-
-        {/* SECURITY & SAFE ZONE */}
-        <div className="col-span-12 md:col-span-6 bg-[var(--app-surface)] border-[0.5px] border-[color:var(--app-border)] rounded-card-outer p-6 sm:p-8 space-y-6 shadow-sm">
-           <div className="flex items-center gap-3 border-b-[0.5px] border-[#F4F5F7] pb-4">
-              <Shield size={18} className="text-[#FF5C00]" />
-              <h3 className="text-[11px] font-black text-[color:var(--app-text)] uppercase tracking-[0.2em] italic">SÉCURITÉ DU CREW</h3>
-           </div>
-           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div className="space-y-4">
-                 <div className="space-y-1.5">
-                    <p className="text-[10px] font-black uppercase text-[color:var(--app-text)]">NUMÉROS SOS PRIORITAIRES</p>
-                    <input 
-                      type="text" 
-                      value={sosNumbers}
-                      onChange={(e) => setSosNumbers(e.target.value)}
-                      className="w-full bg-[var(--app-surface-2)] border border-[color:var(--app-border)] rounded-control px-3 py-2 text-[12px] font-mono font-bold text-[color:var(--app-text)] focus:outline-none focus:border-[#FF5C00] focus:bg-[var(--app-surface)] focus-visible:ring-1 focus-visible:ring-[#FF5C00] transition-all"
-                    />
-                 </div>
-                 <div className="space-y-1.5">
-                    <p className="text-[10px] font-black uppercase text-[color:var(--app-text)]">CONTACT D'URGENCE DE L'ORGANISATEUR</p>
-                    <input 
-                      type="text" 
-                      value={safetyContact}
-                      onChange={(e) => setSafetyContact(e.target.value)}
-                      className="w-full bg-[var(--app-surface-2)] border border-[color:var(--app-border)] rounded-control px-3 py-2 text-[12px] font-mono font-bold text-[color:var(--app-text)] focus:outline-none focus:border-[#FF5C00] focus:bg-[var(--app-surface)] focus-visible:ring-1 focus-visible:ring-[#FF5C00] transition-all"
-                    />
-                 </div>
-              </div>
-              <div className="bg-[var(--app-surface-2)] border border-[color:var(--app-border)] rounded-card-inner p-5 flex flex-col justify-center gap-2">
-                 <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center text-[#FF5C00]">
-                    <AlertTriangle size={16} />
-                 </div>
-                 <p className="text-[10px] font-black uppercase tracking-widest leading-relaxed text-[color:var(--app-text)]">
-                   NUMÉROS D'URGENCE
-                 </p>
-                 <p className="text-[10px] font-medium leading-relaxed text-[#6B6B63]">
-                   Affichés sur ton portail d'inscription. Tes membres les voient avant chaque session.
-                 </p>
-              </div>
-           </div>
-        </div>
-
-        {/* COTISATION & CAGNOTTE CONFIG */}
-        <div className="col-span-12 md:col-span-6 bg-[var(--app-surface)] border-[0.5px] border-[color:var(--app-border)] rounded-card-outer p-6 sm:p-8 space-y-6 shadow-sm">
-           <div className="flex items-center gap-3 border-b-[0.5px] border-[#F4F5F7] pb-4">
-              <Wallet size={18} className="text-[#FF5C00]" />
-              <h3 className="text-[11px] font-black text-[color:var(--app-text)] uppercase tracking-[0.2em] italic">COTISATION / ADHÉSION & CAGNOTTE</h3>
-           </div>
-           <div className="space-y-4">
-              <div className="space-y-2 text-left">
-                 <label className="text-[8px] font-black text-[color:var(--app-text)] uppercase tracking-widest italic block">
-                    Lien HelloAsso, Lydia, Sumeria ou PayPal
-                 </label>
-                 <input 
-                   type="text" 
-                   value={cagnotteUrl}
-                   onChange={(e) => setCagnotteUrl(e.target.value)}
-                   placeholder="https://www.helloasso.com/... ou https://lydia-app.com/..."
-                   className="w-full bg-[var(--app-surface-2)] border border-[color:var(--app-border)] rounded-control px-3.5 py-2.5 text-[12px] font-mono font-bold text-[color:var(--app-text)] focus:outline-none focus:border-[#FF5C00] focus:bg-[var(--app-surface)] focus-visible:ring-1 focus-visible:ring-[#FF5C00] transition-all placeholder:text-neutral-450"
-                 />
-              </div>
-
-              <div className="text-[9.5px] font-medium text-[color:var(--app-text-muted)] leading-relaxed uppercase space-y-1 bg-[var(--app-surface-2)]/30 border border-black/[0.03] p-3 rounded-card-inner text-left">
-                 <p className="text-[8px] font-black text-[color:var(--app-text-muted)]">Colle ici le lien pour collecter les cotisations de ton club ou les dons :</p>
-                 <p className="font-bold text-[color:var(--app-text)]/60 pt-0.5">• HelloAsso → helloasso.com/associations/ton-club (0% commission)</p>
-                 <p className="font-bold text-[color:var(--app-text)]/60">• Lydia / Sumeria → lydia-app.com ou sumeria.eu/collect/...</p>
-                 <p className="font-bold text-[color:var(--app-text)]/60">• PayPal → paypal.me/tonnom</p>
-                 <p className="text-[8.5px] text-[#FF5C00] font-black pt-1">💡 Affiché sur l&apos;écran d&apos;accueil et le profil de tous tes membres.</p>
-              </div>
-
-              <button 
-                onClick={async () => {
-                  setIsSavingCagnotte(true);
-                  localStorage.setItem('capten_cagnotte_url', cagnotteUrl);
-                  try {
-                    const supabase = getSupabase();
-                    if (supabase) {
-                      const { data: { user } } = await supabase.auth.getUser();
-                      if (user) {
-                        await supabase
-                          .from('clubs')
-                          .update({ cagnotte_url: cagnotteUrl, website_url: cagnotteUrl })
-                          .eq('id', user.id);
-                        showToast("COTISATION & CAGNOTTE ENREGISTRÉES !");
-                      }
-                    } else {
-                      showToast("ENREGISTRÉ LOCALEMENT !");
-                    }
-                  } catch (e) {
-                    showToast("Erreur lors de la sauvegarde.");
-                  } finally {
-                    setIsSavingCagnotte(false);
-                  }
-                }}
-                disabled={isSavingCagnotte}
-                className="w-full bg-black text-white px-5 py-3.5 rounded-[6px] text-[10px] font-black uppercase tracking-widest hover:bg-[#FF5C00] transition-all cursor-pointer active:scale-95 disabled:bg-gray-400 flex items-center justify-center gap-2"
-              >
-                {isSavingCagnotte ? (
-                  <>
-                    <div className="w-3.5 h-3.5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-                    SAUVEGARDE...
-                  </>
-                ) : (
-                  "SAUVEGARDER LE LIEN DE COTISATION"
-                )}
-              </button>
-           </div>
-        </div>
-
-        {/* SUBSCRIPTION & ACCESS */}
-        <div className="col-span-12 bg-[var(--app-surface)] border-[0.5px] border-[color:var(--app-border)] rounded-card-outer p-6 sm:p-8 flex flex-col lg:flex-row gap-6 items-start lg:items-center justify-between shadow-sm">
-           <div className="flex items-center gap-6 text-left">
-              <div className="w-12 h-12 bg-[#FF5C00]/10 rounded-control flex items-center justify-center text-[#FF5C00] shrink-0">
-                 <CreditCard size={24} />
-              </div>
-              <div className="space-y-1">
-                 <h4 className="text-[15px] sm:text-[16px] font-black uppercase text-[color:var(--app-text)]">
-                   Mon Abonnement CAPTEN : <span className="text-[#FF5C00]">{club?.plan === 'trial' ? 'ESSAI EN COURS' : currentPlan === 'CAPTEN' ? 'ACTIF PRO' : 'GRATUIT'}</span>
-                 </h4>
-                 <p className="text-[9px] sm:text-[10px] font-medium text-[color:var(--app-text-muted)] uppercase tracking-widest leading-relaxed">
-                   {club?.plan === 'trial' 
-                     ? `Période d'essai gratuite active • ${Math.max(0, 21 - Math.floor((Date.now() - new Date(club.created_at || Date.now()).getTime()) / (1000 * 60 * 60 * 24)))} jours restants`
-                     : currentPlan === 'CAPTEN'
-                       ? `Formule pro active • Facturation automatique active` 
-                       : `Formule gratuite active • Fonctionnalités limitées`}
-                 </p>
-              </div>
-           </div>
-           <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
-              <button 
-                onClick={() => setShowTeamModal(true)}
-                className="w-full sm:w-auto px-6 py-3.5 bg-[var(--app-surface-2)] text-[color:var(--app-text)] text-[10px] font-black uppercase tracking-widest rounded-control hover:bg-black hover:text-white transition-all cursor-pointer text-center"
-              >
-                GÉRER L'ÉQUIPE
-              </button>
-              {(club?.plan === 'trial' || currentPlan === 'CAPTEN') && (
-                <button 
-                  onClick={handleCancelTrial}
-                  className="w-full sm:w-auto px-6 py-3.5 bg-red-50 text-red-650 hover:bg-red-500 hover:text-white text-[10px] font-black uppercase tracking-widest rounded-control transition-all cursor-pointer text-center"
-                >
-                  {currentPlan === 'CAPTEN' ? "RÉSILIER L'ABONNEMENT" : "RÉSILIER L'ESSAI"}
-                </button>
-              )}
-              <button 
-                onClick={handleRedirectToPortal}
-                className="w-full sm:w-auto px-6 py-3.5 bg-black text-white text-[10px] font-black uppercase tracking-widest rounded-control hover:bg-[#FF5C00] transition-all flex items-center justify-center cursor-pointer text-center"
-              >
-                GÉRER MON ABONNEMENT
-              </button>
-           </div>
-        </div>
-
-      </div>
-
-      {/* TOAST NOTIFICATION OVERLAY */}
+    <div className="space-y-8 pb-24 max-w-4xl">
+      {/* Toast */}
       {toast && (
-        <div className="fixed bottom-10 left-1/2 -translate-x-1/2 bg-black text-white px-6 sm:px-8 py-4 rounded-card-outer border-[0.5px] border-white/20 shadow-2xl z-[300] flex items-center gap-3 animate-slide-up text-center w-[90%] max-w-[400px] justify-center">
-          <CheckCircle2 size={16} className="text-[#56E39F] shrink-0" />
-          <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider">{toast}</span>
+        <div className="fixed top-6 right-6 z-50 bg-[#111111] text-white px-5 py-3 rounded-2xl shadow-2xl border border-white/10 text-xs font-black uppercase tracking-wider flex items-center gap-2 animate-fade-in">
+          <Check size={14} className="text-[#22C55E]" />
+          {toast}
         </div>
       )}
 
-      {/* WHATSAPP CONNECTION MODAL */}
-      {showWhatsappModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-[500] flex items-center justify-center p-4">
-          <div className="bg-[#0A0A0C] border-[0.5px] border-white/10 rounded-card-outer max-w-[450px] w-full p-6 sm:p-8 space-y-6 relative overflow-hidden shadow-2xl">
-            {/* Glowing decorative border */}
-            <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#25D366] to-transparent animate-pulse" />
+      {/* Header */}
+      <div>
+        <h1 className="text-[32px] sm:text-[42px] font-display italic font-black uppercase text-[color:var(--app-text)] leading-none tracking-tighter">
+          Réglages
+        </h1>
+        <p className="text-[13px] text-[color:var(--app-text-muted)] font-sans mt-1">
+          Gère l&apos;identité de ton crew, ton forfait et ton assistance.
+        </p>
+      </div>
 
-            <div className="flex justify-between items-start">
-              <div className="space-y-1">
-                <h3 className="text-[18px] font-display italic font-black uppercase text-white tracking-wide">
-                  INTÉGRATION WHATSAPP
-                </h3>
-                <p className="text-[10px] font-medium text-white/40 uppercase tracking-widest">
-                  {isDemoMode ? "[MODE DÉMO] SIMULATEUR DE LIAISON" : "CONNEXION DIRECTE PAR CODE QR"}
-                </p>
-              </div>
-              <button 
-                onClick={() => setShowWhatsappModal(false)}
-                className="text-white/40 hover:text-white transition-colors text-[18px] font-bold cursor-pointer"
-              >
-                ✕
-              </button>
-            </div>
+      {/* ── SECTION 1 : IDENTITÉ DU CLUB & PAGE PUBLIQUE ── */}
+      <form onSubmit={handleSaveIdentity} className="bg-[var(--app-surface)] border border-[color:var(--app-border)] rounded-[28px] p-6 sm:p-8 shadow-sm space-y-6">
+        <div className="flex items-center gap-3 border-b border-[color:var(--app-border)] pb-4">
+          <span className="w-10 h-10 rounded-2xl bg-[#FF5C00]/10 flex items-center justify-center text-[#FF5C00]">
+            <Building2 size={20} />
+          </span>
+          <div>
+            <h2 className="text-base font-extrabold uppercase tracking-tight text-[color:var(--app-text)]">
+              1. Identité &amp; Page Publique du Crew
+            </h2>
+            <p className="text-xs text-[color:var(--app-text-muted)]">
+              Ces informations sont affichées sur ta page d&apos;inscription et le passeport de tes membres.
+            </p>
+          </div>
+        </div>
 
-            {whatsappStatus === 'connected' ? (
-              <div className="space-y-6 py-4 text-center">
-                <div className="w-16 h-16 bg-[#25D366]/10 border-[0.5px] border-[#25D366]/20 rounded-full flex items-center justify-center mx-auto text-[#25D366] shadow-[0_0_20px_rgba(37,211,102,0.1)]">
-                  <CheckCircle2 size={32} />
-                </div>
-                <div className="space-y-2">
-                  <p className="text-[16px] font-black text-white uppercase italic">
-                    WHATSAPP LIÉ ET ACTIF !
-                  </p>
-                  <p className="text-[11px] font-mono text-white/60">
-                    Numéro connecté : +{whatsappPhone}
-                  </p>
-                  {isDemoMode && (
-                    <p className="text-[9px] font-medium text-[#FF5C00] uppercase tracking-wider bg-[#FF5C00]/10 py-1.5 px-3 rounded-control max-w-[300px] mx-auto">
-                      Note : Vous êtes en mode démonstration.
-                    </p>
-                  )}
-                </div>
-                <div className="pt-4 flex flex-col gap-3">
-                  <button
-                    onClick={fetchWhatsappStatus}
-                    className="w-full py-3 border-[0.5px] border-white/10 hover:border-white/30 text-white rounded-control text-[10px] font-black uppercase tracking-wider transition-colors cursor-pointer"
-                  >
-                    ACTUALISER LE STATUT
-                  </button>
-                  <button
-                    onClick={handleDisconnectWhatsapp}
-                    className="w-full py-3 bg-[#FF0000]/10 border-[0.5px] border-[#FF0000]/20 hover:bg-[#FF0000] text-[#FF0000] hover:text-white rounded-control text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer"
-                  >
-                    DÉCONNECTER CET APPAREIL
-                  </button>
-                </div>
-              </div>
+        {/* Logo Upload */}
+        <div className="flex items-center gap-5">
+          <div 
+            onClick={() => fileInputRef.current?.click()}
+            className="relative w-20 h-20 rounded-2xl bg-[var(--app-surface-2)] border-2 border-dashed border-[color:var(--app-border)] hover:border-[#FF5C00] flex items-center justify-center cursor-pointer overflow-hidden transition-colors group shrink-0"
+          >
+            {logoUrl ? (
+              <img src={logoUrl} alt="Logo" className="w-full h-full object-cover" />
             ) : (
-              <div className="space-y-6 text-center">
-                <p className="text-[11px] font-medium text-white/70 leading-relaxed uppercase tracking-wider text-left">
-                  Pour connecter le WhatsApp du club, ouvrez WhatsApp sur votre téléphone :
-                  <br /><span className="text-[#25D366] font-bold">Paramètres &gt; Appareils Connectés &gt; Lier un appareil</span>, puis scannez ce code.
-                </p>
-
-                <div className="bg-[var(--app-surface)] p-4 rounded-card-inner w-56 h-56 mx-auto flex items-center justify-center relative overflow-hidden shadow-[0_0_30px_rgba(37,211,102,0.15)] border-[0.5px] border-white/10">
-                  {whatsappQr ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img 
-                      src={whatsappQr} 
-                      alt="WhatsApp QR Code" 
-                      className="w-full h-full object-contain"
-                    />
-                  ) : (
-                    <div className="flex flex-col items-center justify-center gap-3">
-                      <div className="w-8 h-8 border-2 border-black/20 border-t-[#25D366] rounded-full animate-spin" />
-                      <p className="text-[9px] font-black text-[color:var(--app-text)] uppercase tracking-widest">GÉNÉRATION DU CODE...</p>
-                    </div>
-                  )}
-                </div>
-
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => {
-                      fetchWhatsappStatus();
-                      showToast("Vérification en cours...");
-                    }}
-                    className="flex-1 py-3 bg-[#25D366] text-[color:var(--app-text)] hover:bg-[#00E676] rounded-control text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer shadow-[0_0_15px_rgba(37,211,102,0.3)]"
-                  >
-                    VÉRIFIER LA CONNEXION
-                  </button>
-                  <button
-                    onClick={() => setShowWhatsappModal(false)}
-                    className="flex-1 py-3 border-[0.5px] border-white/10 hover:border-white/20 text-white rounded-control text-[10px] font-black uppercase tracking-wider transition-colors cursor-pointer"
-                  >
-                    FERMER
-                  </button>
-                </div>
+              <div className="text-center p-2">
+                <Upload size={18} className="mx-auto text-[color:var(--app-text-muted)] group-hover:text-[#FF5C00] transition-colors" />
+                <span className="text-[9px] font-bold text-[color:var(--app-text-muted)] block mt-1 uppercase">Logo</span>
+              </div>
+            )}
+            {logoUploading && (
+              <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                <Loader2 size={16} className="text-white animate-spin" />
               </div>
             )}
           </div>
-        </div>
-      )}
+          <input 
+            type="file" 
+            ref={fileInputRef} 
+            onChange={handleLogoUpload} 
+            accept="image/*" 
+            className="hidden" 
+          />
 
-      {/* TEAM MANAGEMENT MODAL */}
-      {showTeamModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-[500] flex items-center justify-center p-4">
-          <div className="bg-[#0A0A0C] border-[0.5px] border-white/10 rounded-card-outer max-w-[500px] w-full p-6 sm:p-8 space-y-6 relative overflow-hidden shadow-2xl">
-            {/* Glowing decorative border */}
-            <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#FF5C00] to-transparent" />
-
-            <div className="flex justify-between items-start">
-              <div className="space-y-1">
-                <h3 className="text-[18px] font-display italic font-black uppercase text-white tracking-wide">
-                  Gérer l'équipe des Coachs
-                </h3>
-                <p className="text-[10px] font-medium text-white/40 uppercase tracking-widest">
-                  Membres autorisés à gérer le club et planifier les runs
-                </p>
-              </div>
-              <button 
-                onClick={() => setShowTeamModal(false)}
-                className="text-white/40 hover:text-white transition-colors text-[18px] font-bold cursor-pointer"
-              >
-                ✕
-              </button>
-            </div>
-
-            {/* List of coaches */}
-            <div className="space-y-3 max-h-[200px] overflow-y-auto pr-1 custom-scrollbar">
-              {coaches.map((coach, index) => (
-                <div key={index} className="flex justify-between items-center p-3 bg-white/5 border border-white/5 rounded-control">
-                  <div>
-                    <p className="text-[12px] font-bold text-white">{coach.name}</p>
-                    <p className="text-[10px] text-white/40">{coach.email}</p>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-[9px] font-mono bg-[#FF5C00]/10 border border-[#FF5C00]/20 text-[#FF5C00] px-2 py-0.5 rounded uppercase">
-                      {coach.role}
-                    </span>
-                    {coach.role !== "Créateur" && (
-                      <button
-                        onClick={async () => {
-                          const updated = coaches.filter((_, i) => i !== index);
-                          setCoaches(updated);
-                          if (isMock) {
-                            localStorage.setItem('capten_coaches', JSON.stringify(updated));
-                          } else {
-                            try {
-                              await fetch('/api/club/settings', {
-                                method: 'PATCH',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ coaches: updated })
-                              });
-                              await refreshClub();
-                            } catch (e) {
-                              console.error(e);
-                            }
-                          }
-                          showToast("MEMBRE RETIRÉ DE L'ÉQUIPE !");
-                        }}
-                        className="text-red-500 hover:text-red-400 text-[10px] font-bold uppercase transition-colors"
-                      >
-                        Retirer
-                      </button>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Form to add coach */}
-            <form 
-              onSubmit={async (e) => {
-                e.preventDefault();
-                const formData = new FormData(e.currentTarget);
-                const name = formData.get('name') as string;
-                const email = formData.get('email') as string;
-                const role = formData.get('role') as string;
-                if (!name || !email) return;
-
-                const newCoach = { name, email, role };
-                const updated = [...coaches, newCoach];
-                setCoaches(updated);
-                
-                if (isMock) {
-                  localStorage.setItem('capten_coaches', JSON.stringify(updated));
-                } else {
-                  try {
-                    await fetch('/api/club/settings', {
-                      method: 'PATCH',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ coaches: updated })
-                    });
-                    await refreshClub();
-                  } catch (err) {
-                    console.error(err);
-                  }
-                }
-                showToast("NOUVEAU COACH INVITÉ !");
-                e.currentTarget.reset();
-              }}
-              className="border-t border-white/10 pt-4 space-y-4"
+          <div className="space-y-1">
+            <p className="text-xs font-black uppercase text-[color:var(--app-text)]">
+              Logo du Crew
+            </p>
+            <p className="text-xs text-[color:var(--app-text-muted)]">
+              PNG ou SVG recommandé (carré 400x400 px).
+            </p>
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="text-xs font-bold text-[#FF5C00] hover:underline cursor-pointer"
             >
-              <p className="text-[10px] font-black uppercase text-white/60 tracking-wider">Ajouter un membre à l'équipe</p>
-              <div className="grid grid-cols-2 gap-3">
-                <input 
-                  type="text" 
-                  name="name" 
-                  placeholder="Prénom & Nom"
-                  required
-                  className="bg-white/5 border border-white/10 rounded-control px-3 py-2 text-[11px] text-white placeholder-white/30 focus:outline-none focus:border-[#FF5C00] transition-all"
-                />
-                <input 
-                  type="email" 
-                  name="email" 
-                  placeholder="Adresse Email"
-                  required
-                  className="bg-white/5 border border-white/10 rounded-control px-3 py-2 text-[11px] text-white placeholder-white/30 focus:outline-none focus:border-[#FF5C00] transition-all"
-                />
-              </div>
-              <div className="flex gap-3 items-center">
-                <select 
-                  name="role"
-                  defaultValue="Coach Principal"
-                  className="flex-1 bg-white/5 border border-white/10 rounded-control px-3 py-2 text-[11px] text-white/80 focus:outline-none focus:border-[#FF5C00] transition-all cursor-pointer"
-                >
-                  <option value="Coach Principal" className="bg-[#0A0A0C] text-white">Coach Principal</option>
-                  <option value="Meneur d'Allure" className="bg-[#0A0A0C] text-white">Meneur d'Allure</option>
-                  <option value="Co-Organisateur" className="bg-[#0A0A0C] text-white">Co-Organisateur</option>
-                </select>
-                <button 
-                  type="submit"
-                  className="bg-[#FF5C00] hover:bg-[#FF5C00]/90 text-white px-5 py-2 rounded-control text-[10px] font-black uppercase tracking-wider transition-all active:scale-95 cursor-pointer"
-                >
-                  AJOUTER
-                </button>
-              </div>
-            </form>
-
-            <div className="pt-2">
-              <button
-                onClick={() => setShowTeamModal(false)}
-                className="w-full py-3 border-[0.5px] border-white/10 hover:border-white/20 text-white rounded-control text-[10px] font-black uppercase tracking-wider transition-colors cursor-pointer"
-              >
-                FERMER
-              </button>
-            </div>
+              Changer l&apos;image →
+            </button>
           </div>
         </div>
-      )}
+
+        {/* Form Inputs */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-black uppercase tracking-widest text-[color:var(--app-text-muted)]">
+              Nom du Crew *
+            </label>
+            <input
+              type="text"
+              required
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Ex: DIAWARA CLUB"
+              className="w-full h-11 px-4 rounded-xl bg-[var(--app-surface-2)] text-xs font-extrabold text-[color:var(--app-text)] outline-none focus:ring-1 focus:ring-[#FF5C00]"
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-black uppercase tracking-widest text-[color:var(--app-text-muted)]">
+              Ville ou Quartier
+            </label>
+            <input
+              type="text"
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+              placeholder="Ex: Paris 10ème, Lyon, Bordeaux..."
+              className="w-full h-11 px-4 rounded-xl bg-[var(--app-surface-2)] text-xs font-medium text-[color:var(--app-text)] outline-none focus:ring-1 focus:ring-[#FF5C00]"
+            />
+          </div>
+        </div>
+
+        <div className="space-y-1.5">
+          <label className="text-[10px] font-black uppercase tracking-widest text-[color:var(--app-text-muted)]">
+            Description / Bio du Crew
+          </label>
+          <textarea
+            rows={2}
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Ex: Runs tous les mardis et jeudis à 19h. Ambiance bienveillante, tous niveaux bienvenus !"
+            className="w-full p-3 rounded-xl bg-[var(--app-surface-2)] text-xs font-medium text-[color:var(--app-text)] outline-none focus:ring-1 focus:ring-[#FF5C00] resize-none"
+          />
+        </div>
+
+        {/* Social Links */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-[color:var(--app-border)]">
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-black uppercase tracking-widest text-[color:var(--app-text-muted)] flex items-center gap-1.5">
+              <Instagram size={12} className="text-[#FF5C00]" />
+              Lien ou Compte Instagram
+            </label>
+            <input
+              type="text"
+              value={instagramUrl}
+              onChange={(e) => setInstagramUrl(e.target.value)}
+              placeholder="https://instagram.com/diawaraclub"
+              className="w-full h-11 px-4 rounded-xl bg-[var(--app-surface-2)] text-xs font-medium text-[color:var(--app-text)] outline-none focus:ring-1 focus:ring-[#FF5C00]"
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-black uppercase tracking-widest text-[color:var(--app-text-muted)] flex items-center gap-1.5">
+              <Phone size={12} className="text-[#22C55E]" />
+              Lien Groupe WhatsApp du Crew
+            </label>
+            <input
+              type="text"
+              value={whatsappLink}
+              onChange={(e) => setWhatsappLink(e.target.value)}
+              placeholder="https://chat.whatsapp.com/..."
+              className="w-full h-11 px-4 rounded-xl bg-[var(--app-surface-2)] text-xs font-medium text-[color:var(--app-text)] outline-none focus:ring-1 focus:ring-[#FF5C00]"
+            />
+          </div>
+        </div>
+
+        {/* Public Join Link Card */}
+        <div className="bg-[#FF5C00]/[0.06] border border-[#FF5C00]/20 rounded-2xl p-4.5 space-y-2">
+          <p className="text-[10px] font-black uppercase tracking-widest text-[#FF5C00]">
+            🔗 Ton Lien Public d&apos;Adhésion
+          </p>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+            <div className="flex-1 px-3.5 py-2 rounded-xl bg-[var(--app-surface)] border border-[color:var(--app-border)] font-mono text-xs font-bold text-[color:var(--app-text)] truncate">
+              {joinUrl}
+            </div>
+            <button
+              type="button"
+              onClick={copyJoinUrl}
+              className="h-10 px-4 rounded-xl bg-[var(--app-surface)] border border-[color:var(--app-border)] text-xs font-bold text-[color:var(--app-text)] hover:border-[#FF5C00] transition-colors flex items-center justify-center gap-1.5 cursor-pointer shrink-0"
+            >
+              {copied ? <CheckCheck size={14} className="text-[#22C55E]" /> : <Copy size={14} />}
+              {copied ? "Lien copié !" : "Copier le lien"}
+            </button>
+            <a
+              href={joinUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="h-10 px-3.5 rounded-xl bg-[#FF5C00] text-white text-xs font-black uppercase tracking-wider hover:bg-[#E04B00] transition-colors flex items-center justify-center gap-1.5 shrink-0"
+            >
+              <ExternalLink size={13} />
+              Aperçu
+            </a>
+          </div>
+        </div>
+
+        <div className="flex justify-end pt-2">
+          <button
+            type="submit"
+            disabled={saving}
+            className="h-11 px-7 rounded-xl bg-[#111111] text-white text-xs font-black uppercase tracking-wider hover:bg-black transition-transform active:scale-95 cursor-pointer shadow-md"
+          >
+            {saving ? "Enregistrement..." : "Sauvegarder les modifications"}
+          </button>
+        </div>
+      </form>
+
+      {/* ── SECTION 2 : FORFAIT & ABONNEMENT ── */}
+      <div className="bg-[var(--app-surface)] border border-[color:var(--app-border)] rounded-[28px] p-6 sm:p-8 shadow-sm space-y-6">
+        <div className="flex items-center gap-3 border-b border-[color:var(--app-border)] pb-4">
+          <span className="w-10 h-10 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-600">
+            <CreditCard size={20} />
+          </span>
+          <div>
+            <h2 className="text-base font-extrabold uppercase tracking-tight text-[color:var(--app-text)]">
+              2. Forfait &amp; Statut du Compte
+            </h2>
+            <p className="text-xs text-[color:var(--app-text-muted)]">
+              Détails de ton infrastructure CAPTEN.
+            </p>
+          </div>
+        </div>
+
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl bg-[var(--app-surface-2)] border border-[color:var(--app-border)]">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="text-base font-black text-[color:var(--app-text)]">
+                Plan Fondateur Pro
+              </span>
+              <span className="px-2.5 py-0.5 rounded-full bg-[#22C55E]/10 text-[#22C55E] border border-[#22C55E]/20 text-[10px] font-black uppercase tracking-wider">
+                ✓ Actif &amp; Débloqué
+              </span>
+            </div>
+            <p className="text-xs text-[color:var(--app-text-muted)]">
+              Accès complet à toutes les fonctionnalités (Runs illimités, Décharges horodatées, ICE, Spots, Cagnotte).
+            </p>
+          </div>
+
+          <div className="shrink-0">
+            <span className="text-xs font-mono font-bold text-[color:var(--app-text-muted)]">
+              Compte : {user?.email || "Fondateur"}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* ── SECTION 3 : ASSISTANCE & SUPPORT ── */}
+      <div className="bg-[var(--app-surface)] border border-[color:var(--app-border)] rounded-[28px] p-6 sm:p-8 shadow-sm space-y-6">
+        <div className="flex items-center gap-3 border-b border-[color:var(--app-border)] pb-4">
+          <span className="w-10 h-10 rounded-2xl bg-blue-500/10 flex items-center justify-center text-blue-500">
+            <HelpCircle size={20} />
+          </span>
+          <div>
+            <h2 className="text-base font-extrabold uppercase tracking-tight text-[color:var(--app-text)]">
+              3. Assistance &amp; Support Direct
+            </h2>
+            <p className="text-xs text-[color:var(--app-text-muted)]">
+              Une question, une idée ou un besoin d&apos;assistance ? L&apos;équipe CAPTEN te répond en direct.
+            </p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <a
+            href={`https://wa.me/33600000000?text=${encodeURIComponent(`👋 Hello l'équipe CAPTEN ! Je suis le capitaine de ${name || "mon club"} et j'ai une question :`)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-5 rounded-2xl bg-[#22C55E]/10 border border-[#22C55E]/30 hover:bg-[#22C55E]/15 transition-colors flex items-start gap-3.5 group"
+          >
+            <MessageCircle className="w-6 h-6 text-[#22C55E] shrink-0 mt-0.5" />
+            <div>
+              <p className="text-xs font-black uppercase text-[color:var(--app-text)]">
+                Assistance WhatsApp
+              </p>
+              <p className="text-[11px] text-[color:var(--app-text-muted)] mt-0.5">
+                Chat en direct avec l&apos;équipe produit pour un retour rapide.
+              </p>
+              <span className="inline-flex items-center gap-1 text-xs font-extrabold text-[#22C55E] mt-2 group-hover:translate-x-0.5 transition-transform">
+                Ouvrir WhatsApp →
+              </span>
+            </div>
+          </a>
+
+          <a
+            href="mailto:info.captenfr@gmail.com?subject=Assistance%20Capitaine%20CAPTEN"
+            className="p-5 rounded-2xl bg-[var(--app-surface-2)] border border-[color:var(--app-border)] hover:border-[#FF5C00] transition-colors flex items-start gap-3.5 group"
+          >
+            <Mail className="w-6 h-6 text-[#FF5C00] shrink-0 mt-0.5" />
+            <div>
+              <p className="text-xs font-black uppercase text-[color:var(--app-text)]">
+                Support par Email
+              </p>
+              <p className="text-[11px] text-[color:var(--app-text-muted)] mt-0.5">
+                info.captenfr@gmail.com (réponse sous 24h).
+              </p>
+              <span className="inline-flex items-center gap-1 text-xs font-extrabold text-[#FF5C00] mt-2 group-hover:translate-x-0.5 transition-transform">
+                Envoyer un email →
+              </span>
+            </div>
+          </a>
+        </div>
+
+        {/* FAQ Accordion */}
+        <div className="pt-3 space-y-2">
+          <p className="text-[10px] font-black uppercase tracking-widest text-[color:var(--app-text-muted)] mb-2">
+            Questions Fréquentes (FAQ)
+          </p>
+          <div className="divide-y divide-[color:var(--app-border)] border border-[color:var(--app-border)] rounded-2xl overflow-hidden">
+            {FAQS.map((item, i) => {
+              const isOpen = openFaq === i;
+              return (
+                <div key={i} className="bg-[var(--app-surface)]">
+                  <button
+                    type="button"
+                    onClick={() => setOpenFaq(isOpen ? null : i)}
+                    className="w-full p-4 flex items-center justify-between gap-3 text-left hover:bg-[var(--app-hover)] transition-colors cursor-pointer"
+                  >
+                    <span className="text-xs font-extrabold text-[color:var(--app-text)]">
+                      {item.q}
+                    </span>
+                    {isOpen ? (
+                      <ChevronUp size={16} className="text-[#FF5C00] shrink-0" />
+                    ) : (
+                      <ChevronDown size={16} className="text-neutral-400 shrink-0" />
+                    )}
+                  </button>
+                  {isOpen && (
+                    <div className="px-4 pb-4 pt-1 text-xs text-[color:var(--app-text-muted)] leading-relaxed bg-[var(--app-surface-2)]/30">
+                      {item.a}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
