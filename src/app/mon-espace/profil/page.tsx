@@ -55,7 +55,7 @@ async function getMembreData(membreId: string) {
       .single(),
 
     ub(supabase, "membre_club")
-      .select("club_id, joined_at, clubs(id, name, logo_url, city)")
+      .select("club_id, joined_at, clubs(id, name, logo_url, city, website_url, cagnotte_url)")
       .eq("membre_id", membreId)
       .eq("is_active", true),
 
@@ -259,6 +259,36 @@ export default async function ProfilPage({
                 <p className="text-sm font-bold text-[#111111]">Aucun run prévu</p>
                 <p className="text-xs text-[#9CA3AF] mt-0.5">Ton crew publiera bientôt le prochain.</p>
               </Link>
+            )}
+
+            {/* Soutien / Cotisation du Crew */}
+            {(primaryClub?.website_url || primaryClub?.cagnotte_url) && (
+              <div className="bg-gradient-to-br from-amber-500/[0.08] via-white to-white rounded-2xl border border-amber-500/30 p-5 shadow-sm space-y-3">
+                <div className="flex items-center gap-2.5">
+                  <span className="w-9 h-9 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-600 font-bold text-base shrink-0">
+                    ☕
+                  </span>
+                  <div>
+                    <p className="text-xs font-black uppercase tracking-tight text-[#111111]">
+                      Cotisation & Soutien du Crew
+                    </p>
+                    <p className="text-[11px] text-[#6B7280]">
+                      {primaryClub.name}
+                    </p>
+                  </div>
+                </div>
+                <p className="text-xs text-[#6B7280] leading-relaxed">
+                  Participe à la caisse du club pour soutenir l&apos;organisation des runs, les ravitaillements et les équipements du crew.
+                </p>
+                <a
+                  href={primaryClub.website_url || primaryClub.cagnotte_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 w-full h-11 rounded-xl bg-amber-500 hover:bg-amber-600 text-black text-xs font-black uppercase tracking-wider transition-all shadow-sm"
+                >
+                  Soutenir le crew en 1 clic ↗
+                </a>
+              </div>
             )}
 
             {/* Ta fiche — statut prêt à courir en un coup d'œil */}

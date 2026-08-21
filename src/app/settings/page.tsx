@@ -499,31 +499,32 @@ export default function SettingsPage() {
            </div>
         </div>
 
-        {/* CAGNOTTE CONFIG */}
+        {/* COTISATION & CAGNOTTE CONFIG */}
         <div className="col-span-12 md:col-span-6 bg-[var(--app-surface)] border-[0.5px] border-[color:var(--app-border)] rounded-card-outer p-6 sm:p-8 space-y-6 shadow-sm">
            <div className="flex items-center gap-3 border-b-[0.5px] border-[#F4F5F7] pb-4">
               <Wallet size={18} className="text-[#FF5C00]" />
-              <h3 className="text-[11px] font-black text-[color:var(--app-text)] uppercase tracking-[0.2em] italic">CAGNOTTE POST-RUN</h3>
+              <h3 className="text-[11px] font-black text-[color:var(--app-text)] uppercase tracking-[0.2em] italic">COTISATION / ADHÉSION & CAGNOTTE</h3>
            </div>
            <div className="space-y-4">
               <div className="space-y-2 text-left">
                  <label className="text-[8px] font-black text-[color:var(--app-text)] uppercase tracking-widest italic block">
-                    URL Cagnotte / Lien de Paiement
+                    Lien HelloAsso, Lydia, Sumeria ou PayPal
                  </label>
                  <input 
                    type="text" 
                    value={cagnotteUrl}
                    onChange={(e) => setCagnotteUrl(e.target.value)}
-                   placeholder="https://sumeria.eu/collect/tonnom"
+                   placeholder="https://www.helloasso.com/... ou https://lydia-app.com/..."
                    className="w-full bg-[var(--app-surface-2)] border border-[color:var(--app-border)] rounded-control px-3.5 py-2.5 text-[12px] font-mono font-bold text-[color:var(--app-text)] focus:outline-none focus:border-[#FF5C00] focus:bg-[var(--app-surface)] focus-visible:ring-1 focus-visible:ring-[#FF5C00] transition-all placeholder:text-neutral-450"
                  />
               </div>
 
               <div className="text-[9.5px] font-medium text-[color:var(--app-text-muted)] leading-relaxed uppercase space-y-1 bg-[var(--app-surface-2)]/30 border border-black/[0.03] p-3 rounded-card-inner text-left">
-                 <p className="text-[8px] font-black text-[color:var(--app-text-muted)]">Colle ici le lien de ta cagnotte ou de ton profil de paiement. Exemples acceptés :</p>
-                 <p className="font-bold text-[color:var(--app-text)]/60 pt-0.5">• Sumeria → sumeria.eu/collect#tonnom</p>
-                 <p className="font-bold text-[color:var(--app-text)]/60">• Revolut → revolut.me/tonnom</p>
+                 <p className="text-[8px] font-black text-[color:var(--app-text-muted)]">Colle ici le lien pour collecter les cotisations de ton club ou les dons :</p>
+                 <p className="font-bold text-[color:var(--app-text)]/60 pt-0.5">• HelloAsso → helloasso.com/associations/ton-club (0% commission)</p>
+                 <p className="font-bold text-[color:var(--app-text)]/60">• Lydia / Sumeria → lydia-app.com ou sumeria.eu/collect/...</p>
                  <p className="font-bold text-[color:var(--app-text)]/60">• PayPal → paypal.me/tonnom</p>
+                 <p className="text-[8.5px] text-[#FF5C00] font-black pt-1">💡 Affiché sur l&apos;écran d&apos;accueil et le profil de tous tes membres.</p>
               </div>
 
               <button 
@@ -537,12 +538,12 @@ export default function SettingsPage() {
                       if (user) {
                         await supabase
                           .from('clubs')
-                          .update({ cagnotte_url: cagnotteUrl })
+                          .update({ cagnotte_url: cagnotteUrl, website_url: cagnotteUrl })
                           .eq('id', user.id);
-                        showToast("CAGNOTTE ENREGISTRÉE !");
+                        showToast("COTISATION & CAGNOTTE ENREGISTRÉES !");
                       }
                     } else {
-                      showToast("CAGNOTTE ENREGISTRÉE LOCALEMENT !");
+                      showToast("ENREGISTRÉ LOCALEMENT !");
                     }
                   } catch (e) {
                     showToast("Erreur lors de la sauvegarde.");
@@ -559,7 +560,7 @@ export default function SettingsPage() {
                     SAUVEGARDE...
                   </>
                 ) : (
-                  "SAUVEGARDER LA CAGNOTTE"
+                  "SAUVEGARDER LE LIEN DE COTISATION"
                 )}
               </button>
            </div>
