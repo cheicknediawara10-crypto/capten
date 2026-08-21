@@ -80,7 +80,7 @@ function SpotsSection({ spots, clubName }: { spots: CrewSpot[]; clubName: string
 
 function useClub(slug: string) {
   const [club, setClub] = React.useState<{
-    id: string; name: string; logo_url: string | null; city: string | null; description: string | null;
+    id: string; name: string; logo_url: string | null; city: string | null; description: string | null; website_url: string | null;
   } | null>(null);
   const [loading, setLoading] = React.useState(true);
 
@@ -88,7 +88,7 @@ function useClub(slug: string) {
     import("@/lib/supabase/client").then(({ createClient }) => {
       const sb = createClient();
       sb.from("clubs")
-        .select("id, name, logo_url, city, description")
+        .select("id, name, logo_url, city, description, website_url")
         .eq("slug", slug)
         .single()
         .then((res: { data: typeof club }) => { setClub(res.data); setLoading(false); });
@@ -243,6 +243,17 @@ export default function JoinPage() {
           >
             Accéder à mon espace <ArrowRight className="w-4 h-4" />
           </button>
+
+          {club.website_url && (
+            <a
+              href={club.website_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-3 w-full h-11 border border-[#E8E8E8] hover:border-[#FF5500] rounded-xl flex items-center justify-center gap-2 text-xs font-bold text-[#111111] transition-colors"
+            >
+              ☕ Cotisation / Soutenir l&apos;orga du crew ↗
+            </a>
+          )}
         </motion.div>
       </div>
     );

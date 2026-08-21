@@ -225,17 +225,20 @@ export default function ClubSettingsPage() {
             />
           </div>
           <div className="space-y-1">
-            <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--app-text-muted)] flex items-center gap-1">
-              <Globe size={10} />
-              Site web
+            <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--app-text-muted)] flex items-center justify-between">
+              <span className="flex items-center gap-1"><Globe size={10} /> Lien de Cotisation / Adhésion (Optionnel)</span>
+              <span className="text-[#FF5C00] font-normal lowercase">helloasso · lydia · site</span>
             </label>
             <input
               type="url"
               value={club.website_url || ""}
               onChange={(e) => update("website_url", e.target.value)}
-              placeholder="https://…"
+              placeholder="https://www.helloasso.com/... ou https://lydia-app.com/..."
               className="w-full h-11 px-4 rounded-[12px] border border-[color:var(--app-border)] text-sm font-medium focus:border-[#FF5C00] focus:ring-2 focus:ring-[#FF5C00]/20 outline-none transition-all"
             />
+            <p className="text-[11px] text-[color:var(--app-text-muted)]">
+              Permet aux membres de cotiser ou de soutenir le crew (ex: 10€/an pour l&apos;équipement, l&apos;after-run ou financer ton abonnement).
+            </p>
           </div>
         </div>
       </motion.div>
