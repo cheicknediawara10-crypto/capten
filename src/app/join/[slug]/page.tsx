@@ -16,6 +16,7 @@ const STEPS: Step[] = ["infos", "pin", "ice", "waiver", "success"];
 interface CrewSpot {
   id: string; nom: string; categorie: string; adresse: string | null;
   lien_maps: string | null; mot_du_fondateur: string | null; avantage: string | null;
+  suggested_by_name?: string | null; status?: string;
 }
 
 function useCrewSpots(clubId: string | undefined) {
@@ -25,8 +26,9 @@ function useCrewSpots(clubId: string | undefined) {
     import("@/lib/supabase/client").then(({ createClient }) => {
       createClient()
         .from("crew_spots")
-        .select("id, nom, categorie, adresse, lien_maps, mot_du_fondateur, avantage")
+        .select("id, nom, categorie, adresse, lien_maps, mot_du_fondateur, avantage, suggested_by_name, status")
         .eq("club_id", clubId)
+        .neq("status", "pending")
         .order("ordre")
         .then((res: { data: CrewSpot[] | null }) => setSpots(res.data || []));
     });
@@ -53,6 +55,11 @@ function SpotsSection({ spots, clubName }: { spots: CrewSpot[]; clubName: string
               </span>
               <div className="flex-1 min-w-0">
                 <p className="text-[13px] font-extrabold text-[#111111] leading-tight">{s.nom}</p>
+                {s.suggested_by_name && (
+                  <p className="text-[10px] font-bold text-[#FF5500] mt-0.5">
+                    🤝 Découvert par {s.suggested_by_name}
+                  </p>
+                )}
                 {s.mot_du_fondateur && (
                   <p className="text-[11px] text-[#9CA3AF] italic mt-0.5 truncate">« {s.mot_du_fondateur} »</p>
                 )}

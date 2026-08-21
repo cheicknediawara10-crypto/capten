@@ -654,11 +654,19 @@ CREATE TABLE IF NOT EXISTS membre_signalements (
 );
 
 CREATE INDEX IF NOT EXISTS idx_membre_signalements_club ON membre_signalements(club_id);
-CREATE INDEX IF NOT EXISTS idx_membre_signalements_status ON membre_signalements(status);
-
 ALTER TABLE membre_signalements ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Organisateur gere ses signalements" ON membre_signalements;
 CREATE POLICY "Organisateur gere ses signalements" ON membre_signalements FOR ALL
   USING (club_id IN (SELECT id FROM clubs WHERE owner_id = auth.uid() OR id = auth.uid()))
   WITH CHECK (club_id IN (SELECT id FROM clubs WHERE owner_id = auth.uid() OR id = auth.uid()));
+
+-- ─────────────────────────────────────────────
+-- 7. CREW SPOTS & SUGGESTIONS COUREURS
+-- ─────────────────────────────────────────────
+
+ALTER TABLE crew_spots ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'published';
+ALTER TABLE crew_spots ADD COLUMN IF NOT EXISTS suggested_by_name TEXT;
+CREATE INDEX IF NOT EXISTS idx_crew_spots_status ON crew_spots(status);
+
+
 

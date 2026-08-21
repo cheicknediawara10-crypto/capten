@@ -10,6 +10,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { formatDateShort } from "@/lib/utils/format";
 import LogoutButton from "./LogoutButton";
 import PushNotificationPrompt from "@/components/push/PushNotificationPrompt";
+import SuggestSpotModal from "./SuggestSpotModal";
 
 type MembreProfile = {
   id: string; first_name: string; last_name: string;
@@ -22,6 +23,7 @@ type MembreIce = {
 type CrewSpot = {
   id: string; nom: string; categorie: string; adresse: string | null;
   lien_maps: string | null; mot_du_fondateur: string | null; avantage: string | null;
+  suggested_by_name?: string | null; status?: string;
 };
 
 const CAT_EMOJI: Record<string, string> = {
@@ -91,8 +93,9 @@ async function getMembreData(membreId: string) {
   const clubIds = (clubs ?? []).map((mc: any) => mc.club_id).filter(Boolean);
   const { data: spotsRaw } = clubIds.length > 0
     ? await ub(supabase, "crew_spots")
-        .select("id, nom, categorie, adresse, lien_maps, mot_du_fondateur, avantage")
+        .select("id, nom, categorie, adresse, lien_maps, mot_du_fondateur, avantage, suggested_by_name, status")
         .in("club_id", clubIds)
+        .neq("status", "pending")
         .order("ordre")
     : { data: [] };
 
@@ -454,9 +457,12 @@ export default async function ProfilPage({
             <div className="bg-white rounded-2xl border border-[#E8E8E8] p-4 flex items-start gap-2.5">
               <span className="text-lg shrink-0">🗺️</span>
               <p className="text-xs text-[#6B7280] leading-snug">
-                Les adresses recommandées par ton crew — café d'après-run, shop, kiné. Les avantages sont à présenter sur place.
+                Les adresses &amp; bons plans recommandés par ton crew — café d&apos;après-run, boulangerie, shop, kiné. Tu as une pépite ? Partage-la ci-dessous !
               </p>
             </div>
+
+            <SuggestSpotModal />
+
             {spots.map((s) => {
               const isSponsor = s.avantage?.toLowerCase().includes("sponsor") || s.mot_du_fondateur?.toLowerCase().includes("sponsor");
               return (
@@ -479,6 +485,11 @@ export default async function ProfilPage({
                           </span>
                         )}
                       </div>
+                      {s.suggested_by_name && (
+                        <p className="text-[10.5px] font-bold text-[#FF5500] mt-0.5">
+                          🤝 Découvert par {s.suggested_by_name}
+                        </p>
+                      )}
                       {s.mot_du_fondateur && (
                         <p className="text-xs text-[#9CA3AF] italic mt-0.5">« {s.mot_du_fondateur} »</p>
                       )}

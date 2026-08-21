@@ -10,7 +10,7 @@ import {
 import Link from "next/link";
 import { hasProAccess } from "@/lib/plan-access";
 import { SPOT_CATEGORIES, getSpotCategory, type SpotCategorie } from "@/lib/spot-categories";
-import { getMySpots, saveSpot, deleteSpot, reorderSpots } from "./actions";
+import { getMySpots, saveSpot, deleteSpot, reorderSpots, approveSpot } from "./actions";
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
@@ -27,6 +27,8 @@ interface CrewSpot {
   avantage: string | null;
   ordre: number;
   created_at: string;
+  status?: string;
+  suggested_by_name?: string | null;
 }
 
 // ── Constants ────────────────────────────────────────────────────────────────
@@ -338,6 +340,14 @@ function SpotCard({
         </p>
       )}
 
+      {spot.suggested_by_name && (
+        <div className="mb-2">
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#FF5C00]/10 text-[#FF5C00] text-[10.5px] font-bold">
+            🤝 Découvert par {spot.suggested_by_name}
+          </span>
+        </div>
+      )}
+
       {spot.adresse && (
         <div className="flex items-center gap-1 text-[11px] text-[color:var(--app-text-muted)] mb-2">
           <MapPin size={10} />
@@ -375,6 +385,7 @@ function SpotCard({
 export default function CrewSpotsPage() {
   const [club, setClub] = useState<any>(null);
   const [spots, setSpots] = useState<CrewSpot[]>([]);
+  const [pendingSuggestions, setPendingSuggestions] = useState<CrewSpot[]>([]);
   const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState<{ open: boolean; editing?: CrewSpot }>({ open: false });
 
@@ -382,6 +393,7 @@ export default function CrewSpotsPage() {
     const res = await getMySpots();
     if (!("error" in res)) {
       setSpots((res.spots as CrewSpot[]) || []);
+      setPendingSuggestions((res.pendingSuggestions as CrewSpot[]) || []);
       setClub(res.club);
     }
     setLoading(false);
@@ -399,11 +411,22 @@ export default function CrewSpotsPage() {
         mot_du_fondateur: form.mot_du_fondateur,
         avantage: form.avantage,
         ordre: spots.length,
+        suggested_by_name: modal.editing?.suggested_by_name,
       },
       modal.editing?.id
     );
     setModal({ open: false });
     load();
+  }
+
+  async function handleApprove(id: string) {
+    await approveSpot(id);
+    load();
+  }
+
+  async function handleReject(id: string) {
+    await deleteSpot(id);
+    setPendingSuggestions((p) => p.filter((x) => x.id !== id));
   }
 
   async function handleDelete(id: string) {
@@ -429,10 +452,10 @@ export default function CrewSpotsPage() {
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-[30px] sm:text-[40px] font-display italic font-black uppercase text-[color:var(--app-text)] leading-none tracking-tighter">
-            Les Spots du Crew
+            Les Bonnes Adresses
           </h1>
           <p className="text-[13px] text-[color:var(--app-text-muted)] font-sans mt-1">
-            Tes adresses recommandées — café, shop, kiné, ostéo & sponsors…
+            Le carnet d&apos;adresses &amp; bons plans de ton crew — cafés, boulangeries, shops, kinés et ostéos.
           </p>
         </div>
         <button
@@ -443,6 +466,87 @@ export default function CrewSpotsPage() {
           Ajouter
         </button>
       </div>
+
+      {/* Suggestions des coureurs en attente */}
+      {pendingSuggestions.length > 0 && (
+        <div className="bg-gradient-to-br from-amber-500/[0.08] via-[var(--app-surface)] to-[var(--app-surface)] rounded-[24px] border border-amber-500/30 p-5 sm:p-6 shadow-sm space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <span className="w-8 h-8 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-500 font-bold">
+                📥
+              </span>
+              <div>
+                <h3 className="text-[14px] font-black uppercase tracking-tight text-[color:var(--app-text)]">
+                  Suggestions &amp; Bons Plans des Coureurs ({pendingSuggestions.length} en attente)
+                </h3>
+                <p className="text-[11px] text-[color:var(--app-text-muted)]">
+                  Tes coureurs ont déniché ces adresses. Valide-les en 1 clic pour les publier sur le carnet officiel !
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+            {pendingSuggestions.map((s) => {
+              const cat = getCat(s.categorie);
+              return (
+                <div key={s.id} className="bg-[var(--app-surface-2)] rounded-[18px] border border-[color:var(--app-border)] p-4 flex flex-col justify-between gap-3">
+                  <div>
+                    <div className="flex items-start justify-between gap-2 mb-1.5">
+                      <div className="flex items-center gap-2">
+                        <span className="w-7 h-7 rounded-[8px] bg-[#FF5C00]/10 flex items-center justify-center text-[#FF5C00]">
+                          <cat.Icon size={14} />
+                        </span>
+                        <p className="text-[14px] font-extrabold text-[color:var(--app-text)]">{s.nom}</p>
+                      </div>
+                      <span className="text-[10px] font-bold text-[#9CA3AF] uppercase">{cat.short}</span>
+                    </div>
+
+                    {s.suggested_by_name && (
+                      <p className="text-[11px] font-bold text-[#FF5C00] mb-1">
+                        🤝 Proposé par {s.suggested_by_name}
+                      </p>
+                    )}
+
+                    {s.mot_du_fondateur && (
+                      <p className="text-[12px] text-[color:var(--app-text-muted)] italic leading-snug mb-2">
+                        « {s.mot_du_fondateur} »
+                      </p>
+                    )}
+
+                    {s.avantage && (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-500 text-black text-[10.5px] font-black">
+                        <Gift size={10} /> {s.avantage}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-2 pt-2 border-t border-[color:var(--app-border)]">
+                    <button
+                      onClick={() => handleApprove(s.id)}
+                      className="flex-1 h-9 rounded-full bg-[#22C55E] hover:bg-[#1eb053] text-white text-[11px] font-black uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all shadow-sm cursor-pointer"
+                    >
+                      <Check size={13} /> Valider pour le crew
+                    </button>
+                    <button
+                      onClick={() => setModal({ open: true, editing: s })}
+                      className="h-9 px-3 rounded-full border border-[color:var(--app-border)] text-[11px] font-bold text-[color:var(--app-text)] hover:border-[#FF5C00] transition-colors cursor-pointer"
+                    >
+                      <Pencil size={12} />
+                    </button>
+                    <button
+                      onClick={() => handleReject(s.id)}
+                      className="h-9 px-3 rounded-full border border-red-500/20 text-red-500 hover:bg-red-500/10 text-[11px] font-bold transition-colors cursor-pointer"
+                    >
+                      <Trash2 size={12} />
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Banner info */}
       <div className="bg-[var(--app-surface)] border border-[color:var(--app-border)] rounded-[24px] p-5 sm:p-6 flex items-start gap-4 shadow-sm">
