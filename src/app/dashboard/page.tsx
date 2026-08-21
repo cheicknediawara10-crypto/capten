@@ -12,6 +12,7 @@ import { useAuth } from '@/context/AuthContext';
 import { getAppUrl } from '@/lib/domain';
 import { getCommunityLabels } from '@/lib/community-labels';
 import { hasProAccess, isOnTrial, trialDaysLeft } from '@/lib/plan-access';
+import PushNotificationPrompt from '@/components/push/PushNotificationPrompt';
 
 interface UpcomingEvent {
   id: string;
@@ -163,6 +164,9 @@ export default function DashboardPage() {
           </div>
         </div>
       )}
+
+      {/* Notifications Push */}
+      <PushNotificationPrompt clubId={club?.id} />
 
       {/* Rangée 1 : anneau héro + prochain run */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">

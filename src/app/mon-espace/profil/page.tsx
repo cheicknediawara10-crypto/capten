@@ -9,6 +9,7 @@ import { requireMembreSession } from "@/lib/membre-session";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { formatDateShort } from "@/lib/utils/format";
 import LogoutButton from "./LogoutButton";
+import PushNotificationPrompt from "@/components/push/PushNotificationPrompt";
 
 type MembreProfile = {
   id: string; first_name: string; last_name: string;
@@ -223,6 +224,7 @@ export default async function ProfilPage({
 
       {/* Tab content */}
       <div className="max-w-sm mx-auto px-4 py-6 space-y-4">
+        <PushNotificationPrompt clubId={primaryClub?.id} />
 
         {/* ── PROFIL ── */}
         {tab === "profil" && (

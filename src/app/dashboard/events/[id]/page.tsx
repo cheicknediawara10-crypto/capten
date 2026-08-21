@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft, Calendar, MapPin, Users, QrCode, CheckSquare, FileText, List,
-  Download, Globe, Lock, Trash2, Loader2, Wifi, Megaphone, Camera
+  Download, Globe, Lock, Trash2, Loader2, Wifi, Megaphone, Camera, MessageCircle
 } from "lucide-react";
 import { getSupabase } from "@/lib/supabase";
 import Link from "next/link";
@@ -13,6 +13,7 @@ import { formatDateShort } from "@/lib/utils/format";
 import dynamic from "next/dynamic";
 import CrewVisualModal from "@/components/visuals/CrewVisualModal";
 import { hasProAccess } from "@/lib/plan-access";
+import { getAppUrl } from "@/lib/domain";
 import { getRunDetail, setRunStatus, deleteRun, setRunFlag } from "../actions";
 
 const QRCodeSVG = dynamic(() => import("qrcode.react").then((m) => ({ default: m.QRCodeSVG })), { ssr: false });
@@ -295,6 +296,20 @@ export default function EventDetailPage() {
             >
               <Download size={13} /> Registre
             </button>
+          )}
+          {event.status === "published" && (
+            <a
+              href={`https://wa.me/?text=${encodeURIComponent(
+                liveCount > 0
+                  ? `Merci à tous pour le run « ${event.title} » ! 🔥\n${liveCount} coureurs étaient présents au RDV 👏\nÀ très vite sur le prochain run du crew ! 🖤`
+                  : `${event.title} 🏃\n📅 ${formatDateShort(event.event_date)}\n📍 ${event.meeting_point_address || "Point de RDV"}\n\nRejoins le run ici : ${getAppUrl()}/event/${event.id} 🖤`
+              )}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-full text-[11px] font-black uppercase tracking-widest bg-[#25D366] text-white hover:bg-[#1EBE5D] transition-all shadow-sm"
+            >
+              <MessageCircle size={13} /> {liveCount > 0 ? "Récap WhatsApp" : "Annoncer"}
+            </a>
           )}
           <button
             onClick={togglePublish}

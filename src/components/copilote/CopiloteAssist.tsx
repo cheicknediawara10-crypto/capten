@@ -121,7 +121,15 @@ export default function CopiloteAssist({ preview = false }: { preview?: boolean 
       {result && (
         <div className="mt-3 rounded-xl bg-[var(--app-surface-2)] border border-[color:var(--app-border)] p-3.5">
           <p className="text-[12.5px] text-[color:var(--app-text)] whitespace-pre-wrap leading-snug">{result}</p>
-          <div className="flex items-center gap-2 mt-3">
+          <div className="flex items-center flex-wrap gap-2 mt-3">
+            <a
+              href={`https://wa.me/?text=${encodeURIComponent(result)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg text-[11px] font-bold bg-[#25D366] text-white hover:bg-[#1EBE5D] transition-colors"
+            >
+              <MessageCircle size={13} /> Ouvrir dans WhatsApp
+            </a>
             <button onClick={copy} className={`inline-flex items-center gap-1.5 h-8 px-3 rounded-lg text-[11px] font-bold transition-colors ${copied ? "bg-[#3DD68C] text-black" : "bg-[#FF5C00] text-white hover:bg-[#E04B00]"}`}>
               {copied ? <><Check size={13} /> Copié</> : <><Copy size={13} /> Copier</>}
             </button>

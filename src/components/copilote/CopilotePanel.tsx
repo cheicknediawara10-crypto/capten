@@ -5,7 +5,7 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Compass, Users, CalendarPlus, Megaphone, Trophy, ShieldAlert, Activity,
-  Settings, ArrowRight, Check, X, Loader2, Lock, Sparkles, Copy,
+  Settings, ArrowRight, Check, X, Loader2, Lock, Sparkles, Copy, Send,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import CopiloteAssist from "@/components/copilote/CopiloteAssist";
@@ -183,12 +183,22 @@ export default function CopilotePanel({
                         ) : (
                           <>
                             <p className="text-[12.5px] text-[color:var(--app-text)] whitespace-pre-wrap leading-snug">{gen.text}</p>
-                            <button
-                              onClick={() => { navigator.clipboard?.writeText(gen.text); setGenCopied(true); setTimeout(() => setGenCopied(false), 1500); }}
-                              className={`inline-flex items-center gap-1.5 mt-2.5 h-8 px-3 rounded-lg text-[11px] font-bold transition-colors ${genCopied ? "bg-[#3DD68C] text-black" : "bg-[var(--app-surface-2)] text-[color:var(--app-text)] hover:bg-[var(--app-hover)]"}`}
-                            >
-                              {genCopied ? <><Check size={12} /> Copié</> : <><Copy size={12} /> Copier pour WhatsApp</>}
-                            </button>
+                            <div className="flex items-center gap-2 mt-2.5">
+                              <a
+                                href={`https://wa.me/?text=${encodeURIComponent(gen.text)}`}
+                                target="_blank" rel="noopener noreferrer"
+                                onClick={() => resolve(a.id, "done")}
+                                className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg text-[11px] font-bold bg-[#25D366] text-white hover:bg-[#1FB855] transition-colors"
+                              >
+                                <Send size={12} /> Ouvrir dans WhatsApp
+                              </a>
+                              <button
+                                onClick={() => { navigator.clipboard?.writeText(gen.text); setGenCopied(true); setTimeout(() => setGenCopied(false), 1500); }}
+                                className={`inline-flex items-center gap-1.5 h-8 px-3 rounded-lg text-[11px] font-bold transition-colors ${genCopied ? "bg-[#3DD68C] text-black" : "bg-[var(--app-surface-2)] text-[color:var(--app-text)] hover:bg-[var(--app-hover)]"}`}
+                              >
+                                {genCopied ? <><Check size={12} /> Copié</> : <><Copy size={12} /> Copier</>}
+                              </button>
+                            </div>
                           </>
                         )}
                       </div>
