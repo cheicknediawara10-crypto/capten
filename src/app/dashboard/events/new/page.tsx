@@ -268,6 +268,12 @@ export default function NewEventPage() {
               Récurrence hebdomadaire
             </span>
           </div>
+          {form.is_recurring && (
+            <p className="text-[12px] text-[color:var(--app-text-muted)] leading-snug flex items-start gap-1.5 -mt-1">
+              <Repeat size={13} className="text-[#FF5C00] shrink-0 mt-0.5" />
+              Capten recréera ce run <b className="text-[color:var(--app-text)]">automatiquement chaque semaine</b> (même jour, même heure) — tu n'as plus rien à faire.
+            </p>
+          )}
         </motion.div>
       </div>
 

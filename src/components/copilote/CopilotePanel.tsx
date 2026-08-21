@@ -5,11 +5,11 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Compass, Users, CalendarPlus, Megaphone, Trophy, ShieldAlert, Activity,
-  Settings, ArrowRight, Check, X, Loader2, Lock, Sparkles,
+  Settings, ArrowRight, Check, X, Loader2, Lock, Sparkles, Copy,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import CopiloteAssist from "@/components/copilote/CopiloteAssist";
-import { getCopiloteState, resolveCopiloteAlert } from "@/lib/copilote/actions";
+import { getCopiloteState, resolveCopiloteAlert, generateCopilote } from "@/lib/copilote/actions";
 
 interface Alert {
   id: string;
@@ -50,6 +50,26 @@ export default function CopilotePanel({
   const [isPro, setIsPro] = useState(false);
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [loading, setLoading] = useState(true);
+  const [gen, setGen] = useState<{ id: string; loading: boolean; text: string; error?: boolean } | null>(null);
+  const [genCopied, setGenCopied] = useState(false);
+
+  // Un nudge "message" (accueil / rappel) → le Copilote écrit le message, prêt à copier.
+  async function runGenerate(a: Alert) {
+    setGenCopied(false);
+    setGen({ id: a.id, loading: true, text: "" });
+    const intent = a.category === "accueil" ? "mot" : "annonce";
+    const input =
+      a.category === "accueil"
+        ? "Écris un mot de bienvenue chaleureux et court pour les nouveaux du crew."
+        : "Écris un rappel court et motivant pour le prochain run du crew (donne envie de venir).";
+    if (isMock) {
+      setTimeout(() => setGen({ id: a.id, loading: false, text: "Salut le crew 🖤\nRun ce soir 19h — 8 km tranquilles, tous niveaux. On part à l'heure au portail. Qui est chaud ? ⚡" }), 700);
+      return;
+    }
+    const res = await generateCopilote(intent, input);
+    if ("error" in res) setGen({ id: a.id, loading: false, text: "", error: true });
+    else setGen({ id: a.id, loading: false, text: res.text });
+  }
 
   useEffect(() => {
     onCount?.(alerts.length);
@@ -140,10 +160,38 @@ export default function CopilotePanel({
                   <div className="flex-1 min-w-0">
                     <p className="text-[13px] font-bold text-[color:var(--app-text)] leading-tight">{a.title}</p>
                     <p className="text-[12px] text-[color:var(--app-text-muted)] leading-snug mt-0.5">{a.message}</p>
-                    {a.cta_href && a.cta_label && (
+                    {a.cta_href === "/messages" ? (
+                      <button
+                        onClick={() => runGenerate(a)}
+                        disabled={gen?.id === a.id && gen.loading}
+                        className="inline-flex items-center gap-1.5 mt-2 h-8 px-3 rounded-full bg-[#FF5C00] text-white text-[11px] font-bold uppercase tracking-wider hover:bg-[#E04B00] transition-all disabled:opacity-50"
+                      >
+                        {gen?.id === a.id && gen.loading
+                          ? <><Loader2 size={12} className="animate-spin" /> Le Copilote écrit…</>
+                          : <><Sparkles size={12} /> Rédige-le pour moi</>}
+                      </button>
+                    ) : a.cta_href && a.cta_label ? (
                       <Link href={a.cta_href} onClick={() => resolve(a.id, "done")} className="inline-flex items-center gap-1 mt-2 text-[12px] font-bold text-[#FF5C00] hover:underline">
                         {a.cta_label} <ArrowRight size={12} />
                       </Link>
+                    ) : null}
+
+                    {gen?.id === a.id && !gen.loading && (gen.text || gen.error) && (
+                      <div className="mt-2 rounded-xl bg-[var(--app-surface)] border border-[color:var(--app-border)] p-3">
+                        {gen.error ? (
+                          <p className="text-[12px] text-[#F87171]">Oups, réessaie dans un instant.</p>
+                        ) : (
+                          <>
+                            <p className="text-[12.5px] text-[color:var(--app-text)] whitespace-pre-wrap leading-snug">{gen.text}</p>
+                            <button
+                              onClick={() => { navigator.clipboard?.writeText(gen.text); setGenCopied(true); setTimeout(() => setGenCopied(false), 1500); }}
+                              className={`inline-flex items-center gap-1.5 mt-2.5 h-8 px-3 rounded-lg text-[11px] font-bold transition-colors ${genCopied ? "bg-[#3DD68C] text-black" : "bg-[var(--app-surface-2)] text-[color:var(--app-text)] hover:bg-[var(--app-hover)]"}`}
+                            >
+                              {genCopied ? <><Check size={12} /> Copié</> : <><Copy size={12} /> Copier pour WhatsApp</>}
+                            </button>
+                          </>
+                        )}
+                      </div>
                     )}
                   </div>
                   <div className="flex flex-col gap-1 shrink-0">
