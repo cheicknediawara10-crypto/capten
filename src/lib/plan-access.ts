@@ -30,9 +30,13 @@ type ClubLike = {
 } | null | undefined;
 
 export function isPaidPlan(club: ClubLike): boolean {
+  const plan = String(club?.stripe_plan || "").toUpperCase();
+  const status = String(club?.stripe_subscription_status || "").toLowerCase();
   return (
-    String(club?.stripe_plan || "").toUpperCase() === "CAPTEN" ||
-    club?.stripe_subscription_status === "active" ||
+    // Le tier Pro est écrit tantôt "CAPTEN", tantôt "PRO" selon les flux.
+    plan === "CAPTEN" || plan === "PRO" ||
+    // "active" = payant ; "trialing" = essai Stripe en cours → accès Pro.
+    status === "active" || status === "trialing" ||
     String(club?.plan || "").toLowerCase() === "pro"
   );
 }
