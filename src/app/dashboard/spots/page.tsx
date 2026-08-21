@@ -113,7 +113,7 @@ function SpotModal({
               type="text"
               value={form.nom}
               onChange={(e) => set("nom", e.target.value)}
-              placeholder="Le Café du Coin, Distance Shop…"
+              placeholder="Boulangerie Mamiche, Café Nuances, Distance Shop…"
               className="w-full bg-[var(--app-surface-2)] border border-transparent focus:border-[#FF5C00] focus:bg-[var(--app-surface)] rounded-[14px] px-4 py-3 text-[14px] text-[color:var(--app-text)] outline-none transition-all"
             />
           </div>
@@ -121,7 +121,7 @@ function SpotModal({
           {/* Catégorie */}
           <div className="space-y-1.5">
             <label className="text-[10px] font-black uppercase tracking-widest text-[color:var(--app-text-muted)]">Catégorie</label>
-            <div className="grid grid-cols-5 gap-2">
+            <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
               {CATEGORIES.map((c) => (
                 <button
                   key={c.value}
@@ -166,59 +166,46 @@ function SpotModal({
 
           {/* Mot du fondateur */}
           <div className="space-y-1.5">
-            <label className="text-[10px] font-black uppercase tracking-widest text-[color:var(--app-text-muted)]">Ton mot (optionnel)</label>
+            <label className="text-[10px] font-black uppercase tracking-widest text-[color:var(--app-text-muted)]">Pourquoi tu recommandes cette adresse</label>
             <input
               type="text"
               value={form.mot_du_fondateur}
               onChange={(e) => set("mot_du_fondateur", e.target.value)}
-              placeholder="Notre QG d'après-run, On y va tous les jeudis…"
+              placeholder="Le meilleur café filtre du quartier, les croissants chauds du dimanche, le kiné du crew…"
               className="w-full bg-[var(--app-surface-2)] border border-transparent focus:border-[#FF5C00] focus:bg-[var(--app-surface)] rounded-[14px] px-4 py-3 text-[14px] text-[color:var(--app-text)] outline-none transition-all"
             />
           </div>
 
-          {/* Avantage & Sponsoring */}
+          {/* Bon plan ou avantage */}
           <div className="space-y-1.5">
-            <div className="flex items-center justify-between">
-              <label className="text-[10px] font-black uppercase tracking-widest text-[color:var(--app-text-muted)]">
-                Avantage pour le crew ou Statut Sponsoring
-              </label>
-              <span className="text-[10px] font-bold text-[#FF5C00]">⭐️ Sponsoring</span>
+            <label className="text-[10px] font-black uppercase tracking-widest text-[color:var(--app-text-muted)]">
+              Bon plan ou Avantage (optionnel)
+            </label>
+            <input
+              type="text"
+              value={form.avantage}
+              onChange={(e) => set("avantage", e.target.value)}
+              placeholder="Ex : ☕ QG After-run · 🥐 Croissants post-run · 🏷️ -10% pour le crew"
+              className="w-full bg-[var(--app-surface-2)] border border-transparent focus:border-[#FF5C00] focus:bg-[var(--app-surface)] rounded-[14px] px-4 py-3 text-[14px] text-[color:var(--app-text)] outline-none transition-all"
+            />
+            <div className="flex flex-wrap gap-1.5 pt-1">
+              {[
+                "☕ QG After-run",
+                "🥐 Croissants du dimanche",
+                "🏷️ -10% pour le crew",
+                "🩺 Kiné / Soin recommandé",
+                "👟 Shop running partenaire",
+              ].map((p) => (
+                <button
+                  key={p}
+                  type="button"
+                  onClick={() => set("avantage", p)}
+                  className="px-2.5 py-1 rounded-full text-[10.5px] font-semibold bg-[var(--app-surface-2)] text-[color:var(--app-text-muted)] hover:text-[color:var(--app-text)] hover:border-[#FF5C00] border border-[color:var(--app-border)] transition-all"
+                >
+                  {p}
+                </button>
+              ))}
             </div>
-            {isPro ? (
-              <>
-                <input
-                  type="text"
-                  value={form.avantage}
-                  onChange={(e) => set("avantage", e.target.value)}
-                  placeholder="Ex : ⭐ Sponsor Officiel du Crew · ou : -10% café"
-                  className="w-full bg-[var(--app-surface-2)] border border-transparent focus:border-[#FF5C00] focus:bg-[var(--app-surface)] rounded-[14px] px-4 py-3 text-[14px] text-[color:var(--app-text)] outline-none transition-all"
-                />
-                <div className="flex flex-wrap gap-1.5 pt-1">
-                  {[
-                    "⭐ Sponsor Officiel du Crew",
-                    "-10% sur présentation Capten",
-                    "Café offert après le run",
-                    "Consigne sacs garantie",
-                  ].map((p) => (
-                    <button
-                      key={p}
-                      type="button"
-                      onClick={() => set("avantage", p)}
-                      className="px-2.5 py-1 rounded-full text-[10.5px] font-semibold bg-[var(--app-surface-2)] text-[color:var(--app-text-muted)] hover:text-[color:var(--app-text)] hover:border-[#FF5C00] border border-[color:var(--app-border)] transition-all"
-                    >
-                      {p}
-                    </button>
-                  ))}
-                </div>
-              </>
-            ) : (
-              <Link
-                href="/plan"
-                className="flex items-center gap-2 rounded-[14px] border border-dashed border-[color:var(--app-border)] px-4 py-3 text-[13px] text-[color:var(--app-text-muted)] hover:border-[#FF5C00] hover:text-[#FF5C00] transition-colors"
-              >
-                🔒 Avantages VIP & Sponsoring — réservé à Captain Pro. Débloque pour afficher les perks négociés et marquer tes sponsors.
-              </Link>
-            )}
           </div>
 
           {err && <p className="text-[12px] text-red-500 font-medium">{err}</p>}
@@ -229,7 +216,7 @@ function SpotModal({
             className="w-full h-12 rounded-[14px] bg-[#FF5C00] text-white font-black uppercase tracking-widest text-[13px] hover:bg-[#E04B00] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
           >
             {saving ? <Loader2 size={16} className="animate-spin" /> : <Check size={16} />}
-            {initial ? "Enregistrer" : "Ajouter ce spot"}
+            {initial ? "Enregistrer" : "Ajouter cette adresse"}
           </button>
         </form>
       </motion.div>

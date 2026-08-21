@@ -40,7 +40,7 @@ function SpotsSection({ spots, clubName }: { spots: CrewSpot[]; clubName: string
     <div className="w-full max-w-sm mt-8 mb-4">
       <p className="text-[11px] font-bold uppercase tracking-widest text-[#9CA3AF] mb-3 text-center flex items-center justify-center gap-1.5">
         <MapPin size={12} className="text-[#FF5500]" />
-        Les Spots du Crew
+        Les Bonnes Adresses du Crew
       </p>
       <div className="space-y-2.5">
         {spots.map((s) => {

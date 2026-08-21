@@ -25,7 +25,7 @@ type CrewSpot = {
 };
 
 const CAT_EMOJI: Record<string, string> = {
-  cafe: "☕", shop: "👟", kine: "🦵", osteo: "🤸", autre: "📍",
+  cafe: "☕", boulangerie: "🥐", shop: "👟", kine: "🦵", osteo: "🤸", autre: "📍",
 };
 
 // Tables not yet in Supabase generated types — cast query results explicitly
