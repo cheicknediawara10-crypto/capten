@@ -45,76 +45,7 @@ const EMPTY_FORM = {
   avantage: "",
 };
 
-function SponsorPitchModal({ clubName, onClose }: { clubName: string; onClose: () => void }) {
-  const [copied, setCopied] = useState(false);
-  const pitchText = `Salut ! C'est le capitaine de ${clubName || "notre Run Club"}. On se retrouve chez vous chaque semaine avec notre crew de coureurs qui consomment après le run. 🏃‍♂️🍻
 
-On est en train d'officialiser nos partenaires sur notre application CAPTEN (consultée par tous nos membres pour les sorties et fiches d'urgence). 
-
-Est-ce que ça vous intéresserait de devenir notre Sponsor Officiel ? En échange de votre visibilité en tête de notre page officielle et auprès de nos coureurs, vous prenez simplement en charge notre cockpit d'organisation (29,99€/mois, 100% déductible de vos charges pro).
-
-Dis-moi si on en parle au prochain after-run ! 🙌`;
-
-  const waUrl = `https://wa.me/?text=${encodeURIComponent(pitchText)}`;
-
-  const copy = () => {
-    navigator.clipboard.writeText(pitchText);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2500);
-  };
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95, y: 20 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.95, y: 20 }}
-        className="w-full max-w-lg bg-[var(--app-surface)] rounded-[28px] shadow-2xl overflow-hidden border border-[color:var(--app-border)] p-6 space-y-4"
-      >
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="w-8 h-8 rounded-full bg-[#FF5C00]/10 flex items-center justify-center text-[#FF5C00]">
-              <Sparkles size={16} />
-            </span>
-            <div>
-              <h3 className="text-[15px] font-black uppercase tracking-tight text-[color:var(--app-text)]">
-                Pitch Sponsoring pour ton Spot
-              </h3>
-              <p className="text-[11px] text-[color:var(--app-text-muted)]">À envoyer au patron du café, bar ou shop</p>
-            </div>
-          </div>
-          <button onClick={onClose} className="w-8 h-8 rounded-full bg-[var(--app-surface-2)] flex items-center justify-center hover:bg-[var(--app-hover)] transition-colors">
-            <X size={14} className="text-[color:var(--app-text-muted)]" />
-          </button>
-        </div>
-
-        <div className="bg-[var(--app-surface-2)] rounded-[18px] p-4 text-[13px] text-[color:var(--app-text)] font-sans leading-relaxed whitespace-pre-wrap border border-[color:var(--app-border)]">
-          {pitchText}
-        </div>
-
-        <div className="grid grid-cols-2 gap-2.5 pt-1">
-          <button
-            onClick={copy}
-            className="flex items-center justify-center gap-2 h-11 rounded-full border border-[color:var(--app-border)] text-[12px] font-black uppercase tracking-wider text-[color:var(--app-text)] hover:border-[#FF5C00] transition-colors"
-          >
-            {copied ? <CheckCheck size={15} className="text-[#22C55E]" /> : <Copy size={15} />}
-            {copied ? "Copié !" : "Copier le texte"}
-          </button>
-
-          <a
-            href={waUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-center gap-2 h-11 rounded-full bg-[#25D366] text-white text-[12px] font-black uppercase tracking-wider hover:bg-[#20bd5a] transition-all shadow-sm"
-          >
-            <MessageCircle size={15} />
-            Ouvrir WhatsApp
-          </a>
-        </div>
-      </motion.div>
-    </div>
-  );
-}
 
 // ── Modal d'ajout / édition ──────────────────────────────────────────────────
 
@@ -459,7 +390,6 @@ export default function CrewSpotsPage() {
   const [spots, setSpots] = useState<CrewSpot[]>([]);
   const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState<{ open: boolean; editing?: CrewSpot }>({ open: false });
-  const [pitchModal, setPitchModal] = useState(false);
 
   const load = useCallback(async () => {
     const res = await getMySpots();
@@ -527,48 +457,17 @@ export default function CrewSpotsPage() {
         </button>
       </div>
 
-      {/* Sponsoring Banner */}
-      <div className="bg-gradient-to-br from-amber-500/[0.08] via-[var(--app-surface)] to-[var(--app-surface)] rounded-[24px] border border-amber-500/30 p-5 sm:p-6 shadow-sm">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-start gap-3.5">
-            <span className="shrink-0 w-10 h-10 rounded-[14px] bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-500 mt-0.5">
-              <Star size={20} className="fill-amber-400" />
-            </span>
-            <div>
-              <div className="flex items-center gap-2">
-                <p className="text-[14px] font-black uppercase tracking-tight text-[color:var(--app-text)]">
-                  Autofinance ton Crew avec un Sponsor Spot
-                </p>
-                <span className="px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 text-[10px] font-black uppercase tracking-wider">
-                  0 € pour toi
-                </span>
-              </div>
-              <p className="text-[12.5px] text-[color:var(--app-text-muted)] mt-1 leading-snug max-w-xl">
-                Ton café ou bar préféré encaisse des centaines d'euros chaque mois grâce à tes coureurs. Propose-lui de prendre en charge ton abonnement CAPTEN (29,99€/mois déductible de ses charges pro) en échange du badge <b>Sponsor Officiel</b> !
-              </p>
-            </div>
-          </div>
-
-          <button
-            onClick={() => setPitchModal(true)}
-            className="shrink-0 inline-flex items-center justify-center gap-2 h-11 px-5 rounded-full bg-amber-500 hover:bg-amber-600 text-black font-black uppercase tracking-wider text-[12px] transition-all shadow-sm"
-          >
-            <Sparkles size={14} />
-            Obtenir le Pitch WhatsApp
-          </button>
-        </div>
-      </div>
-
       {/* Banner info */}
-      <div className="bg-[var(--app-surface-2)] rounded-[20px] px-5 py-4 flex items-start gap-3">
-        <span className="shrink-0 w-9 h-9 rounded-[12px] bg-[var(--app-surface)] flex items-center justify-center">
-          <MapPin size={18} strokeWidth={2} className="text-[#FF5C00]" />
+      <div className="bg-[var(--app-surface)] border border-[color:var(--app-border)] rounded-[24px] p-5 sm:p-6 flex items-start gap-4 shadow-sm">
+        <span className="shrink-0 w-11 h-11 rounded-[16px] bg-[#FF5C00]/10 flex items-center justify-center text-[#FF5C00]">
+          <MapPin size={22} strokeWidth={2} />
         </span>
         <div>
-          <p className="text-[13px] font-bold text-[color:var(--app-text)]">L'after-run, les soins, l'équipement</p>
-          <p className="text-[12px] text-[color:var(--app-text-muted)] mt-0.5 leading-snug">
-            Ces spots apparaîtront sur la page d'inscription de ton crew et sur la fiche de chaque membre.
-            Les avantages et statuts sponsors sont des accords que <em>tu</em> as négociés à l'oral — Capten affiche juste l'info.
+          <p className="text-[14px] font-black uppercase tracking-tight text-[color:var(--app-text)]">
+            L&apos;After-run, les Soins &amp; l&apos;Équipement du Crew
+          </p>
+          <p className="text-[12.5px] text-[color:var(--app-text-muted)] mt-1 leading-snug max-w-2xl">
+            Partage tes adresses coups de cœur avec ton crew : le café où se poser après le run, le shop avec réduction membre, le kiné ou l&apos;ostéo de confiance. Tes membres les retrouvent directement sur leur passeport coureur.
           </p>
         </div>
       </div>

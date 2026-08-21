@@ -237,7 +237,7 @@ export default function ClubSettingsPage() {
               className="w-full h-11 px-4 rounded-[12px] border border-[color:var(--app-border)] text-sm font-medium focus:border-[#FF5C00] focus:ring-2 focus:ring-[#FF5C00]/20 outline-none transition-all"
             />
             <p className="text-[11px] text-[color:var(--app-text-muted)]">
-              Permet aux membres de cotiser ou de soutenir le crew (ex: 10€/an pour l&apos;équipement, l&apos;after-run ou financer ton abonnement).
+              Permet aux membres de cotiser ou de soutenir le crew (ex: 10€/an pour l&apos;équipement, les ravitaillements et la logistique du crew).
             </p>
           </div>
         </div>
