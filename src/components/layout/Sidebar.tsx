@@ -7,7 +7,7 @@ import {
   Map, MapPin, Users, Globe, Wallet, Store,
   BarChart3, Sparkles, Ticket, ShieldCheck, 
   LogOut, Zap, LayoutDashboard, HelpCircle,
-  MessageSquare, CreditCard, Shield, Plus, History, CloudRain, Wind, Droplets, Activity, Lock, PlayCircle, Flag
+  MessageSquare, CreditCard, Shield, Plus, History, CloudRain, Wind, Droplets, Activity, Lock, PlayCircle, Flag, Sliders
 } from "lucide-react";
 import { logout } from "@/app/login/actions";
 import ThemeToggle from "@/components/layout/ThemeToggle";
@@ -50,26 +50,24 @@ export default function Sidebar() {
     {
       title: "PILOTAGE",
       items: [
-        { name: "Tableau de bord", icon: <LayoutDashboard size={18} strokeWidth={1.5} />, href: "/dashboard" },
-        { name: "Membres", icon: <Users size={18} strokeWidth={1.5} />, href: "/dashboard/members" },
-        { name: sessionMenuLabel, icon: <Map size={18} strokeWidth={1.5} />, href: "/dashboard/events" },
-        { name: "Statistiques", icon: <BarChart3 size={18} strokeWidth={1.5} />, href: "/dashboard/stats" },
+        { name: "Dashboard", icon: <LayoutDashboard size={18} strokeWidth={1.5} />, href: "/dashboard" },
+        { name: "Crew", icon: <Users size={18} strokeWidth={1.5} />, href: "/dashboard/members" },
+        { name: "Runs", icon: <Map size={18} strokeWidth={1.5} />, href: "/dashboard/events" },
         { name: "Messages", icon: <MessageSquare size={18} strokeWidth={1.5} />, href: "/messages" },
       ]
     },
     {
-      title: "TERRAIN",
+      title: "COMMUNAUTÉ",
       items: [
-        { name: "Les Spots", icon: <MapPin size={18} strokeWidth={1.5} />, href: "/dashboard/spots" },
+        { name: "Cagnotte", icon: <Wallet size={18} strokeWidth={1.5} />, href: "/dashboard/cagnotte" },
+        { name: "Spots", icon: <MapPin size={18} strokeWidth={1.5} />, href: "/dashboard/spots" },
         { name: "Signalements", icon: <Flag size={18} strokeWidth={1.5} />, href: "/dashboard/signalements" },
-        { name: "Protection", icon: <ShieldCheck size={18} strokeWidth={1.5} />, href: "/securite" },
       ]
     },
     {
       title: "COMPTE",
       items: [
-        { name: "Abonnement", icon: <CreditCard size={18} strokeWidth={1.5} />, href: "/plan" },
-        { name: "Support & Aide", icon: <HelpCircle size={18} strokeWidth={1.5} />, href: "/support" },
+        { name: "Réglages", icon: <Sliders size={18} strokeWidth={1.5} />, href: "/settings" },
       ]
     }
   ];

@@ -4,8 +4,8 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
-  Menu, X, LayoutDashboard, Users, Map, BarChart3, MapPin,
-  MessageSquare, ShieldCheck, CreditCard, LogOut, HelpCircle, Flag
+  Menu, X, LayoutDashboard, Users, Map, MapPin,
+  MessageSquare, Sliders, LogOut, Wallet, Flag
 } from "lucide-react";
 import { logout } from "@/app/login/actions";
 
@@ -37,25 +37,23 @@ export default function MobileHeader() {
       title: "Pilotage",
       items: [
         { name: "Dashboard", icon: <LayoutDashboard size={18} strokeWidth={1.5} />, href: "/dashboard" },
-        { name: "Membres", icon: <Users size={18} strokeWidth={1.5} />, href: "/dashboard/members" },
-        { name: "Les Runs", icon: <Map size={18} strokeWidth={1.5} />, href: "/dashboard/events" },
-        { name: "Statistiques", icon: <BarChart3 size={18} strokeWidth={1.5} />, href: "/dashboard/stats" },
+        { name: "Crew", icon: <Users size={18} strokeWidth={1.5} />, href: "/dashboard/members" },
+        { name: "Runs", icon: <Map size={18} strokeWidth={1.5} />, href: "/dashboard/events" },
         { name: "Messages", icon: <MessageSquare size={18} strokeWidth={1.5} />, href: "/messages" },
       ]
     },
     {
-      title: "Terrain",
+      title: "Communauté",
       items: [
-        { name: "Les Spots", icon: <MapPin size={18} strokeWidth={1.5} />, href: "/dashboard/spots" },
+        { name: "Cagnotte", icon: <Wallet size={18} strokeWidth={1.5} />, href: "/dashboard/cagnotte" },
+        { name: "Spots", icon: <MapPin size={18} strokeWidth={1.5} />, href: "/dashboard/spots" },
         { name: "Signalements", icon: <Flag size={18} strokeWidth={1.5} />, href: "/dashboard/signalements" },
-        { name: "Protection", icon: <ShieldCheck size={18} strokeWidth={1.5} />, href: "/securite" },
       ]
     },
     {
       title: "Compte",
       items: [
-        { name: "Abonnement", icon: <CreditCard size={18} strokeWidth={1.5} />, href: "/plan" },
-        { name: "Support", icon: <HelpCircle size={18} strokeWidth={1.5} />, href: "/support" },
+        { name: "Réglages", icon: <Sliders size={18} strokeWidth={1.5} />, href: "/settings" },
       ]
     }
   ];
