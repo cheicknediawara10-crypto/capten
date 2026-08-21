@@ -53,6 +53,7 @@ export default function Sidebar() {
         { name: "Dashboard", icon: <LayoutDashboard size={18} strokeWidth={1.5} />, href: "/dashboard" },
         { name: "Crew", icon: <Users size={18} strokeWidth={1.5} />, href: "/dashboard/members" },
         { name: "Runs", icon: <Map size={18} strokeWidth={1.5} />, href: "/dashboard/events" },
+        { name: "Signalements", icon: <Flag size={18} strokeWidth={1.5} />, href: "/dashboard/signalements" },
         { name: "Messages", icon: <MessageSquare size={18} strokeWidth={1.5} />, href: "/messages" },
       ]
     },
@@ -61,7 +62,6 @@ export default function Sidebar() {
       items: [
         { name: "Cagnotte", icon: <Wallet size={18} strokeWidth={1.5} />, href: "/dashboard/cagnotte" },
         { name: "Spots", icon: <MapPin size={18} strokeWidth={1.5} />, href: "/dashboard/spots" },
-        { name: "Signalements", icon: <Flag size={18} strokeWidth={1.5} />, href: "/dashboard/signalements" },
       ]
     },
     {
