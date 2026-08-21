@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   Menu, X, LayoutDashboard, Users, Map, BarChart3, MapPin,
-  MessageSquare, ShieldCheck, CreditCard, LogOut, HelpCircle
+  MessageSquare, ShieldCheck, CreditCard, LogOut, HelpCircle, Flag
 } from "lucide-react";
 import { logout } from "@/app/login/actions";
 
@@ -47,6 +47,7 @@ export default function MobileHeader() {
       title: "Terrain",
       items: [
         { name: "Les Spots", icon: <MapPin size={18} strokeWidth={1.5} />, href: "/dashboard/spots" },
+        { name: "Signalements", icon: <Flag size={18} strokeWidth={1.5} />, href: "/dashboard/signalements" },
         { name: "Protection", icon: <ShieldCheck size={18} strokeWidth={1.5} />, href: "/securite" },
       ]
     },

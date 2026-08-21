@@ -312,6 +312,20 @@ export default async function ProfilPage({
             </details>
 
             <Link
+              href="/mon-espace/signaler"
+              className="flex items-center gap-3 w-full bg-white rounded-2xl border border-[#E8E8E8] p-5 hover:border-[#D0D0D0] transition-colors"
+            >
+              <span className="w-10 h-10 rounded-xl bg-[#FF5500]/10 flex items-center justify-center shrink-0">
+                <AlertTriangle className="w-5 h-5 text-[#FF5500]" />
+              </span>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-bold text-[#111111]">Signaler un problème / donner mon avis</p>
+                <p className="text-xs text-[#9CA3AF] mt-0.5">Sécurité, organisation, idée — vu par ton organisateur seul. Anonyme possible.</p>
+              </div>
+              <ChevronRight className="w-4 h-4 text-[#9CA3AF] shrink-0" />
+            </Link>
+
+            <Link
               href="/mon-espace/pin-oublie"
               className="flex items-center justify-between w-full bg-white rounded-2xl border border-[#E8E8E8] p-5 hover:border-[#D0D0D0] transition-colors"
             >

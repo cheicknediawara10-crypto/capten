@@ -7,7 +7,7 @@ import {
   Map, MapPin, Users, Globe, Wallet, Store,
   BarChart3, Sparkles, Ticket, ShieldCheck, 
   LogOut, Zap, LayoutDashboard, HelpCircle,
-  MessageSquare, CreditCard, Shield, Plus, History, CloudRain, Wind, Droplets, Activity, Lock, PlayCircle
+  MessageSquare, CreditCard, Shield, Plus, History, CloudRain, Wind, Droplets, Activity, Lock, PlayCircle, Flag
 } from "lucide-react";
 import { logout } from "@/app/login/actions";
 import ThemeToggle from "@/components/layout/ThemeToggle";
@@ -61,6 +61,7 @@ export default function Sidebar() {
       title: "TERRAIN",
       items: [
         { name: "Les Spots", icon: <MapPin size={18} strokeWidth={1.5} />, href: "/dashboard/spots" },
+        { name: "Signalements", icon: <Flag size={18} strokeWidth={1.5} />, href: "/dashboard/signalements" },
         { name: "Protection", icon: <ShieldCheck size={18} strokeWidth={1.5} />, href: "/securite" },
       ]
     },
