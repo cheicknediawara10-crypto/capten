@@ -4,8 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { Upload, Save, Loader2, Globe, Copy, Check, Link2, ArrowLeft } from "lucide-react";
-import { getSupabase } from "@/lib/supabase";
-import { getMyClub, saveMyClub } from "./actions";
+import { getMyClub, saveMyClub, uploadClubLogo } from "./actions";
 
 interface Club {
   id: string;
@@ -63,23 +62,15 @@ export default function ClubSettingsPage() {
 
   async function uploadLogo(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
-    if (!file || !club) return;
+    if (!file) return;
 
     setLogoUploading(true);
-    const supabase = getSupabase();
-    if (!supabase) { setLogoUploading(false); return; }
-
-    const ext = file.name.split(".").pop();
-    const path = `clubs/${club.id}/logo.${ext}`;
-
-    const { error: uploadError } = await supabase.storage
-      .from("avatars")
-      .upload(path, file, { upsert: true, contentType: file.type });
-
-    if (!uploadError) {
-      const { data: { publicUrl } } = supabase.storage.from("avatars").getPublicUrl(path);
-      update("logo_url", publicUrl);
-    }
+    // Upload via server action (clé service) → pas de dépendance à la session client.
+    const fd = new FormData();
+    fd.append("file", file);
+    const res = await uploadClubLogo(fd);
+    if ("error" in res) alert(res.error);
+    else update("logo_url", res.url);
 
     setLogoUploading(false);
   }

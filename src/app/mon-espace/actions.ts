@@ -96,6 +96,14 @@ export async function registerMembre(data: {
     return { error: "Champs requis manquants." };
   }
 
+  // Anti-spam : l'inscription est publique (/join) → on limite par IP.
+  const rhStore = await headers();
+  const rip = rhStore.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+  const rlReg = await rateLimit(`membre:register:${rip}`, 5, 15 * 60);
+  if (!rlReg.success) {
+    return { error: "Trop d'inscriptions depuis cet appareil. Réessaie dans 15 minutes." };
+  }
+
   let supabase: ReturnType<typeof createAdminClient>;
   try {
     supabase = createAdminClient();
@@ -204,7 +212,7 @@ export async function requestPinReset(email: string): Promise<ResetRequestResult
 
   // Always return success — do not reveal whether email exists
   if (!membreRaw) {
-    console.warn(`[pin-reset] aucun membre avec l'e-mail "${email.trim()}" — aucun envoi.`);
+    console.warn("[pin-reset] aucun membre pour l'e-mail fourni — aucun envoi.");
     return { success: true };
   }
 

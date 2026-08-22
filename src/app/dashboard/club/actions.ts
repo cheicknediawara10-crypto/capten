@@ -8,6 +8,35 @@ function ub(supabase: ReturnType<typeof createAdminClient>, table: string): any 
   return supabase.from(table as Parameters<ReturnType<typeof createAdminClient>["from"]>[0]);
 }
 
+/**
+ * Upload du logo du crew via la clé service (contourne proprement le RLS du
+ * Storage — le client navigateur n'a pas de session côté Storage).
+ * Borné au crew connecté.
+ */
+export async function uploadClubLogo(formData: FormData): Promise<{ url: string } | { error: string }> {
+  const club_id = await getAuthenticatedCaptainId();
+  if (!club_id) return { error: "Session expirée. Reconnecte-toi." };
+
+  const file = formData.get("file") as File | null;
+  if (!file || typeof file.arrayBuffer !== "function") return { error: "Fichier invalide." };
+  if (file.size > 2 * 1024 * 1024) return { error: "Image trop lourde (max 2 Mo)." };
+  if (!file.type.startsWith("image/")) return { error: "Le fichier doit être une image." };
+
+  let sb: ReturnType<typeof createAdminClient>;
+  try { sb = createAdminClient(); } catch { return { error: "Service indisponible." }; }
+
+  const ext = (file.name.split(".").pop() || "png").toLowerCase().replace(/[^a-z0-9]/g, "") || "png";
+  const path = `clubs/${club_id}/logo.${ext}`;
+  const bytes = Buffer.from(await file.arrayBuffer());
+
+  const { error: upErr } = await sb.storage.from("avatars").upload(path, bytes, { upsert: true, contentType: file.type });
+  if (upErr) return { error: "Erreur d'upload. Réessaie." };
+
+  const { data } = sb.storage.from("avatars").getPublicUrl(path);
+  // Cache-busting pour que le nouveau logo s'affiche immédiatement.
+  return { url: `${data.publicUrl}?v=${Date.now()}` };
+}
+
 function slugify(s: string): string {
   return (s || "")
     .toLowerCase()

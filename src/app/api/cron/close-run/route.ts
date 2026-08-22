@@ -16,7 +16,7 @@ function ub(supabase: ReturnType<typeof createAdminClient>, table: string): any 
 export async function GET(req: NextRequest) {
   const secret = process.env.CRON_SECRET;
   const auth = req.headers.get("authorization");
-  if (secret && auth !== `Bearer ${secret}`) {
+  if (!secret || auth !== `Bearer ${secret}`) {
     return new Response("Unauthorized", { status: 401 });
   }
 

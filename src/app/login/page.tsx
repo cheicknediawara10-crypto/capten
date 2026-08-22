@@ -7,7 +7,7 @@ import Link from "next/link";
 import {
   Mail, Lock, ArrowRight, Loader2,
   MessageSquare, MapPin, Wallet, ShieldCheck, AlertCircle, CheckCircle2,
-  Eye, EyeOff, ArrowLeft, Zap, Users, BarChart3, UserPlus, CreditCard, Calendar, Hash
+  Eye, EyeOff, ArrowLeft, Zap, Users, BarChart3, UserPlus, Calendar, Hash
 } from "lucide-react";
 import { loginWithPassword, loginWithOtp, resetPassword, signUp } from "./actions";
 
@@ -243,10 +243,6 @@ function LoginForm() {
 
   // Step 2 Card states
   const [signupStep, setSignupStep] = useState<1 | 2>(1);
-  const [cardNumber, setCardNumber] = useState("");
-  const [cardExpiry, setCardExpiry] = useState("");
-  const [cardCvc, setCardCvc] = useState("");
-  const [cardName, setCardName] = useState("");
 
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -444,7 +440,7 @@ function LoginForm() {
         }}>
           {mode === "signup" 
             ? (assignedVariant === 'B' && !isFreePlanUrl 
-                ? (signupStep === 1 ? <UserPlus size={10} /> : <CreditCard size={10} />)
+                ? <UserPlus size={10} />
                 : <UserPlus size={10} />)
             : <Lock size={10} />}
           {mode === "password" 
@@ -839,203 +835,6 @@ function LoginForm() {
         )}
 
         {/* Step 2 Fields: Card Details (Variant B Trial signup only) */}
-        {mode === "signup" && signupStep === 2 && (
-          <div className="login-fade-up space-y-4">
-            {/* Trial Recap Panel */}
-            <div style={{
-              background: "#FDFCF8",
-              border: "1px dashed #FF5C00",
-              borderRadius: 14,
-              padding: 18,
-              marginBottom: 20,
-            }}>
-              <h4 style={{
-                fontFamily: "var(--font-barlow), sans-serif",
-                fontStyle: "italic",
-                fontWeight: 900,
-                fontSize: 15,
-                color: "#000",
-                textTransform: "uppercase",
-                letterSpacing: 0.5,
-                marginBottom: 10,
-              }}>
-                ESSAI CAPTEN — 14 JOURS
-              </h4>
-              <ul style={{
-                fontSize: 12,
-                color: C.textSecondary,
-                paddingLeft: 16,
-                listStyleType: "disc",
-                lineHeight: 1.6,
-                margin: 0,
-              }}>
-                <li>Accès complet premium immédiat sans restriction.</li>
-                <li style={{ fontWeight: 800, color: C.text }}>Rien ne t'est prélevé aujourd'hui.</li>
-                <li>Débit de 29,99 €/mois à partir du <span style={{ fontWeight: 700 }}>{new Date(Date.now() + 21 * 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR')}</span>.</li>
-                <li>Annulation en 1 clic sans justification depuis tes réglages.</li>
-              </ul>
-            </div>
-
-            {/* Card Name */}
-            <div style={{ marginBottom: 14 }}>
-              <label style={{
-                display: "block",
-                fontSize: 11,
-                fontWeight: 700,
-                color: C.textSecondary,
-                textTransform: "uppercase",
-                letterSpacing: 1,
-                marginBottom: 8,
-                fontFamily: "var(--font-dm-sans), sans-serif",
-              }}>
-                Titulaire de la carte
-              </label>
-              <div style={{ position: "relative" }}>
-                <Users size={16} style={{
-                  position: "absolute",
-                  left: 16,
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                  color: C.textLight,
-                }} />
-                <input
-                  type="text"
-                  required
-                  placeholder="Jean Dupont"
-                  value={cardName}
-                  onChange={(e) => setCardName(e.target.value)}
-                  disabled={isLoading}
-                  className="login-input"
-                />
-              </div>
-            </div>
-
-            {/* Card Number */}
-            <div style={{ marginBottom: 14 }}>
-              <label style={{
-                display: "block",
-                fontSize: 11,
-                fontWeight: 700,
-                color: C.textSecondary,
-                textTransform: "uppercase",
-                letterSpacing: 1,
-                marginBottom: 8,
-                fontFamily: "var(--font-dm-sans), sans-serif",
-              }}>
-                Numéro de carte bancaire
-              </label>
-              <div style={{ position: "relative" }}>
-                <CreditCard size={16} style={{
-                  position: "absolute",
-                  left: 16,
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                  color: C.textLight,
-                }} />
-                <input
-                  type="text"
-                  required
-                  maxLength={19}
-                  placeholder="4242 4242 4242 4242"
-                  value={cardNumber}
-                  onChange={(e) => {
-                    let v = e.target.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
-                    let matches = v.match(/\d{4,16}/g);
-                    let match = matches && matches[0] || '';
-                    let parts = [];
-                    for (let i=0, len=match.length; i<len; i+=4) {
-                      parts.push(match.substring(i, i+4));
-                    }
-                    if (parts.length > 0) {
-                      setCardNumber(parts.join(' '));
-                    } else {
-                      setCardNumber(v);
-                    }
-                  }}
-                  disabled={isLoading}
-                  className="login-input"
-                />
-              </div>
-            </div>
-
-            {/* Expiry & CVC Grid */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 24 }}>
-              <div>
-                <label style={{
-                  display: "block",
-                  fontSize: 11,
-                  fontWeight: 700,
-                  color: C.textSecondary,
-                  textTransform: "uppercase",
-                  letterSpacing: 1,
-                  marginBottom: 8,
-                  fontFamily: "var(--font-dm-sans), sans-serif",
-                }}>
-                  Date d'expiration
-                </label>
-                <div style={{ position: "relative" }}>
-                  <Calendar size={16} style={{
-                    position: "absolute",
-                    left: 16,
-                    top: "50%",
-                    transform: "translateY(-50%)",
-                    color: C.textLight,
-                  }} />
-                  <input
-                    type="text"
-                    required
-                    maxLength={5}
-                    placeholder="MM/AA"
-                    value={cardExpiry}
-                    onChange={(e) => {
-                      let v = e.target.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
-                      if (v.length >= 2) {
-                        setCardExpiry(v.substring(0, 2) + '/' + v.substring(2, 4));
-                      } else {
-                        setCardExpiry(v);
-                      }
-                    }}
-                    disabled={isLoading}
-                    className="login-input"
-                  />
-                </div>
-              </div>
-              <div>
-                <label style={{
-                  display: "block",
-                  fontSize: 11,
-                  fontWeight: 700,
-                  color: C.textSecondary,
-                  textTransform: "uppercase",
-                  letterSpacing: 1,
-                  marginBottom: 8,
-                  fontFamily: "var(--font-dm-sans), sans-serif",
-                }}>
-                  CVC / CVV
-                </label>
-                <div style={{ position: "relative" }}>
-                  <Hash size={16} style={{
-                    position: "absolute",
-                    left: 16,
-                    top: "50%",
-                    transform: "translateY(-50%)",
-                    color: C.textLight,
-                  }} />
-                  <input
-                    type="text"
-                    required
-                    maxLength={3}
-                    placeholder="123"
-                    value={cardCvc}
-                    onChange={(e) => setCardCvc(e.target.value.replace(/[^0-9]/g, ''))}
-                    disabled={isLoading}
-                    className="login-input"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* Submit Button */}
         <div className="login-fade-up-3">
@@ -1076,29 +875,6 @@ function LoginForm() {
           </button>
         </div>
 
-        {/* Back Link to Step 1 (Step 2 signup only) */}
-        {mode === "signup" && signupStep === 2 && (
-          <div className="login-fade-up-3" style={{ textAlign: "center", marginTop: 16 }}>
-            <button
-              type="button"
-              disabled={isLoading}
-              onClick={() => setSignupStep(1)}
-              style={{
-                background: "none",
-                border: "none",
-                color: C.textSecondary,
-                fontSize: 12,
-                fontWeight: 600,
-                cursor: isLoading ? "not-allowed" : "pointer",
-                fontFamily: "var(--font-dm-sans), sans-serif",
-                textDecoration: "underline",
-                opacity: isLoading ? 0.5 : 1,
-              }}
-            >
-              ← Modifier les informations de compte
-            </button>
-          </div>
-        )}
 
         {/* Back Link (Only shown in forgot mode) */}
         {mode === "forgot" && (
