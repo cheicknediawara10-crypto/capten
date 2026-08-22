@@ -7,6 +7,41 @@ function ub(supabase: ReturnType<typeof createAdminClient>, table: string): any 
   return supabase.from(table as Parameters<ReturnType<typeof createAdminClient>["from"]>[0]);
 }
 
+/**
+ * Mutation ATOMIQUE de la cagnotte (argent) : lit `cagnotte_data`, applique le
+ * mutateur, puis écrit avec un compare-and-swap sur `_ver` (verrou optimiste).
+ * Si une écriture concurrente a bougé la version → 0 ligne affectée → on
+ * réessaie. Empêche les "lost updates" (contribution/transaction écrasée).
+ */
+async function mutateCagnotte(
+  sb: ReturnType<typeof createAdminClient>,
+  club_id: string,
+  mutator: (current: Record<string, any>) => { data: Record<string, any> } | { error: string },
+  extra?: Record<string, any>
+): Promise<{ ok: true } | { error: string }> {
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const { data: club } = await ub(sb, "clubs").select("cagnotte_data").eq("id", club_id).maybeSingle();
+    const current = ((club as any)?.cagnotte_data || {}) as Record<string, any>;
+    const ver = Number(current._ver || 0);
+
+    const m = mutator({ ...current });
+    if ("error" in m) return { error: m.error };
+    const next = { ...m.data, _ver: ver + 1 };
+
+    let q = ub(sb, "clubs").update({ cagnotte_data: next, ...(extra || {}) }).eq("id", club_id);
+    q = (current._ver === undefined || current._ver === null)
+      ? q.is("cagnotte_data->>_ver", null)
+      : q.eq("cagnotte_data->>_ver", String(ver));
+
+    const { data: updated, error } = await q.select("id");
+    if (error) return { error: "Erreur d'enregistrement." };
+    if (updated && (updated as any[]).length > 0) return { ok: true };
+
+    await new Promise((r) => setTimeout(r, 40 * (attempt + 1))); // conflit → petite attente puis retry
+  }
+  return { error: "Trop de modifications simultanées. Réessaie dans un instant." };
+}
+
 export interface CagnotteTransaction {
   id: string;
   member_id?: string | null;
@@ -114,32 +149,21 @@ export async function saveCagnotteSettings(input: {
     return { error: "Service indisponible." };
   }
 
-  const { data: club } = await ub(supabase, "clubs")
-    .select("cagnotte_data, cagnotte_url")
-    .eq("id", club_id)
-    .maybeSingle();
-
-  const current = ((club as any)?.cagnotte_data || {}) as Record<string, any>;
-  const updatedData = {
-    ...current,
-    cagnotte_url: input.cagnotte_url !== undefined ? input.cagnotte_url.trim() : (current.cagnotte_url || ""),
-    goal: input.goal !== undefined ? Number(input.goal) : (current.goal || 300),
-    goal_title: input.goal_title !== undefined ? input.goal_title.trim() : (current.goal_title || "Objectif Crew"),
-    cotisation_amount: input.cotisation_amount !== undefined ? Number(input.cotisation_amount) : (current.cotisation_amount || 20),
-  };
-
-  const updatePayload: Record<string, any> = { cagnotte_data: updatedData };
+  const extra: Record<string, any> = {};
   if (input.cagnotte_url !== undefined) {
-    updatePayload.cagnotte_url = input.cagnotte_url.trim();
-    updatePayload.website_url = input.cagnotte_url.trim();
+    extra.cagnotte_url = input.cagnotte_url.trim();
+    extra.website_url = input.cagnotte_url.trim();
   }
 
-  const { error } = await ub(supabase, "clubs")
-    .update(updatePayload)
-    .eq("id", club_id);
-
-  if (error) return { error: "Erreur lors de la sauvegarde." };
-  return { ok: true };
+  return mutateCagnotte(supabase, club_id, (current) => ({
+    data: {
+      ...current,
+      cagnotte_url: input.cagnotte_url !== undefined ? input.cagnotte_url.trim() : (current.cagnotte_url || ""),
+      goal: input.goal !== undefined ? Number(input.goal) : (current.goal || 300),
+      goal_title: input.goal_title !== undefined ? input.goal_title.trim() : (current.goal_title || "Objectif Crew"),
+      cotisation_amount: input.cotisation_amount !== undefined ? Number(input.cotisation_amount) : (current.cotisation_amount || 20),
+    },
+  }), extra);
 }
 
 export async function addContribution(input: {
@@ -159,59 +183,42 @@ export async function addContribution(input: {
     return { error: "Service indisponible." };
   }
 
-  const { data: club } = await ub(supabase, "clubs")
-    .select("cagnotte_data")
-    .eq("id", club_id)
-    .maybeSingle();
+  return mutateCagnotte(supabase, club_id, (current) => {
+    const transactions: CagnotteTransaction[] = Array.isArray(current.transactions) ? [...current.transactions] : [];
+    const contributors: CagnotteContributor[] = Array.isArray(current.contributors) ? [...current.contributors] : [];
 
-  const current = ((club as any)?.cagnotte_data || {}) as Record<string, any>;
-  const transactions: CagnotteTransaction[] = Array.isArray(current.transactions) ? [...current.transactions] : [];
-  const contributors: CagnotteContributor[] = Array.isArray(current.contributors) ? [...current.contributors] : [];
+    const newTx: CagnotteTransaction = {
+      id: `tx_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+      member_id: input.member_id || null,
+      name: input.name.trim(),
+      amount: Number(input.amount),
+      date: new Date().toISOString(),
+      method: input.method,
+      note: input.note?.trim() || undefined,
+    };
 
-  const newTx: CagnotteTransaction = {
-    id: `tx_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-    member_id: input.member_id || null,
-    name: input.name.trim(),
-    amount: Number(input.amount),
-    date: new Date().toISOString(),
-    method: input.method,
-    note: input.note?.trim() || undefined,
-  };
+    transactions.unshift(newTx);
+    const newBalance = Number(current.balance || 0) + Number(input.amount);
 
-  transactions.unshift(newTx);
-  const newBalance = Number(current.balance || 0) + Number(input.amount);
-
-  // Update contributor status if member_id exists
-  if (input.member_id) {
-    const existingIdx = contributors.findIndex((c) => c.member_id === input.member_id);
-    if (existingIdx >= 0) {
-      contributors[existingIdx].total_contributed += Number(input.amount);
-      contributors[existingIdx].is_up_to_date = true;
-      contributors[existingIdx].last_payment_date = new Date().toISOString();
-    } else {
-      contributors.push({
-        member_id: input.member_id,
-        name: input.name.trim(),
-        total_contributed: Number(input.amount),
-        is_up_to_date: true,
-        last_payment_date: new Date().toISOString(),
-      });
+    if (input.member_id) {
+      const existingIdx = contributors.findIndex((c) => c.member_id === input.member_id);
+      if (existingIdx >= 0) {
+        contributors[existingIdx].total_contributed += Number(input.amount);
+        contributors[existingIdx].is_up_to_date = true;
+        contributors[existingIdx].last_payment_date = new Date().toISOString();
+      } else {
+        contributors.push({
+          member_id: input.member_id,
+          name: input.name.trim(),
+          total_contributed: Number(input.amount),
+          is_up_to_date: true,
+          last_payment_date: new Date().toISOString(),
+        });
+      }
     }
-  }
 
-  const updatedData = {
-    ...current,
-    balance: newBalance,
-    transactions,
-    contributors,
-  };
-
-  const { error } = await ub(supabase, "clubs")
-    .update({ cagnotte_data: updatedData })
-    .eq("id", club_id);
-
-  if (error) return { error: "Erreur lors de l'enregistrement de la contribution." };
-  return { ok: true };
+    return { data: { ...current, balance: newBalance, transactions, contributors } };
+  });
 }
 
 export async function deleteTransaction(txId: string): Promise<{ ok: true } | { error: string }> {
@@ -225,30 +232,12 @@ export async function deleteTransaction(txId: string): Promise<{ ok: true } | { 
     return { error: "Service indisponible." };
   }
 
-  const { data: club } = await ub(supabase, "clubs")
-    .select("cagnotte_data")
-    .eq("id", club_id)
-    .maybeSingle();
-
-  const current = ((club as any)?.cagnotte_data || {}) as Record<string, any>;
-  const transactions: CagnotteTransaction[] = Array.isArray(current.transactions) ? [...current.transactions] : [];
-  
-  const target = transactions.find((t) => t.id === txId);
-  if (!target) return { error: "Transaction introuvable." };
-
-  const filteredTx = transactions.filter((t) => t.id !== txId);
-  const newBalance = Math.max(0, Number(current.balance || 0) - target.amount);
-
-  const updatedData = {
-    ...current,
-    balance: newBalance,
-    transactions: filteredTx,
-  };
-
-  const { error } = await ub(supabase, "clubs")
-    .update({ cagnotte_data: updatedData })
-    .eq("id", club_id);
-
-  if (error) return { error: "Erreur lors de la suppression." };
-  return { ok: true };
+  return mutateCagnotte(supabase, club_id, (current) => {
+    const transactions: CagnotteTransaction[] = Array.isArray(current.transactions) ? [...current.transactions] : [];
+    const target = transactions.find((t) => t.id === txId);
+    if (!target) return { error: "Transaction introuvable." };
+    const filteredTx = transactions.filter((t) => t.id !== txId);
+    const newBalance = Math.max(0, Number(current.balance || 0) - target.amount);
+    return { data: { ...current, balance: newBalance, transactions: filteredTx } };
+  });
 }
