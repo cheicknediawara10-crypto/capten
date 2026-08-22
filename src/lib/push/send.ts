@@ -1,10 +1,29 @@
-import crypto from "crypto";
+import webpush from "web-push";
 import { createAdminClient } from "@/lib/supabase/admin";
 
-// Clés VAPID pour le Web Push PWA (générées avec P-256)
-const DEFAULT_VAPID_PUBLIC = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || "BNo_tHk_JtH3r9Lz_Qh1T5vW_8k2Y7pM_3Xz9Q_1Vb4N7cK9mP_2Rt6Wy_8Qz1Xb4N7cK9mP2Rt6Wy8Qz1X";
-const DEFAULT_VAPID_PRIVATE = process.env.VAPID_PRIVATE_KEY || "k9M2Rt6Wy8Qz1Xb4N7cK9mP2Rt6Wy8Qz1Xb4N7cK9mP=";
+// Web Push (RFC 8030/8291/8292) — l'authentification VAPID (JWT ES256) et le
+// chiffrement du payload (aes128gcm) sont gérés par la lib `web-push`.
+const VAPID_PUBLIC = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || "";
+const VAPID_PRIVATE = process.env.VAPID_PRIVATE_KEY || "";
 const VAPID_SUBJECT = process.env.VAPID_SUBJECT || "mailto:info.captenfr@gmail.com";
+
+let vapidReady: boolean | null = null;
+function ensureVapid(): boolean {
+  if (vapidReady !== null) return vapidReady;
+  if (!VAPID_PUBLIC || !VAPID_PRIVATE) {
+    console.error("[Web Push] Clés VAPID absentes → notifications désactivées.");
+    vapidReady = false;
+    return false;
+  }
+  try {
+    webpush.setVapidDetails(VAPID_SUBJECT, VAPID_PUBLIC, VAPID_PRIVATE);
+    vapidReady = true;
+  } catch (e) {
+    console.error("[Web Push] Clés VAPID invalides:", e);
+    vapidReady = false;
+  }
+  return vapidReady;
+}
 
 export interface PushPayload {
   title: string;
@@ -20,88 +39,62 @@ export interface PushSubscriptionRecord {
   auth: string;
 }
 
-/**
- * Envoie une notification Web Push à un abonné unique.
- */
-export async function sendWebPush(
-  sub: PushSubscriptionRecord,
-  payload: PushPayload
-): Promise<boolean> {
+type SendResult = "ok" | "expired" | "error";
+
+/** Envoie une notification Web Push à un abonné. */
+export async function sendWebPush(sub: PushSubscriptionRecord, payload: PushPayload): Promise<SendResult> {
+  if (!ensureVapid()) return "error";
   try {
-    const url = new URL(sub.endpoint);
-    const audience = `${url.protocol}//${url.host}`;
-
-    // Payload JSON
-    const bodyStr = JSON.stringify({
-      title: payload.title,
-      body: payload.body,
-      url: payload.url || "/",
-      icon: payload.icon || "/logo.png",
-    });
-
-    const response = await fetch(sub.endpoint, {
-      method: "POST",
-      headers: {
-        "TTL": "86400",
-        "Content-Type": "application/json",
-        "Urgency": "high",
-      },
-      body: bodyStr,
-    });
-
-    if (response.status === 410 || response.status === 404) {
-      // L'abonnement a expiré ou a été désactivé par le navigateur
-      return false;
-    }
-
-    return response.ok;
-  } catch (err) {
-    console.error("[Web Push Error]", err);
-    return false;
+    await webpush.sendNotification(
+      { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
+      JSON.stringify({
+        title: payload.title,
+        body: payload.body,
+        url: payload.url || "/",
+        icon: payload.icon || "/logo.png",
+      }),
+      { TTL: 86400, urgency: "high" }
+    );
+    return "ok";
+  } catch (err: any) {
+    const code = err?.statusCode;
+    if (code === 404 || code === 410) return "expired"; // abonnement mort → à purger
+    console.error("[Web Push Error]", code, err?.body || err?.message);
+    return "error";
   }
 }
 
-/**
- * Diffuse une notification Web Push à tous les coureurs et fondateurs d'un club.
- */
+/** Diffuse une notification à tous les abonnés (coureurs + fondateur) d'un crew. */
 export async function sendClubPushNotification(
   clubId: string,
   payload: PushPayload
 ): Promise<{ total: number; sent: number }> {
+  if (!ensureVapid()) return { total: 0, sent: 0 };
+
   let supabase: ReturnType<typeof createAdminClient>;
-  try {
-    supabase = createAdminClient();
-  } catch {
-    return { total: 0, sent: 0 };
-  }
+  try { supabase = createAdminClient(); } catch { return { total: 0, sent: 0 }; }
 
   const { data: subs } = await (supabase as any)
     .from("push_subscriptions")
     .select("id, endpoint, p256dh, auth")
     .eq("club_id", clubId);
 
-  if (!subs || subs.length === 0) {
-    return { total: 0, sent: 0 };
-  }
+  const list = (subs as PushSubscriptionRecord[]) || [];
+  if (list.length === 0) return { total: 0, sent: 0 };
 
-  const list = subs as PushSubscriptionRecord[];
   let sent = 0;
   const deadIds: string[] = [];
 
   await Promise.all(
     list.map(async (s) => {
-      const ok = await sendWebPush(s, payload);
-      if (ok) sent++;
-      else if (s.id) deadIds.push(s.id);
+      const r = await sendWebPush(s, payload);
+      if (r === "ok") sent++;
+      else if (r === "expired" && s.id) deadIds.push(s.id); // on ne purge QUE les expirés (pas les erreurs transitoires)
     })
   );
 
-  // Nettoyage des abonnements expirés
   if (deadIds.length > 0) {
-    await (supabase as any)
-      .from("push_subscriptions")
-      .delete()
-      .in("id", deadIds);
+    await (supabase as any).from("push_subscriptions").delete().in("id", deadIds);
   }
 
   return { total: list.length, sent };
