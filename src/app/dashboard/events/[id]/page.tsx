@@ -8,7 +8,6 @@ import {
   Download, Globe, Lock, Trash2, Loader2, Wifi, Megaphone, Camera, MessageCircle,
   Luggage, Gauge, Coffee, Bell
 } from "lucide-react";
-import { getSupabase } from "@/lib/supabase";
 import Link from "next/link";
 import { formatDateShort } from "@/lib/utils/format";
 import { parsePracticalInfo } from "@/lib/utils/practical-info";
@@ -114,31 +113,20 @@ export default function EventDetailPage() {
   useEffect(() => {
     loadEvent();
 
-    // Supabase Realtime subscription for live check-ins
-    const supabase = getSupabase();
-    if (!supabase) return;
+    // Check-ins "quasi-live" par polling (12 s). Fiable et indépendant du RLS
+    // Realtime — le client navigateur n'a pas de session Supabase. On met en
+    // pause quand l'onglet est masqué (économie), et on rafraîchit au retour.
+    const tick = () => {
+      if (typeof document === "undefined" || document.visibilityState === "visible") loadEvent();
+    };
+    const timer = setInterval(tick, 12000);
+    const onVis = () => { if (document.visibilityState === "visible") loadEvent(); };
+    if (typeof document !== "undefined") document.addEventListener("visibilitychange", onVis);
 
-    const channel = supabase
-      .channel(`membre-checkins-${id}`)
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "membre_checkins", filter: `event_id=eq.${id}` },
-        (payload) => {
-          if (payload.eventType === "INSERT") {
-            setCheckins((prev) => [payload.new as Checkin, ...prev]);
-            if ((payload.new as Checkin).is_valid) {
-              setLiveCount((c) => c + 1);
-            }
-          } else if (payload.eventType === "UPDATE") {
-            setCheckins((prev) =>
-              prev.map((c) => c.id === (payload.new as Checkin).id ? { ...c, ...(payload.new as Checkin) } : c)
-            );
-          }
-        }
-      )
-      .subscribe();
-
-    return () => { supabase.removeChannel(channel); };
+    return () => {
+      clearInterval(timer);
+      if (typeof document !== "undefined") document.removeEventListener("visibilitychange", onVis);
+    };
   }, [id, loadEvent]);
 
   async function togglePublish() {
