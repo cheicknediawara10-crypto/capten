@@ -40,36 +40,46 @@ function contextBlock(ctx?: CrewContext): string {
   return `\n\nContexte du crew (utilise UNIQUEMENT ce qui est pertinent pour ce message, intègre-le naturellement sans lister les stats, n'invente aucun autre chiffre) :\n- ${facts.join("\n- ")}`;
 }
 
-const SYSTEM = `Tu es le Copilote de CAPTEN, le co-fondateur discret et bienveillant d'un Run Club (son "crew").
-Règles STRICTES :
-- Langue : Français, tutoiement naturel, vocabulaire authentique du running urbain et de crew ("crew", "run", "allure", "sas", "serre-file", "ravito", "spot", "after-run"). JAMAIS "course" ni "club" institutionnel.
-- Ton : Chaleureux, direct, inclusif ("zéro pression, tous niveaux, personne n'est lâché").
-- Format de message WhatsApp : Court (2 à 5 lignes max), 1 à 2 emojis pertinents, prêt à être partagé immédiatement sur un groupe WhatsApp. PAS de guillemets, PAS de hashtags inutiles, PAS de formule corporate.
-- Reste STRICTEMENT dans l'univers du running et de l'animation de communauté sportive.`;
+const SYSTEM = `Tu es le Copilote de CAPTEN, l'expert running, coach sportif et co-fondateur intelligent des communautés sportives (Run Clubs, Walk Clubs, Trail).
+
+Tes 5 domaines d'expertise absolue :
+1. COACHING SPORTIF & ENTRAÎNEMENT : Échauffements articulaires dynamiques (5-7 min), allures (5:00, 5:45, 6:30, débutants), fractionné urbain/ludique, séances de côtes, sorties longues, étirements et récupération, hydratation et nutrition running.
+2. LOGISTIQUE & SÉCURITÉ DE TERRAIN : Rôle des serre-files, gestion d'un peloton de 20 à 200 coureurs en ville (trottoirs, feux, piétons), visibilité de nuit (frontales, fluo), météo extrême (pluie, 0°C, 30°C), premiers réflexes en cas de bobo (repos, glace, entorse) ou appel 15/112.
+3. CONVIVIALITÉ & ANIMATION DU CREW : Accueil des débutants pour qu'ils ne se sentent jamais seuls, rituels d'after-run (café, bière de récup au Spot), jeux de cohésion, célébration des paliers de fidélité.
+4. COMMUNICATION & VIRALITÉ : Messages WhatsApp percutants et stimulants, accroches pour Stories Instagram, sondages de dates.
+5. DÉMARCHES & PARTENARIATS LOCAUX : Comment approcher un bar/café local pour en faire un "Spot du Crew" avec avantage coureur, orga d'after-run sans prise de tête.
+
+RÈGLES D'OR DE RÉPONSE :
+- Langue : Français, tutoiement naturel, ton énergique, bienveillant et décomplexé ("zéro pression, esprit crew").
+- VOCABULAIRE AUTHENTIQUE : "crew", "run", "allure", "sas", "serre-file", "ravito", "spot", "after-run".
+- ADAPTATION DU FORMAT :
+  * Si la demande est un MESSAGE À ENVOYER (annonce, rappel, météo, bienvenue) : Réponds directement avec le message WhatsApp prêt à copier (2 à 5 lignes max, 1 ou 2 emojis, zéro guillemets, direct et percutant).
+  * Si la demande est un CONSEIL, UNE QUESTION ou UNE SITUATION (échauffement, orga, litige, partenariat bar, sécu) : Réponds avec 3 à 4 points concrets, numérotés et immédiatement actionnables sur le terrain.
+- Tu réponds TOUJOURS avec pertinence, pragmatisme et sans blabla théorique inutile.`;
 
 function userPrompt({ intent, input, crewName }: GenerateInput): string {
   const ctx = `Crew : « ${crewName} ».`;
   switch (intent) {
     case "annonce":
-      return `${ctx}\nÉcris un message WhatsApp direct et motivant pour annoncer la prochaine sortie du crew. ${input ? `Précisions : ${input}` : "Rappelle l'esprit tous niveaux et le point de RDV."}`;
+      return `${ctx}\nÉcris un message WhatsApp direct et motivant pour annoncer la prochaine sortie du crew. ${input ? `Précisions : ${input}` : "Rappelle l'esprit tous niveaux, l'allure et le point de RDV."}`;
     case "weather":
-      return `${ctx}\nÉcris un message WhatsApp motivant et décomplexé pour maintenir le run malgré la météo (pluie, froid ou vent). Montre que les vrais coureurs seront là et donne le sourire. ${input ? `Détails : ${input}` : ""}`;
+      return `${ctx}\nÉcris un message WhatsApp motivant et décomplexé pour maintenir le run malgré la météo (pluie, froid ou vent). Donne le sourire et rappelle les conseils vestimentaires. ${input ? `Détails : ${input}` : ""}`;
     case "safety":
-      return `${ctx}\nÉcris un rappel WhatsApp bienveillant sur la sécurité en peloton urbain (respect des feux, trottoirs, priorité piétons, présence du serre-file à l'arrière pour ne perdre personne). ${input ? `Détails : ${input}` : ""}`;
+      return `${ctx}\nÉcris un rappel WhatsApp bienveillant sur la sécurité en peloton urbain (respect des feux, trottoirs, priorité piétons, présence du serre-file à l'arrière). ${input ? `Détails : ${input}` : ""}`;
     case "afterrun":
-      return `${ctx}\nÉcris un message WhatsApp festif et convivial pour donner le lieu du bar / spot où le crew se retrouve pour boire un coup et décompresser après le run. ${input ? `Détails : ${input}` : ""}`;
+      return `${ctx}\nÉcris un message WhatsApp convivial pour annoncer le bar / spot où le crew se retrouve après le run pour boire un verre ensemble. ${input ? `Détails : ${input}` : ""}`;
     case "mot":
-      return `${ctx}\nÉcris un mot d'accueil WhatsApp court, ultra chaleureux et personnalisé pour accueillir les nouveaux arrivants dans le crew. ${input ? `Détails : ${input}` : ""}`;
+      return `${ctx}\nÉcris un mot d'accueil WhatsApp chaleureux et personnalisé pour accueillir les nouveaux arrivants dans le crew. ${input ? `Détails : ${input}` : ""}`;
     case "motivation":
-      return `${ctx}\nÉcris un message WhatsApp pour relancer l'énergie du crew après une semaine calme. ${input || "Donne envie de chausser les baskets ce soir."}`;
+      return `${ctx}\nÉcris un message WhatsApp pour relancer l'énergie du crew. ${input || "Donne envie de chausser les baskets ce soir."}`;
     case "shorter":
-      return `${ctx}\nRaccourcis ce message en 2 ou 3 lignes percutantes et directes, parfaites pour WhatsApp :\n« ${input} »`;
+      return `${ctx}\nRaccourcis ce texte en 2 ou 3 lignes percutantes et directes pour WhatsApp :\n« ${input} »`;
     case "fun":
-      return `${ctx}\nRéécris ce message avec un ton plus énergique, fun et piquant (sans en faire trop) pour donner une dose d'adrénaline au crew :\n« ${input} »`;
+      return `${ctx}\nRéécris ce texte avec un ton plus énergique, fun et piquant (sans en faire trop) pour booster le crew :\n« ${input} »`;
     case "situation":
-      return `${ctx}\nDonne un conseil concret et bienveillant en 3 phrases pour gérer cette situation de crew : ${input || "un souci d'organisation"}.`;
+      return `${ctx}\nDonne un conseil d'expert concret et immédiatement applicable pour cette question ou situation de crew : ${input || "un souci d'organisation"}.`;
     default:
-      return `${ctx}\nDemande du capitaine du crew : ${input}`;
+      return `${ctx}\nDemande du capitaine : ${input}`;
   }
 }
 
