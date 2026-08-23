@@ -39,6 +39,11 @@ const nextConfig = {
             key: 'Strict-Transport-Security',
             value: 'max-age=63072000; includeSubDomains; preload',
           },
+          {
+            // Opt-out des IA d'entraînement (signal honoré par plusieurs acteurs).
+            key: 'X-Robots-Tag',
+            value: 'noai, noimageai',
+          },
           // CSP is defined in vercel.json for production to avoid duplication
         ],
       },

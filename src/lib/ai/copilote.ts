@@ -116,6 +116,12 @@ export interface GenerateResult {
 }
 
 export async function generateCopiloteMessage(g: GenerateInput): Promise<GenerateResult> {
+  // Interrupteur "zéro IA" : COPILOTE_AI_ENABLED=false → aucune donnée n'est
+  // envoyée à Gemini, on retombe sur les templates locaux. Kill-switch simple
+  // et vérifiable pour couper toute sortie vers une IA tierce.
+  if (process.env.COPILOTE_AI_ENABLED === "false") {
+    return { text: fallback(g), aiUsed: false };
+  }
   const key = process.env.GEMINI_API_KEY;
   if (!key) return { text: fallback(g), aiUsed: false };
   try {
