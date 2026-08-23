@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { ArrowLeft, MapPin, Calendar, Clock, Users, Repeat, Save, Send, Loader2, Luggage, Gauge, Coffee } from "lucide-react";
+import { ArrowLeft, MapPin, Calendar, Clock, Users, Repeat, Save, Send, Loader2, Luggage, Gauge, Coffee, Shield } from "lucide-react";
 import Link from "next/link";
 import { createRun } from "../actions";
 import { formatPracticalDescription } from "@/lib/utils/practical-info";
@@ -18,6 +18,7 @@ export default function NewEventPage() {
     description: "",
     bag_drop: "",
     pace: "",
+    sweeper: "Présent — Personne n'est jamais lâché 🛡️",
     after_run: "",
     event_date: "",
     event_time: "",
@@ -49,6 +50,7 @@ export default function NewEventPage() {
     const fullDescription = formatPracticalDescription(form.description, {
       bagDrop: form.bag_drop,
       pace: form.pace,
+      sweeper: form.sweeper,
       afterRun: form.after_run,
     });
 
@@ -175,21 +177,23 @@ export default function NewEventPage() {
           </div>
 
           {/* Allure */}
+          {/* Allure & Sas */}
           <div className="space-y-1.5">
             <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--app-text-muted)] flex items-center gap-1">
-              <Gauge size={11} /> 2. Allure prévue & Vibe
+              <Gauge size={11} /> 2. Sas d'Allures & Rythme du Crew
             </label>
             <input
               type="text"
               value={form.pace}
               onChange={(e) => update("pace", e.target.value)}
-              placeholder="Ex : Tous niveaux (6:00/km — personne n'est laissé derrière !)"
+              placeholder="Ex : Sas 1 (5:00/km) · Sas 2 (5:45/km) · Sas 3 (6:30/km) · Débutants"
               className="w-full h-11 px-4 rounded-[12px] border border-[color:var(--app-border)] text-sm font-medium focus:border-[#FF5C00] focus:ring-2 focus:ring-[#FF5C00]/20 outline-none transition-all"
             />
             <div className="flex flex-wrap gap-1.5 pt-1">
               {[
                 "Tous niveaux (6:00/km — zéro pression)",
-                "Allure modérée (5:30/km)",
+                "3 Sas (5:00 · 5:45 · 6:30/km)",
+                "Sas Débutant & Reprise douce",
                 "Rythmé (5:00/km)",
               ].map((p) => (
                 <button
@@ -204,10 +208,40 @@ export default function NewEventPage() {
             </div>
           </div>
 
+          {/* Serre-file & Sécurité Peloton */}
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-bold uppercase tracking-widest text-[#22C55E] flex items-center gap-1">
+              <Shield size={11} /> 3. Serre-file & Encadrement (Anti-stress débutant)
+            </label>
+            <input
+              type="text"
+              value={form.sweeper}
+              onChange={(e) => update("sweeper", e.target.value)}
+              placeholder="Ex : Serre-file présent — Personne n'est jamais lâché"
+              className="w-full h-11 px-4 rounded-[12px] border border-[color:var(--app-border)] text-sm font-medium focus:border-[#22C55E] focus:ring-2 focus:ring-[#22C55E]/20 outline-none transition-all"
+            />
+            <div className="flex flex-wrap gap-1.5 pt-1">
+              {[
+                "Présent — Personne n'est jamais lâché 🛡️",
+                "Meneur en tête + Serre-file à l'arrière",
+                "Allure calée sur le dernier coureur",
+              ].map((s) => (
+                <button
+                  key={s}
+                  type="button"
+                  onClick={() => update("sweeper", s)}
+                  className="px-2.5 py-1 rounded-full text-[10.5px] font-semibold bg-[#DCFCE7] text-[#166534] border border-[#22C55E]/30 hover:border-[#22C55E] transition-all"
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+          </div>
+
           {/* After-run */}
           <div className="space-y-1.5">
             <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--app-text-muted)] flex items-center gap-1">
-              <Coffee size={11} /> 3. After-run / Moment convivial
+              <Coffee size={11} /> 4. After-run / Moment convivial
             </label>
             <input
               type="text"

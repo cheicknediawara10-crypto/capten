@@ -166,7 +166,7 @@ export default function PublicEventPage() {
 
       <div className="max-w-lg mx-auto px-5 mt-6 space-y-4">
         {/* Infos Pratiques Anti-Stress */}
-        {(practical.bagDrop || practical.pace || practical.afterRun) && (
+        {(practical.bagDrop || practical.pace || practical.sweeper || practical.afterRun) && (
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
@@ -193,8 +193,20 @@ export default function PublicEventPage() {
                     <Gauge size={14} />
                   </span>
                   <div>
-                    <p className="text-[10.5px] font-bold uppercase tracking-wider text-[#666562]">Allure & Distance</p>
+                    <p className="text-[10.5px] font-bold uppercase tracking-wider text-[#666562]">Sas d'Allures & Vibe</p>
                     <p className="text-[13px] font-semibold text-[#1A1918]">{practical.pace}</p>
+                  </div>
+                </div>
+              )}
+              {practical.sweeper && (
+                <div className="flex items-start gap-3 p-3 rounded-2xl bg-[#DCFCE7]/60 border border-[#22C55E]/30">
+                  <span className="w-7 h-7 rounded-xl bg-[#22C55E]/20 text-[#166534] flex items-center justify-center shrink-0 mt-0.5">
+                    <Shield size={14} />
+                  </span>
+                  <div>
+                    <p className="text-[10.5px] font-bold uppercase tracking-wider text-[#166534]">Serre-file & Encadrement</p>
+                    <p className="text-[13px] font-bold text-[#166534]">{practical.sweeper}</p>
+                    <p className="text-[10.5px] text-[#166534]/80 mt-0.5">Veille à ce que personne ne coure seul ou ne soit lâché.</p>
                   </div>
                 </div>
               )}

@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft, Calendar, MapPin, Users, QrCode, CheckSquare, FileText, List,
   Download, Globe, Lock, Trash2, Loader2, Wifi, Megaphone, Camera, MessageCircle,
-  Luggage, Gauge, Coffee, Bell
+  Luggage, Gauge, Coffee, Bell, Shield
 } from "lucide-react";
 import Link from "next/link";
 import { formatDateShort } from "@/lib/utils/format";
@@ -405,7 +405,7 @@ export default function EventDetailPage() {
               </div>
 
               {/* Infos Pratiques Anti-Stress */}
-              {(parsePracticalInfo(event.description).bagDrop || parsePracticalInfo(event.description).pace || parsePracticalInfo(event.description).afterRun) && (
+              {(parsePracticalInfo(event.description).bagDrop || parsePracticalInfo(event.description).pace || parsePracticalInfo(event.description).sweeper || parsePracticalInfo(event.description).afterRun) && (
                 <div className="bg-[var(--app-surface)] rounded-[24px] border border-[color:var(--app-border)] p-6 space-y-3">
                   <h3 className="text-[11px] font-black uppercase tracking-widest text-[#FF5C00] flex items-center gap-1.5">
                     <Luggage size={14} /> Infos Pratiques du Run
@@ -418,9 +418,15 @@ export default function EventDetailPage() {
                       </div>
                     )}
                     {parsePracticalInfo(event.description).pace && (
-                      <div className="flex items-center gap-2 text-[color:var(--app-text)]">
+                       <div className="flex items-center gap-2 text-[color:var(--app-text)]">
                         <Gauge size={14} className="text-[#FF5C00] shrink-0" />
-                        <span><b className="text-[color:var(--app-text-muted)] font-normal text-[11px] uppercase tracking-wider block">Allure :</b> {parsePracticalInfo(event.description).pace}</span>
+                        <span><b className="text-[color:var(--app-text-muted)] font-normal text-[11px] uppercase tracking-wider block">Sas d'Allures :</b> {parsePracticalInfo(event.description).pace}</span>
+                      </div>
+                    )}
+                    {parsePracticalInfo(event.description).sweeper && (
+                      <div className="flex items-center gap-2 text-[#166534] bg-[#DCFCE7]/60 p-2.5 rounded-xl border border-[#22C55E]/30">
+                        <Shield size={14} className="text-[#22C55E] shrink-0" />
+                        <span><b className="text-[#166534] font-bold text-[11px] uppercase tracking-wider block">Serre-file :</b> {parsePracticalInfo(event.description).sweeper}</span>
                       </div>
                     )}
                     {parsePracticalInfo(event.description).afterRun && (
