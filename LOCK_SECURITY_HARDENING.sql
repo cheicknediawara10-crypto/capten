@@ -1,21 +1,15 @@
 -- ════════════════════════════════════════════════════════════════════════
---  CAPTEN — VERROUILLAGE TOTAL DE SÉCURITÉ (CLUBS + EVENTS)
---  À exécuter dans Supabase → SQL Editor → Run (1 seul clic).
---
---  1. TABLE CLUBS :
---     On retire l'accès total d'anon sur `clubs` pour stopper le leak des
---     données financières (cagnotte_data, stripe_*, owner_id, twilio_*).
---     Anon ne pourra lire QUE les colonnes publiques nécessaires aux pages /join.
---
---  2. TABLE EVENTS :
---     Anon ne pourra lire QUE les sorties publiées et les colonnes publiques.
+--  CAPTEN — VERROUILLAGE SÉCURITÉ CONSOLIDÉ (CLUBS + EVENTS)
+--  À exécuter dans Supabase → SQL Editor → Run.
 -- ════════════════════════════════════════════════════════════════════════
 
--- 1. Verrouillage de la table CLUBS
+-- 1. Table CLUBS : révocation de l'accès total
 REVOKE SELECT ON public.clubs FROM anon;
 
+-- 2. Table CLUBS : autorisation des seules colonnes publiques nécessaires
 GRANT SELECT (
   id,
+  owner_id,
   name,
   slug,
   description,
@@ -38,9 +32,10 @@ GRANT SELECT (
   branding
 ) ON public.clubs TO anon;
 
--- 2. Verrouillage de la table EVENTS
+-- 3. Table EVENTS : révocation de l'accès total
 REVOKE SELECT ON public.events FROM anon;
 
+-- 4. Table EVENTS : autorisation des seules colonnes publiques
 GRANT SELECT (
   id,
   club_id,
@@ -58,7 +53,7 @@ GRANT SELECT (
   created_at
 ) ON public.events TO anon;
 
--- RLS stricte : la clé publique ne lit que les events publiés ou terminés
+-- 5. RLS stricte sur events pour la clé publique (sorties publiées / terminées)
 DROP POLICY IF EXISTS "Published events are public" ON public.events;
 CREATE POLICY "Published events are public" ON public.events
   FOR SELECT TO anon
