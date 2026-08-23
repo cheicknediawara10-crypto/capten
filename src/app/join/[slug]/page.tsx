@@ -9,8 +9,6 @@ import {
 } from "lucide-react";
 import { registerMembre } from "@/app/mon-espace/actions";
 import { getSpotCategory } from "@/lib/spot-categories";
-import { useLanguage } from "@/context/LanguageContext";
-import LanguageToggle from "@/components/layout/LanguageToggle";
 
 type Step = "infos" | "pin" | "ice" | "waiver" | "success";
 const STEPS: Step[] = ["infos", "pin", "ice", "waiver", "success"];
@@ -112,9 +110,8 @@ export default function JoinPage() {
   const router = useRouter();
   const { club, loading } = useClub(slug);
   const spots = useCrewSpots(club?.id);
-  const { lang } = useLanguage();
 
-  const isEn = lang === "en";
+  const isEn = false;
 
   const [step, setStep]       = useState<Step>("infos");
   const [isPending, start]    = useTransition();
@@ -293,10 +290,6 @@ export default function JoinPage() {
       </div>
 
       <div className="flex-1 flex flex-col items-center justify-center p-5 pt-6">
-        {/* Language switch */}
-        <div className="w-full max-w-sm flex justify-end mb-4">
-          <LanguageToggle variant="compact" />
-        </div>
 
         {/* Club header */}
         <motion.div

@@ -11,13 +11,10 @@ import {
 } from "lucide-react";
 import { logout } from "@/app/login/actions";
 import ThemeToggle from "@/components/layout/ThemeToggle";
-import LanguageToggle from "@/components/layout/LanguageToggle";
-import { useLanguage } from "@/context/LanguageContext";
 
 export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
-  const { t } = useLanguage();
   const [logo, setLogo] = useState("/logo.png");
 
   useEffect(() => {
@@ -41,26 +38,26 @@ export default function Sidebar() {
 
   const sections = [
     {
-      title: t("nav.pilotage", "PILOTAGE"),
+      title: "PILOTAGE",
       items: [
-        { name: t("nav.dashboard", "Dashboard"), icon: <LayoutDashboard size={18} strokeWidth={1.5} />, href: "/dashboard" },
-        { name: t("nav.crew", "Crew"), icon: <Users size={18} strokeWidth={1.5} />, href: "/dashboard/members" },
-        { name: t("nav.runs", "Runs"), icon: <Map size={18} strokeWidth={1.5} />, href: "/dashboard/events" },
-        { name: t("nav.messages", "Messages"), icon: <MessageSquare size={18} strokeWidth={1.5} />, href: "/messages" },
-        { name: t("nav.signalements", "Signalements"), icon: <Flag size={18} strokeWidth={1.5} />, href: "/dashboard/signalements" },
+        { name: "Dashboard", icon: <LayoutDashboard size={18} strokeWidth={1.5} />, href: "/dashboard" },
+        { name: "Crew", icon: <Users size={18} strokeWidth={1.5} />, href: "/dashboard/members" },
+        { name: "Runs", icon: <Map size={18} strokeWidth={1.5} />, href: "/dashboard/events" },
+        { name: "Messages", icon: <MessageSquare size={18} strokeWidth={1.5} />, href: "/messages" },
+        { name: "Signalements", icon: <Flag size={18} strokeWidth={1.5} />, href: "/dashboard/signalements" },
       ]
     },
     {
-      title: t("nav.communaute", "COMMUNAUTÉ"),
+      title: "COMMUNAUTÉ",
       items: [
-        { name: t("nav.cagnotte", "Cagnotte"), icon: <Wallet size={18} strokeWidth={1.5} />, href: "/dashboard/cagnotte" },
-        { name: t("nav.spots", "Spots"), icon: <MapPin size={18} strokeWidth={1.5} />, href: "/dashboard/spots" },
+        { name: "Cagnotte", icon: <Wallet size={18} strokeWidth={1.5} />, href: "/dashboard/cagnotte" },
+        { name: "Spots", icon: <MapPin size={18} strokeWidth={1.5} />, href: "/dashboard/spots" },
       ]
     },
     {
-      title: t("nav.compte", "COMPTE"),
+      title: "COMPTE",
       items: [
-        { name: t("nav.reglages", "Réglages"), icon: <Sliders size={18} strokeWidth={1.5} />, href: "/settings" },
+        { name: "Réglages", icon: <Sliders size={18} strokeWidth={1.5} />, href: "/settings" },
       ]
     }
   ];
@@ -131,11 +128,7 @@ export default function Sidebar() {
 
       <div className="mt-auto pt-4 border-t-[0.5px] px-6 space-y-2" style={{ borderColor: "var(--app-border)" }}>
         <div className="flex items-center justify-between px-3 py-1.5">
-          <span className="text-[11px] font-bold uppercase tracking-widest text-[color:var(--app-text-muted)]">Langue</span>
-          <LanguageToggle variant="compact" />
-        </div>
-        <div className="flex items-center justify-between px-3 py-1.5">
-          <span className="text-[11px] font-bold uppercase tracking-widest text-[color:var(--app-text-muted)]">{t("nav.theme", "Thème")}</span>
+          <span className="text-[11px] font-bold uppercase tracking-widest text-[color:var(--app-text-muted)]">Thème</span>
           <ThemeToggle />
         </div>
         <button
@@ -143,7 +136,7 @@ export default function Sidebar() {
           className="w-full flex items-center gap-3 px-3 py-2.5 text-[color:var(--app-text-muted)] hover:text-[#FF0000] hover:bg-[#FF0000]/5 rounded-control transition-all group cursor-pointer"
         >
           <LogOut size={16} strokeWidth={1.5} className="text-[color:var(--app-text-muted)] group-hover:text-[#FF0000]" />
-          <span className="text-[12px] font-bold uppercase tracking-widest">{t("nav.logout", "Déconnexion")}</span>
+          <span className="text-[12px] font-bold uppercase tracking-widest">Déconnexion</span>
         </button>
       </div>
     </aside>
