@@ -39,6 +39,7 @@ export const metadata: Metadata = {
 };
 
 import { AuthContextProvider } from "@/context/AuthContext";
+import { LanguageProvider } from "@/context/LanguageContext";
 import AppLayoutWrapper from "@/components/layout/AppLayoutWrapper";
 
 export default function RootLayout({
@@ -57,9 +58,11 @@ export default function RootLayout({
         />
       </head>
       <body className={`${barlow.variable} ${montserrat.variable} ${dmMono.variable} font-sans bg-[var(--app-bg)]`}>
-        <AuthContextProvider>
-          <AppLayoutWrapper>{children}</AppLayoutWrapper>
-        </AuthContextProvider>
+        <LanguageProvider>
+          <AuthContextProvider>
+            <AppLayoutWrapper>{children}</AppLayoutWrapper>
+          </AuthContextProvider>
+        </LanguageProvider>
       </body>
     </html>
   );

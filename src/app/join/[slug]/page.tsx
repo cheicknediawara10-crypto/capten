@@ -9,6 +9,8 @@ import {
 } from "lucide-react";
 import { registerMembre } from "@/app/mon-espace/actions";
 import { getSpotCategory } from "@/lib/spot-categories";
+import { useLanguage } from "@/context/LanguageContext";
+import LanguageToggle from "@/components/layout/LanguageToggle";
 
 type Step = "infos" | "pin" | "ice" | "waiver" | "success";
 const STEPS: Step[] = ["infos", "pin", "ice", "waiver", "success"];
@@ -110,6 +112,9 @@ export default function JoinPage() {
   const router = useRouter();
   const { club, loading } = useClub(slug);
   const spots = useCrewSpots(club?.id);
+  const { lang } = useLanguage();
+
+  const isEn = lang === "en";
 
   const [step, setStep]       = useState<Step>("infos");
   const [isPending, start]    = useTransition();
@@ -159,15 +164,24 @@ export default function JoinPage() {
 
   function validateInfos(): boolean {
     if (!firstName.trim() || !lastName.trim() || !dob) {
-      setError("Prénom, nom et date de naissance sont requis."); return false;
+      setError(isEn ? "First name, last name, and date of birth are required." : "Prénom, nom et date de naissance sont requis.");
+      return false;
     }
     return true;
   }
 
   function validatePin(): boolean {
     const p = pin.join(""); const c = pinConfirm.join("");
-    if (p.length < 4) { setError("Choisis un code PIN à 4 chiffres."); return false; }
-    if (p !== c) { setError("Les deux codes PIN ne correspondent pas."); setPinConfirm(["","","",""]); pinCRefs.current[0]?.focus(); return false; }
+    if (p.length < 4) { 
+      setError(isEn ? "Please choose a 4-digit PIN code." : "Choisis un code PIN à 4 chiffres."); 
+      return false; 
+    }
+    if (p !== c) { 
+      setError(isEn ? "PIN codes do not match." : "Les deux codes PIN ne correspondent pas."); 
+      setPinConfirm(["","","",""]); 
+      pinCRefs.current[0]?.focus(); 
+      return false; 
+    }
     return true;
   }
 
@@ -278,7 +292,12 @@ export default function JoinPage() {
         />
       </div>
 
-      <div className="flex-1 flex flex-col items-center justify-center p-5 pt-10">
+      <div className="flex-1 flex flex-col items-center justify-center p-5 pt-6">
+        {/* Language switch */}
+        <div className="w-full max-w-sm flex justify-end mb-4">
+          <LanguageToggle variant="compact" />
+        </div>
+
         {/* Club header */}
         <motion.div
           initial={{ opacity: 0, y: -12 }}
@@ -304,42 +323,42 @@ export default function JoinPage() {
             {step === "infos" && (
               <motion.div key="infos" initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -24 }}>
                 <div className="bg-white rounded-3xl border border-[#E8E8E8] p-7 space-y-4 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
-                  <StepLabel index={1} total={4} title="Tes informations" />
+                  <StepLabel index={1} total={4} title={isEn ? "Your information" : "Tes informations"} isEn={isEn} />
 
                   <div className="grid grid-cols-2 gap-3">
-                    <Field label="Prénom">
+                    <Field label={isEn ? "First name" : "Prénom"}>
                       <input type="text" autoComplete="given-name" value={firstName}
                         onChange={(e) => setFirstName(e.target.value)}
-                        placeholder="Ahmed" className="capten-input" />
+                        placeholder="Alex" className="capten-input" />
                     </Field>
-                    <Field label="Nom">
+                    <Field label={isEn ? "Last name" : "Nom"}>
                       <input type="text" autoComplete="family-name" value={lastName}
                         onChange={(e) => setLastName(e.target.value)}
-                        placeholder="Diallo" className="capten-input" />
+                        placeholder="Dupont" className="capten-input" />
                     </Field>
                   </div>
 
-                  <Field label="Date de naissance">
+                  <Field label={isEn ? "Date of birth" : "Date de naissance"}>
                     <input type="date" autoComplete="bday" value={dob}
                       onChange={(e) => setDob(e.target.value)}
                       max={new Date().toISOString().split("T")[0]}
                       className="capten-input" />
                   </Field>
 
-                  <Field label="Téléphone (optionnel)">
+                  <Field label={isEn ? "Phone (optional)" : "Téléphone (optionnel)"}>
                     <input type="tel" autoComplete="tel" value={phone}
                       onChange={(e) => setPhone(e.target.value)}
-                      placeholder="06 12 34 56 78" className="capten-input" />
+                      placeholder="+33 6 12 34 56 78" className="capten-input" />
                   </Field>
 
-                  <Field label="E-mail (pour récupérer ton PIN)">
+                  <Field label={isEn ? "Email (to recover your PIN)" : "E-mail (pour récupérer ton PIN)"}>
                     <input type="email" autoComplete="email" value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder="ahmed@exemple.fr" className="capten-input" />
+                      placeholder="alex@example.com" className="capten-input" />
                   </Field>
 
                   <ErrorBox error={error} />
-                  <ContinueBtn onClick={next} />
+                  <ContinueBtn onClick={next} label={isEn ? "Continue" : "Continuer"} />
                 </div>
               </motion.div>
             )}
@@ -348,31 +367,33 @@ export default function JoinPage() {
             {step === "pin" && (
               <motion.div key="pin" initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -24 }}>
                 <div className="bg-white rounded-3xl border border-[#E8E8E8] p-7 space-y-6 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
-                  <StepLabel index={2} total={4} title="Choisis ton code PIN" />
+                  <StepLabel index={2} total={4} title={isEn ? "Choose your PIN code" : "Choisis ton code PIN"} isEn={isEn} />
 
                   <p className="text-xs text-[#6B7280]">
-                    Ce code à 4 chiffres te permettra d'accéder à ton espace membre. Mémorise-le.
+                    {isEn ? "This 4-digit code will let you log into your member passport. Memorize it." : "Ce code à 4 chiffres te permettra d'accéder à ton espace membre. Mémorise-le."}
                   </p>
 
                   <div className="flex items-center justify-between mb-1">
-                    <label className="text-[11px] font-bold uppercase tracking-wider text-[#9CA3AF]">Code PIN</label>
+                    <label className="text-[11px] font-bold uppercase tracking-wider text-[#9CA3AF]">
+                      {isEn ? "PIN Code" : "Code PIN"}
+                    </label>
                     <button type="button" onClick={() => setShowPin((s) => !s)}
-                      className="flex items-center gap-1 text-[11px] text-[#9CA3AF] hover:text-[#6B7280] transition-colors">
+                      className="flex items-center gap-1 text-[11px] text-[#9CA3AF] hover:text-[#6B7280] transition-colors cursor-pointer">
                       {showPin ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
-                      {showPin ? "Masquer" : "Afficher"}
+                      {showPin ? (isEn ? "Hide" : "Masquer") : (isEn ? "Show" : "Afficher")}
                     </button>
                   </div>
 
                   <PinBoxes digits={pin} setDigits={setPin} refs={pinRefs} show={showPin} />
 
-                  <Field label="Confirme ton PIN">
+                  <Field label={isEn ? "Confirm your PIN" : "Confirme ton PIN"}>
                     <PinBoxes digits={pinConfirm} setDigits={setPinConfirm} refs={pinCRefs} show={showPin} />
                   </Field>
 
                   <ErrorBox error={error} />
                   <div className="flex gap-3">
                     <BackBtn onClick={() => { setError(""); setStep("infos"); }} />
-                    <ContinueBtn onClick={next} />
+                    <ContinueBtn onClick={next} label={isEn ? "Continue" : "Continuer"} />
                   </div>
                 </div>
               </motion.div>
@@ -386,29 +407,29 @@ export default function JoinPage() {
                     <div className="w-8 h-8 rounded-xl bg-[#DCFCE7] flex items-center justify-center shrink-0">
                       <Shield className="w-4 h-4 text-[#22C55E]" />
                     </div>
-                    <StepLabel index={3} total={4} title="Contact d'urgence" />
+                    <StepLabel index={3} total={4} title={isEn ? "Emergency Contact (ICE)" : "Contact d'urgence"} isEn={isEn} />
                   </div>
                   <p className="text-xs text-[#6B7280]">
-                    En cas d'incident sur un run. Cette info reste confidentielle et accessible uniquement à ton organisateur.
+                    {isEn ? "In case of emergency during a session. Strictly confidential and only accessible by organizers." : "En cas d'incident sur un run. Cette info reste confidentielle et accessible uniquement à ton organisateur."}
                   </p>
 
-                  <Field label="Nom du contact">
+                  <Field label={isEn ? "Contact Full Name" : "Nom du contact"}>
                     <input type="text" value={iceName} onChange={(e) => setIceName(e.target.value)}
-                      placeholder="Fatou Diallo" className="capten-input" />
+                      placeholder="Sarah Dupont" className="capten-input" />
                   </Field>
-                  <Field label="Téléphone du contact">
+                  <Field label={isEn ? "Contact Phone Number" : "Téléphone du contact"}>
                     <input type="tel" value={icePhone} onChange={(e) => setIcePhone(e.target.value)}
-                      placeholder="06 98 76 54 32" className="capten-input" />
+                      placeholder="+33 6 98 76 54 32" className="capten-input" />
                   </Field>
-                  <Field label="Relation (optionnel)">
+                  <Field label={isEn ? "Relationship (optional)" : "Relation (optionnel)"}>
                     <input type="text" value={iceRelation} onChange={(e) => setIceRelation(e.target.value)}
-                      placeholder="Sœur, conjoint…" className="capten-input" />
+                      placeholder={isEn ? "Sister, Partner, Friend..." : "Sœur, conjoint, ami…"} className="capten-input" />
                   </Field>
 
                   <ErrorBox error={error} />
                   <div className="flex gap-3">
                     <BackBtn onClick={() => { setError(""); setStep("pin"); }} />
-                    <ContinueBtn onClick={next} label={!iceName && !icePhone ? "Passer" : "Continuer"} />
+                    <ContinueBtn onClick={next} label={!iceName && !icePhone ? (isEn ? "Skip" : "Passer") : (isEn ? "Continue" : "Continuer")} />
                   </div>
                 </div>
               </motion.div>
@@ -422,18 +443,30 @@ export default function JoinPage() {
                     <div className="w-8 h-8 rounded-xl bg-[#FF5500]/10 flex items-center justify-center shrink-0">
                       <FileText className="w-4 h-4 text-[#FF5500]" />
                     </div>
-                    <StepLabel index={4} total={4} title="Décharge de responsabilité" />
+                    <StepLabel index={4} total={4} title={isEn ? "Liability Waiver" : "Décharge de responsabilité"} isEn={isEn} />
                   </div>
 
                   <div className="bg-[#F5F5F3] rounded-2xl p-4 max-h-48 overflow-y-auto text-xs text-[#6B7280] leading-relaxed space-y-2">
-                    <p className="font-bold text-[#374151]">Décharge de responsabilité — {club.name}</p>
-                    <p>En rejoignant ce club et en participant à ses activités sportives, je reconnais que la pratique de la course à pied et d'activités physiques comporte des risques inhérents.</p>
-                    <p>Je certifie être en bonne condition physique pour pratiquer ces activités et avoir consulté un médecin si nécessaire.</p>
-                    <p>Je dégage {club.name} et ses organisateurs de toute responsabilité en cas d'accident, de blessure ou de dommage survenus lors des sessions, sauf en cas de faute grave.</p>
-                    <p>Je m'engage à respecter les consignes de sécurité et à signaler tout problème de santé avant de participer.</p>
-                    <p className="text-[#9CA3AF] italic">
-                      Cette décharge est horodatée et signée électroniquement. Document valable version v1.
-                    </p>
+                    <p className="font-bold text-[#374151]">{isEn ? "Liability Waiver & Medical Agreement — " : "Décharge de responsabilité — "}{club.name}</p>
+                    {isEn ? (
+                      <>
+                        <p>By joining this club and taking part in its athletic activities, I acknowledge that running and physical activities involve inherent outdoor risks.</p>
+                        <p>I certify that I am in suitable physical condition and have consulted a physician if necessary.</p>
+                        <p>I release {club.name} and its volunteer organizers from any liability in the event of injury, accident, or damage occurring during sessions, except in cases of gross negligence.</p>
+                        <p className="text-[#9CA3AF] italic">
+                          This waiver is digitally timestamped and signed. Valid version v1.
+                        </p>
+                      </>
+                    ) : (
+                      <>
+                        <p>En rejoignant ce club et en participant à ses activités sportives, je reconnais que la pratique de la course à pied et d'activités physiques comporte des risques inhérents.</p>
+                        <p>Je certifie être en bonne condition physique pour pratiquer ces activités et avoir consulté un médecin si nécessaire.</p>
+                        <p>Je dégage {club.name} et ses organisateurs de toute responsabilité en cas d'accident, de blessure ou de dommage survenus lors des sessions, sauf en cas de faute grave.</p>
+                        <p className="text-[#9CA3AF] italic">
+                          Cette décharge est horodatée et signée électroniquement. Document valable version v1.
+                        </p>
+                      </>
+                    )}
                   </div>
 
                   <label className="flex items-start gap-3 cursor-pointer">
@@ -446,7 +479,7 @@ export default function JoinPage() {
                       {waiverChecked && <CheckCircle2 className="w-3 h-3 text-white" />}
                     </div>
                     <span className="text-xs text-[#374151] leading-relaxed">
-                      J'ai lu et j'accepte la décharge de responsabilité. Je certifie que les informations fournies sont exactes.{" "}
+                      {isEn ? "I have read and agree to the liability waiver. I certify that the provided information is accurate." : "J'ai lu et j'accepte la décharge de responsabilité. Je certifie que les informations fournies sont exactes."}{" "}
                       <span className="text-[#111111] font-bold">{firstName} {lastName}</span>
                     </span>
                   </label>
@@ -462,7 +495,9 @@ export default function JoinPage() {
                     >
                       {isPending
                         ? <Loader2 className="w-4 h-4 animate-spin" />
-                        : <>Signer et rejoindre <CheckCircle2 className="w-4 h-4" /></>
+                        : <>
+                            {isEn ? "Sign & Join Crew" : "Signer et rejoindre"} <CheckCircle2 className="w-4 h-4" />
+                          </>
                       }
                     </button>
                   </div>
@@ -470,10 +505,10 @@ export default function JoinPage() {
               </motion.div>
             )}
           </AnimatePresence>
-        </div>
 
-        {/* Spots du crew — visibles pendant l'inscription */}
-        <SpotsSection spots={spots} clubName={club.name} />
+          {/* Crew Spots */}
+          {spots.length > 0 && <SpotsSection spots={spots} clubName={club.name} />}
+        </div>
       </div>
     </div>
   );
@@ -481,11 +516,11 @@ export default function JoinPage() {
 
 // ── Sub-components ──────────────────────────────────────────
 
-function StepLabel({ index, total, title }: { index: number; total: number; title: string }) {
+function StepLabel({ index, total, title, isEn = false }: { index: number; total: number; title: string; isEn?: boolean }) {
   return (
     <div>
       <p className="text-[10px] font-bold uppercase tracking-widest text-[#9CA3AF] mb-0.5">
-        Étape {index}/{total}
+        {isEn ? `Step ${index}/${total}` : `Étape ${index}/${total}`}
       </p>
       <h2 className="text-lg font-extrabold text-[#111111]">{title}</h2>
     </div>

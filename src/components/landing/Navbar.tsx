@@ -5,15 +5,19 @@ import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-const NAV_LINKS = [
-  { label: "Fonctionnalités",    href: "/#features" },
-  { label: "Les Spots du Crew",  href: "/les-spots-du-crew" },
-  { label: "Tarifs",             href: "/#tarifs" },
-];
+import { useLanguage } from "@/context/LanguageContext";
+import LanguageToggle from "@/components/layout/LanguageToggle";
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const { lang } = useLanguage();
+
+  const NAV_LINKS = [
+    { label: lang === "en" ? "Features" : "Fonctionnalités", href: "/#features" },
+    { label: lang === "en" ? "Crew Spots" : "Les Spots du Crew", href: "/les-spots-du-crew" },
+    { label: lang === "en" ? "Pricing" : "Tarifs", href: "/#tarifs" },
+  ];
 
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 8);
@@ -42,22 +46,26 @@ export function Navbar() {
           ))}
         </nav>
 
-        {/* Desktop CTA */}
+        {/* Desktop CTA & Language Toggle */}
         <div className="hidden md:flex items-center gap-3">
+          <LanguageToggle variant="compact" />
           <a href="/mon-espace"
             className="text-[13px] font-medium text-[#6B7280] hover:text-[#111111] transition-colors">
-            Espace membre
+            {lang === "en" ? "Member area" : "Espace membre"}
           </a>
           <a href="/login?mode=signup"
             className="inline-flex items-center h-9 px-4 rounded-xl bg-[#FF5500] text-white text-[13px] font-semibold hover:bg-[#E04B00] transition-colors">
-            Lancer mon crew
+            {lang === "en" ? "Launch my crew" : "Lancer mon crew"}
           </a>
         </div>
 
-        {/* Mobile burger */}
-        <button onClick={() => setOpen((o) => !o)} className="md:hidden p-2 -mr-2 text-[#111111]">
-          {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-        </button>
+        {/* Mobile burger & toggle */}
+        <div className="md:hidden flex items-center gap-2">
+          <LanguageToggle variant="compact" />
+          <button onClick={() => setOpen((o) => !o)} className="p-2 -mr-2 text-[#111111]">
+            {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile menu */}

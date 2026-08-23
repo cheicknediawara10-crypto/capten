@@ -8,11 +8,14 @@ import {
   MessageSquare, Sliders, LogOut, Wallet, Flag
 } from "lucide-react";
 import { logout } from "@/app/login/actions";
+import { useLanguage } from "@/context/LanguageContext";
+import LanguageToggle from "@/components/layout/LanguageToggle";
 
 export default function MobileHeader() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
+  const { t } = useLanguage();
   const [logo, setLogo] = useState("/logo.png");
 
   useEffect(() => {
@@ -34,26 +37,26 @@ export default function MobileHeader() {
 
   const menuSections = [
     {
-      title: "Pilotage",
+      title: t("nav.pilotage", "PILOTAGE"),
       items: [
-        { name: "Dashboard", icon: <LayoutDashboard size={18} strokeWidth={1.5} />, href: "/dashboard" },
-        { name: "Crew", icon: <Users size={18} strokeWidth={1.5} />, href: "/dashboard/members" },
-        { name: "Runs", icon: <Map size={18} strokeWidth={1.5} />, href: "/dashboard/events" },
-        { name: "Messages", icon: <MessageSquare size={18} strokeWidth={1.5} />, href: "/messages" },
-        { name: "Signalements", icon: <Flag size={18} strokeWidth={1.5} />, href: "/dashboard/signalements" },
+        { name: t("nav.dashboard", "Dashboard"), icon: <LayoutDashboard size={18} strokeWidth={1.5} />, href: "/dashboard" },
+        { name: t("nav.crew", "Crew"), icon: <Users size={18} strokeWidth={1.5} />, href: "/dashboard/members" },
+        { name: t("nav.runs", "Runs"), icon: <Map size={18} strokeWidth={1.5} />, href: "/dashboard/events" },
+        { name: t("nav.messages", "Messages"), icon: <MessageSquare size={18} strokeWidth={1.5} />, href: "/messages" },
+        { name: t("nav.signalements", "Signalements"), icon: <Flag size={18} strokeWidth={1.5} />, href: "/dashboard/signalements" },
       ]
     },
     {
-      title: "Communauté",
+      title: t("nav.communaute", "COMMUNAUTÉ"),
       items: [
-        { name: "Cagnotte", icon: <Wallet size={18} strokeWidth={1.5} />, href: "/dashboard/cagnotte" },
-        { name: "Spots", icon: <MapPin size={18} strokeWidth={1.5} />, href: "/dashboard/spots" },
+        { name: t("nav.cagnotte", "Cagnotte"), icon: <Wallet size={18} strokeWidth={1.5} />, href: "/dashboard/cagnotte" },
+        { name: t("nav.spots", "Spots"), icon: <MapPin size={18} strokeWidth={1.5} />, href: "/dashboard/spots" },
       ]
     },
     {
-      title: "Compte",
+      title: t("nav.compte", "COMPTE"),
       items: [
-        { name: "Réglages", icon: <Sliders size={18} strokeWidth={1.5} />, href: "/settings" },
+        { name: t("nav.reglages", "Réglages"), icon: <Sliders size={18} strokeWidth={1.5} />, href: "/settings" },
       ]
     }
   ];
@@ -141,13 +144,17 @@ export default function MobileHeader() {
               ))}
             </nav>
 
-            {/* Logout button */}
-            <div className="mt-8 border-t border-[#F4F5F7] pt-6 px-6">
+            {/* Drawer Footer with Language & Logout */}
+            <div className="mt-8 border-t border-[color:var(--app-border)] pt-5 px-6 space-y-3">
+              <div className="flex items-center justify-between py-1">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--app-text-muted)]">Language</span>
+                <LanguageToggle variant="compact" />
+              </div>
               <button 
                 onClick={handleLogout}
-                className="w-full flex items-center justify-center gap-2.5 py-3 border border-red-500/10 hover:border-red-500 bg-red-500/5 hover:bg-red-500 hover:text-white text-red-500 rounded-control text-[11px] font-black uppercase tracking-widest transition-all active:scale-95 cursor-pointer"
+                className="w-full flex items-center justify-center gap-2.5 py-3 border border-red-500/15 hover:border-red-500 bg-red-500/5 hover:bg-red-500 hover:text-white text-red-500 rounded-control text-[11px] font-black uppercase tracking-widest transition-all active:scale-95 cursor-pointer"
               >
-                <LogOut size={14} /> Déconnexion
+                <LogOut size={14} /> {t("nav.logout", "Déconnexion")}
               </button>
             </div>
           </div>
