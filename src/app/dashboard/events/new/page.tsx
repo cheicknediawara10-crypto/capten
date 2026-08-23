@@ -376,25 +376,6 @@ export default function NewEventPage() {
             />
           </div>
 
-          <div className="space-y-2">
-            <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--app-text-muted)]">
-              Rayon de check-in: {form.checkin_radius_meters}m
-            </label>
-            <input
-              type="range"
-              min="50"
-              max="500"
-              step="50"
-              value={form.checkin_radius_meters}
-              onChange={(e) => update("checkin_radius_meters", parseInt(e.target.value))}
-              className="w-full accent-[#FF5C00]"
-            />
-            <div className="flex justify-between text-[10px] text-[color:var(--app-text-muted)]">
-              <span>50m</span>
-              <span>500m</span>
-            </div>
-          </div>
-
           <div className="flex items-center gap-3">
             <button
               type="button"
