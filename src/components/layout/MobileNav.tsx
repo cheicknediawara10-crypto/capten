@@ -1,117 +1,67 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  LayoutDashboard, Users, Map, MapPin, BarChart3,
-  MessageSquare, ShieldCheck, CreditCard, Settings, HelpCircle
-} from "lucide-react";
+import { LayoutDashboard, Users, Map, MapPin, MessageSquare } from "lucide-react";
 
 export default function MobileNav() {
   const pathname = usePathname();
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [sessionMenuLabel, setSessionMenuLabel] = React.useState("Les Sorties");
+  const [sessionLabel, setSessionLabel] = useState("Runs");
 
   useEffect(() => {
     const updateBranding = () => {
-      const savedType = typeof window !== 'undefined' ? localStorage.getItem("capten_community_type") : null;
-      if (savedType === "run_club") {
-        setSessionMenuLabel("Les Runs");
-      } else if (savedType === "walk_club") {
-        setSessionMenuLabel("Les Marches");
-      } else if (savedType === "trail_hiking") {
-        setSessionMenuLabel("Sorties Trail");
-      } else {
-        setSessionMenuLabel("Les Runs");
-      }
+      const savedType = typeof window !== "undefined" ? localStorage.getItem("capten_community_type") : null;
+      if (savedType === "walk_club") setSessionLabel("Marches");
+      else if (savedType === "trail_hiking") setSessionLabel("Trail");
+      else setSessionLabel("Runs");
     };
     updateBranding();
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       window.addEventListener("capten_branding_change", updateBranding);
       return () => window.removeEventListener("capten_branding_change", updateBranding);
     }
   }, []);
 
   const items = [
-    { name: "Tableau de bord", icon: <LayoutDashboard size={18} strokeWidth={1.5} />, href: "/dashboard" },
-    { name: "Membres", icon: <Users size={18} strokeWidth={1.5} />, href: "/dashboard/members" },
-    { name: sessionMenuLabel, icon: <Map size={18} strokeWidth={1.5} />, href: "/dashboard/events" },
-    { name: "Stats", icon: <BarChart3 size={18} strokeWidth={1.5} />, href: "/dashboard/stats" },
-    { name: "Les Spots", icon: <MapPin size={18} strokeWidth={1.5} />, href: "/dashboard/spots" },
-    { name: "Messages", icon: <MessageSquare size={18} strokeWidth={1.5} />, href: "/messages" },
-    { name: "Protection", icon: <ShieldCheck size={18} strokeWidth={1.5} />, href: "/securite" },
-    { name: "Abonnement", icon: <CreditCard size={18} strokeWidth={1.5} />, href: "/plan" },
-    { name: "Réglages", icon: <Settings size={18} strokeWidth={1.5} />, href: "/settings" },
-    { name: "Support", icon: <HelpCircle size={18} strokeWidth={1.5} />, href: "/support" },
+    { name: "Dashboard", icon: <LayoutDashboard size={20} strokeWidth={1.75} />, href: "/dashboard" },
+    { name: "Crew", icon: <Users size={20} strokeWidth={1.75} />, href: "/dashboard/members" },
+    { name: sessionLabel, icon: <Map size={20} strokeWidth={1.75} />, href: "/dashboard/events" },
+    { name: "Messages", icon: <MessageSquare size={20} strokeWidth={1.75} />, href: "/messages" },
+    { name: "Spots", icon: <MapPin size={20} strokeWidth={1.75} />, href: "/dashboard/spots" },
   ];
 
-  // Auto-scroll active item into the viewport center
-  useEffect(() => {
-    if (containerRef.current) {
-      const activeEl = containerRef.current.querySelector('[data-active="true"]');
-      if (activeEl) {
-        activeEl.scrollIntoView({
-          behavior: "smooth",
-          block: "nearest",
-          inline: "center",
-        });
-      }
-    }
-  }, [pathname]);
-
   return (
-    <div className="lg:hidden fixed bottom-0 left-0 right-0 backdrop-blur-md border-t-[0.5px] z-[100] pb-safe-bottom shadow-[0_-4px_24px_rgba(0,0,0,0.06)] select-none" style={{ background: "color-mix(in srgb, var(--app-surface) 95%, transparent)", borderColor: "var(--app-border)" }}>
-      
-      {/* Hide Scrollbars CSS Injection */}
-      <style jsx global>{`
-        .no-scrollbar::-webkit-scrollbar {
-          display: none;
-        }
-        .no-scrollbar {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-      `}</style>
-
-      {/* Horizontal Fade Overlays */}
-      <div className="absolute left-0 top-0 bottom-0 w-8 pointer-events-none z-10" style={{ background: "linear-gradient(to right, var(--app-surface), transparent)" }} />
-      <div className="absolute right-0 top-0 bottom-0 w-8 pointer-events-none z-10" style={{ background: "linear-gradient(to left, var(--app-surface), transparent)" }} />
-
-      {/* Sliding Scroll Container */}
-      <div 
-        ref={containerRef}
-        className="flex items-center gap-6 overflow-x-auto scroll-smooth py-3 px-8 no-scrollbar w-full"
-      >
+    <nav
+      aria-label="Navigation mobile principale"
+      className="lg:hidden fixed bottom-0 left-0 right-0 z-[100] pb-safe-bottom backdrop-blur-xl border-t-[0.5px] select-none shadow-[0_-4px_20px_rgba(0,0,0,0.08)]"
+      style={{
+        background: "color-mix(in srgb, var(--app-surface) 92%, transparent)",
+        borderColor: "var(--app-border)",
+      }}
+    >
+      <div className="flex items-center justify-around px-2 py-2.5 max-w-md mx-auto">
         {items.map((item) => {
-          const isActive = pathname === item.href;
-          
+          const isActive = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href));
+
           return (
-            <Link 
-              key={item.name}
+            <Link
+              key={item.href}
               href={item.href}
-              data-active={isActive ? "true" : "false"}
-              className={`flex flex-col items-center gap-1 shrink-0 transition-all duration-300 relative px-1 active:scale-95 ${
-                isActive ? "text-[#FF5C00]" : "text-[#A3A3A3]"
+              className={`flex flex-col items-center justify-center gap-1 py-1 px-3 rounded-xl transition-all duration-150 active:scale-90 ${
+                isActive
+                  ? "text-[#FF5C00] font-black"
+                  : "text-[color:var(--app-text-muted)] hover:text-[color:var(--app-text)] font-semibold"
               }`}
             >
-              {/* Selected Highlight Line */}
-              {isActive && (
-                <span className="absolute -top-[13px] left-0 right-0 h-[2px] bg-[#FF5C00] rounded-full animate-fade-in" />
-              )}
-              
-              <div className={`transition-all duration-300 ${isActive ? "scale-110 text-[#FF5C00]" : "text-[#A3A3A3]"}`}>
+              <div className={`transition-transform duration-150 ${isActive ? "scale-110" : ""}`}>
                 {item.icon}
               </div>
-              <span className={`text-[8.5px] font-black uppercase tracking-widest transition-all duration-300 ${
-                isActive ? "text-[#FF5C00]" : "text-[#A3A3A3]"
-              }`}>
-                {item.name}
-              </span>
+              <span className="text-[10px] tracking-tight leading-none">{item.name}</span>
             </Link>
           );
         })}
       </div>
-    </div>
+    </nav>
   );
 }

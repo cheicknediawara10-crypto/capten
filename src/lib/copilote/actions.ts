@@ -12,7 +12,7 @@ function ub(supabase: ReturnType<typeof createAdminClient>, table: string): any 
 }
 
 const DAILY_LIMIT = 20;
-const VALID: CopiloteIntent[] = ["annonce", "motivation", "mot", "situation", "libre"];
+const VALID: CopiloteIntent[] = ["annonce", "motivation", "mot", "situation", "libre", "weather", "safety", "afterrun", "shorter", "fun"];
 
 /** État du Copilote : accès Pro + alertes actives (détection lancée côté serveur). */
 export async function getCopiloteState(): Promise<{ isPro: boolean; alerts: any[] } | { error: string }> {
