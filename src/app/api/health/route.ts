@@ -43,16 +43,17 @@ export async function GET() {
     errors.stripe = err?.message || 'Stripe API connection exception';
   }
 
+  // Réponse PUBLIQUE : jamais de messages d'erreur internes (fuite d'infos).
+  // Les détails (errors) restent uniquement dans les logs serveur.
   const responsePayload = {
     status: isHealthy ? 'ok' : 'error',
     timestamp: new Date().toISOString(),
     supabase: supabaseStatus,
     stripe: stripeStatus,
-    ...(Object.keys(errors).length > 0 ? { errors } : {})
   };
 
   if (!isHealthy) {
-    log('error', 'health.check.failed', responsePayload);
+    log('error', 'health.check.failed', { ...responsePayload, errors });
     return NextResponse.json(responsePayload, { status: 503 });
   }
 
