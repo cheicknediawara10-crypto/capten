@@ -20,7 +20,7 @@ export function SectionTitle({
   return (
     <div className={`space-y-4 max-w-3xl ${alignment} ${className}`}>
       {badge && (
-        <span className="inline-block text-[11px] font-extrabold uppercase tracking-widest text-[#FF5B14] bg-[#FF5B14]/10 px-3.5 py-1.5 rounded-full border border-[#FF5B14]/20">
+        <span className="inline-block text-[11px] font-extrabold uppercase tracking-widest text-[#FF5500] bg-[#FF5500]/10 px-3.5 py-1.5 rounded-full border border-[#FF5500]/20">
           {badge}
         </span>
       )}

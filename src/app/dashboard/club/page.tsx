@@ -114,7 +114,7 @@ export default function ClubSettingsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="animate-spin text-[#FF5C00]" size={32} />
+        <Loader2 className="animate-spin text-[#FF5500]" size={32} />
       </div>
     );
   }
@@ -163,7 +163,7 @@ export default function ClubSettingsPage() {
             <button
               onClick={() => fileRef.current?.click()}
               disabled={logoUploading}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-full border border-[color:var(--app-border)] text-[11px] font-black uppercase tracking-widest text-[color:var(--app-text-muted)] hover:border-[#FF5C00] hover:text-[color:var(--app-text)] transition-all disabled:opacity-50"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-full border border-[color:var(--app-border)] text-[11px] font-black uppercase tracking-widest text-[color:var(--app-text-muted)] hover:border-[#FF5500] hover:text-[color:var(--app-text)] transition-all disabled:opacity-50"
             >
               {logoUploading ? <Loader2 size={12} className="animate-spin" /> : <Upload size={12} />}
               {logoUploading ? "Envoi…" : "Changer le logo"}
@@ -189,7 +189,7 @@ export default function ClubSettingsPage() {
             value={club.name}
             onChange={(e) => update("name", e.target.value)}
             placeholder="Paris Night Runners"
-            className="w-full h-11 px-4 rounded-[12px] border border-[color:var(--app-border)] text-sm font-medium focus:border-[#FF5C00] focus:ring-2 focus:ring-[#FF5C00]/20 outline-none transition-all"
+            className="w-full h-11 px-4 rounded-[12px] border border-[color:var(--app-border)] text-sm font-medium focus:border-[#FF5500] focus:ring-2 focus:ring-[#FF5500]/20 outline-none transition-all"
           />
         </div>
 
@@ -199,7 +199,7 @@ export default function ClubSettingsPage() {
             value={club.description || ""}
             onChange={(e) => update("description", e.target.value)}
             rows={3}
-            className="w-full px-4 py-3 rounded-[12px] border border-[color:var(--app-border)] text-sm font-medium focus:border-[#FF5C00] focus:ring-2 focus:ring-[#FF5C00]/20 outline-none transition-all resize-none"
+            className="w-full px-4 py-3 rounded-[12px] border border-[color:var(--app-border)] text-sm font-medium focus:border-[#FF5500] focus:ring-2 focus:ring-[#FF5500]/20 outline-none transition-all resize-none"
             placeholder="Qui êtes-vous ? Quand courrez-vous ?"
           />
         </div>
@@ -212,20 +212,20 @@ export default function ClubSettingsPage() {
               value={club.city || ""}
               onChange={(e) => update("city", e.target.value)}
               placeholder="Paris"
-              className="w-full h-11 px-4 rounded-[12px] border border-[color:var(--app-border)] text-sm font-medium focus:border-[#FF5C00] focus:ring-2 focus:ring-[#FF5C00]/20 outline-none transition-all"
+              className="w-full h-11 px-4 rounded-[12px] border border-[color:var(--app-border)] text-sm font-medium focus:border-[#FF5500] focus:ring-2 focus:ring-[#FF5500]/20 outline-none transition-all"
             />
           </div>
           <div className="space-y-1">
             <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--app-text-muted)] flex items-center justify-between">
               <span className="flex items-center gap-1"><Globe size={10} /> Lien de Cotisation / Adhésion (Optionnel)</span>
-              <span className="text-[#FF5C00] font-normal lowercase">helloasso · lydia · site</span>
+              <span className="text-[#FF5500] font-normal lowercase">helloasso · lydia · site</span>
             </label>
             <input
               type="url"
               value={club.website_url || ""}
               onChange={(e) => update("website_url", e.target.value)}
               placeholder="https://www.helloasso.com/... ou https://lydia-app.com/..."
-              className="w-full h-11 px-4 rounded-[12px] border border-[color:var(--app-border)] text-sm font-medium focus:border-[#FF5C00] focus:ring-2 focus:ring-[#FF5C00]/20 outline-none transition-all"
+              className="w-full h-11 px-4 rounded-[12px] border border-[color:var(--app-border)] text-sm font-medium focus:border-[#FF5500] focus:ring-2 focus:ring-[#FF5500]/20 outline-none transition-all"
             />
             <p className="text-[11px] text-[color:var(--app-text-muted)]">
               Permet aux membres de cotiser ou de soutenir le crew (ex: 10€/an pour l&apos;équipement, les ravitaillements et la logistique du crew).
@@ -255,7 +255,7 @@ export default function ClubSettingsPage() {
                 onClick={copyLink}
                 disabled={!slugReady}
                 title={slugReady ? "" : "Enregistre d'abord pour activer le lien"}
-                className="flex items-center gap-1.5 px-4 py-2.5 rounded-[12px] bg-[#FF5C00] text-white text-[11px] font-black uppercase tracking-widest hover:bg-[#E04B00] transition-all shrink-0 disabled:opacity-40"
+                className="flex items-center gap-1.5 px-4 py-2.5 rounded-[12px] bg-[#FF5500] text-white text-[11px] font-black uppercase tracking-widest hover:bg-[#E04B00] transition-all shrink-0 disabled:opacity-40"
               >
                 {copied ? <Check size={12} /> : <Copy size={12} />}
                 {copied ? "Copié" : "Copier"}
@@ -278,7 +278,7 @@ export default function ClubSettingsPage() {
       <button
         onClick={save}
         disabled={saving}
-        className="flex items-center gap-2 px-8 py-3 rounded-full bg-[#FF5C00] text-white text-[11px] font-black uppercase tracking-widest hover:bg-[#E04B00] transition-all active:scale-95 disabled:opacity-50"
+        className="flex items-center gap-2 px-8 py-3 rounded-full bg-[#FF5500] text-white text-[11px] font-black uppercase tracking-widest hover:bg-[#E04B00] transition-all active:scale-95 disabled:opacity-50"
       >
         {saving ? <Loader2 size={13} className="animate-spin" /> : saved ? <Check size={13} /> : <Save size={13} />}
         {saved ? "Enregistré ✓" : "Enregistrer les modifications"}

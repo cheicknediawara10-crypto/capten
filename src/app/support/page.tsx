@@ -79,7 +79,7 @@ export default function SupportPage() {
             <h1 className="text-[28px] sm:text-[42px] font-display italic font-black uppercase text-[color:var(--app-text)] leading-none tracking-tight">
               SUPPORT & ASSISTANCE
             </h1>
-            <span className="bg-[#FF5C00]/10 text-[#FF5C00] border border-[#FF5C00]/20 px-3 py-1 rounded-full text-[10px] font-mono font-black uppercase tracking-wider flex items-center gap-1.5">
+            <span className="bg-[#FF5500]/10 text-[#FF5500] border border-[#FF5500]/20 px-3 py-1 rounded-full text-[10px] font-mono font-black uppercase tracking-wider flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-[#56E39F] animate-pulse" /> SUPPORT CAPTEN
             </span>
           </div>
@@ -215,7 +215,7 @@ export default function SupportPage() {
                   <select
                     value={ticketCategory}
                     onChange={(e) => setTicketCategory(e.target.value)}
-                    className="w-full bg-[var(--app-surface-2)] border border-[color:var(--app-border)] rounded-control px-4 py-2.5 text-xs font-bold text-[color:var(--app-text)] focus:outline-none focus:border-[#FF5C00] focus:bg-[var(--app-surface)] transition-all"
+                    className="w-full bg-[var(--app-surface-2)] border border-[color:var(--app-border)] rounded-control px-4 py-2.5 text-xs font-bold text-[color:var(--app-text)] focus:outline-none focus:border-[#FF5500] focus:bg-[var(--app-surface)] transition-all"
                   >
                     <option value="Urgent — Session ce soir">Urgent — Session imminente</option>
                     <option value="Question Juridique / Décharge">Question Juridique / Décharge</option>
@@ -235,7 +235,7 @@ export default function SupportPage() {
                     value={contactEmail}
                     onChange={(e) => setContactEmail(e.target.value)}
                     placeholder="capitaine@exemple.com"
-                    className="w-full bg-[var(--app-surface-2)] border border-[color:var(--app-border)] rounded-control px-4 py-2.5 text-xs font-bold text-[color:var(--app-text)] focus:outline-none focus:border-[#FF5C00] focus:bg-[var(--app-surface)] transition-all"
+                    className="w-full bg-[var(--app-surface-2)] border border-[color:var(--app-border)] rounded-control px-4 py-2.5 text-xs font-bold text-[color:var(--app-text)] focus:outline-none focus:border-[#FF5500] focus:bg-[var(--app-surface)] transition-all"
                   />
                 </div>
               </div>
@@ -250,7 +250,7 @@ export default function SupportPage() {
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   placeholder="Expliquez ce que vous souhaitez accomplir ou le problème rencontré..."
-                  className="w-full bg-[var(--app-surface-2)] border border-[color:var(--app-border)] rounded-control px-4 py-3 text-xs font-medium text-[color:var(--app-text)] focus:outline-none focus:border-[#FF5C00] focus:bg-[var(--app-surface)] transition-all resize-none leading-relaxed"
+                  className="w-full bg-[var(--app-surface-2)] border border-[color:var(--app-border)] rounded-control px-4 py-3 text-xs font-medium text-[color:var(--app-text)] focus:outline-none focus:border-[#FF5500] focus:bg-[var(--app-surface)] transition-all resize-none leading-relaxed"
                 />
               </div>
 
@@ -295,7 +295,7 @@ export default function SupportPage() {
                 >
                   <button
                     onClick={() => setOpenFaq(isOpen ? null : idx)}
-                    className="w-full p-4 text-left font-bold text-xs flex justify-between items-center text-[color:var(--app-text)] hover:text-[#FF5C00] transition-colors"
+                    className="w-full p-4 text-left font-bold text-xs flex justify-between items-center text-[color:var(--app-text)] hover:text-[#FF5500] transition-colors"
                   >
                     <span>{faq.q}</span>
                     {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}

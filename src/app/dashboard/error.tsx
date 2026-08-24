@@ -20,7 +20,7 @@ export default function DashboardError({
       </p>
       <button
         onClick={() => { reset(); if (typeof window !== "undefined") window.location.reload(); }}
-        className="mt-1 h-12 px-7 rounded-full bg-[#FF5C00] text-white text-[12px] font-black uppercase tracking-widest hover:bg-[#E04B00] transition-colors"
+        className="mt-1 h-12 px-7 rounded-full bg-[#FF5500] text-white text-[12px] font-black uppercase tracking-widest hover:bg-[#E04B00] transition-colors"
       >
         Recharger
       </button>

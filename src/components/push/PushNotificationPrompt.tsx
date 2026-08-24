@@ -33,7 +33,7 @@ export default function PushNotificationPrompt({ clubId }: { clubId?: string }) 
   return (
     <div className="rounded-2xl bg-[var(--app-surface-2)] border border-[color:var(--app-border)] p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
       <div className="flex items-start gap-3">
-        <span className="w-9 h-9 rounded-xl bg-[#FF5C00]/10 text-[#FF5C00] flex items-center justify-center shrink-0 mt-0.5">
+        <span className="w-9 h-9 rounded-xl bg-[#FF5500]/10 text-[#FF5500] flex items-center justify-center shrink-0 mt-0.5">
           <BellRing size={18} className="animate-bounce" />
         </span>
         <div>
@@ -55,7 +55,7 @@ export default function PushNotificationPrompt({ clubId }: { clubId?: string }) 
         <button
           onClick={() => subscribe(clubId)}
           disabled={loading}
-          className="inline-flex items-center gap-1.5 h-9 px-4 rounded-xl bg-[#FF5C00] text-white text-[12px] font-black uppercase tracking-wider hover:bg-[#E04B00] active:scale-95 transition-all disabled:opacity-50"
+          className="inline-flex items-center gap-1.5 h-9 px-4 rounded-xl bg-[#FF5500] text-white text-[12px] font-black uppercase tracking-wider hover:bg-[#E04B00] active:scale-95 transition-all disabled:opacity-50"
         >
           {loading ? (
             <>

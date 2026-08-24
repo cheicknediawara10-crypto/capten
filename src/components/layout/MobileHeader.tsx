@@ -97,7 +97,7 @@ export default function MobileHeader() {
 
                       const content = (
                         <>
-                          <span className={isActive ? 'text-[#FF5C00]' : 'text-[color:var(--app-text-muted)]'}>
+                          <span className={isActive ? 'text-[#FF5500]' : 'text-[color:var(--app-text-muted)]'}>
                             {item.icon}
                           </span>
                           <span className="text-[12px] uppercase tracking-wider font-bold">
@@ -128,7 +128,7 @@ export default function MobileHeader() {
                           onClick={() => setIsOpen(false)}
                           className={`flex items-center gap-3.5 px-4 py-3 rounded-control transition-all active:scale-98 ${
                             isActive 
-                              ? 'bg-[var(--app-accent-soft)] text-[#FF5C00] font-bold' 
+                              ? 'bg-[var(--app-accent-soft)] text-[#FF5500] font-bold' 
                               : 'text-[color:var(--app-text)] hover:bg-[var(--app-hover)]'
                           }`}
                         >

@@ -199,7 +199,7 @@ export default function CagnottePage() {
 
         <button
           onClick={() => handleOpenAddModal()}
-          className="h-11 px-5 rounded-2xl bg-[#FF5C00] text-white text-xs font-black uppercase tracking-wider hover:bg-[#E04B00] transition-transform active:scale-95 flex items-center gap-2 cursor-pointer shadow-[0_4px_16px_rgba(255,92,0,0.25)] shrink-0"
+          className="h-11 px-5 rounded-2xl bg-[#FF5500] text-white text-xs font-black uppercase tracking-wider hover:bg-[#E04B00] transition-transform active:scale-95 flex items-center gap-2 cursor-pointer shadow-[0_4px_16px_rgba(255,85,0,0.25)] shrink-0"
         >
           <Plus size={16} strokeWidth={3} />
           Enregistrer un versement
@@ -237,11 +237,11 @@ export default function CagnottePage() {
           <div>
             <div className="flex items-center justify-between text-[10px] font-black text-[color:var(--app-text-muted)] uppercase mb-1.5">
               <span>Progression</span>
-              <span className="text-[#FF5C00] font-extrabold">{progressPercent}%</span>
+              <span className="text-[#FF5500] font-extrabold">{progressPercent}%</span>
             </div>
             <div className="w-full h-2 rounded-full bg-[var(--app-surface-2)] overflow-hidden">
               <div
-                className="h-full rounded-full bg-gradient-to-r from-[#FF5C00] to-[#22C55E] transition-all duration-500"
+                className="h-full rounded-full bg-gradient-to-r from-[#FF5500] to-[#22C55E] transition-all duration-500"
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
@@ -254,7 +254,7 @@ export default function CagnottePage() {
             <span className="text-[10px] font-black uppercase tracking-widest text-[color:var(--app-text-muted)]">
               Membres à jour
             </span>
-            <span className="w-8 h-8 rounded-xl bg-[#FF5C00]/10 flex items-center justify-center text-[#FF5C00]">
+            <span className="w-8 h-8 rounded-xl bg-[#FF5500]/10 flex items-center justify-center text-[#FF5500]">
               <Users size={16} />
             </span>
           </div>
@@ -309,7 +309,7 @@ export default function CagnottePage() {
               <>
                 <button
                   onClick={handleCopy}
-                  className="flex-1 h-9 rounded-xl border border-[color:var(--app-border)] text-xs font-bold text-[color:var(--app-text)] hover:border-[#FF5C00] transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                  className="flex-1 h-9 rounded-xl border border-[color:var(--app-border)] text-xs font-bold text-[color:var(--app-text)] hover:border-[#FF5500] transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
                 >
                   {copied ? <CheckCheck size={13} className="text-[#22C55E]" /> : <Copy size={13} />}
                   {copied ? "Copié !" : "Copier"}
@@ -327,7 +327,7 @@ export default function CagnottePage() {
             ) : (
               <button
                 onClick={() => setTab("reglages")}
-                className="w-full h-9 rounded-xl bg-[#FF5C00]/10 text-[#FF5C00] text-xs font-bold hover:bg-[#FF5C00]/20 transition-colors"
+                className="w-full h-9 rounded-xl bg-[#FF5500]/10 text-[#FF5500] text-xs font-bold hover:bg-[#FF5500]/20 transition-colors"
               >
                 + Configurer mon lien
               </button>
@@ -383,7 +383,7 @@ export default function CagnottePage() {
                 placeholder="Rechercher un membre..."
                 value={searchMember}
                 onChange={(e) => setSearchMember(e.target.value)}
-                className="w-full h-10 pl-9 pr-4 rounded-xl bg-[var(--app-surface)] border border-[color:var(--app-border)] text-xs font-medium text-[color:var(--app-text)] outline-none focus:border-[#FF5C00]"
+                className="w-full h-10 pl-9 pr-4 rounded-xl bg-[var(--app-surface)] border border-[color:var(--app-border)] text-xs font-medium text-[color:var(--app-text)] outline-none focus:border-[#FF5500]"
               />
             </div>
             <span className="text-xs text-[color:var(--app-text-muted)] font-bold">
@@ -404,7 +404,7 @@ export default function CagnottePage() {
                     className="p-4 flex items-center justify-between gap-4 hover:bg-[var(--app-hover)] transition-colors"
                   >
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="w-10 h-10 rounded-2xl bg-[#FF5C00]/10 text-[#FF5C00] font-extrabold flex items-center justify-center text-xs shrink-0">
+                      <div className="w-10 h-10 rounded-2xl bg-[#FF5500]/10 text-[#FF5500] font-extrabold flex items-center justify-center text-xs shrink-0">
                         {initials}
                       </div>
                       <div className="min-w-0">
@@ -432,7 +432,7 @@ export default function CagnottePage() {
 
                       <button
                         onClick={() => handleOpenAddModal(m)}
-                        className="h-8 px-3 rounded-xl bg-[var(--app-surface-2)] hover:bg-[#FF5C00] hover:text-white text-xs font-bold text-[color:var(--app-text)] transition-colors cursor-pointer"
+                        className="h-8 px-3 rounded-xl bg-[var(--app-surface-2)] hover:bg-[#FF5500] hover:text-white text-xs font-bold text-[color:var(--app-text)] transition-colors cursor-pointer"
                       >
                         + Cotisation
                       </button>
@@ -540,7 +540,7 @@ export default function CagnottePage() {
                 value={settingsUrl}
                 onChange={(e) => setSettingsUrl(e.target.value)}
                 placeholder="https://www.helloasso.com/associations/..."
-                className="w-full h-11 px-4 rounded-xl bg-[var(--app-surface-2)] text-xs font-mono font-medium text-[color:var(--app-text)] outline-none focus:ring-1 focus:ring-[#FF5C00]"
+                className="w-full h-11 px-4 rounded-xl bg-[var(--app-surface-2)] text-xs font-mono font-medium text-[color:var(--app-text)] outline-none focus:ring-1 focus:ring-[#FF5500]"
               />
             </div>
 
@@ -555,7 +555,7 @@ export default function CagnottePage() {
                   step="10"
                   value={settingsGoal}
                   onChange={(e) => setSettingsGoal(Number(e.target.value))}
-                  className="w-full h-11 px-4 rounded-xl bg-[var(--app-surface-2)] text-xs font-bold text-[color:var(--app-text)] outline-none focus:ring-1 focus:ring-[#FF5C00]"
+                  className="w-full h-11 px-4 rounded-xl bg-[var(--app-surface-2)] text-xs font-bold text-[color:var(--app-text)] outline-none focus:ring-1 focus:ring-[#FF5500]"
                 />
               </div>
 
@@ -569,7 +569,7 @@ export default function CagnottePage() {
                   step="1"
                   value={settingsCotisation}
                   onChange={(e) => setSettingsCotisation(Number(e.target.value))}
-                  className="w-full h-11 px-4 rounded-xl bg-[var(--app-surface-2)] text-xs font-bold text-[color:var(--app-text)] outline-none focus:ring-1 focus:ring-[#FF5C00]"
+                  className="w-full h-11 px-4 rounded-xl bg-[var(--app-surface-2)] text-xs font-bold text-[color:var(--app-text)] outline-none focus:ring-1 focus:ring-[#FF5500]"
                 />
               </div>
             </div>
@@ -583,14 +583,14 @@ export default function CagnottePage() {
                 value={settingsGoalTitle}
                 onChange={(e) => setSettingsGoalTitle(e.target.value)}
                 placeholder="Ex: T-shirts & Ravitaillement du Crew 2026"
-                className="w-full h-11 px-4 rounded-xl bg-[var(--app-surface-2)] text-xs font-medium text-[color:var(--app-text)] outline-none focus:ring-1 focus:ring-[#FF5C00]"
+                className="w-full h-11 px-4 rounded-xl bg-[var(--app-surface-2)] text-xs font-medium text-[color:var(--app-text)] outline-none focus:ring-1 focus:ring-[#FF5500]"
               />
             </div>
 
             <button
               type="submit"
               disabled={isSavingSettings}
-              className="h-11 px-6 rounded-xl bg-[#FF5C00] text-white text-xs font-black uppercase tracking-wider hover:bg-[#E04B00] transition-colors cursor-pointer"
+              className="h-11 px-6 rounded-xl bg-[#FF5500] text-white text-xs font-black uppercase tracking-wider hover:bg-[#E04B00] transition-colors cursor-pointer"
             >
               {isSavingSettings ? "Enregistrement..." : "Sauvegarder les paramètres"}
             </button>
@@ -608,7 +608,7 @@ export default function CagnottePage() {
           >
             <div className="flex items-center justify-between border-b border-[color:var(--app-border)] pb-3">
               <div className="flex items-center gap-2">
-                <span className="w-8 h-8 rounded-xl bg-[#FF5C00]/10 flex items-center justify-center text-[#FF5C00]">
+                <span className="w-8 h-8 rounded-xl bg-[#FF5500]/10 flex items-center justify-center text-[#FF5500]">
                   <Plus size={16} />
                 </span>
                 <h3 className="text-sm font-extrabold uppercase tracking-tight text-[color:var(--app-text)]">
@@ -634,7 +634,7 @@ export default function CagnottePage() {
                   placeholder="Prénom Nom"
                   value={customName}
                   onChange={(e) => setCustomName(e.target.value)}
-                  className="w-full h-11 px-4 rounded-xl bg-[var(--app-surface-2)] text-xs font-bold text-[color:var(--app-text)] outline-none focus:ring-1 focus:ring-[#FF5C00]"
+                  className="w-full h-11 px-4 rounded-xl bg-[var(--app-surface-2)] text-xs font-bold text-[color:var(--app-text)] outline-none focus:ring-1 focus:ring-[#FF5500]"
                 />
               </div>
 
@@ -650,7 +650,7 @@ export default function CagnottePage() {
                     step="1"
                     value={amount}
                     onChange={(e) => setAmount(Number(e.target.value))}
-                    className="w-full h-11 px-4 rounded-xl bg-[var(--app-surface-2)] text-xs font-bold text-[color:var(--app-text)] outline-none focus:ring-1 focus:ring-[#FF5C00]"
+                    className="w-full h-11 px-4 rounded-xl bg-[var(--app-surface-2)] text-xs font-bold text-[color:var(--app-text)] outline-none focus:ring-1 focus:ring-[#FF5500]"
                   />
                 </div>
 
@@ -661,7 +661,7 @@ export default function CagnottePage() {
                   <select
                     value={method}
                     onChange={(e) => setMethod(e.target.value as any)}
-                    className="w-full h-11 px-3 rounded-xl bg-[var(--app-surface-2)] text-xs font-bold text-[color:var(--app-text)] outline-none focus:ring-1 focus:ring-[#FF5C00]"
+                    className="w-full h-11 px-3 rounded-xl bg-[var(--app-surface-2)] text-xs font-bold text-[color:var(--app-text)] outline-none focus:ring-1 focus:ring-[#FF5500]"
                   >
                     <option value="helloasso">🟢 HelloAsso</option>
                     <option value="lydia">🟣 Lydia / Sumeria</option>
@@ -682,7 +682,7 @@ export default function CagnottePage() {
                   placeholder="Ex: Adhésion 2026, don t-shirt..."
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
-                  className="w-full h-11 px-4 rounded-xl bg-[var(--app-surface-2)] text-xs font-medium text-[color:var(--app-text)] outline-none focus:ring-1 focus:ring-[#FF5C00]"
+                  className="w-full h-11 px-4 rounded-xl bg-[var(--app-surface-2)] text-xs font-medium text-[color:var(--app-text)] outline-none focus:ring-1 focus:ring-[#FF5500]"
                 />
               </div>
 
@@ -697,7 +697,7 @@ export default function CagnottePage() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="flex-1 h-11 rounded-xl bg-[#FF5C00] text-white text-xs font-black uppercase tracking-wider hover:bg-[#E04B00] transition-colors"
+                  className="flex-1 h-11 rounded-xl bg-[#FF5500] text-white text-xs font-black uppercase tracking-wider hover:bg-[#E04B00] transition-colors"
                 >
                   {isSubmitting ? "Enregistrement..." : "Valider"}
                 </button>

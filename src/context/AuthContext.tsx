@@ -168,7 +168,7 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
         try { cagnotteContributors = JSON.parse(localStorage.getItem('capten_cagnotte_contributors_v3') || '[]'); } catch {}
 
         const branding: ClubBranding = {
-          primary_color: localStorage.getItem('capten_primary_color') || '#FF5C00',
+          primary_color: localStorage.getItem('capten_primary_color') || '#FF5500',
           logo: localStorage.getItem('capten_logo') || '',
           sos_numbers: localStorage.getItem('capten_sos_numbers') || '',
           safety_contact: localStorage.getItem('capten_safety_contact') || '',

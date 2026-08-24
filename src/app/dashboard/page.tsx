@@ -24,7 +24,7 @@ interface UpcomingEvent {
 const fmtDate = (iso: string) =>
   new Date(iso).toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
 
-function Ring({ pct, size = 150, stroke = 13, color = '#FF5C00', children }: {
+function Ring({ pct, size = 150, stroke = 13, color = '#FF5500', children }: {
   pct: number; size?: number; stroke?: number; color?: string; children: React.ReactNode;
 }) {
   const r = (size - stroke) / 2;
@@ -119,7 +119,7 @@ export default function DashboardPage() {
           </h1>
         </div>
         <Link href="/plan" className={`inline-flex items-center gap-1.5 self-start px-3.5 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider transition-colors ${
-          isPro ? 'bg-[var(--app-accent-soft)] text-[#FF5C00]' : 'bg-[var(--app-surface-2)] text-[color:var(--app-text-muted)] hover:text-[#FF5C00]'
+          isPro ? 'bg-[var(--app-accent-soft)] text-[#FF5500]' : 'bg-[var(--app-surface-2)] text-[color:var(--app-text-muted)] hover:text-[#FF5500]'
         }`}>
           <Flame size={13} /> {onTrial ? `Essai Pro · J-${daysLeft}` : isPro ? 'Captain Pro' : 'Découverte'}
         </Link>
@@ -127,10 +127,10 @@ export default function DashboardPage() {
 
       {/* Onboarding */}
       {showOnboarding && (
-        <div className="rounded-3xl border border-[#FF5C00]/25 bg-[var(--app-accent-soft)] overflow-hidden">
+        <div className="rounded-3xl border border-[#FF5500]/25 bg-[var(--app-accent-soft)] overflow-hidden">
           <div className="flex items-center justify-between gap-3 px-5 pt-5">
             <div className="flex items-center gap-2.5">
-              <span className="w-9 h-9 rounded-xl bg-[#FF5C00] flex items-center justify-center text-white shrink-0"><Rocket size={17} /></span>
+              <span className="w-9 h-9 rounded-xl bg-[#FF5500] flex items-center justify-center text-white shrink-0"><Rocket size={17} /></span>
               <div>
                 <p className="text-[15px] font-display italic font-black uppercase text-[color:var(--app-text)] leading-none">Lance ton crew</p>
                 <p className="text-[12px] text-[color:var(--app-text-muted)] mt-1">{doneCount}/{steps.length} étapes — tu y es presque.</p>
@@ -140,7 +140,7 @@ export default function DashboardPage() {
           </div>
           <div className="px-5 mt-3">
             <div className="h-1.5 rounded-full bg-[color:var(--app-border)] overflow-hidden">
-              <div className="h-full rounded-full bg-[#FF5C00] transition-all" style={{ width: `${(doneCount / steps.length) * 100}%` }} />
+              <div className="h-full rounded-full bg-[#FF5500] transition-all" style={{ width: `${(doneCount / steps.length) * 100}%` }} />
             </div>
           </div>
           <div className="p-3 sm:p-4 space-y-2">
@@ -152,12 +152,12 @@ export default function DashboardPage() {
                   {!s.done && <p className="text-[11px] text-[color:var(--app-text-muted)] mt-0.5">{s.desc}</p>}
                 </div>
                 {!s.done && s.action === 'copy' && joinUrl && (
-                  <button onClick={copyJoin} className="shrink-0 inline-flex items-center gap-1.5 h-9 px-4 rounded-full bg-[#FF5C00] text-white text-[12px] font-semibold hover:bg-[#E04B00] transition-colors">
+                  <button onClick={copyJoin} className="shrink-0 inline-flex items-center gap-1.5 h-9 px-4 rounded-full bg-[#FF5500] text-white text-[12px] font-semibold hover:bg-[#E04B00] transition-colors">
                     {copied ? <><Check size={13} /> Copié</> : <><Copy size={13} /> Copier le lien</>}
                   </button>
                 )}
                 {!s.done && s.href && (
-                  <Link href={s.href} className="shrink-0 inline-flex items-center gap-1.5 h-9 px-4 rounded-full bg-[#FF5C00] text-white text-[12px] font-semibold hover:bg-[#E04B00] transition-colors">{s.cta} <ArrowRight size={13} /></Link>
+                  <Link href={s.href} className="shrink-0 inline-flex items-center gap-1.5 h-9 px-4 rounded-full bg-[#FF5500] text-white text-[12px] font-semibold hover:bg-[#E04B00] transition-colors">{s.cta} <ArrowRight size={13} /></Link>
                 )}
               </div>
             ))}
@@ -185,7 +185,7 @@ export default function DashboardPage() {
               { v: memberCount, l: 'Membres', href: '/dashboard/members' },
             ].map((m) => (
               <Link key={m.l} href={m.href} className="group">
-                <p className="text-[30px] font-display italic font-black text-[color:var(--app-text)] leading-none group-hover:text-[#FF5C00] transition-colors">{loading ? '—' : m.v}</p>
+                <p className="text-[30px] font-display italic font-black text-[color:var(--app-text)] leading-none group-hover:text-[#FF5500] transition-colors">{loading ? '—' : m.v}</p>
                 <p className="text-[10px] font-medium uppercase tracking-wider text-[color:var(--app-text-muted)] mt-1.5">{m.l}</p>
               </Link>
             ))}
@@ -229,7 +229,7 @@ export default function DashboardPage() {
             <div className="flex items-end justify-between gap-2 sm:gap-3" style={{ height: 150 }}>
               {weekly.map((v, i) => (
                 <div key={i} className="flex-1 flex flex-col items-center gap-2">
-                  <div className="w-full rounded-t-lg" style={{ height: `${Math.max((v / maxWeek) * 130, 3)}px`, background: i === weekly.length - 1 ? '#FF5C00' : 'rgba(255,92,0,0.28)' }} />
+                  <div className="w-full rounded-t-lg" style={{ height: `${Math.max((v / maxWeek) * 130, 3)}px`, background: i === weekly.length - 1 ? '#FF5500' : 'rgba(255,85,0,0.28)' }} />
                   <span className="text-[9px] text-[color:var(--app-text-muted)]">S{i + 1}</span>
                 </div>
               ))}
@@ -264,9 +264,9 @@ export default function DashboardPage() {
           ].map((a) => (
             <Link key={a.label} href={a.href}
               className={`flex items-center gap-2.5 rounded-xl px-4 py-3.5 text-[13px] font-semibold transition-colors ${
-                a.primary ? 'bg-[#FF5C00] text-white hover:bg-[#E04B00]' : `${card} text-[color:var(--app-text)] hover:border-[#FF5C00]/40`
+                a.primary ? 'bg-[#FF5500] text-white hover:bg-[#E04B00]' : `${card} text-[color:var(--app-text)] hover:border-[#FF5500]/40`
               }`}>
-              <span className={a.primary ? 'text-white' : 'text-[#FF5C00]'}>{a.icon}</span>
+              <span className={a.primary ? 'text-white' : 'text-[#FF5500]'}>{a.icon}</span>
               {a.label}
             </Link>
           ))}

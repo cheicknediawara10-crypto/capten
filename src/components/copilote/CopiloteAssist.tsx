@@ -200,7 +200,7 @@ export default function CopiloteAssist({ preview = false }: { preview?: boolean 
       {/* En-tête avec compteur */}
       <div className="flex items-center justify-between pt-2 border-t border-[color:var(--app-border)]">
         <span className="text-[11px] font-black uppercase tracking-wider text-[color:var(--app-text-muted)] flex items-center gap-1.5">
-          <Sparkles size={12} className="text-[#FF5C00]" /> Suggestions instantanées
+          <Sparkles size={12} className="text-[#FF5500]" /> Suggestions instantanées
         </span>
         <span className="text-[10px] font-mono text-[color:var(--app-text-muted)]">
           {used}/{limit} aujourd&apos;hui
@@ -220,13 +220,13 @@ export default function CopiloteAssist({ preview = false }: { preview?: boolean 
               disabled={loading || atLimit}
               className={`flex items-center justify-between p-2.5 rounded-2xl border text-left transition-all active:scale-[0.98] cursor-pointer ${
                 isActive
-                  ? "bg-[#FF5C00]/10 border-[#FF5C00] text-[#FF5C00]"
-                  : "bg-[var(--app-surface-2)] border-[color:var(--app-border)] hover:border-[#FF5C00]/50 text-[color:var(--app-text)]"
+                  ? "bg-[#FF5500]/10 border-[#FF5500] text-[#FF5500]"
+                  : "bg-[var(--app-surface-2)] border-[color:var(--app-border)] hover:border-[#FF5500]/50 text-[color:var(--app-text)]"
               }`}
             >
               <div className="flex items-center gap-2.5 min-w-0">
                 <span className="w-7 h-7 rounded-xl bg-white dark:bg-black/20 flex items-center justify-center shrink-0 shadow-sm">
-                  <Icon size={14} className="text-[#FF5C00]" />
+                  <Icon size={14} className="text-[#FF5500]" />
                 </span>
                 <span className="text-[12px] font-bold truncate">{sit.label}</span>
               </div>
@@ -243,7 +243,7 @@ export default function CopiloteAssist({ preview = false }: { preview?: boolean 
       {/* Loading state */}
       {loading && (
         <div className="flex flex-col items-center justify-center py-6 bg-[var(--app-surface-2)] rounded-2xl border border-[color:var(--app-border)] gap-2">
-          <Loader2 size={20} className="animate-spin text-[#FF5C00]" />
+          <Loader2 size={20} className="animate-spin text-[#FF5500]" />
           <p className="text-[12px] font-bold text-[color:var(--app-text-muted)]">
             Le Copilote prépare ton message WhatsApp…
           </p>
@@ -293,7 +293,7 @@ export default function CopiloteAssist({ preview = false }: { preview?: boolean 
               disabled={loading}
               className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-white dark:bg-white/10 hover:bg-black/5 text-[#111111] dark:text-white transition-all cursor-pointer shadow-xs"
             >
-              <Flame size={11} className="text-[#FF5C00]" /> Plus motivant
+              <Flame size={11} className="text-[#FF5500]" /> Plus motivant
             </button>
             <button
               type="button"
@@ -347,7 +347,7 @@ export default function CopiloteAssist({ preview = false }: { preview?: boolean 
           value={customPrompt}
           onChange={(e) => setCustomPrompt(e.target.value)}
           placeholder="Ou tape / dicte un mot sur-mesure…"
-          className="w-full h-11 pl-4 pr-20 rounded-2xl bg-[var(--app-surface-2)] border border-[color:var(--app-border)] text-[12.5px] text-[color:var(--app-text)] placeholder:text-[color:var(--app-text-muted)] focus:outline-none focus:border-[#FF5C00] transition-colors"
+          className="w-full h-11 pl-4 pr-20 rounded-2xl bg-[var(--app-surface-2)] border border-[color:var(--app-border)] text-[12.5px] text-[color:var(--app-text)] placeholder:text-[color:var(--app-text-muted)] focus:outline-none focus:border-[#FF5500] transition-colors"
         />
         <div className="absolute right-1.5 top-1.5 flex items-center gap-1">
           <button
@@ -365,7 +365,7 @@ export default function CopiloteAssist({ preview = false }: { preview?: boolean 
           <button
             type="submit"
             disabled={!customPrompt.trim() || loading || atLimit}
-            className="w-8 h-8 rounded-xl bg-[#FF5C00] text-white flex items-center justify-center hover:bg-[#E04B00] active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer"
+            className="w-8 h-8 rounded-xl bg-[#FF5500] text-white flex items-center justify-center hover:bg-[#E04B00] active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer"
           >
             <Send size={13} />
           </button>

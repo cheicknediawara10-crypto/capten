@@ -38,7 +38,7 @@ export default function AppLayoutWrapper({ children }: AppLayoutWrapperProps) {
 
   if (isPublicPage) {
     return (
-      <div className="min-h-screen bg-white text-[#0F172A] overflow-x-hidden selection:bg-[#FF5C00]/20 selection:text-black">
+      <div className="min-h-screen bg-white text-[#0F172A] overflow-x-hidden selection:bg-[#FF5500]/20 selection:text-black">
         {children}
       </div>
     );

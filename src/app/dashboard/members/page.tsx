@@ -102,7 +102,7 @@ export default function MembersPage() {
         </div>
         <button
           onClick={() => setShowAdd(true)}
-          className="shrink-0 flex items-center gap-2 px-4 sm:px-5 h-11 rounded-full bg-[#FF5C00] text-white text-[11px] font-black uppercase tracking-widest hover:bg-[#E04B00] transition-all active:scale-95"
+          className="shrink-0 flex items-center gap-2 px-4 sm:px-5 h-11 rounded-full bg-[#FF5500] text-white text-[11px] font-black uppercase tracking-widest hover:bg-[#E04B00] transition-all active:scale-95"
         >
           <UserPlus size={15} />
           <span className="hidden sm:inline">Ajouter</span>
@@ -113,7 +113,7 @@ export default function MembersPage() {
       <div className={`${card} rounded-2xl p-5`}>
         <div className="flex items-center gap-2 mb-3">
           <span className="w-7 h-7 rounded-lg bg-[var(--app-accent-soft)] flex items-center justify-center shrink-0">
-            <Link2 size={14} className="text-[#FF5C00]" />
+            <Link2 size={14} className="text-[#FF5500]" />
           </span>
           <h2 className="text-[11px] font-black uppercase tracking-widest text-[color:var(--app-text-muted)]">
             Inviter des coureurs
@@ -128,7 +128,7 @@ export default function MembersPage() {
               </p>
               <button
                 onClick={copyJoinLink}
-                className="flex items-center gap-1.5 px-4 py-2.5 rounded-[12px] bg-[#FF5C00] text-white text-[11px] font-black uppercase tracking-widest hover:bg-[#E04B00] transition-all shrink-0"
+                className="flex items-center gap-1.5 px-4 py-2.5 rounded-[12px] bg-[#FF5500] text-white text-[11px] font-black uppercase tracking-widest hover:bg-[#E04B00] transition-all shrink-0"
               >
                 {linkCopied ? <CheckCircle2 size={12} /> : <Copy size={12} />}
                 {linkCopied ? "Copié" : "Copier"}
@@ -145,7 +145,7 @@ export default function MembersPage() {
             </p>
             <Link
               href="/dashboard/club"
-              className="shrink-0 flex items-center gap-1.5 px-4 h-9 rounded-full border border-[color:var(--app-border)] text-[10px] font-black uppercase tracking-widest text-[color:var(--app-text-muted)] hover:border-[#FF5C00] hover:text-[color:var(--app-text)] transition-all"
+              className="shrink-0 flex items-center gap-1.5 px-4 h-9 rounded-full border border-[color:var(--app-border)] text-[10px] font-black uppercase tracking-widest text-[color:var(--app-text-muted)] hover:border-[#FF5500] hover:text-[color:var(--app-text)] transition-all"
             >
               <Settings size={13} /> Configurer
             </Link>
@@ -156,7 +156,7 @@ export default function MembersPage() {
           <div className="mt-3 pt-3 border-t border-[color:var(--app-border)]">
             <Link
               href="/dashboard/club"
-              className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-[color:var(--app-text-muted)] hover:text-[#FF5C00] transition-colors"
+              className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-[color:var(--app-text-muted)] hover:text-[#FF5500] transition-colors"
             >
               <Settings size={12} /> Personnaliser la page d&apos;inscription (nom, logo, ville)
             </Link>
@@ -173,7 +173,7 @@ export default function MembersPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Nom, téléphone…"
-            className={`w-full h-11 pl-10 pr-4 rounded-full ${card} text-sm text-[color:var(--app-text)] placeholder:text-[color:var(--app-text-muted)] focus:border-[#FF5C00] outline-none transition-all`}
+            className={`w-full h-11 pl-10 pr-4 rounded-full ${card} text-sm text-[color:var(--app-text)] placeholder:text-[color:var(--app-text-muted)] focus:border-[#FF5500] outline-none transition-all`}
           />
         </div>
         <div className={`flex gap-1 ${card} rounded-full p-1 h-fit`}>
@@ -182,7 +182,7 @@ export default function MembersPage() {
               key={f.key}
               onClick={() => setFilter(f.key)}
               className={`px-3 py-1.5 rounded-full text-[10px] font-semibold uppercase tracking-wider transition-all whitespace-nowrap ${
-                filter === f.key ? "bg-[#FF5C00] text-white" : "text-[color:var(--app-text-muted)] hover:text-[color:var(--app-text)]"
+                filter === f.key ? "bg-[#FF5500] text-white" : "text-[color:var(--app-text-muted)] hover:text-[color:var(--app-text)]"
               }`}
             >
               {f.label}
@@ -221,7 +221,7 @@ export default function MembersPage() {
           className="flex flex-col items-center gap-3 py-16 text-center"
         >
           <div className="w-14 h-14 rounded-2xl bg-[var(--app-accent-soft)] flex items-center justify-center">
-            <Users size={26} className="text-[#FF5C00]" />
+            <Users size={26} className="text-[#FF5500]" />
           </div>
           <p className="text-[15px] font-semibold text-[color:var(--app-text)]">
             {members.length === 0 ? "Aucun membre encore" : "Aucun membre trouvé"}
@@ -234,7 +234,7 @@ export default function MembersPage() {
           {members.length === 0 && (
             <button
               onClick={() => setShowAdd(true)}
-              className="mt-2 flex items-center gap-2 px-5 h-11 rounded-full bg-[#FF5C00] text-white text-[11px] font-black uppercase tracking-widest hover:bg-[#E04B00] transition-all active:scale-95"
+              className="mt-2 flex items-center gap-2 px-5 h-11 rounded-full bg-[#FF5500] text-white text-[11px] font-black uppercase tracking-widest hover:bg-[#E04B00] transition-all active:scale-95"
             >
               <UserPlus size={15} />
               Ajouter un membre
@@ -258,7 +258,7 @@ export default function MembersPage() {
                     href={`/dashboard/members/${member.membre_id}`}
                     className="flex items-center gap-4 p-4 hover:bg-[var(--app-hover)] transition-colors group"
                   >
-                    <div className="w-10 h-10 rounded-full bg-[var(--app-accent-soft)] flex items-center justify-center shrink-0 font-bold text-[12px] text-[#FF5C00]">
+                    <div className="w-10 h-10 rounded-full bg-[var(--app-accent-soft)] flex items-center justify-center shrink-0 font-bold text-[12px] text-[#FF5500]">
                       {initials || "?"}
                     </div>
 
@@ -284,7 +284,7 @@ export default function MembersPage() {
                       )}
                     </div>
 
-                    <ChevronRight size={14} className="text-[color:var(--app-text-muted)] group-hover:text-[#FF5C00] transition-colors shrink-0" />
+                    <ChevronRight size={14} className="text-[color:var(--app-text-muted)] group-hover:text-[#FF5500] transition-colors shrink-0" />
                   </Link>
                 </motion.div>
               );
@@ -340,7 +340,7 @@ function AddMemberModal({
   }
 
   const input =
-    "w-full h-11 px-4 rounded-[12px] border border-[color:var(--app-border)] bg-[var(--app-surface-2)] text-sm font-medium text-[color:var(--app-text)] placeholder:text-[color:var(--app-text-muted)] focus:border-[#FF5C00] focus:ring-2 focus:ring-[#FF5C00]/20 outline-none transition-all";
+    "w-full h-11 px-4 rounded-[12px] border border-[color:var(--app-border)] bg-[var(--app-surface-2)] text-sm font-medium text-[color:var(--app-text)] placeholder:text-[color:var(--app-text-muted)] focus:border-[#FF5500] focus:ring-2 focus:ring-[#FF5500]/20 outline-none transition-all";
   const lbl = "text-[10px] font-bold uppercase tracking-widest text-[color:var(--app-text-muted)] block mb-1";
 
   return (
@@ -361,7 +361,7 @@ function AddMemberModal({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5">
                 <span className="w-9 h-9 rounded-xl bg-[var(--app-accent-soft)] flex items-center justify-center">
-                  <UserPlus size={17} className="text-[#FF5C00]" />
+                  <UserPlus size={17} className="text-[#FF5500]" />
                 </span>
                 <h2 className="text-[17px] font-display italic font-black uppercase text-[color:var(--app-text)] leading-none">
                   {done ? "Membre ajouté" : "Ajouter un membre"}
@@ -396,7 +396,7 @@ function AddMemberModal({
                       </span>
                       <button
                         onClick={() => { navigator.clipboard?.writeText(done.pin); setCopied(true); setTimeout(() => setCopied(false), 1600); }}
-                        className="flex items-center gap-1.5 px-3 h-9 rounded-full border border-[color:var(--app-border)] text-[11px] font-bold uppercase tracking-wider text-[color:var(--app-text-muted)] hover:border-[#FF5C00] hover:text-[color:var(--app-text)] transition-all"
+                        className="flex items-center gap-1.5 px-3 h-9 rounded-full border border-[color:var(--app-border)] text-[11px] font-bold uppercase tracking-wider text-[color:var(--app-text-muted)] hover:border-[#FF5500] hover:text-[color:var(--app-text)] transition-all"
                       >
                         {copied ? <CheckCircle2 size={13} className="text-[#22C55E]" /> : <Copy size={13} />}
                         {copied ? "Copié" : "Copier"}
@@ -411,10 +411,10 @@ function AddMemberModal({
                 )}
 
                 <div className="flex gap-3 pt-1">
-                  <button onClick={reset} className="flex-1 h-11 rounded-full border border-[color:var(--app-border)] text-[11px] font-black uppercase tracking-widest text-[color:var(--app-text-muted)] hover:border-[#FF5C00] hover:text-[color:var(--app-text)] transition-all">
+                  <button onClick={reset} className="flex-1 h-11 rounded-full border border-[color:var(--app-border)] text-[11px] font-black uppercase tracking-widest text-[color:var(--app-text-muted)] hover:border-[#FF5500] hover:text-[color:var(--app-text)] transition-all">
                     Ajouter un autre
                   </button>
-                  <button onClick={close} className="flex-1 h-11 rounded-full bg-[#FF5C00] text-white text-[11px] font-black uppercase tracking-widest hover:bg-[#E04B00] transition-all">
+                  <button onClick={close} className="flex-1 h-11 rounded-full bg-[#FF5500] text-white text-[11px] font-black uppercase tracking-widest hover:bg-[#E04B00] transition-all">
                     Terminé
                   </button>
                 </div>
@@ -454,7 +454,7 @@ function AddMemberModal({
                 <button
                   onClick={submit}
                   disabled={saving}
-                  className="w-full h-12 rounded-full bg-[#FF5C00] text-white text-[12px] font-black uppercase tracking-widest hover:bg-[#E04B00] transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="w-full h-12 rounded-full bg-[#FF5500] text-white text-[12px] font-black uppercase tracking-widest hover:bg-[#E04B00] transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   {saving ? <Loader2 size={15} className="animate-spin" /> : <UserPlus size={15} />}
                   Ajouter au crew

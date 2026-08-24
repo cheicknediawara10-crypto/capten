@@ -338,7 +338,7 @@ const WhatsAppBubblePreview = React.memo(({ text, clubName }: WhatsAppBubblePrev
       {/* WhatsApp Header */}
       <header className="bg-[#075E54] text-white pt-6 pb-2 px-3 flex items-center gap-2 relative z-10">
         <div className="w-2 h-2 border-t-2 border-l-2 border-white -rotate-45 mt-0.5" />
-        <div className="w-7 h-7 rounded-full bg-[#12131C] border border-white/10 flex items-center justify-center text-[10px] font-mono font-black text-[#FF5C00]">
+        <div className="w-7 h-7 rounded-full bg-[#12131C] border border-white/10 flex items-center justify-center text-[10px] font-mono font-black text-[#FF5500]">
           {clubName ? clubName.substring(0, 2).toUpperCase() : "BR"}
         </div>
         <div className="flex-1 min-w-0">
@@ -395,20 +395,20 @@ const TemplateCard = React.memo(({ template, parsedPreview, categoryLabel, onSel
         onSelect(template);
       }}
       title={tooltip}
-      className={`relative overflow-hidden rounded-[20px] border p-5 transition-all duration-300 group shadow-sm flex flex-col justify-between select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF5C00] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--app-bg)] ${
+      className={`relative overflow-hidden rounded-[20px] border p-5 transition-all duration-300 group shadow-sm flex flex-col justify-between select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF5500] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--app-bg)] ${
         isDisabled 
           ? 'border-[color:var(--app-border)] bg-[var(--app-surface-2)] opacity-45 cursor-not-allowed' 
-          : 'border-[color:var(--app-border)] bg-[var(--app-surface)] hover:border-[#FF5C00] hover:shadow-md hover:-translate-y-1 active:translate-y-0 cursor-pointer'
+          : 'border-[color:var(--app-border)] bg-[var(--app-surface)] hover:border-[#FF5500] hover:shadow-md hover:-translate-y-1 active:translate-y-0 cursor-pointer'
       }`}
       tabIndex={isDisabled ? -1 : 0}
       role="button"
       aria-label={isDisabled ? `${template.label} - ${tooltip}` : `Sélectionner le modèle : ${template.label}`}
     >
-      <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-[#FF5C00]/0 to-transparent transition-all duration-500 group-hover:via-[#FF5C00]/50"></div>
+      <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-[#FF5500]/0 to-transparent transition-all duration-500 group-hover:via-[#FF5500]/50"></div>
       
       <div>
         <div className="flex justify-between items-start gap-2 mb-3">
-          <span className="font-mono text-[9px] text-[#FF5C00] uppercase tracking-widest bg-[#FF5C00]/10 border border-[#FF5C00]/20 px-2.5 py-0.5 rounded-full font-bold">
+          <span className="font-mono text-[9px] text-[#FF5500] uppercase tracking-widest bg-[#FF5500]/10 border border-[#FF5500]/20 px-2.5 py-0.5 rounded-full font-bold">
             {template.id}
           </span>
           <span className="font-mono text-[9px] text-[color:var(--app-text-muted)] uppercase">
@@ -416,7 +416,7 @@ const TemplateCard = React.memo(({ template, parsedPreview, categoryLabel, onSel
           </span>
         </div>
 
-        <h3 className="font-display font-black italic uppercase text-lg text-[color:var(--app-text)] leading-tight tracking-tight group-hover:text-[#FF5C00] transition-colors">
+        <h3 className="font-display font-black italic uppercase text-lg text-[color:var(--app-text)] leading-tight tracking-tight group-hover:text-[#FF5500] transition-colors">
           {template.label}
         </h3>
         
@@ -474,18 +474,18 @@ const SimulatorPanel = React.memo(({ simulator, onChange, onReset, selectedTempl
 
   return (
     <div className="sticky top-6 bg-[var(--app-surface)] border border-[color:var(--app-border)] rounded-[24px] p-6 shadow-sm space-y-6 select-none">
-      <div className="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#FF5C00]/40 to-transparent"></div>
+      <div className="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#FF5500]/40 to-transparent"></div>
 
       <div className="flex justify-between items-center border-b border-[color:var(--app-border)] pb-4">
         <div className="flex items-center gap-2">
-          <Sliders className="w-4 h-4 text-[#FF5C00]" />
+          <Sliders className="w-4 h-4 text-[#FF5500]" />
           <h3 className="font-display font-black italic uppercase text-lg tracking-tight text-[color:var(--app-text)]">
             Infos supplémentaires
           </h3>
         </div>
         <button
           onClick={onReset}
-          className="text-[10px] font-mono font-bold text-[color:var(--app-text-muted)] hover:text-[color:var(--app-text)] border border-[color:var(--app-border)] px-2.5 py-1 rounded hover:bg-[var(--app-surface-2)] active:scale-95 transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#FF5C00]"
+          className="text-[10px] font-mono font-bold text-[color:var(--app-text-muted)] hover:text-[color:var(--app-text)] border border-[color:var(--app-border)] px-2.5 py-1 rounded hover:bg-[var(--app-surface-2)] active:scale-95 transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#FF5500]"
         >
           RESET
         </button>
@@ -497,7 +497,7 @@ const SimulatorPanel = React.memo(({ simulator, onChange, onReset, selectedTempl
             {crewSpots.length > 0 && (
               <div className="space-y-1.5">
                 <label className="text-[10px] font-mono font-black uppercase text-[color:var(--app-text-muted)] tracking-wider flex items-center gap-1.5">
-                  <MapPin className="w-3 h-3 text-[#FF5C00]" />
+                  <MapPin className="w-3 h-3 text-[#FF5500]" />
                   <span>Choisir un spot du crew</span>
                 </label>
                 <select
@@ -509,7 +509,7 @@ const SimulatorPanel = React.memo(({ simulator, onChange, onReset, selectedTempl
                     onChange("spot_address", s.adresse || "");
                     if (s.avantage) onChange("spot_message", s.avantage);
                   }}
-                  className="w-full bg-[#FFF0E8] border border-[#FF5C00]/20 rounded-xl px-3.5 py-2.5 text-[color:var(--app-text)] focus:outline-none focus:border-[#FF5C00] transition-colors focus-visible:ring-1 focus-visible:ring-[#FF5C00] font-medium"
+                  className="w-full bg-[#FFF0E8] border border-[#FF5500]/20 rounded-xl px-3.5 py-2.5 text-[color:var(--app-text)] focus:outline-none focus:border-[#FF5500] transition-colors focus-visible:ring-1 focus-visible:ring-[#FF5500] font-medium"
                 >
                   <option value="">— Pré-remplir depuis mes spots —</option>
                   {crewSpots.map((s) => (
@@ -524,37 +524,37 @@ const SimulatorPanel = React.memo(({ simulator, onChange, onReset, selectedTempl
             <div className="space-y-1.5">
               <label className="text-[10px] font-mono font-black uppercase text-[color:var(--app-text-muted)] tracking-wider flex justify-between items-center">
                 <span>Nom du Spot</span>
-                <span className="text-[#FF5C00] normal-case text-[9px] tracking-normal">{"{{spot_name}}"}</span>
+                <span className="text-[#FF5500] normal-case text-[9px] tracking-normal">{"{{spot_name}}"}</span>
               </label>
               <input
                 type="text"
                 value={simulator.spot_name || ""}
                 onChange={(e) => onChange("spot_name", e.target.value)}
-                className="w-full bg-[var(--app-surface-2)] border border-[color:var(--app-border)] rounded-xl px-3.5 py-2.5 text-[color:var(--app-text)] focus:outline-none focus:border-[#FF5C00] transition-colors focus:bg-[var(--app-surface)] focus-visible:ring-1 focus-visible:ring-[#FF5C00]"
+                className="w-full bg-[var(--app-surface-2)] border border-[color:var(--app-border)] rounded-xl px-3.5 py-2.5 text-[color:var(--app-text)] focus:outline-none focus:border-[#FF5500] transition-colors focus:bg-[var(--app-surface)] focus-visible:ring-1 focus-visible:ring-[#FF5500]"
               />
             </div>
             <div className="space-y-1.5">
               <label className="text-[10px] font-mono font-black uppercase text-[color:var(--app-text-muted)] tracking-wider flex justify-between items-center">
                 <span>Adresse du Spot</span>
-                <span className="text-[#FF5C00] normal-case text-[9px] tracking-normal">{"{{spot_address}}"}</span>
+                <span className="text-[#FF5500] normal-case text-[9px] tracking-normal">{"{{spot_address}}"}</span>
               </label>
               <input
                 type="text"
                 value={simulator.spot_address || ""}
                 onChange={(e) => onChange("spot_address", e.target.value)}
-                className="w-full bg-[var(--app-surface-2)] border border-[color:var(--app-border)] rounded-xl px-3.5 py-2.5 text-[color:var(--app-text)] focus:outline-none focus:border-[#FF5C00] transition-colors focus:bg-[var(--app-surface)] focus-visible:ring-1 focus-visible:ring-[#FF5C00]"
+                className="w-full bg-[var(--app-surface-2)] border border-[color:var(--app-border)] rounded-xl px-3.5 py-2.5 text-[color:var(--app-text)] focus:outline-none focus:border-[#FF5500] transition-colors focus:bg-[var(--app-surface)] focus-visible:ring-1 focus-visible:ring-[#FF5500]"
               />
             </div>
             <div className="space-y-1.5">
               <label className="text-[10px] font-mono font-black uppercase text-[color:var(--app-text-muted)] tracking-wider flex justify-between items-center">
                 <span>Message du Spot</span>
-                <span className="text-[#FF5C00] normal-case text-[9px] tracking-normal">{"{{spot_message}}"}</span>
+                <span className="text-[#FF5500] normal-case text-[9px] tracking-normal">{"{{spot_message}}"}</span>
               </label>
               <input
                 type="text"
                 value={simulator.spot_message || ""}
                 onChange={(e) => onChange("spot_message", e.target.value)}
-                className="w-full bg-[var(--app-surface-2)] border border-[color:var(--app-border)] rounded-xl px-3.5 py-2.5 text-[color:var(--app-text)] focus:outline-none focus:border-[#FF5C00] transition-colors focus:bg-[var(--app-surface)] focus-visible:ring-1 focus-visible:ring-[#FF5C00]"
+                className="w-full bg-[var(--app-surface-2)] border border-[color:var(--app-border)] rounded-xl px-3.5 py-2.5 text-[color:var(--app-text)] focus:outline-none focus:border-[#FF5500] transition-colors focus:bg-[var(--app-surface)] focus-visible:ring-1 focus-visible:ring-[#FF5500]"
               />
             </div>
           </>
@@ -565,49 +565,49 @@ const SimulatorPanel = React.memo(({ simulator, onChange, onReset, selectedTempl
             <div className="space-y-1.5">
               <label className="text-[10px] font-mono font-black uppercase text-[color:var(--app-text-muted)] tracking-wider flex justify-between items-center">
                 <span>Nom du Partenaire</span>
-                <span className="text-[#FF5C00] normal-case text-[9px] tracking-normal">{"{{partner_name}}"}</span>
+                <span className="text-[#FF5500] normal-case text-[9px] tracking-normal">{"{{partner_name}}"}</span>
               </label>
               <input
                 type="text"
                 value={simulator.partner_name || ""}
                 onChange={(e) => onChange("partner_name", e.target.value)}
-                className="w-full bg-[var(--app-surface-2)] border border-[color:var(--app-border)] rounded-xl px-3.5 py-2.5 text-[color:var(--app-text)] focus:outline-none focus:border-[#FF5C00] transition-colors focus:bg-[var(--app-surface)] focus-visible:ring-1 focus-visible:ring-[#FF5C00]"
+                className="w-full bg-[var(--app-surface-2)] border border-[color:var(--app-border)] rounded-xl px-3.5 py-2.5 text-[color:var(--app-text)] focus:outline-none focus:border-[#FF5500] transition-colors focus:bg-[var(--app-surface)] focus-visible:ring-1 focus-visible:ring-[#FF5500]"
               />
             </div>
             <div className="space-y-1.5">
               <label className="text-[10px] font-mono font-black uppercase text-[color:var(--app-text-muted)] tracking-wider flex justify-between items-center">
                 <span>Description de l&apos;offre</span>
-                <span className="text-[#FF5C00] normal-case text-[9px] tracking-normal">{"{{offer_description}}"}</span>
+                <span className="text-[#FF5500] normal-case text-[9px] tracking-normal">{"{{offer_description}}"}</span>
               </label>
               <input
                 type="text"
                 value={simulator.offer_description || ""}
                 onChange={(e) => onChange("offer_description", e.target.value)}
-                className="w-full bg-[var(--app-surface-2)] border border-[color:var(--app-border)] rounded-xl px-3.5 py-2.5 text-[color:var(--app-text)] focus:outline-none focus:border-[#FF5C00] transition-colors focus:bg-[var(--app-surface)] focus-visible:ring-1 focus-visible:ring-[#FF5C00]"
+                className="w-full bg-[var(--app-surface-2)] border border-[color:var(--app-border)] rounded-xl px-3.5 py-2.5 text-[color:var(--app-text)] focus:outline-none focus:border-[#FF5500] transition-colors focus:bg-[var(--app-surface)] focus-visible:ring-1 focus-visible:ring-[#FF5500]"
               />
             </div>
             <div className="space-y-1.5">
               <label className="text-[10px] font-mono font-black uppercase text-[color:var(--app-text-muted)] tracking-wider flex justify-between items-center">
                 <span>Code Promo</span>
-                <span className="text-[#FF5C00] normal-case text-[9px] tracking-normal">{"{{promo_code}}"}</span>
+                <span className="text-[#FF5500] normal-case text-[9px] tracking-normal">{"{{promo_code}}"}</span>
               </label>
               <input
                 type="text"
                 value={simulator.promo_code || ""}
                 onChange={(e) => onChange("promo_code", e.target.value)}
-                className="w-full bg-[var(--app-surface-2)] border border-[color:var(--app-border)] rounded-xl px-3.5 py-2.5 text-[color:var(--app-text)] focus:outline-none focus:border-[#FF5C00] transition-colors focus:bg-[var(--app-surface)] focus-visible:ring-1 focus-visible:ring-[#FF5C00]"
+                className="w-full bg-[var(--app-surface-2)] border border-[color:var(--app-border)] rounded-xl px-3.5 py-2.5 text-[color:var(--app-text)] focus:outline-none focus:border-[#FF5500] transition-colors focus:bg-[var(--app-surface)] focus-visible:ring-1 focus-visible:ring-[#FF5500]"
               />
             </div>
             <div className="space-y-1.5">
               <label className="text-[10px] font-mono font-black uppercase text-[color:var(--app-text-muted)] tracking-wider flex justify-between items-center">
                 <span>Date d&apos;expiration</span>
-                <span className="text-[#FF5C00] normal-case text-[9px] tracking-normal">{"{{expiry_date}}"}</span>
+                <span className="text-[#FF5500] normal-case text-[9px] tracking-normal">{"{{expiry_date}}"}</span>
               </label>
               <input
                 type="text"
                 value={simulator.expiry_date || ""}
                 onChange={(e) => onChange("expiry_date", e.target.value)}
-                className="w-full bg-[var(--app-surface-2)] border border-[color:var(--app-border)] rounded-xl px-3.5 py-2.5 text-[color:var(--app-text)] focus:outline-none focus:border-[#FF5C00] transition-colors focus:bg-[var(--app-surface)] focus-visible:ring-1 focus-visible:ring-[#FF5C00]"
+                className="w-full bg-[var(--app-surface-2)] border border-[color:var(--app-border)] rounded-xl px-3.5 py-2.5 text-[color:var(--app-text)] focus:outline-none focus:border-[#FF5500] transition-colors focus:bg-[var(--app-surface)] focus-visible:ring-1 focus-visible:ring-[#FF5500]"
               />
             </div>
           </>
@@ -615,7 +615,7 @@ const SimulatorPanel = React.memo(({ simulator, onChange, onReset, selectedTempl
       </div>
 
       <div className="bg-[var(--app-surface-2)] border border-[color:var(--app-border)] p-4 rounded-[16px] text-[10px] font-mono text-[color:var(--app-text-muted)] leading-relaxed relative">
-        <div className="flex gap-2 items-center text-[#FF5C00] font-black uppercase tracking-wider mb-1.5">
+        <div className="flex gap-2 items-center text-[#FF5500] font-black uppercase tracking-wider mb-1.5">
           <Sparkles className="w-3 h-3 animate-pulse" />
           ASTUCE
         </div>
@@ -732,7 +732,7 @@ const MessageEditorModal = React.memo(({
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 bg-[var(--app-surface-2)] hover:bg-black/5 w-9 h-9 rounded-full flex items-center justify-center text-[color:var(--app-text-muted)] hover:text-[color:var(--app-text)] transition-all z-20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF5C00]"
+          className="absolute top-4 right-4 bg-[var(--app-surface-2)] hover:bg-black/5 w-9 h-9 rounded-full flex items-center justify-center text-[color:var(--app-text-muted)] hover:text-[color:var(--app-text)] transition-all z-20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF5500]"
           aria-label="Fermer la boîte de dialogue"
         >
           <X className="w-4 h-4" />
@@ -750,9 +750,9 @@ const MessageEditorModal = React.memo(({
                 role="tab"
                 aria-selected={!isEditingBase}
                 onClick={() => setIsEditingBase(false)}
-                className={`flex-1 py-2.5 rounded-lg text-[10px] font-mono font-black uppercase tracking-wider transition-all min-h-[40px] flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF5C00] ${
+                className={`flex-1 py-2.5 rounded-lg text-[10px] font-mono font-black uppercase tracking-wider transition-all min-h-[40px] flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF5500] ${
                   !isEditingBase
-                    ? 'bg-[#FF5C00] text-white shadow-md shadow-[#FF5C00]/25'
+                    ? 'bg-[#FF5500] text-white shadow-md shadow-[#FF5500]/25'
                     : 'text-[color:var(--app-text-muted)] hover:text-[color:var(--app-text)] hover:bg-black/5'
                 }`}
               >
@@ -762,9 +762,9 @@ const MessageEditorModal = React.memo(({
                 role="tab"
                 aria-selected={isEditingBase}
                 onClick={() => setIsEditingBase(true)}
-                className={`flex-1 py-2.5 rounded-lg text-[10px] font-mono font-black uppercase tracking-wider transition-all min-h-[40px] flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF5C00] ${
+                className={`flex-1 py-2.5 rounded-lg text-[10px] font-mono font-black uppercase tracking-wider transition-all min-h-[40px] flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF5500] ${
                   isEditingBase
-                    ? 'bg-[#FF5C00] text-white shadow-md shadow-[#FF5C00]/25'
+                    ? 'bg-[#FF5500] text-white shadow-md shadow-[#FF5500]/25'
                     : 'text-[color:var(--app-text-muted)] hover:text-[color:var(--app-text)] hover:bg-black/5'
                 }`}
               >
@@ -776,7 +776,7 @@ const MessageEditorModal = React.memo(({
               /* --- MODE CUSTOM SEND --- */
               <div className="space-y-4">
                 <div>
-                  <span className="font-mono text-[9px] text-[#FF5C00] uppercase tracking-widest font-black">
+                  <span className="font-mono text-[9px] text-[#FF5500] uppercase tracking-widest font-black">
                     RETREMPER AVANT L'ENVOI
                   </span>
                   <h3 id="modal-title" className="text-xl sm:text-2xl font-display italic font-black uppercase text-[color:var(--app-text)] tracking-tight mt-1 leading-tight">
@@ -796,7 +796,7 @@ const MessageEditorModal = React.memo(({
                     rows={7}
                     value={editedText}
                     onChange={(e) => setEditedText(e.target.value)}
-                    className="w-full bg-[var(--app-surface-2)] border border-[color:var(--app-border)] rounded-2xl px-4 py-3 text-xs text-[color:var(--app-text)] placeholder-[color:var(--app-text-muted)] focus:outline-none focus:border-[#FF5C00] transition-colors focus:bg-[var(--app-surface)] resize-none leading-relaxed font-sans focus-visible:ring-1 focus-visible:ring-[#FF5C00]"
+                    className="w-full bg-[var(--app-surface-2)] border border-[color:var(--app-border)] rounded-2xl px-4 py-3 text-xs text-[color:var(--app-text)] placeholder-[color:var(--app-text-muted)] focus:outline-none focus:border-[#FF5500] transition-colors focus:bg-[var(--app-surface)] resize-none leading-relaxed font-sans focus-visible:ring-1 focus-visible:ring-[#FF5500]"
                   />
                   <div className="flex justify-between items-center text-[9px] font-mono text-[color:var(--app-text-muted)]">
                     <span>{editedText.length} caractères</span>
@@ -805,7 +805,7 @@ const MessageEditorModal = React.memo(({
                 </div>
 
                 <div className="bg-[var(--app-surface-2)] border border-[color:var(--app-border)] rounded-xl p-4 text-[10px] text-[color:var(--app-text-muted)] leading-relaxed">
-                  <span className="font-black text-[#FF5C00] block uppercase tracking-wider mb-1">CONSIGNE DU RUN</span>
+                  <span className="font-black text-[#FF5500] block uppercase tracking-wider mb-1">CONSIGNE DU RUN</span>
                   Ajoutez vos remarques (ex: météo locale, retard ou ravitaillement). Cela n'écrase pas le modèle général.
                 </div>
               </div>
@@ -813,7 +813,7 @@ const MessageEditorModal = React.memo(({
               /* --- MODE MASTER EDIT --- */
               <div className="space-y-4">
                 <div>
-                  <span className="font-mono text-[9px] text-[#FF5C00] uppercase tracking-widest font-black">
+                  <span className="font-mono text-[9px] text-[#FF5500] uppercase tracking-widest font-black">
                     ÉDITER LA SOURCE COMMUNE
                   </span>
                   <h3 id="modal-title" className="text-xl font-display italic font-black uppercase text-[color:var(--app-text)] tracking-tight mt-1 leading-tight">
@@ -833,7 +833,7 @@ const MessageEditorModal = React.memo(({
                     type="text"
                     value={editBaseLabel}
                     onChange={(e) => setEditBaseLabel(e.target.value)}
-                    className="w-full bg-[var(--app-surface-2)] border border-[color:var(--app-border)] rounded-xl px-3.5 py-2.5 text-[color:var(--app-text)] focus:outline-none focus:border-[#FF5C00] transition-colors focus:bg-[var(--app-surface)] focus-visible:ring-1 focus-visible:ring-[#FF5C00]"
+                    className="w-full bg-[var(--app-surface-2)] border border-[color:var(--app-border)] rounded-xl px-3.5 py-2.5 text-[color:var(--app-text)] focus:outline-none focus:border-[#FF5500] transition-colors focus:bg-[var(--app-surface)] focus-visible:ring-1 focus-visible:ring-[#FF5500]"
                   />
                 </div>
 
@@ -846,7 +846,7 @@ const MessageEditorModal = React.memo(({
                     type="text"
                     value={editBaseHint}
                     onChange={(e) => setEditBaseHint(e.target.value)}
-                    className="w-full bg-[var(--app-surface-2)] border border-[color:var(--app-border)] rounded-xl px-3.5 py-2.5 text-[color:var(--app-text)] focus:outline-none focus:border-[#FF5C00] transition-colors focus:bg-[var(--app-surface)] focus-visible:ring-1 focus-visible:ring-[#FF5C00]"
+                    className="w-full bg-[var(--app-surface-2)] border border-[color:var(--app-border)] rounded-xl px-3.5 py-2.5 text-[color:var(--app-text)] focus:outline-none focus:border-[#FF5500] transition-colors focus:bg-[var(--app-surface)] focus-visible:ring-1 focus-visible:ring-[#FF5500]"
                   />
                 </div>
 
@@ -859,7 +859,7 @@ const MessageEditorModal = React.memo(({
                     rows={4}
                     value={editBaseText}
                     onChange={(e) => setEditBaseText(e.target.value)}
-                    className="w-full bg-[var(--app-surface-2)] border border-[color:var(--app-border)] rounded-2xl px-4 py-3 text-[color:var(--app-text)] focus:outline-none focus:border-[#FF5C00] transition-colors focus:bg-[var(--app-surface)] resize-none leading-relaxed font-mono focus-visible:ring-1 focus-visible:ring-[#FF5C00]"
+                    className="w-full bg-[var(--app-surface-2)] border border-[color:var(--app-border)] rounded-2xl px-4 py-3 text-[color:var(--app-text)] focus:outline-none focus:border-[#FF5500] transition-colors focus:bg-[var(--app-surface)] resize-none leading-relaxed font-mono focus-visible:ring-1 focus-visible:ring-[#FF5500]"
                   />
                 </div>
 
@@ -890,7 +890,7 @@ const MessageEditorModal = React.memo(({
                         key={v.t}
                         type="button"
                         onClick={() => insertVariableTag(v.t)}
-                        className="bg-black/5 border border-[color:var(--app-border)] rounded-lg px-2 py-1 text-[8px] font-mono text-[#FF5C00] hover:bg-[#FF5C00] hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#FF5C00]"
+                        className="bg-black/5 border border-[color:var(--app-border)] rounded-lg px-2 py-1 text-[8px] font-mono text-[#FF5500] hover:bg-[#FF5500] hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#FF5500]"
                       >
                         {v.l}
                       </button>
@@ -908,7 +908,7 @@ const MessageEditorModal = React.memo(({
                 <>
                   <button
                     onClick={onCopy}
-                    className={`flex-1 py-3.5 rounded-xl text-xs font-mono font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-all active:scale-95 duration-200 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF5C00] ${
+                    className={`flex-1 py-3.5 rounded-xl text-xs font-mono font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-all active:scale-95 duration-200 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF5500] ${
                       copyFeedback 
                         ? 'bg-[#00FF66] text-[color:var(--app-text)] shadow-lg shadow-[#00FF66]/20 ring-2 ring-[#00FF66]' 
                         : 'bg-black text-white hover:bg-black/90'
@@ -946,7 +946,7 @@ const MessageEditorModal = React.memo(({
 
                   <button
                     onClick={onSaveBase}
-                    className="flex-[2] py-3.5 bg-[#FF5C00] hover:bg-[#E04B00] text-white rounded-xl text-xs font-mono font-black uppercase tracking-wider transition-all active:scale-95 duration-200 min-h-[44px] flex items-center justify-center gap-2 font-bold shadow-lg shadow-[#FF5C00]/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF5C00]"
+                    className="flex-[2] py-3.5 bg-[#FF5500] hover:bg-[#E04B00] text-white rounded-xl text-xs font-mono font-black uppercase tracking-wider transition-all active:scale-95 duration-200 min-h-[44px] flex items-center justify-center gap-2 font-bold shadow-lg shadow-[#FF5500]/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF5500]"
                   >
                     Enregistrer modèle
                   </button>
@@ -1453,19 +1453,19 @@ export default function MessagesPage() {
 
   return (
     <div className="bg-[var(--app-surface)] text-[color:var(--app-text)] border border-[color:var(--app-border)] rounded-[24px] overflow-hidden shadow-sm relative p-6 sm:p-10 animate-fade-in select-none">
-      <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-[#FF5C00]/80 to-transparent"></div>
+      <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-[#FF5500]/80 to-transparent"></div>
 
       {isLocked && (
         <div className="absolute inset-0 bg-[var(--app-surface-2)]/30 backdrop-blur-md z-40 flex items-center justify-center p-6 select-none pointer-events-auto">
           <div className="bg-black text-white max-w-md w-full rounded-[24px] border border-white/10 p-8 shadow-2xl text-center relative overflow-hidden">
             {/* Ambient neon orange glow */}
-            <div className="absolute -right-20 -top-20 w-48 h-48 bg-gradient-to-br from-[#FF5C00]/20 to-transparent rounded-full blur-2xl pointer-events-none" />
+            <div className="absolute -right-20 -top-20 w-48 h-48 bg-gradient-to-br from-[#FF5500]/20 to-transparent rounded-full blur-2xl pointer-events-none" />
             
-            <div className="w-12 h-12 rounded-2xl bg-neutral-900 border border-white/10 text-[#FF5C00] flex items-center justify-center mx-auto mb-5 shadow-lg">
+            <div className="w-12 h-12 rounded-2xl bg-neutral-900 border border-white/10 text-[#FF5500] flex items-center justify-center mx-auto mb-5 shadow-lg">
               <Lock className="h-6 w-6" />
             </div>
             
-            <span className="text-[10px] font-black text-[#FF5C00] uppercase tracking-[0.25em] font-display italic">
+            <span className="text-[10px] font-black text-[#FF5500] uppercase tracking-[0.25em] font-display italic">
               FONCTIONNALITÉ PREMIUM
             </span>
             
@@ -1480,7 +1480,7 @@ export default function MessagesPage() {
             <div className="mt-6 border-t border-white/5 pt-5">
               <Link 
                 href="/plan"
-                className="w-full bg-[#FF5C00] hover:bg-[#FF5C00]/90 text-white py-3 rounded-control text-xs font-black uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-[#FF5C00]/15 active:scale-95"
+                className="w-full bg-[#FF5500] hover:bg-[#FF5500]/90 text-white py-3 rounded-control text-xs font-black uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-[#FF5500]/15 active:scale-95"
               >
                 Débloquer avec le plan Capten <ArrowRight className="h-3.5 w-3.5" />
               </Link>
@@ -1509,7 +1509,7 @@ export default function MessagesPage() {
             <select
               value={selectedRunId}
               onChange={(e) => setSelectedRunId(e.target.value)}
-              className="w-full bg-[var(--app-surface)] border border-[color:var(--app-border)] rounded-xl px-4 py-3 text-xs font-bold text-[color:var(--app-text)] focus:outline-none focus:border-[#FF5C00] transition-colors focus-visible:ring-1 focus-visible:ring-[#FF5C00] cursor-pointer"
+              className="w-full bg-[var(--app-surface)] border border-[color:var(--app-border)] rounded-xl px-4 py-3 text-xs font-bold text-[color:var(--app-text)] focus:outline-none focus:border-[#FF5500] transition-colors focus-visible:ring-1 focus-visible:ring-[#FF5500] cursor-pointer"
             >
               {runsList.map((run) => (
                 <option key={run.id} value={run.id}>
@@ -1525,7 +1525,7 @@ export default function MessagesPage() {
             </p>
             <Link
               href="/dashboard/events/new"
-              className="px-4 py-2.5 bg-[#FF5C00] text-white rounded-control text-[10px] font-black uppercase tracking-widest hover:bg-[#E04B00] transition-all text-center block active:scale-95 shadow-sm"
+              className="px-4 py-2.5 bg-[#FF5500] text-white rounded-control text-[10px] font-black uppercase tracking-widest hover:bg-[#E04B00] transition-all text-center block active:scale-95 shadow-sm"
             >
               + PLANIFIER UN RUN
             </Link>
@@ -1557,9 +1557,9 @@ export default function MessagesPage() {
                   aria-controls={`panel-${tab.id}`}
                   tabIndex={activeTab === tab.id ? 0 : -1}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`px-4 py-3 rounded-lg text-xs font-bold transition-all uppercase tracking-wider min-h-[44px] flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF5C00] ${
+                  className={`px-4 py-3 rounded-lg text-xs font-bold transition-all uppercase tracking-wider min-h-[44px] flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF5500] ${
                     activeTab === tab.id
-                      ? 'bg-[#FF5C00] text-white shadow-lg shadow-[#FF5C00]/25'
+                      ? 'bg-[#FF5500] text-white shadow-lg shadow-[#FF5500]/25'
                       : 'text-[color:var(--app-text-muted)] hover:text-[color:var(--app-text)] hover:bg-[var(--app-surface-2)]'
                   }`}
                 >
@@ -1576,7 +1576,7 @@ export default function MessagesPage() {
                 placeholder="Rechercher un modèle..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-[var(--app-surface-2)] border border-[color:var(--app-border)] rounded-xl pl-10 pr-4 py-2.5 text-xs text-[color:var(--app-text)] placeholder-[color:var(--app-text-muted)] focus:outline-none focus:border-[#FF5C00] transition-colors focus:bg-[var(--app-surface)] focus-visible:ring-1 focus-visible:ring-[#FF5C00]"
+                className="w-full bg-[var(--app-surface-2)] border border-[color:var(--app-border)] rounded-xl pl-10 pr-4 py-2.5 text-xs text-[color:var(--app-text)] placeholder-[color:var(--app-text-muted)] focus:outline-none focus:border-[#FF5500] transition-colors focus:bg-[var(--app-surface)] focus-visible:ring-1 focus-visible:ring-[#FF5500]"
                 aria-label="Rechercher dans les modèles"
               />
               {searchQuery && (

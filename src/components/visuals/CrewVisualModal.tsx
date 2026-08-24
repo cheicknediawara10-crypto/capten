@@ -152,14 +152,14 @@ export default function CrewVisualModal({
           {photo ? (
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="w-full h-11 rounded-xl bg-[var(--app-surface-2)] border border-[color:var(--app-border)] text-[13px] font-bold text-[color:var(--app-text)] flex items-center justify-center gap-2 hover:border-[#FF5C00] transition-colors"
+              className="w-full h-11 rounded-xl bg-[var(--app-surface-2)] border border-[color:var(--app-border)] text-[13px] font-bold text-[color:var(--app-text)] flex items-center justify-center gap-2 hover:border-[#FF5500] transition-colors"
             >
               <RefreshCw size={15} /> Changer de photo
             </button>
           ) : (
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="w-full h-12 rounded-xl border-2 border-dashed border-[color:var(--app-border)] text-[13px] font-semibold text-[color:var(--app-text-muted)] flex items-center justify-center gap-2 hover:border-[#FF5C00] hover:text-[#FF5C00] transition-colors"
+              className="w-full h-12 rounded-xl border-2 border-dashed border-[color:var(--app-border)] text-[13px] font-semibold text-[color:var(--app-text-muted)] flex items-center justify-center gap-2 hover:border-[#FF5500] hover:text-[#FF5500] transition-colors"
             >
               <ImagePlus size={17} /> Ajoute une photo (optionnel)
             </button>
@@ -170,7 +170,7 @@ export default function CrewVisualModal({
         <div className="p-6 pt-3 border-t border-[color:var(--app-border)] shrink-0">
           <button
             onClick={onDownload}
-            className="w-full h-13 py-4 rounded-xl bg-[#FF5C00] text-white text-[13px] font-black uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-[#E04B00] active:scale-95 transition-all"
+            className="w-full h-13 py-4 rounded-xl bg-[#FF5500] text-white text-[13px] font-black uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-[#E04B00] active:scale-95 transition-all"
           >
             <Download size={16} /> Télécharger
           </button>

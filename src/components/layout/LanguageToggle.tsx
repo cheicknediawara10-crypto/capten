@@ -20,7 +20,7 @@ export default function LanguageToggle({ variant = "pill", className = "" }: Lan
           onClick={() => setLang("fr")}
           className={`px-2 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer ${
             lang === "fr"
-              ? "bg-[#FF5C00] text-white shadow-sm"
+              ? "bg-[#FF5500] text-white shadow-sm"
               : "text-[color:var(--app-text-muted)] hover:text-[color:var(--app-text)]"
           }`}
         >
@@ -31,7 +31,7 @@ export default function LanguageToggle({ variant = "pill", className = "" }: Lan
           onClick={() => setLang("en")}
           className={`px-2 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer ${
             lang === "en"
-              ? "bg-[#FF5C00] text-white shadow-sm"
+              ? "bg-[#FF5500] text-white shadow-sm"
               : "text-[color:var(--app-text-muted)] hover:text-[color:var(--app-text)]"
           }`}
         >

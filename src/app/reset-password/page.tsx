@@ -12,10 +12,10 @@ const C = {
   bg: "#FFFFFF",
   surface: "#FAFAFA",
   surface2: "#F4F4F5",
-  orange: "#FF5C00",
+  orange: "#FF5500",
   orangeHover: "#FF7233",
-  orangeDim: "rgba(255,92,0,0.05)",
-  orangeBorder: "rgba(255,92,0,0.15)",
+  orangeDim: "rgba(255,85,0,0.05)",
+  orangeBorder: "rgba(255,85,0,0.15)",
   text: "#09090B",
   textSecondary: "#52525B",
   textMuted: "#71717A",
@@ -54,7 +54,7 @@ const RESET_CSS = `
   }
   .login-input:focus {
     border-color: ${C.orange};
-    box-shadow: 0 0 0 3px rgba(255,92,0,0.08);
+    box-shadow: 0 0 0 3px rgba(255,85,0,0.08);
     background: ${C.bg};
   }
   .login-input:disabled {
@@ -79,12 +79,12 @@ const RESET_CSS = `
     justify-content: center;
     gap: 8px;
     transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
-    box-shadow: 0 4px 12px rgba(255,92,0,0.15);
+    box-shadow: 0 4px 12px rgba(255,85,0,0.15);
     font-family: var(--font-dm-sans), sans-serif;
   }
   .login-btn:hover:not(:disabled) {
     background: ${C.orangeHover};
-    box-shadow: 0 6px 16px rgba(255,92,0,0.25);
+    box-shadow: 0 6px 16px rgba(255,85,0,0.25);
   }
   .login-btn:active:not(:disabled) {
     transform: translateY(1px);
@@ -161,7 +161,7 @@ export default function ResetPasswordPage() {
           transform: "translate(-50%, -50%)",
           width: 500,
           height: 500,
-          background: "radial-gradient(circle, rgba(255,92,0,0.15) 0%, rgba(0,0,0,0) 70%)",
+          background: "radial-gradient(circle, rgba(255,85,0,0.15) 0%, rgba(0,0,0,0) 70%)",
           zIndex: 1,
           pointerEvents: "none",
         }} />
@@ -183,8 +183,8 @@ export default function ResetPasswordPage() {
               display: "inline-flex",
               alignItems: "center",
               gap: 6,
-              background: "rgba(255,92,0,0.08)",
-              border: "1px solid rgba(255,92,0,0.15)",
+              background: "rgba(255,85,0,0.08)",
+              border: "1px solid rgba(255,85,0,0.15)",
               color: C.orange,
               fontSize: 10,
               fontWeight: 900,

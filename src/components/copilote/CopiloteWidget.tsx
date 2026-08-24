@@ -52,7 +52,7 @@ export default function CopiloteWidget({ preview = false }: { preview?: boolean 
               {/* Close Button Header */}
               <div className="flex items-center justify-between px-6 py-2 border-b border-[color:var(--app-border)] shrink-0">
                 <div className="flex items-center gap-2">
-                  <span className="w-8 h-8 rounded-xl bg-[#FF5C00]/10 flex items-center justify-center text-[#FF5C00]">
+                  <span className="w-8 h-8 rounded-xl bg-[#FF5500]/10 flex items-center justify-center text-[#FF5500]">
                     <Sparkles size={16} />
                   </span>
                   <div>
@@ -104,11 +104,11 @@ export default function CopiloteWidget({ preview = false }: { preview?: boolean 
         <button
           onClick={() => setOpen((o) => !o)}
           aria-label="Ton Copilote"
-          className="relative w-14 h-14 rounded-full bg-[#FF5C00] text-white shadow-[0_8px_24px_rgba(255,92,0,0.4)] flex items-center justify-center hover:bg-[#E04B00] active:scale-95 transition-all cursor-pointer"
+          className="relative w-14 h-14 rounded-full bg-[#FF5500] text-white shadow-[0_8px_24px_rgba(255,85,0,0.4)] flex items-center justify-center hover:bg-[#E04B00] active:scale-95 transition-all cursor-pointer"
         >
           {open ? <X size={22} /> : <Compass size={24} />}
           {!open && count > 0 && (
-            <span className="absolute -top-1 -right-1 min-w-[22px] h-[22px] px-1 rounded-full bg-white text-[#FF5C00] text-[11px] font-black flex items-center justify-center border-2 border-[var(--app-bg)]">
+            <span className="absolute -top-1 -right-1 min-w-[22px] h-[22px] px-1 rounded-full bg-white text-[#FF5500] text-[11px] font-black flex items-center justify-center border-2 border-[var(--app-bg)]">
               {count}
             </span>
           )}

@@ -22,7 +22,7 @@ export interface CrewVisualData {
 
 export const CANVAS_W = 1080;
 export const CANVAS_H = 1920;
-const ORANGE = "#FF5C00";
+const ORANGE = "#FF5500";
 const M = 84; // marge gauche
 const WHITE = "#FFFFFF";
 const GREY = "rgba(255,255,255,0.55)";

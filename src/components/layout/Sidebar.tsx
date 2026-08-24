@@ -87,11 +87,11 @@ export default function Sidebar() {
                 
                 const content = (
                   <>
-                    {isActive && <div className="absolute left-0 top-0 bottom-0 w-[4px] bg-[#FF5C00]" />}
-                    <span className={isActive ? 'text-[#FF5C00]' : 'text-[color:var(--app-text-muted)]'}>
+                    {isActive && <div className="absolute left-0 top-0 bottom-0 w-[4px] bg-[#FF5500]" />}
+                    <span className={isActive ? 'text-[#FF5500]' : 'text-[color:var(--app-text-muted)]'}>
                       {item.icon}
                     </span>
-                    <span className={`text-[13px] tracking-tight ${isActive ? 'text-[#FF5C00] font-bold' : 'text-[color:var(--app-text)] font-medium'}`}>
+                    <span className={`text-[13px] tracking-tight ${isActive ? 'text-[#FF5500] font-bold' : 'text-[color:var(--app-text)] font-medium'}`}>
                       {item.name}
                     </span>
                   </>
@@ -115,7 +115,7 @@ export default function Sidebar() {
                   <Link 
                     key={item.name}
                     href={item.href}
-                    className={`relative flex items-center gap-4 px-8 py-2.5 transition-all ${isActive ? 'bg-[var(--app-accent-soft)] text-[#FF5C00]' : 'text-[color:var(--app-text)] hover:bg-[var(--app-hover)]'}`}
+                    className={`relative flex items-center gap-4 px-8 py-2.5 transition-all ${isActive ? 'bg-[var(--app-accent-soft)] text-[#FF5500]' : 'text-[color:var(--app-text)] hover:bg-[var(--app-hover)]'}`}
                   >
                     {content}
                   </Link>

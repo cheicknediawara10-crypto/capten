@@ -96,11 +96,11 @@ export default function MobileNav() {
                       href={item.href}
                       className={`flex items-center gap-3.5 p-3.5 rounded-2xl border transition-all active:scale-[0.98] ${
                         isActive
-                          ? "bg-[#FF5C00]/10 border-[#FF5C00] text-[#FF5C00]"
-                          : "bg-[var(--app-surface-2)] border-[color:var(--app-border)] hover:border-[#FF5C00]/40 text-[color:var(--app-text)]"
+                          ? "bg-[#FF5500]/10 border-[#FF5500] text-[#FF5500]"
+                          : "bg-[var(--app-surface-2)] border-[color:var(--app-border)] hover:border-[#FF5500]/40 text-[color:var(--app-text)]"
                       }`}
                     >
-                      <span className="w-9 h-9 rounded-xl bg-white dark:bg-black/30 flex items-center justify-center text-[#FF5C00] shrink-0 shadow-xs">
+                      <span className="w-9 h-9 rounded-xl bg-white dark:bg-black/30 flex items-center justify-center text-[#FF5500] shrink-0 shadow-xs">
                         {item.icon}
                       </span>
                       <div className="flex-1 min-w-0">
@@ -135,7 +135,7 @@ export default function MobileNav() {
                 href={item.href}
                 className={`flex flex-col items-center justify-center gap-1 py-1 px-3 rounded-xl transition-all duration-150 active:scale-90 ${
                   isActive
-                    ? "text-[#FF5C00] font-black"
+                    ? "text-[#FF5500] font-black"
                     : "text-[color:var(--app-text-muted)] hover:text-[color:var(--app-text)] font-semibold"
                 }`}
               >
@@ -153,7 +153,7 @@ export default function MobileNav() {
             onClick={() => setMoreOpen(!moreOpen)}
             className={`flex flex-col items-center justify-center gap-1 py-1 px-3 rounded-xl transition-all duration-150 active:scale-90 cursor-pointer ${
               moreOpen || isMoreActive
-                ? "text-[#FF5C00] font-black"
+                ? "text-[#FF5500] font-black"
                 : "text-[color:var(--app-text-muted)] hover:text-[color:var(--app-text)] font-semibold"
             }`}
           >

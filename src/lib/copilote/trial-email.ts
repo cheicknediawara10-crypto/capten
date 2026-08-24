@@ -33,7 +33,7 @@ export async function sendTrialEndingEmail(
           <p style="color:#6b6a6a;font-size:13px;line-height:1.5;margin:0 0 24px;">
             La semaine dernière tes coureurs ont adoré le check-in auto. Garde-le pour eux 🖤
           </p>
-          <a href="${SITE}/plan" style="display:inline-block;background:#ff5c00;color:#ffffff;font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:1px;text-decoration:none;padding:14px 26px;border-radius:12px;">
+          <a href="${SITE}/plan" style="display:inline-block;background:#FF5500;color:#ffffff;font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:1px;text-decoration:none;padding:14px 26px;border-radius:12px;">
             Garder Captain Pro — 29,99€/mois
           </a>
         </div>

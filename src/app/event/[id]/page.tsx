@@ -172,7 +172,7 @@ export default function PublicEventPage() {
             animate={{ opacity: 1, y: 0 }}
             className="bg-white rounded-[24px] border border-black/5 p-5 space-y-3 shadow-sm"
           >
-            <h2 className="text-[11px] font-black uppercase tracking-widest text-[#FF5C00] flex items-center gap-1.5">
+            <h2 className="text-[11px] font-black uppercase tracking-widest text-[#FF5500] flex items-center gap-1.5">
               <Luggage size={13} /> Infos Pratiques du Run
             </h2>
             <div className="space-y-2.5 pt-1">
@@ -189,7 +189,7 @@ export default function PublicEventPage() {
               )}
               {practical.pace && (
                 <div className="flex items-start gap-3 p-3 rounded-2xl bg-[#F8F8F6]">
-                  <span className="w-7 h-7 rounded-xl bg-[#FF5C00]/10 text-[#FF5C00] flex items-center justify-center shrink-0 mt-0.5">
+                  <span className="w-7 h-7 rounded-xl bg-[#FF5500]/10 text-[#FF5500] flex items-center justify-center shrink-0 mt-0.5">
                     <Gauge size={14} />
                   </span>
                   <div>

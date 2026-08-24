@@ -16,10 +16,10 @@ const C = {
   bg: "#FFFFFF",
   surface: "#FAFAFA",
   surface2: "#F4F4F5",
-  orange: "#FF5C00",
+  orange: "#FF5500",
   orangeHover: "#FF7233",
-  orangeDim: "rgba(255,92,0,0.05)",
-  orangeBorder: "rgba(255,92,0,0.15)",
+  orangeDim: "rgba(255,85,0,0.05)",
+  orangeBorder: "rgba(255,85,0,0.15)",
   text: "#09090B",
   textSecondary: "#52525B",
   textMuted: "#71717A",
@@ -73,7 +73,7 @@ const LOGIN_CSS = `
   }
   .login-input:focus {
     border-color: ${C.orange};
-    box-shadow: 0 0 0 3px rgba(255,92,0,0.08);
+    box-shadow: 0 0 0 3px rgba(255,85,0,0.08);
     background: ${C.bg};
   }
   .login-input:disabled {
@@ -103,7 +103,7 @@ const LOGIN_CSS = `
   .login-btn:hover:not(:disabled) {
     background: ${C.orangeHover};
     transform: translateY(-1px);
-    box-shadow: 0 8px 24px rgba(255,92,0,0.25);
+    box-shadow: 0 8px 24px rgba(255,85,0,0.25);
   }
   .login-btn:active:not(:disabled) {
     transform: translateY(0);
@@ -125,7 +125,7 @@ const LOGIN_CSS = `
   }
   .feature-card:hover {
     background: rgba(255,255,255,0.06);
-    border-color: rgba(255,92,0,0.3);
+    border-color: rgba(255,85,0,0.3);
   }
 
   .eye-toggle {
@@ -416,12 +416,12 @@ function LoginForm() {
           gap: 8,
           background: mode === "signup" 
             ? (assignedVariant === 'B' && !isFreePlanUrl 
-                ? (signupStep === 1 ? "rgba(22,163,74,0.05)" : "rgba(255,92,0,0.05)")
+                ? (signupStep === 1 ? "rgba(22,163,74,0.05)" : "rgba(255,85,0,0.05)")
                 : "rgba(22,163,74,0.05)") 
             : C.orangeDim,
           border: `1px solid ${mode === "signup" 
             ? (assignedVariant === 'B' && !isFreePlanUrl
-                ? (signupStep === 1 ? "rgba(22,163,74,0.18)" : "rgba(255,92,0,0.18)")
+                ? (signupStep === 1 ? "rgba(22,163,74,0.18)" : "rgba(255,85,0,0.18)")
                 : "rgba(22,163,74,0.18)")
             : C.orangeBorder}`,
           color: mode === "signup" 
@@ -849,7 +849,7 @@ function LoginForm() {
             onMouseEnter={mode === "signup" ? (e) => { 
               e.currentTarget.style.background = signupStep === 1 && assignedVariant === 'B' && !isFreePlanUrl ? C.orangeHover : "#15803d"; 
               e.currentTarget.style.transform = "translateY(-1px)"; 
-              e.currentTarget.style.boxShadow = signupStep === 1 && assignedVariant === 'B' && !isFreePlanUrl ? "0 8px 24px rgba(255,92,0,0.25)" : "0 8px 24px rgba(22,163,74,0.25)"; 
+              e.currentTarget.style.boxShadow = signupStep === 1 && assignedVariant === 'B' && !isFreePlanUrl ? "0 8px 24px rgba(255,85,0,0.25)" : "0 8px 24px rgba(22,163,74,0.25)"; 
             } : undefined}
             onMouseLeave={mode === "signup" ? (e) => { 
               e.currentTarget.style.background = signupStep === 1 && assignedVariant === 'B' && !isFreePlanUrl ? C.orange : C.green; 
@@ -1133,7 +1133,7 @@ export default function LoginPage() {
             width: "60vw",
             height: "60vw",
             borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(255,92,0,0.08) 0%, transparent 70%)",
+            background: "radial-gradient(circle, rgba(255,85,0,0.08) 0%, transparent 70%)",
             pointerEvents: "none",
           }} />
           <div style={{
@@ -1233,8 +1233,8 @@ export default function LoginPage() {
                     width: 36,
                     height: 36,
                     borderRadius: 10,
-                    background: "rgba(255,92,0,0.08)",
-                    border: "1px solid rgba(255,92,0,0.15)",
+                    background: "rgba(255,85,0,0.08)",
+                    border: "1px solid rgba(255,85,0,0.15)",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",

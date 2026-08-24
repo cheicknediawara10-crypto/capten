@@ -73,7 +73,7 @@ export default function EventsPage() {
         </div>
         <Link
           href="/dashboard/events/new"
-          className="flex items-center gap-2 bg-[#FF5C00] text-white px-5 py-2.5 rounded-full text-[11px] font-black uppercase tracking-widest hover:bg-[#E04B00] transition-all active:scale-95"
+          className="flex items-center gap-2 bg-[#FF5500] text-white px-5 py-2.5 rounded-full text-[11px] font-black uppercase tracking-widest hover:bg-[#E04B00] transition-all active:scale-95"
         >
           <Plus size={14} />
           Nouveau Run
@@ -88,7 +88,7 @@ export default function EventsPage() {
             onClick={() => setActiveTab(tab.key)}
             className={`px-4 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider transition-all ${
               activeTab === tab.key
-                ? "bg-[#FF5C00] text-white shadow-sm"
+                ? "bg-[#FF5500] text-white shadow-sm"
                 : "text-[color:var(--app-text-muted)] hover:text-[color:var(--app-text)]"
             }`}
           >
@@ -110,8 +110,8 @@ export default function EventsPage() {
           animate={{ opacity: 1, y: 0 }}
           className="flex flex-col items-center justify-center py-24 space-y-4"
         >
-          <div className="w-14 h-14 rounded-2xl bg-[#FF5C00]/[0.08] flex items-center justify-center">
-            <MapPin size={26} className="text-[#FF5C00]" />
+          <div className="w-14 h-14 rounded-2xl bg-[#FF5500]/[0.08] flex items-center justify-center">
+            <MapPin size={26} className="text-[#FF5500]" />
           </div>
           <h3 className="text-[20px] font-display italic font-black uppercase text-[color:var(--app-text)]">
             Aucun run prévu
@@ -121,7 +121,7 @@ export default function EventsPage() {
           </p>
           <Link
             href="/dashboard/events/new"
-            className="flex items-center gap-2 bg-[#FF5C00] text-white px-6 py-3 rounded-full text-[12px] font-black uppercase tracking-widest hover:bg-[#E04B00] transition-all"
+            className="flex items-center gap-2 bg-[#FF5500] text-white px-6 py-3 rounded-full text-[12px] font-black uppercase tracking-widest hover:bg-[#E04B00] transition-all"
           >
             <Plus size={14} />
             Créer un run
@@ -146,7 +146,7 @@ export default function EventsPage() {
                   {/* Date bar */}
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center gap-2 text-[11px] text-[color:var(--app-text-muted)] font-medium">
-                      <Calendar size={13} className="text-[#FF5C00]" />
+                      <Calendar size={13} className="text-[#FF5500]" />
                       {formatDateShort(event.event_date)}
                     </div>
                     <span
@@ -158,7 +158,7 @@ export default function EventsPage() {
                   </div>
 
                   {/* Title */}
-                  <h3 className="text-[16px] font-black uppercase text-[color:var(--app-text)] mb-3 leading-tight tracking-tight group-hover:text-[#FF5C00] transition-colors">
+                  <h3 className="text-[16px] font-black uppercase text-[color:var(--app-text)] mb-3 leading-tight tracking-tight group-hover:text-[#FF5500] transition-colors">
                     {event.title}
                   </h3>
 
@@ -186,7 +186,7 @@ export default function EventsPage() {
                     <span className="text-[10px] text-[color:var(--app-text-muted)] font-mono uppercase tracking-wider">
                       Voir les détails
                     </span>
-                    <ChevronRight size={14} className="text-[color:var(--app-text-muted)] group-hover:text-[#FF5C00] transition-colors" />
+                    <ChevronRight size={14} className="text-[color:var(--app-text-muted)] group-hover:text-[#FF5500] transition-colors" />
                   </div>
                 </Link>
               </motion.div>

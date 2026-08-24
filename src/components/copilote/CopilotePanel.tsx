@@ -23,8 +23,8 @@ interface Alert {
 
 const CAT: Record<string, { Icon: any; color: string }> = {
   accueil: { Icon: Users, color: "#3DD68C" },
-  logistique: { Icon: CalendarPlus, color: "#FF5C00" },
-  visuels: { Icon: Megaphone, color: "#FF5C00" },
+  logistique: { Icon: CalendarPlus, color: "#FF5500" },
+  visuels: { Icon: Megaphone, color: "#FF5500" },
   celebration: { Icon: Trophy, color: "#F59E0B" },
   securite: { Icon: ShieldAlert, color: "#F87171" },
   sante: { Icon: Activity, color: "#3DD68C" },
@@ -110,14 +110,14 @@ export default function CopilotePanel({
     return (
       <div className={embedded ? "p-5 relative overflow-hidden" : `${card} p-6 relative overflow-hidden`}>
         <div className="flex items-center gap-2.5 mb-2">
-          <span className="w-9 h-9 rounded-xl bg-[var(--app-accent-soft)] flex items-center justify-center"><Compass size={18} className="text-[#FF5C00]" /></span>
+          <span className="w-9 h-9 rounded-xl bg-[var(--app-accent-soft)] flex items-center justify-center"><Compass size={18} className="text-[#FF5500]" /></span>
           <h2 className="text-[15px] font-black uppercase tracking-tight text-[color:var(--app-text)]">Ton Copilote</h2>
           <span className="ml-auto inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-[color:var(--app-text-muted)]"><Lock size={11} /> Verrouillé</span>
         </div>
         <p className="text-[13px] text-[color:var(--app-text-muted)] max-w-md leading-snug">
           Ton assistant qui pense à ce que tu oublies : accueil des nouveaux, rappels de run, affiches à partager, sécurité… Il te prévient, tu agis en 1 clic.
         </p>
-        <Link href="/plan" className="mt-4 inline-flex items-center gap-2 h-10 px-5 rounded-full bg-[#FF5C00] text-white text-[12px] font-black uppercase tracking-widest hover:bg-[#E04B00] transition-colors">
+        <Link href="/plan" className="mt-4 inline-flex items-center gap-2 h-10 px-5 rounded-full bg-[#FF5500] text-white text-[12px] font-black uppercase tracking-widest hover:bg-[#E04B00] transition-colors">
           <Sparkles size={14} /> Débloque ton Copilote
         </Link>
       </div>
@@ -127,10 +127,10 @@ export default function CopilotePanel({
   return (
     <div className={embedded ? "p-5" : `${card} p-6`}>
       <div className="flex items-center gap-2.5 mb-1">
-        <span className="w-9 h-9 rounded-xl bg-[var(--app-accent-soft)] flex items-center justify-center"><Compass size={18} className="text-[#FF5C00]" /></span>
+        <span className="w-9 h-9 rounded-xl bg-[var(--app-accent-soft)] flex items-center justify-center"><Compass size={18} className="text-[#FF5500]" /></span>
         <h2 className="text-[15px] font-black uppercase tracking-tight text-[color:var(--app-text)]">Ton Copilote</h2>
         {alerts.length > 0 && (
-          <span className="ml-auto text-[11px] font-black px-2.5 py-0.5 rounded-full bg-[#FF5C00] text-white">{alerts.length}</span>
+          <span className="ml-auto text-[11px] font-black px-2.5 py-0.5 rounded-full bg-[#FF5500] text-white">{alerts.length}</span>
         )}
       </div>
 
@@ -164,14 +164,14 @@ export default function CopilotePanel({
                       <button
                         onClick={() => runGenerate(a)}
                         disabled={gen?.id === a.id && gen.loading}
-                        className="inline-flex items-center gap-1.5 mt-2 h-8 px-3 rounded-full bg-[#FF5C00] text-white text-[11px] font-bold uppercase tracking-wider hover:bg-[#E04B00] transition-all disabled:opacity-50"
+                        className="inline-flex items-center gap-1.5 mt-2 h-8 px-3 rounded-full bg-[#FF5500] text-white text-[11px] font-bold uppercase tracking-wider hover:bg-[#E04B00] transition-all disabled:opacity-50"
                       >
                         {gen?.id === a.id && gen.loading
                           ? <><Loader2 size={12} className="animate-spin" /> Le Copilote écrit…</>
                           : <><Sparkles size={12} /> Rédige-le pour moi</>}
                       </button>
                     ) : a.cta_href && a.cta_label ? (
-                      <Link href={a.cta_href} onClick={() => resolve(a.id, "done")} className="inline-flex items-center gap-1 mt-2 text-[12px] font-bold text-[#FF5C00] hover:underline">
+                      <Link href={a.cta_href} onClick={() => resolve(a.id, "done")} className="inline-flex items-center gap-1 mt-2 text-[12px] font-bold text-[#FF5500] hover:underline">
                         {a.cta_label} <ArrowRight size={12} />
                       </Link>
                     ) : null}

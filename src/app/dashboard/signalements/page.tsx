@@ -81,7 +81,7 @@ export default function SignalementsPage() {
         {([["new", `À traiter (${newCount})`], ["done", "Traités"]] as const).map(([k, label]) => (
           <button key={k} onClick={() => setTab(k)}
             className={`px-4 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider transition-all ${
-              tab === k ? "bg-[#FF5C00] text-white" : "text-[color:var(--app-text-muted)] hover:text-[color:var(--app-text)]"
+              tab === k ? "bg-[#FF5500] text-white" : "text-[color:var(--app-text-muted)] hover:text-[color:var(--app-text)]"
             }`}>
             {label}
           </button>
@@ -93,7 +93,7 @@ export default function SignalementsPage() {
       ) : shown.length === 0 ? (
         <div className="flex flex-col items-center gap-3 py-16 text-center">
           <div className="w-14 h-14 rounded-2xl bg-[var(--app-accent-soft)] flex items-center justify-center">
-            <Flag size={24} className="text-[#FF5C00]" />
+            <Flag size={24} className="text-[#FF5500]" />
           </div>
           <p className="text-[15px] font-semibold text-[color:var(--app-text)]">
             {tab === "new" ? "Rien à traiter 🖤" : "Aucun signalement traité"}

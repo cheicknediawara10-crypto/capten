@@ -4,11 +4,11 @@ import { ArrowLeft, Shield } from "lucide-react";
 
 export default function RGPDPage() {
   return (
-    <div className="min-h-screen bg-white text-[#09090B] font-sans selection:bg-[#FF5C00]/20 selection:text-black">
+    <div className="min-h-screen bg-white text-[#09090B] font-sans selection:bg-[#FF5500]/20 selection:text-black">
       {/* Header */}
       <header className="border-b border-black/5 bg-white/85 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-4xl mx-auto px-6 h-20 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 text-[13px] font-bold uppercase tracking-wider text-[#52525B] hover:text-[#FF5C00] transition-colors">
+          <Link href="/" className="flex items-center gap-2 text-[13px] font-bold uppercase tracking-wider text-[#52525B] hover:text-[#FF5500] transition-colors">
             <ArrowLeft size={16} />
             <span>Retour</span>
           </Link>
@@ -20,7 +20,7 @@ export default function RGPDPage() {
       {/* Hero Banner */}
       <div className="bg-[#FAFAFA] border-b border-black/5 py-16 px-6">
         <div className="max-w-3xl mx-auto text-center space-y-4">
-          <span className="inline-flex items-center gap-2 bg-[#FF5C00]/10 border border-[#FF5C00]/20 text-[#FF5C00] px-3.5 py-1 rounded-full text-[10px] font-mono tracking-widest uppercase font-bold">
+          <span className="inline-flex items-center gap-2 bg-[#FF5500]/10 border border-[#FF5500]/20 text-[#FF5500] px-3.5 py-1 rounded-full text-[10px] font-mono tracking-widest uppercase font-bold">
             <Shield size={12} /> PROTECTION DES DONNÉES
           </span>
           <h1 className="text-4xl sm:text-5xl font-display font-black italic uppercase tracking-tight text-black">
@@ -49,7 +49,7 @@ export default function RGPDPage() {
 
           <section className="space-y-4">
             <h2 className="text-xl font-bold uppercase tracking-wide text-black border-b border-black/5 pb-2">2. Confidentialité des fiches de sécurité</h2>
-            <p className="font-semibold text-black bg-[#FF5C00]/5 border border-[#FF5C00]/10 p-4 rounded-lg">
+            <p className="font-semibold text-black bg-[#FF5500]/5 border border-[#FF5500]/10 p-4 rounded-lg">
               ⚠️ Les données médicales et de contact d'urgence (Fiches ICE) sont strictement confidentielles. Elles ne sont accessibles qu'aux fondateurs du club (Captains) en 2 clics sur le terrain en cas d'accident. Elles sont totalement invisibles pour les autres membres du club et les tiers.
             </p>
           </section>

@@ -366,7 +366,7 @@ export default function PlanPage() {
                        {plan.period && <span className={`text-[12px] sm:text-[14px] font-bold uppercase ${isCapten ? 'text-white/70' : 'text-[color:var(--app-text-muted)]'}`}>{plan.period}</span>}
                     </div>
                     {plan.billingNote && (
-                      <p className={`text-[10px] font-bold uppercase tracking-wider mt-0.5 ${isCapten ? 'text-white/85' : 'text-[#FF5C00]'}`}>
+                      <p className={`text-[10px] font-bold uppercase tracking-wider mt-0.5 ${isCapten ? 'text-white/85' : 'text-[#FF5500]'}`}>
                         {plan.billingNote}
                       </p>
                     )}
@@ -420,7 +420,7 @@ export default function PlanPage() {
                           ? (isCapten ? 'bg-white/20 text-white' : 'bg-[var(--app-surface-2)] text-[color:var(--app-text-muted)]')
                           : isCapten
                             ? 'bg-white text-[#E04B00] hover:bg-white/90'
-                            : 'bg-[#FF5C00] text-white hover:bg-[#E04B00]'
+                            : 'bg-[#FF5500] text-white hover:bg-[#E04B00]'
                       }`}
                     >
                       {isProcessing && processingPlan === plan.name ? (
@@ -449,7 +449,7 @@ export default function PlanPage() {
                       variant === 'A' ? (
                         <Link
                           href="/login?mode=signup&variant=A"
-                          className="w-full text-center py-4 rounded-xl text-[10px] sm:text-[11px] font-black uppercase tracking-[0.2em] transition-all bg-[#FF5C00] text-white hover:bg-[#E04B00] block cursor-pointer"
+                          className="w-full text-center py-4 rounded-xl text-[10px] sm:text-[11px] font-black uppercase tracking-[0.2em] transition-all bg-[#FF5500] text-white hover:bg-[#E04B00] block cursor-pointer"
                         >
                           COMMENCER GRATUITEMENT
                         </Link>

@@ -37,7 +37,7 @@ export default function ThemeToggle() {
           boxShadow: "0 1px 3px rgba(0,0,0,0.15)",
         }}
       >
-        {dark ? <Moon size={13} className="text-[#FF6A1A]" /> : <Sun size={13} className="text-[#FF5C00]" />}
+        {dark ? <Moon size={13} className="text-[#FF6A1A]" /> : <Sun size={13} className="text-[#FF5500]" />}
       </span>
     </button>
   );

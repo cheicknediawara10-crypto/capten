@@ -116,7 +116,7 @@ function SpotModal({
               value={form.nom}
               onChange={(e) => set("nom", e.target.value)}
               placeholder="Boulangerie Mamiche, Café Nuances, Distance Shop…"
-              className="w-full bg-[var(--app-surface-2)] border border-transparent focus:border-[#FF5C00] focus:bg-[var(--app-surface)] rounded-[14px] px-4 py-3 text-[14px] text-[color:var(--app-text)] outline-none transition-all"
+              className="w-full bg-[var(--app-surface-2)] border border-transparent focus:border-[#FF5500] focus:bg-[var(--app-surface)] rounded-[14px] px-4 py-3 text-[14px] text-[color:var(--app-text)] outline-none transition-all"
             />
           </div>
 
@@ -131,7 +131,7 @@ function SpotModal({
                   onClick={() => set("categorie", c.value)}
                   className={`flex flex-col items-center gap-1 p-2.5 rounded-[14px] border transition-all text-center ${
                     form.categorie === c.value
-                      ? "bg-[#FF5C00] border-[#FF5C00] text-white"
+                      ? "bg-[#FF5500] border-[#FF5500] text-white"
                       : "bg-[var(--app-surface-2)] border-transparent text-[color:var(--app-text-muted)] hover:bg-[var(--app-hover)]"
                   }`}
                 >
@@ -150,7 +150,7 @@ function SpotModal({
               value={form.adresse}
               onChange={(e) => set("adresse", e.target.value)}
               placeholder="12 rue de la Paix, Paris"
-              className="w-full bg-[var(--app-surface-2)] border border-transparent focus:border-[#FF5C00] focus:bg-[var(--app-surface)] rounded-[14px] px-4 py-3 text-[14px] text-[color:var(--app-text)] outline-none transition-all"
+              className="w-full bg-[var(--app-surface-2)] border border-transparent focus:border-[#FF5500] focus:bg-[var(--app-surface)] rounded-[14px] px-4 py-3 text-[14px] text-[color:var(--app-text)] outline-none transition-all"
             />
           </div>
 
@@ -162,7 +162,7 @@ function SpotModal({
               value={form.lien_maps}
               onChange={(e) => set("lien_maps", e.target.value)}
               placeholder="https://maps.google.com/…"
-              className="w-full bg-[var(--app-surface-2)] border border-transparent focus:border-[#FF5C00] focus:bg-[var(--app-surface)] rounded-[14px] px-4 py-3 text-[14px] text-[color:var(--app-text)] outline-none transition-all"
+              className="w-full bg-[var(--app-surface-2)] border border-transparent focus:border-[#FF5500] focus:bg-[var(--app-surface)] rounded-[14px] px-4 py-3 text-[14px] text-[color:var(--app-text)] outline-none transition-all"
             />
           </div>
 
@@ -174,7 +174,7 @@ function SpotModal({
               value={form.mot_du_fondateur}
               onChange={(e) => set("mot_du_fondateur", e.target.value)}
               placeholder="Le meilleur café filtre du quartier, les croissants chauds du dimanche, le kiné du crew…"
-              className="w-full bg-[var(--app-surface-2)] border border-transparent focus:border-[#FF5C00] focus:bg-[var(--app-surface)] rounded-[14px] px-4 py-3 text-[14px] text-[color:var(--app-text)] outline-none transition-all"
+              className="w-full bg-[var(--app-surface-2)] border border-transparent focus:border-[#FF5500] focus:bg-[var(--app-surface)] rounded-[14px] px-4 py-3 text-[14px] text-[color:var(--app-text)] outline-none transition-all"
             />
           </div>
 
@@ -188,7 +188,7 @@ function SpotModal({
               value={form.avantage}
               onChange={(e) => set("avantage", e.target.value)}
               placeholder="Ex : ☕ QG After-run · 🥐 Croissants post-run · 🏷️ -10% pour le crew"
-              className="w-full bg-[var(--app-surface-2)] border border-transparent focus:border-[#FF5C00] focus:bg-[var(--app-surface)] rounded-[14px] px-4 py-3 text-[14px] text-[color:var(--app-text)] outline-none transition-all"
+              className="w-full bg-[var(--app-surface-2)] border border-transparent focus:border-[#FF5500] focus:bg-[var(--app-surface)] rounded-[14px] px-4 py-3 text-[14px] text-[color:var(--app-text)] outline-none transition-all"
             />
             <div className="flex flex-wrap gap-1.5 pt-1">
               {[
@@ -202,7 +202,7 @@ function SpotModal({
                   key={p}
                   type="button"
                   onClick={() => set("avantage", p)}
-                  className="px-2.5 py-1 rounded-full text-[10.5px] font-semibold bg-[var(--app-surface-2)] text-[color:var(--app-text-muted)] hover:text-[color:var(--app-text)] hover:border-[#FF5C00] border border-[color:var(--app-border)] transition-all"
+                  className="px-2.5 py-1 rounded-full text-[10.5px] font-semibold bg-[var(--app-surface-2)] text-[color:var(--app-text-muted)] hover:text-[color:var(--app-text)] hover:border-[#FF5500] border border-[color:var(--app-border)] transition-all"
                 >
                   {p}
                 </button>
@@ -215,7 +215,7 @@ function SpotModal({
           <button
             type="submit"
             disabled={saving}
-            className="w-full h-12 rounded-[14px] bg-[#FF5C00] text-white font-black uppercase tracking-widest text-[13px] hover:bg-[#E04B00] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+            className="w-full h-12 rounded-[14px] bg-[#FF5500] text-white font-black uppercase tracking-widest text-[13px] hover:bg-[#E04B00] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
           >
             {saving ? <Loader2 size={16} className="animate-spin" /> : <Check size={16} />}
             {initial ? "Enregistrer" : "Ajouter cette adresse"}
@@ -316,8 +316,8 @@ function SpotCard({
 
       {/* Header card */}
       <div className="flex items-center justify-between gap-2 mb-3">
-        <div className="w-10 h-10 rounded-[14px] bg-[#FF5C00]/[0.08] flex items-center justify-center">
-          <cat.Icon size={19} strokeWidth={2} className="text-[#FF5C00]" />
+        <div className="w-10 h-10 rounded-[14px] bg-[#FF5500]/[0.08] flex items-center justify-center">
+          <cat.Icon size={19} strokeWidth={2} className="text-[#FF5500]" />
         </div>
         {isSponsor && (
           <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-[10px] font-black uppercase tracking-wider">
@@ -342,7 +342,7 @@ function SpotCard({
 
       {spot.suggested_by_name && (
         <div className="mb-2">
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#FF5C00]/10 text-[#FF5C00] text-[10.5px] font-bold">
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#FF5500]/10 text-[#FF5500] text-[10.5px] font-bold">
             🤝 Découvert par {spot.suggested_by_name}
           </span>
         </div>
@@ -358,7 +358,7 @@ function SpotCard({
       <div className="flex flex-wrap items-center gap-2 mt-3">
         {spot.avantage && (
           <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold ${
-            isSponsor ? "bg-amber-500 text-black font-black" : "bg-[#FF5C00] text-white"
+            isSponsor ? "bg-amber-500 text-black font-black" : "bg-[#FF5500] text-white"
           }`}>
             {isSponsor ? <Star size={11} className="fill-black text-black" /> : <Gift size={11} strokeWidth={2.4} />}
             {spot.avantage}
@@ -369,7 +369,7 @@ function SpotCard({
             href={spot.lien_maps}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full border border-[color:var(--app-border)] text-[11px] font-medium text-[color:var(--app-text-muted)] hover:border-[#FF5C00] hover:text-[#FF5C00] transition-colors"
+            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full border border-[color:var(--app-border)] text-[11px] font-medium text-[color:var(--app-text-muted)] hover:border-[#FF5500] hover:text-[#FF5500] transition-colors"
           >
             <ExternalLink size={9} />
             Voir sur la carte
@@ -460,7 +460,7 @@ export default function CrewSpotsPage() {
         </div>
         <button
           onClick={() => setModal({ open: true })}
-          className="shrink-0 inline-flex items-center gap-2 h-10 px-5 rounded-full bg-[#FF5C00] text-white text-[13px] font-black uppercase tracking-wider hover:bg-[#E04B00] transition-colors"
+          className="shrink-0 inline-flex items-center gap-2 h-10 px-5 rounded-full bg-[#FF5500] text-white text-[13px] font-black uppercase tracking-wider hover:bg-[#E04B00] transition-colors"
         >
           <Plus size={15} />
           Ajouter
@@ -494,7 +494,7 @@ export default function CrewSpotsPage() {
                   <div>
                     <div className="flex items-start justify-between gap-2 mb-1.5">
                       <div className="flex items-center gap-2">
-                        <span className="w-7 h-7 rounded-[8px] bg-[#FF5C00]/10 flex items-center justify-center text-[#FF5C00]">
+                        <span className="w-7 h-7 rounded-[8px] bg-[#FF5500]/10 flex items-center justify-center text-[#FF5500]">
                           <cat.Icon size={14} />
                         </span>
                         <p className="text-[14px] font-extrabold text-[color:var(--app-text)]">{s.nom}</p>
@@ -503,7 +503,7 @@ export default function CrewSpotsPage() {
                     </div>
 
                     {s.suggested_by_name && (
-                      <p className="text-[11px] font-bold text-[#FF5C00] mb-1">
+                      <p className="text-[11px] font-bold text-[#FF5500] mb-1">
                         🤝 Proposé par {s.suggested_by_name}
                       </p>
                     )}
@@ -530,7 +530,7 @@ export default function CrewSpotsPage() {
                     </button>
                     <button
                       onClick={() => setModal({ open: true, editing: s })}
-                      className="h-9 px-3 rounded-full border border-[color:var(--app-border)] text-[11px] font-bold text-[color:var(--app-text)] hover:border-[#FF5C00] transition-colors cursor-pointer"
+                      className="h-9 px-3 rounded-full border border-[color:var(--app-border)] text-[11px] font-bold text-[color:var(--app-text)] hover:border-[#FF5500] transition-colors cursor-pointer"
                     >
                       <Pencil size={12} />
                     </button>
@@ -550,7 +550,7 @@ export default function CrewSpotsPage() {
 
       {/* Banner info */}
       <div className="bg-[var(--app-surface)] border border-[color:var(--app-border)] rounded-[24px] p-5 sm:p-6 flex items-start gap-4 shadow-sm">
-        <span className="shrink-0 w-11 h-11 rounded-[16px] bg-[#FF5C00]/10 flex items-center justify-center text-[#FF5C00]">
+        <span className="shrink-0 w-11 h-11 rounded-[16px] bg-[#FF5500]/10 flex items-center justify-center text-[#FF5500]">
           <MapPin size={22} strokeWidth={2} />
         </span>
         <div>
@@ -566,7 +566,7 @@ export default function CrewSpotsPage() {
       {/* Content */}
       {loading ? (
         <div className="flex items-center justify-center py-20">
-          <Loader2 className="animate-spin text-[#FF5C00]" size={28} />
+          <Loader2 className="animate-spin text-[#FF5500]" size={28} />
         </div>
       ) : spots.length === 0 ? (
         <motion.div
@@ -574,8 +574,8 @@ export default function CrewSpotsPage() {
           animate={{ opacity: 1, y: 0 }}
           className="flex flex-col items-center gap-3 py-20 text-center"
         >
-          <span className="w-16 h-16 rounded-[20px] bg-[#FF5C00]/[0.08] flex items-center justify-center mb-1">
-            <MapPin size={30} strokeWidth={1.8} className="text-[#FF5C00]" />
+          <span className="w-16 h-16 rounded-[20px] bg-[#FF5500]/[0.08] flex items-center justify-center mb-1">
+            <MapPin size={30} strokeWidth={1.8} className="text-[#FF5500]" />
           </span>
           <p className="text-[15px] font-black uppercase tracking-tight text-[color:var(--app-text)]">
             Aucun spot encore
@@ -585,7 +585,7 @@ export default function CrewSpotsPage() {
           </p>
           <button
             onClick={() => setModal({ open: true })}
-            className="mt-2 inline-flex items-center gap-2 h-10 px-6 rounded-full bg-[#FF5C00] text-white text-[12px] font-black uppercase tracking-wider hover:bg-[#E04B00] transition-colors"
+            className="mt-2 inline-flex items-center gap-2 h-10 px-6 rounded-full bg-[#FF5500] text-white text-[12px] font-black uppercase tracking-wider hover:bg-[#E04B00] transition-colors"
           >
             <Plus size={14} />
             Ajouter mon premier spot
@@ -612,7 +612,7 @@ export default function CrewSpotsPage() {
           <motion.button
             layout
             onClick={() => setModal({ open: true })}
-            className="border-2 border-dashed border-[color:var(--app-border)] rounded-[24px] p-5 flex flex-col items-center justify-center gap-2 text-[color:var(--app-text-muted)] hover:border-[#FF5C00] hover:text-[#FF5C00] transition-colors min-h-[160px]"
+            className="border-2 border-dashed border-[color:var(--app-border)] rounded-[24px] p-5 flex flex-col items-center justify-center gap-2 text-[color:var(--app-text-muted)] hover:border-[#FF5500] hover:text-[#FF5500] transition-colors min-h-[160px]"
           >
             <Plus size={22} />
             <span className="text-[12px] font-black uppercase tracking-wider">Ajouter un spot</span>

@@ -53,10 +53,10 @@ export default function StatsPage() {
   }, []);
 
   const KPI_CARDS = [
-    { label: "Membres", value: kpis.members, icon: <Users size={18} className="text-[#FF5C00]" /> },
-    { label: "Runs", value: kpis.events, icon: <Calendar size={18} className="text-[#FF5C00]" /> },
-    { label: "Check-ins", value: kpis.checkins, icon: <CheckSquare size={18} className="text-[#FF5C00]" /> },
-    { label: "Moy. par run", value: kpis.avgPerEvent, icon: <TrendingUp size={18} className="text-[#FF5C00]" /> },
+    { label: "Membres", value: kpis.members, icon: <Users size={18} className="text-[#FF5500]" /> },
+    { label: "Runs", value: kpis.events, icon: <Calendar size={18} className="text-[#FF5500]" /> },
+    { label: "Check-ins", value: kpis.checkins, icon: <CheckSquare size={18} className="text-[#FF5500]" /> },
+    { label: "Moy. par run", value: kpis.avgPerEvent, icon: <TrendingUp size={18} className="text-[#FF5500]" /> },
   ];
 
   const hasData = kpis.checkins > 0 || kpis.events > 0;
@@ -77,7 +77,7 @@ export default function StatsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="animate-spin text-[#FF5C00]" size={32} />
+        <Loader2 className="animate-spin text-[#FF5500]" size={32} />
       </div>
     );
   }
@@ -92,10 +92,10 @@ export default function StatsPage() {
           <p className="text-[13px] text-[color:var(--app-text-muted)] mt-1">L'activité de ton crew en un coup d'œil.</p>
         </div>
         <div className="rounded-3xl border border-[color:var(--app-border)] bg-[var(--app-surface)] p-8 sm:p-12 text-center flex flex-col items-center gap-3">
-          <span className="w-12 h-12 rounded-2xl bg-[var(--app-accent-soft)] flex items-center justify-center"><Lock size={22} className="text-[#FF5C00]" /></span>
+          <span className="w-12 h-12 rounded-2xl bg-[var(--app-accent-soft)] flex items-center justify-center"><Lock size={22} className="text-[#FF5500]" /></span>
           <h2 className="text-[18px] font-black uppercase tracking-tight text-[color:var(--app-text)]">Stats avancées — Captain Pro</h2>
           <p className="text-[13px] text-[color:var(--app-text-muted)] max-w-sm leading-snug">Présence, assiduité, rétention, tendances sur 6 mois — débloque tes stats pour piloter la croissance de ton crew.</p>
-          <Link href="/plan" className="mt-3 inline-flex items-center gap-2 h-11 px-5 rounded-full bg-[#FF5C00] text-white text-[12px] font-black uppercase tracking-widest hover:bg-[#E04B00] transition-colors">
+          <Link href="/plan" className="mt-3 inline-flex items-center gap-2 h-11 px-5 rounded-full bg-[#FF5500] text-white text-[12px] font-black uppercase tracking-widest hover:bg-[#E04B00] transition-colors">
             Débloquer
           </Link>
         </div>
@@ -158,14 +158,14 @@ export default function StatsPage() {
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--app-border)" vertical={false} />
                 <XAxis dataKey="month" tick={{ fontSize: 11, fill: "var(--app-text-muted)" }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fontSize: 11, fill: "var(--app-text-muted)" }} axisLine={false} tickLine={false} allowDecimals={false} />
-                <Tooltip {...chartTooltip} cursor={{ stroke: "#FF5C00", strokeWidth: 1, strokeDasharray: "4 4" }} />
+                <Tooltip {...chartTooltip} cursor={{ stroke: "#FF5500", strokeWidth: 1, strokeDasharray: "4 4" }} />
                 <Line
                   type="monotone"
                   dataKey="checkins"
-                  stroke="#FF5C00"
+                  stroke="#FF5500"
                   strokeWidth={2.5}
-                  dot={{ fill: "#FF5C00", r: 4, strokeWidth: 0 }}
-                  activeDot={{ r: 6, fill: "#FF5C00" }}
+                  dot={{ fill: "#FF5500", r: 4, strokeWidth: 0 }}
+                  activeDot={{ r: 6, fill: "#FF5500" }}
                   name="Check-ins"
                 />
               </LineChart>
@@ -187,8 +187,8 @@ export default function StatsPage() {
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--app-border)" vertical={false} />
                 <XAxis dataKey="month" tick={{ fontSize: 11, fill: "var(--app-text-muted)" }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fontSize: 11, fill: "var(--app-text-muted)" }} axisLine={false} tickLine={false} allowDecimals={false} />
-                <Tooltip {...chartTooltip} cursor={{ fill: "rgba(255,92,0,0.08)" }} />
-                <Bar dataKey="events" fill="#FF5C00" radius={[6, 6, 0, 0]} name="Runs" />
+                <Tooltip {...chartTooltip} cursor={{ fill: "rgba(255,85,0,0.08)" }} />
+                <Bar dataKey="events" fill="#FF5500" radius={[6, 6, 0, 0]} name="Runs" />
               </BarChart>
             </ResponsiveContainer>
           </motion.div>

@@ -87,7 +87,7 @@ export default function MemberDetailPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="animate-spin text-[#FF5C00]" size={32} />
+        <Loader2 className="animate-spin text-[#FF5500]" size={32} />
       </div>
     );
   }
@@ -96,7 +96,7 @@ export default function MemberDetailPage() {
     return (
       <div className="text-center py-24">
         <p className="text-[color:var(--app-text-muted)]">Membre introuvable.</p>
-        <Link href="/dashboard/members" className="text-[#FF5C00] mt-4 inline-block text-sm">← Retour</Link>
+        <Link href="/dashboard/members" className="text-[#FF5500] mt-4 inline-block text-sm">← Retour</Link>
       </div>
     );
   }
@@ -118,7 +118,7 @@ export default function MemberDetailPage() {
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
         className="bg-[var(--app-surface)] rounded-[24px] border border-[color:var(--app-border)] p-6">
         <div className="flex items-center gap-5">
-          <div className="w-16 h-16 rounded-full bg-[#FF5C00]/10 flex items-center justify-center font-black text-[20px] text-[#FF5C00] shrink-0">
+          <div className="w-16 h-16 rounded-full bg-[#FF5500]/10 flex items-center justify-center font-black text-[20px] text-[#FF5500] shrink-0">
             {initials || "?"}
           </div>
           <div className="flex-1 min-w-0">
@@ -134,7 +134,7 @@ export default function MemberDetailPage() {
           </div>
           {profile.phone && (
             <a href={`tel:${profile.phone}`}
-              className="flex items-center gap-2 bg-[#FF5C00] text-white px-4 py-2.5 rounded-full text-[11px] font-black uppercase tracking-widest hover:bg-black transition-all">
+              className="flex items-center gap-2 bg-[#FF5500] text-white px-4 py-2.5 rounded-full text-[11px] font-black uppercase tracking-widest hover:bg-black transition-all">
               <Phone size={13} />
               Appeler
             </a>
@@ -164,7 +164,7 @@ export default function MemberDetailPage() {
         className="bg-[var(--app-surface)] rounded-[24px] border border-[color:var(--app-border)] p-6">
         <div className="flex items-center gap-2.5 mb-4">
           <span className="w-9 h-9 rounded-xl bg-[var(--app-accent-soft)] flex items-center justify-center shrink-0">
-            <Mail size={16} className="text-[#FF5C00]" />
+            <Mail size={16} className="text-[#FF5500]" />
           </span>
           <div>
             <h2 className="text-[13px] font-black uppercase tracking-tight text-[color:var(--app-text)]">Coordonnées</h2>
@@ -175,15 +175,15 @@ export default function MemberDetailPage() {
           <div>
             <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--app-text-muted)] block mb-1">E-mail</label>
             <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="coureur@exemple.fr"
-              className="w-full h-11 px-4 rounded-[12px] border border-[color:var(--app-border)] bg-[var(--app-surface-2)] text-sm font-medium text-[color:var(--app-text)] placeholder:text-[color:var(--app-text-muted)] focus:border-[#FF5C00] focus:ring-2 focus:ring-[#FF5C00]/20 outline-none transition-all" />
+              className="w-full h-11 px-4 rounded-[12px] border border-[color:var(--app-border)] bg-[var(--app-surface-2)] text-sm font-medium text-[color:var(--app-text)] placeholder:text-[color:var(--app-text-muted)] focus:border-[#FF5500] focus:ring-2 focus:ring-[#FF5500]/20 outline-none transition-all" />
           </div>
           <div>
             <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--app-text-muted)] block mb-1">Téléphone</label>
             <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="06 12 34 56 78"
-              className="w-full h-11 px-4 rounded-[12px] border border-[color:var(--app-border)] bg-[var(--app-surface-2)] text-sm font-medium text-[color:var(--app-text)] placeholder:text-[color:var(--app-text-muted)] focus:border-[#FF5C00] focus:ring-2 focus:ring-[#FF5C00]/20 outline-none transition-all" />
+              className="w-full h-11 px-4 rounded-[12px] border border-[color:var(--app-border)] bg-[var(--app-surface-2)] text-sm font-medium text-[color:var(--app-text)] placeholder:text-[color:var(--app-text-muted)] focus:border-[#FF5500] focus:ring-2 focus:ring-[#FF5500]/20 outline-none transition-all" />
           </div>
           <button onClick={handleSaveContact} disabled={savingContact}
-            className="flex items-center gap-2 px-5 h-10 rounded-full bg-[#FF5C00] text-white text-[11px] font-black uppercase tracking-widest hover:bg-[#E04B00] transition-all active:scale-95 disabled:opacity-50">
+            className="flex items-center gap-2 px-5 h-10 rounded-full bg-[#FF5500] text-white text-[11px] font-black uppercase tracking-widest hover:bg-[#E04B00] transition-all active:scale-95 disabled:opacity-50">
             {savingContact ? <Loader2 size={13} className="animate-spin" /> : contactSaved ? <CheckCircle2 size={13} /> : <Save size={13} />}
             {contactSaved ? "Enregistré" : "Enregistrer"}
           </button>
@@ -196,7 +196,7 @@ export default function MemberDetailPage() {
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <div className="flex items-center gap-2.5">
             <span className="w-9 h-9 rounded-xl bg-[var(--app-accent-soft)] flex items-center justify-center shrink-0">
-              <KeyRound size={16} className="text-[#FF5C00]" />
+              <KeyRound size={16} className="text-[#FF5500]" />
             </span>
             <div>
               <h2 className="text-[13px] font-black uppercase tracking-tight text-[color:var(--app-text)]">Code PIN</h2>
@@ -205,7 +205,7 @@ export default function MemberDetailPage() {
           </div>
           {!newPin && (
             <button onClick={handleResetPin} disabled={resetting}
-              className="flex items-center gap-2 px-4 h-10 rounded-full border border-[color:var(--app-border)] text-[11px] font-black uppercase tracking-widest text-[color:var(--app-text-muted)] hover:border-[#FF5C00] hover:text-[color:var(--app-text)] transition-all disabled:opacity-50">
+              className="flex items-center gap-2 px-4 h-10 rounded-full border border-[color:var(--app-border)] text-[11px] font-black uppercase tracking-widest text-[color:var(--app-text-muted)] hover:border-[#FF5500] hover:text-[color:var(--app-text)] transition-all disabled:opacity-50">
               {resetting ? <Loader2 size={13} className="animate-spin" /> : <RotateCcw size={13} />}
               Réinitialiser
             </button>
@@ -220,7 +220,7 @@ export default function MemberDetailPage() {
             </div>
             <button
               onClick={() => { navigator.clipboard?.writeText(newPin); setPinCopied(true); setTimeout(() => setPinCopied(false), 1600); }}
-              className="flex items-center gap-1.5 px-3 h-9 rounded-full border border-[color:var(--app-border)] text-[11px] font-bold uppercase tracking-wider text-[color:var(--app-text-muted)] hover:border-[#FF5C00] hover:text-[color:var(--app-text)] transition-all shrink-0">
+              className="flex items-center gap-1.5 px-3 h-9 rounded-full border border-[color:var(--app-border)] text-[11px] font-bold uppercase tracking-wider text-[color:var(--app-text-muted)] hover:border-[#FF5500] hover:text-[color:var(--app-text)] transition-all shrink-0">
               {pinCopied ? <CheckCircle2 size={13} className="text-[#22C55E]" /> : <Copy size={13} />}
               {pinCopied ? "Copié" : "Copier"}
             </button>

@@ -155,7 +155,7 @@ export default function EventDetailPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="animate-spin text-[#FF5C00]" size={32} />
+        <Loader2 className="animate-spin text-[#FF5500]" size={32} />
       </div>
     );
   }
@@ -164,7 +164,7 @@ export default function EventDetailPage() {
     return (
       <div className="text-center py-24">
         <p className="text-[color:var(--app-text-muted)]">Sortie introuvable.</p>
-        <Link href="/dashboard/events" className="text-[#FF5C00] mt-4 inline-block text-sm">← Retour</Link>
+        <Link href="/dashboard/events" className="text-[#FF5500] mt-4 inline-block text-sm">← Retour</Link>
       </div>
     );
   }
@@ -273,7 +273,7 @@ export default function EventDetailPage() {
               disabled={!isPro}
               title={!isPro ? "Disponible sur le plan Capten" : ""}
               className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-[11px] font-black uppercase tracking-widest transition-all border border-[color:var(--app-border)] ${
-                !isPro ? "opacity-40 cursor-not-allowed text-[color:var(--app-text-muted)]" : "text-[color:var(--app-text)] hover:border-[#FF5C00] hover:text-[#FF5C00]"
+                !isPro ? "opacity-40 cursor-not-allowed text-[color:var(--app-text-muted)]" : "text-[color:var(--app-text)] hover:border-[#FF5500] hover:text-[#FF5500]"
               }`}
             >
               <Megaphone size={13} /> Affiche
@@ -285,7 +285,7 @@ export default function EventDetailPage() {
               disabled={!isPro || !storyEnabled}
               title={!isPro ? "Disponible sur le plan Capten" : storyTooltip}
               className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-[11px] font-black uppercase tracking-widest transition-all border border-[color:var(--app-border)] ${
-                !isPro || !storyEnabled ? "opacity-40 cursor-not-allowed text-[color:var(--app-text-muted)]" : "text-[color:var(--app-text)] hover:border-[#FF5C00] hover:text-[#FF5C00]"
+                !isPro || !storyEnabled ? "opacity-40 cursor-not-allowed text-[color:var(--app-text-muted)]" : "text-[color:var(--app-text)] hover:border-[#FF5500] hover:text-[#FF5500]"
               }`}
             >
               <Camera size={13} /> Story
@@ -296,7 +296,7 @@ export default function EventDetailPage() {
               onClick={() => (isPro ? exportRegistreCSV() : router.push("/plan"))}
               title={!isPro ? "Disponible sur le plan Capten" : "Exporter le registre horodaté (CSV)"}
               className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-[11px] font-black uppercase tracking-widest transition-all border border-[color:var(--app-border)] ${
-                !isPro ? "opacity-40 cursor-not-allowed text-[color:var(--app-text-muted)]" : "text-[color:var(--app-text)] hover:border-[#FF5C00] hover:text-[#FF5C00]"
+                !isPro ? "opacity-40 cursor-not-allowed text-[color:var(--app-text-muted)]" : "text-[color:var(--app-text)] hover:border-[#FF5500] hover:text-[#FF5500]"
               }`}
             >
               <Download size={13} /> Registre
@@ -321,9 +321,9 @@ export default function EventDetailPage() {
               onClick={handleSendPush}
               disabled={notifying}
               title="Envoyer une notification push sur l'écran des membres"
-              className="flex items-center gap-1.5 px-4 py-2 rounded-full text-[11px] font-black uppercase tracking-widest bg-[var(--app-surface-2)] text-[color:var(--app-text)] hover:border-[#FF5C00] border border-[color:var(--app-border)] transition-all shadow-sm"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-full text-[11px] font-black uppercase tracking-widest bg-[var(--app-surface-2)] text-[color:var(--app-text)] hover:border-[#FF5500] border border-[color:var(--app-border)] transition-all shadow-sm"
             >
-              {notifying ? <Loader2 size={13} className="animate-spin" /> : <Bell size={13} className="text-[#FF5C00]" />}
+              {notifying ? <Loader2 size={13} className="animate-spin" /> : <Bell size={13} className="text-[#FF5500]" />}
               {notifiedMsg || "Notifier (Push)"}
             </button>
           )}
@@ -333,7 +333,7 @@ export default function EventDetailPage() {
             className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-[11px] font-black uppercase tracking-widest transition-all ${
               event.status === "published"
                 ? "border border-[color:var(--app-border)] text-[color:var(--app-text-muted)] hover:border-black hover:text-[color:var(--app-text)]"
-                : "bg-[#FF5C00] text-white hover:bg-black"
+                : "bg-[#FF5500] text-white hover:bg-black"
             }`}
           >
             {isPublishing ? <Loader2 size={12} className="animate-spin" /> : event.status === "published" ? <Lock size={12} /> : <Globe size={12} />}
@@ -356,7 +356,7 @@ export default function EventDetailPage() {
             onClick={() => setActiveTab(tab.key)}
             className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider whitespace-nowrap transition-all ${
               activeTab === tab.key
-                ? "bg-[#FF5C00] text-white shadow-sm"
+                ? "bg-[#FF5500] text-white shadow-sm"
                 : "text-[color:var(--app-text-muted)] hover:text-[color:var(--app-text)]"
             }`}
           >
@@ -375,7 +375,7 @@ export default function EventDetailPage() {
                 <h3 className="text-[11px] font-black uppercase tracking-widest text-[color:var(--app-text-muted)]">Informations</h3>
                 <div className="space-y-3">
                   <div className="flex items-center gap-3">
-                    <Calendar size={16} className="text-[#FF5C00] shrink-0" />
+                    <Calendar size={16} className="text-[#FF5500] shrink-0" />
                     <div>
                       <p className="text-[11px] text-[color:var(--app-text-muted)] uppercase tracking-wider">Date</p>
                       <p className="text-sm font-semibold text-[color:var(--app-text)]">
@@ -385,7 +385,7 @@ export default function EventDetailPage() {
                   </div>
                   {event.meeting_point_address && (
                     <div className="flex items-center gap-3">
-                      <MapPin size={16} className="text-[#FF5C00] shrink-0" />
+                      <MapPin size={16} className="text-[#FF5500] shrink-0" />
                       <div>
                         <p className="text-[11px] text-[color:var(--app-text-muted)] uppercase tracking-wider">Point RDV</p>
                         <p className="text-sm font-semibold text-[color:var(--app-text)]">{event.meeting_point_address}</p>
@@ -393,7 +393,7 @@ export default function EventDetailPage() {
                     </div>
                   )}
                   <div className="flex items-center gap-3">
-                    <Users size={16} className="text-[#FF5C00] shrink-0" />
+                    <Users size={16} className="text-[#FF5500] shrink-0" />
                     <div>
                       <p className="text-[11px] text-[color:var(--app-text-muted)] uppercase tracking-wider">Capacité</p>
                       <p className="text-sm font-semibold text-[color:var(--app-text)]">
@@ -407,19 +407,19 @@ export default function EventDetailPage() {
               {/* Infos Pratiques Anti-Stress */}
               {(parsePracticalInfo(event.description).bagDrop || parsePracticalInfo(event.description).pace || parsePracticalInfo(event.description).sweeper || parsePracticalInfo(event.description).afterRun) && (
                 <div className="bg-[var(--app-surface)] rounded-[24px] border border-[color:var(--app-border)] p-6 space-y-3">
-                  <h3 className="text-[11px] font-black uppercase tracking-widest text-[#FF5C00] flex items-center gap-1.5">
+                  <h3 className="text-[11px] font-black uppercase tracking-widest text-[#FF5500] flex items-center gap-1.5">
                     <Luggage size={14} /> Infos Pratiques du Run
                   </h3>
                   <div className="space-y-2 pt-1 text-sm">
                     {parsePracticalInfo(event.description).bagDrop && (
                       <div className="flex items-center gap-2 text-[color:var(--app-text)]">
-                        <Luggage size={14} className="text-[#FF5C00] shrink-0" />
+                        <Luggage size={14} className="text-[#FF5500] shrink-0" />
                         <span><b className="text-[color:var(--app-text-muted)] font-normal text-[11px] uppercase tracking-wider block">Consigne :</b> {parsePracticalInfo(event.description).bagDrop}</span>
                       </div>
                     )}
                     {parsePracticalInfo(event.description).pace && (
                        <div className="flex items-center gap-2 text-[color:var(--app-text)]">
-                        <Gauge size={14} className="text-[#FF5C00] shrink-0" />
+                        <Gauge size={14} className="text-[#FF5500] shrink-0" />
                         <span><b className="text-[color:var(--app-text-muted)] font-normal text-[11px] uppercase tracking-wider block">Sas d'Allures :</b> {parsePracticalInfo(event.description).pace}</span>
                       </div>
                     )}
@@ -453,8 +453,8 @@ export default function EventDetailPage() {
                     <p className="text-[40px] font-display font-black italic text-[color:var(--app-text)] leading-none">{liveCount}</p>
                     <p className="text-[11px] text-[color:var(--app-text-muted)] mt-1">check-ins validés</p>
                   </div>
-                  <div className="w-16 h-16 rounded-full border-4 border-[#FF5C00]/20 flex items-center justify-center">
-                    <Wifi size={24} className="text-[#FF5C00]" />
+                  <div className="w-16 h-16 rounded-full border-4 border-[#FF5500]/20 flex items-center justify-center">
+                    <Wifi size={24} className="text-[#FF5500]" />
                   </div>
                 </div>
               </div>
@@ -475,8 +475,8 @@ export default function EventDetailPage() {
                 <div className="divide-y divide-[color:var(--app-border)]">
                   {registrations.map((reg) => (
                     <div key={reg.id} className="flex items-center gap-4 p-4">
-                      <div className="w-9 h-9 rounded-full bg-[#FF5C00]/10 flex items-center justify-center shrink-0">
-                        <span className="text-[11px] font-black text-[#FF5C00]">
+                      <div className="w-9 h-9 rounded-full bg-[#FF5500]/10 flex items-center justify-center shrink-0">
+                        <span className="text-[11px] font-black text-[#FF5500]">
                           {membreInitials(reg.membre_profiles)}
                         </span>
                       </div>
@@ -568,7 +568,7 @@ export default function EventDetailPage() {
                     a.download = `checkin-${event.title.replace(/\s+/g, "-").toLowerCase()}.svg`;
                     a.click();
                   }}
-                  className="flex items-center gap-2 w-full justify-center px-6 py-3 rounded-full bg-black text-white text-[11px] font-black uppercase tracking-widest hover:bg-[#FF5C00] transition-all"
+                  className="flex items-center gap-2 w-full justify-center px-6 py-3 rounded-full bg-black text-white text-[11px] font-black uppercase tracking-widest hover:bg-[#FF5500] transition-all"
                 >
                   <Download size={13} />
                   Télécharger le QR Code

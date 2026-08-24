@@ -23,7 +23,7 @@ export async function sendCopiloteBriefEmail(
   const items = alerts
     .map((a) => {
       const cta = a.cta_href
-        ? `<div style="margin-top:6px;"><a href="${SITE}${a.cta_href}" style="color:#ff5c00;font-size:13px;font-weight:700;text-decoration:none;">${a.cta_label || "Ouvrir"} →</a></div>`
+        ? `<div style="margin-top:6px;"><a href="${SITE}${a.cta_href}" style="color:#FF5500;font-size:13px;font-weight:700;text-decoration:none;">${a.cta_label || "Ouvrir"} →</a></div>`
         : "";
       return `<div style="padding:14px 16px;background:#faf9f5;border:1px solid #ecece4;border-radius:14px;margin-bottom:10px;">
         <div style="color:#1a1918;font-size:14px;font-weight:700;">${a.title}</div>
@@ -44,7 +44,7 @@ export async function sendCopiloteBriefEmail(
         <div style="padding:24px 28px;">
           <p style="color:#1a1918;font-size:14px;line-height:1.5;margin:0 0 16px;">Voilà ce qui mérite ton attention :</p>
           ${items}
-          <a href="${SITE}/dashboard" style="display:inline-block;margin-top:8px;background:#ff5c00;color:#ffffff;font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:1px;text-decoration:none;padding:12px 22px;border-radius:12px;">Ouvrir mon tableau de bord</a>
+          <a href="${SITE}/dashboard" style="display:inline-block;margin-top:8px;background:#FF5500;color:#ffffff;font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:1px;text-decoration:none;padding:12px 22px;border-radius:12px;">Ouvrir mon tableau de bord</a>
         </div>
       </div>
       <p style="color:#9c9c94;font-size:11px;text-align:center;margin:16px 0 0;">Tu peux régler la fréquence (quotidien / hebdo / jamais) dans tes réglages.</p>

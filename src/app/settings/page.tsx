@@ -182,7 +182,7 @@ export default function SettingsPage() {
       {/* ── SECTION 1 : IDENTITÉ DU CLUB & PAGE PUBLIQUE ── */}
       <form onSubmit={handleSaveIdentity} className="bg-[var(--app-surface)] border border-[color:var(--app-border)] rounded-[28px] p-6 sm:p-8 shadow-sm space-y-6">
         <div className="flex items-center gap-3 border-b border-[color:var(--app-border)] pb-4">
-          <span className="w-10 h-10 rounded-2xl bg-[#FF5C00]/10 flex items-center justify-center text-[#FF5C00]">
+          <span className="w-10 h-10 rounded-2xl bg-[#FF5500]/10 flex items-center justify-center text-[#FF5500]">
             <Building2 size={20} />
           </span>
           <div>
@@ -199,13 +199,13 @@ export default function SettingsPage() {
         <div className="flex items-center gap-5">
           <div 
             onClick={() => fileInputRef.current?.click()}
-            className="relative w-20 h-20 rounded-2xl bg-[var(--app-surface-2)] border-2 border-dashed border-[color:var(--app-border)] hover:border-[#FF5C00] flex items-center justify-center cursor-pointer overflow-hidden transition-colors group shrink-0"
+            className="relative w-20 h-20 rounded-2xl bg-[var(--app-surface-2)] border-2 border-dashed border-[color:var(--app-border)] hover:border-[#FF5500] flex items-center justify-center cursor-pointer overflow-hidden transition-colors group shrink-0"
           >
             {logoUrl ? (
               <img src={logoUrl} alt="Logo" className="w-full h-full object-cover" />
             ) : (
               <div className="text-center p-2">
-                <Upload size={18} className="mx-auto text-[color:var(--app-text-muted)] group-hover:text-[#FF5C00] transition-colors" />
+                <Upload size={18} className="mx-auto text-[color:var(--app-text-muted)] group-hover:text-[#FF5500] transition-colors" />
                 <span className="text-[9px] font-bold text-[color:var(--app-text-muted)] block mt-1 uppercase">Logo</span>
               </div>
             )}
@@ -233,7 +233,7 @@ export default function SettingsPage() {
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="text-xs font-bold text-[#FF5C00] hover:underline cursor-pointer"
+              className="text-xs font-bold text-[#FF5500] hover:underline cursor-pointer"
             >
               Changer l&apos;image →
             </button>
@@ -252,7 +252,7 @@ export default function SettingsPage() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Ex: DIAWARA CLUB"
-              className="w-full h-11 px-4 rounded-xl bg-[var(--app-surface-2)] text-xs font-extrabold text-[color:var(--app-text)] outline-none focus:ring-1 focus:ring-[#FF5C00]"
+              className="w-full h-11 px-4 rounded-xl bg-[var(--app-surface-2)] text-xs font-extrabold text-[color:var(--app-text)] outline-none focus:ring-1 focus:ring-[#FF5500]"
             />
           </div>
 
@@ -265,7 +265,7 @@ export default function SettingsPage() {
               value={city}
               onChange={(e) => setCity(e.target.value)}
               placeholder="Ex: Paris 10ème, Lyon, Bordeaux..."
-              className="w-full h-11 px-4 rounded-xl bg-[var(--app-surface-2)] text-xs font-medium text-[color:var(--app-text)] outline-none focus:ring-1 focus:ring-[#FF5C00]"
+              className="w-full h-11 px-4 rounded-xl bg-[var(--app-surface-2)] text-xs font-medium text-[color:var(--app-text)] outline-none focus:ring-1 focus:ring-[#FF5500]"
             />
           </div>
         </div>
@@ -279,7 +279,7 @@ export default function SettingsPage() {
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Ex: Runs tous les mardis et jeudis à 19h. Ambiance bienveillante, tous niveaux bienvenus !"
-            className="w-full p-3 rounded-xl bg-[var(--app-surface-2)] text-xs font-medium text-[color:var(--app-text)] outline-none focus:ring-1 focus:ring-[#FF5C00] resize-none"
+            className="w-full p-3 rounded-xl bg-[var(--app-surface-2)] text-xs font-medium text-[color:var(--app-text)] outline-none focus:ring-1 focus:ring-[#FF5500] resize-none"
           />
         </div>
 
@@ -287,7 +287,7 @@ export default function SettingsPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-[color:var(--app-border)]">
           <div className="space-y-1.5">
             <label className="text-[10px] font-black uppercase tracking-widest text-[color:var(--app-text-muted)] flex items-center gap-1.5">
-              <Instagram size={12} className="text-[#FF5C00]" />
+              <Instagram size={12} className="text-[#FF5500]" />
               Lien ou Compte Instagram
             </label>
             <input
@@ -295,7 +295,7 @@ export default function SettingsPage() {
               value={instagramUrl}
               onChange={(e) => setInstagramUrl(e.target.value)}
               placeholder="https://instagram.com/diawaraclub"
-              className="w-full h-11 px-4 rounded-xl bg-[var(--app-surface-2)] text-xs font-medium text-[color:var(--app-text)] outline-none focus:ring-1 focus:ring-[#FF5C00]"
+              className="w-full h-11 px-4 rounded-xl bg-[var(--app-surface-2)] text-xs font-medium text-[color:var(--app-text)] outline-none focus:ring-1 focus:ring-[#FF5500]"
             />
           </div>
 
@@ -309,14 +309,14 @@ export default function SettingsPage() {
               value={whatsappLink}
               onChange={(e) => setWhatsappLink(e.target.value)}
               placeholder="https://chat.whatsapp.com/..."
-              className="w-full h-11 px-4 rounded-xl bg-[var(--app-surface-2)] text-xs font-medium text-[color:var(--app-text)] outline-none focus:ring-1 focus:ring-[#FF5C00]"
+              className="w-full h-11 px-4 rounded-xl bg-[var(--app-surface-2)] text-xs font-medium text-[color:var(--app-text)] outline-none focus:ring-1 focus:ring-[#FF5500]"
             />
           </div>
         </div>
 
         {/* Public Join Link Card */}
-        <div className="bg-[#FF5C00]/[0.06] border border-[#FF5C00]/20 rounded-2xl p-4.5 space-y-2">
-          <p className="text-[10px] font-black uppercase tracking-widest text-[#FF5C00]">
+        <div className="bg-[#FF5500]/[0.06] border border-[#FF5500]/20 rounded-2xl p-4.5 space-y-2">
+          <p className="text-[10px] font-black uppercase tracking-widest text-[#FF5500]">
             🔗 Ton Lien Public d&apos;Adhésion
           </p>
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
@@ -326,7 +326,7 @@ export default function SettingsPage() {
             <button
               type="button"
               onClick={copyJoinUrl}
-              className="h-10 px-4 rounded-xl bg-[var(--app-surface)] border border-[color:var(--app-border)] text-xs font-bold text-[color:var(--app-text)] hover:border-[#FF5C00] transition-colors flex items-center justify-center gap-1.5 cursor-pointer shrink-0"
+              className="h-10 px-4 rounded-xl bg-[var(--app-surface)] border border-[color:var(--app-border)] text-xs font-bold text-[color:var(--app-text)] hover:border-[#FF5500] transition-colors flex items-center justify-center gap-1.5 cursor-pointer shrink-0"
             >
               {copied ? <CheckCheck size={14} className="text-[#22C55E]" /> : <Copy size={14} />}
               {copied ? "Lien copié !" : "Copier le lien"}
@@ -335,7 +335,7 @@ export default function SettingsPage() {
               href={joinUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="h-10 px-3.5 rounded-xl bg-[#FF5C00] text-white text-xs font-black uppercase tracking-wider hover:bg-[#E04B00] transition-colors flex items-center justify-center gap-1.5 shrink-0"
+              className="h-10 px-3.5 rounded-xl bg-[#FF5500] text-white text-xs font-black uppercase tracking-wider hover:bg-[#E04B00] transition-colors flex items-center justify-center gap-1.5 shrink-0"
             >
               <ExternalLink size={13} />
               Aperçu
@@ -432,9 +432,9 @@ export default function SettingsPage() {
 
           <a
             href="mailto:info.captenfr@gmail.com?subject=Assistance%20Capitaine%20CAPTEN"
-            className="p-5 rounded-2xl bg-[var(--app-surface-2)] border border-[color:var(--app-border)] hover:border-[#FF5C00] transition-colors flex items-start gap-3.5 group"
+            className="p-5 rounded-2xl bg-[var(--app-surface-2)] border border-[color:var(--app-border)] hover:border-[#FF5500] transition-colors flex items-start gap-3.5 group"
           >
-            <Mail className="w-6 h-6 text-[#FF5C00] shrink-0 mt-0.5" />
+            <Mail className="w-6 h-6 text-[#FF5500] shrink-0 mt-0.5" />
             <div>
               <p className="text-xs font-black uppercase text-[color:var(--app-text)]">
                 Support par Email
@@ -442,7 +442,7 @@ export default function SettingsPage() {
               <p className="text-[11px] text-[color:var(--app-text-muted)] mt-0.5">
                 info.captenfr@gmail.com (réponse sous 24h).
               </p>
-              <span className="inline-flex items-center gap-1 text-xs font-extrabold text-[#FF5C00] mt-2 group-hover:translate-x-0.5 transition-transform">
+              <span className="inline-flex items-center gap-1 text-xs font-extrabold text-[#FF5500] mt-2 group-hover:translate-x-0.5 transition-transform">
                 Envoyer un email →
               </span>
             </div>
@@ -468,7 +468,7 @@ export default function SettingsPage() {
                       {item.q}
                     </span>
                     {isOpen ? (
-                      <ChevronUp size={16} className="text-[#FF5C00] shrink-0" />
+                      <ChevronUp size={16} className="text-[#FF5500] shrink-0" />
                     ) : (
                       <ChevronDown size={16} className="text-neutral-400 shrink-0" />
                     )}

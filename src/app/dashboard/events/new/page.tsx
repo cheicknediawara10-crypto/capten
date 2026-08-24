@@ -113,7 +113,7 @@ export default function NewEventPage() {
               value={form.title}
               onChange={(e) => update("title", e.target.value)}
               placeholder="Run & Chill #42 — République"
-              className="w-full h-11 px-4 rounded-[12px] border border-[color:var(--app-border)] text-sm font-medium focus:border-[#FF5C00] focus:ring-2 focus:ring-[#FF5C00]/20 outline-none transition-all"
+              className="w-full h-11 px-4 rounded-[12px] border border-[color:var(--app-border)] text-sm font-medium focus:border-[#FF5500] focus:ring-2 focus:ring-[#FF5500]/20 outline-none transition-all"
             />
           </div>
 
@@ -126,7 +126,7 @@ export default function NewEventPage() {
               onChange={(e) => update("description", e.target.value)}
               placeholder="Détails, niveau requis, équipement…"
               rows={3}
-              className="w-full px-4 py-3 rounded-[12px] border border-[color:var(--app-border)] text-sm font-medium focus:border-[#FF5C00] focus:ring-2 focus:ring-[#FF5C00]/20 outline-none transition-all resize-none"
+              className="w-full px-4 py-3 rounded-[12px] border border-[color:var(--app-border)] text-sm font-medium focus:border-[#FF5500] focus:ring-2 focus:ring-[#FF5500]/20 outline-none transition-all resize-none"
             />
           </div>
         </motion.div>
@@ -139,7 +139,7 @@ export default function NewEventPage() {
           className="bg-[var(--app-surface)] rounded-[24px] border border-[color:var(--app-border)] p-6 space-y-4"
         >
           <div className="flex items-center justify-between">
-            <h2 className="text-[11px] font-black uppercase tracking-widest text-[#FF5C00] flex items-center gap-1.5">
+            <h2 className="text-[11px] font-black uppercase tracking-widest text-[#FF5500] flex items-center gap-1.5">
               <Luggage size={14} /> Infos Pratiques (Anti-Stress Coureurs)
             </h2>
             <span className="text-[10px] font-bold text-[color:var(--app-text-muted)] uppercase tracking-wider">
@@ -160,7 +160,7 @@ export default function NewEventPage() {
               value={form.bag_drop}
               onChange={(e) => update("bag_drop", e.target.value)}
               placeholder="Ex : Consigne possible au Café du coin · ou : Venir en tenue"
-              className="w-full h-11 px-4 rounded-[12px] border border-[color:var(--app-border)] text-sm font-medium focus:border-[#FF5C00] focus:ring-2 focus:ring-[#FF5C00]/20 outline-none transition-all"
+              className="w-full h-11 px-4 rounded-[12px] border border-[color:var(--app-border)] text-sm font-medium focus:border-[#FF5500] focus:ring-2 focus:ring-[#FF5500]/20 outline-none transition-all"
             />
             <div className="flex flex-wrap gap-1.5 pt-1">
               {["Consigne possible au QG / café", "Pas de consigne (venir en tenue)"].map((p) => (
@@ -168,7 +168,7 @@ export default function NewEventPage() {
                   key={p}
                   type="button"
                   onClick={() => update("bag_drop", p)}
-                  className="px-2.5 py-1 rounded-full text-[10.5px] font-semibold bg-[var(--app-surface-2)] text-[color:var(--app-text-muted)] hover:text-[color:var(--app-text)] hover:border-[#FF5C00] border border-[color:var(--app-border)] transition-all"
+                  className="px-2.5 py-1 rounded-full text-[10.5px] font-semibold bg-[var(--app-surface-2)] text-[color:var(--app-text-muted)] hover:text-[color:var(--app-text)] hover:border-[#FF5500] border border-[color:var(--app-border)] transition-all"
                 >
                   {p}
                 </button>
@@ -187,7 +187,7 @@ export default function NewEventPage() {
               value={form.pace}
               onChange={(e) => update("pace", e.target.value)}
               placeholder="Ex : Sas 1 (5:00/km) · Sas 2 (5:45/km) · Sas 3 (6:30/km) · Débutants"
-              className="w-full h-11 px-4 rounded-[12px] border border-[color:var(--app-border)] text-sm font-medium focus:border-[#FF5C00] focus:ring-2 focus:ring-[#FF5C00]/20 outline-none transition-all"
+              className="w-full h-11 px-4 rounded-[12px] border border-[color:var(--app-border)] text-sm font-medium focus:border-[#FF5500] focus:ring-2 focus:ring-[#FF5500]/20 outline-none transition-all"
             />
             <div className="flex flex-wrap gap-1.5 pt-1">
               {[
@@ -200,7 +200,7 @@ export default function NewEventPage() {
                   key={p}
                   type="button"
                   onClick={() => update("pace", p)}
-                  className="px-2.5 py-1 rounded-full text-[10.5px] font-semibold bg-[var(--app-surface-2)] text-[color:var(--app-text-muted)] hover:text-[color:var(--app-text)] hover:border-[#FF5C00] border border-[color:var(--app-border)] transition-all"
+                  className="px-2.5 py-1 rounded-full text-[10.5px] font-semibold bg-[var(--app-surface-2)] text-[color:var(--app-text-muted)] hover:text-[color:var(--app-text)] hover:border-[#FF5500] border border-[color:var(--app-border)] transition-all"
                 >
                   {p}
                 </button>
@@ -248,7 +248,7 @@ export default function NewEventPage() {
               value={form.after_run}
               onChange={(e) => update("after_run", e.target.value)}
               placeholder="Ex : Verre / café au Spot du Crew après les étirements"
-              className="w-full h-11 px-4 rounded-[12px] border border-[color:var(--app-border)] text-sm font-medium focus:border-[#FF5C00] focus:ring-2 focus:ring-[#FF5C00]/20 outline-none transition-all"
+              className="w-full h-11 px-4 rounded-[12px] border border-[color:var(--app-border)] text-sm font-medium focus:border-[#FF5500] focus:ring-2 focus:ring-[#FF5500]/20 outline-none transition-all"
             />
             <div className="flex flex-wrap gap-1.5 pt-1">
               {["Verre & étirements au Spot du Crew", "Café / boisson partagée", "Pas d'after (juste la session)"].map((p) => (
@@ -256,7 +256,7 @@ export default function NewEventPage() {
                   key={p}
                   type="button"
                   onClick={() => update("after_run", p)}
-                  className="px-2.5 py-1 rounded-full text-[10.5px] font-semibold bg-[var(--app-surface-2)] text-[color:var(--app-text-muted)] hover:text-[color:var(--app-text)] hover:border-[#FF5C00] border border-[color:var(--app-border)] transition-all"
+                  className="px-2.5 py-1 rounded-full text-[10.5px] font-semibold bg-[var(--app-surface-2)] text-[color:var(--app-text-muted)] hover:text-[color:var(--app-text)] hover:border-[#FF5500] border border-[color:var(--app-border)] transition-all"
                 >
                   {p}
                 </button>
@@ -286,7 +286,7 @@ export default function NewEventPage() {
                 value={form.event_date}
                 onChange={(e) => update("event_date", e.target.value)}
                 min={new Date().toISOString().split("T")[0]}
-                className="w-full h-11 px-4 rounded-[12px] border border-[color:var(--app-border)] text-sm font-medium focus:border-[#FF5C00] focus:ring-2 focus:ring-[#FF5C00]/20 outline-none transition-all"
+                className="w-full h-11 px-4 rounded-[12px] border border-[color:var(--app-border)] text-sm font-medium focus:border-[#FF5500] focus:ring-2 focus:ring-[#FF5500]/20 outline-none transition-all"
               />
             </div>
             <div className="space-y-1">
@@ -298,7 +298,7 @@ export default function NewEventPage() {
                 type="time"
                 value={form.event_time}
                 onChange={(e) => update("event_time", e.target.value)}
-                className="w-full h-11 px-4 rounded-[12px] border border-[color:var(--app-border)] text-sm font-medium focus:border-[#FF5C00] focus:ring-2 focus:ring-[#FF5C00]/20 outline-none transition-all"
+                className="w-full h-11 px-4 rounded-[12px] border border-[color:var(--app-border)] text-sm font-medium focus:border-[#FF5500] focus:ring-2 focus:ring-[#FF5500]/20 outline-none transition-all"
               />
             </div>
           </div>
@@ -325,12 +325,12 @@ export default function NewEventPage() {
               value={form.meeting_point_address}
               onChange={(e) => update("meeting_point_address", e.target.value)}
               placeholder="Place de la République, Paris"
-              className="w-full h-11 px-4 rounded-[12px] border border-[color:var(--app-border)] text-sm font-medium focus:border-[#FF5C00] focus:ring-2 focus:ring-[#FF5C00]/20 outline-none transition-all"
+              className="w-full h-11 px-4 rounded-[12px] border border-[color:var(--app-border)] text-sm font-medium focus:border-[#FF5500] focus:ring-2 focus:ring-[#FF5500]/20 outline-none transition-all"
             />
           </div>
 
           <p className="text-[12px] text-[color:var(--app-text-muted)] leading-snug flex items-start gap-1.5">
-            <MapPin size={13} className="text-[#FF5C00] shrink-0 mt-0.5" />
+            <MapPin size={13} className="text-[#FF5500] shrink-0 mt-0.5" />
             L&apos;adresse suffit — Capten géolocalise le point tout seul pour le check-in GPS de tes coureurs.
           </p>
         </motion.div>
@@ -357,7 +357,7 @@ export default function NewEventPage() {
               onChange={(e) => update("max_participants", e.target.value)}
               placeholder="50"
               min="1"
-              className="w-full h-11 px-4 rounded-[12px] border border-[color:var(--app-border)] text-sm font-medium focus:border-[#FF5C00] focus:ring-2 focus:ring-[#FF5C00]/20 outline-none transition-all"
+              className="w-full h-11 px-4 rounded-[12px] border border-[color:var(--app-border)] text-sm font-medium focus:border-[#FF5500] focus:ring-2 focus:ring-[#FF5500]/20 outline-none transition-all"
             />
           </div>
 
@@ -372,7 +372,7 @@ export default function NewEventPage() {
               placeholder="ex: 8"
               min="0"
               step="0.1"
-              className="w-full h-11 px-4 rounded-[12px] border border-[color:var(--app-border)] text-sm font-medium focus:border-[#FF5C00] focus:ring-2 focus:ring-[#FF5C00]/20 outline-none transition-all"
+              className="w-full h-11 px-4 rounded-[12px] border border-[color:var(--app-border)] text-sm font-medium focus:border-[#FF5500] focus:ring-2 focus:ring-[#FF5500]/20 outline-none transition-all"
             />
           </div>
 
@@ -381,7 +381,7 @@ export default function NewEventPage() {
               type="button"
               onClick={() => update("is_recurring", !form.is_recurring)}
               className={`w-10 h-6 rounded-full transition-all relative ${
-                form.is_recurring ? "bg-[#FF5C00]" : "bg-[var(--app-surface-2)]"
+                form.is_recurring ? "bg-[#FF5500]" : "bg-[var(--app-surface-2)]"
               }`}
             >
               <span
@@ -397,7 +397,7 @@ export default function NewEventPage() {
           </div>
           {form.is_recurring && (
             <p className="text-[12px] text-[color:var(--app-text-muted)] leading-snug flex items-start gap-1.5 -mt-1">
-              <Repeat size={13} className="text-[#FF5C00] shrink-0 mt-0.5" />
+              <Repeat size={13} className="text-[#FF5500] shrink-0 mt-0.5" />
               Capten recréera ce run <b className="text-[color:var(--app-text)]">automatiquement chaque semaine</b> (même jour, même heure) — tu n'as plus rien à faire.
             </p>
           )}
@@ -409,7 +409,7 @@ export default function NewEventPage() {
         <button
           onClick={() => submit("draft")}
           disabled={saving || publishing}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-[color:var(--app-border)] text-[11px] font-black uppercase tracking-widest text-[color:var(--app-text-muted)] hover:border-[#FF5C00] hover:text-[color:var(--app-text)] transition-all disabled:opacity-50"
+          className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-[color:var(--app-border)] text-[11px] font-black uppercase tracking-widest text-[color:var(--app-text-muted)] hover:border-[#FF5500] hover:text-[color:var(--app-text)] transition-all disabled:opacity-50"
         >
           {saving ? <Loader2 size={13} className="animate-spin" /> : <Save size={13} />}
           Brouillon
@@ -417,7 +417,7 @@ export default function NewEventPage() {
         <button
           onClick={() => submit("published")}
           disabled={saving || publishing || !form.title}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#FF5C00] text-white text-[11px] font-black uppercase tracking-widest hover:bg-[#E04B00] transition-all active:scale-95 disabled:opacity-50"
+          className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#FF5500] text-white text-[11px] font-black uppercase tracking-widest hover:bg-[#E04B00] transition-all active:scale-95 disabled:opacity-50"
         >
           {publishing ? <Loader2 size={13} className="animate-spin" /> : <Send size={13} />}
           Publier

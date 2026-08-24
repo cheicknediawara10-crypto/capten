@@ -45,8 +45,8 @@
   --app-text-muted: #8A8880;
   --app-border:     rgba(0,0,0,0.06);
   --app-hover:      #FAFAF8;
-  --app-accent:     #FF5C00;
-  --app-accent-soft: rgba(255,92,0,0.08);
+  --app-accent:     #FF5500;
+  --app-accent-soft: rgba(255,85,0,0.08);
 }
 
 /* ─── Thème sombre PREMIUM (Whoop/Runna) — défaut de l'espace fondateur ─── */
