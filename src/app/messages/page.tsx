@@ -1160,6 +1160,9 @@ export default function MessagesPage() {
       }
     }
     fetchWeather();
+    // On dépend des champs primitifs utilisés (id + location), pas de l'objet
+    // selectedRun entier — pattern correct pour éviter un refetch à chaque render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedRun?.id, selectedRun?.location]);
 
   // Compute next upcoming run date text

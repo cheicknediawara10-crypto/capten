@@ -226,6 +226,10 @@ export default function PlanPage() {
           setSelectedPlan(null);
         });
     }
+    // Effet one-shot au retour de Stripe : refreshClub() (contexte, non mémoïsé)
+    // n'est volontairement PAS dans les deps — l'ajouter relancerait la
+    // vérification de paiement à chaque render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [billingInterval]);
 
   const handleUpgradePlan = async (plan: any) => {
