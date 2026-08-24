@@ -1,9 +1,14 @@
 import { NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
-import { getSupabaseAdmin } from '@/lib/supabase';
 
 export const dynamic = 'force-dynamic';
 
+/**
+ * Route de vérification en lecture seule de la session de paiement Stripe.
+ * N'effectue aucune écriture en base de données.
+ * Les écritures et l'activation des abonnements sont exclusivement gérées
+ * par le webhook cryptographiquement signé (/api/webhooks/stripe).
+ */
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -22,29 +27,6 @@ export async function GET(request: Request) {
     // Pour les abonnements avec période d'essai, payment_status = 'no_payment_required'
     // Pour les paiements classiques, payment_status = 'paid'
     const verified = session.payment_status === 'paid' || session.payment_status === 'no_payment_required';
-
-    // Si le paiement est vérifié et concerne un plan, on met à jour le profil du club
-    if (verified && session.metadata?.type === 'plan' && session.metadata?.planName) {
-      const planName = session.metadata.planName;
-      const clubId = session.metadata.clubId;
-      
-      const supabase = getSupabaseAdmin();
-      if (supabase && clubId && clubId !== 'demo-captain-id') {
-        const { error: updateError } = await supabase
-          .from('clubs')
-          .update({
-            stripe_plan: planName,
-            stripe_subscription_status: 'active'
-          })
-          .eq('id', clubId);
-
-        if (updateError) {
-          console.error('[Stripe Verify Hook Error] Failed updating club plan:', updateError);
-        } else {
-          console.log(`[Stripe Verify Hook Success] Club ${clubId} upgraded to ${planName}`);
-        }
-      }
-    }
 
     return NextResponse.json({
       verified,
