@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Instagram } from "lucide-react";
 
 export function Footer() {
@@ -11,7 +12,7 @@ export function Footer() {
         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-8">
           {/* Logo */}
           <Link href="/">
-            <img src="/logo.png" alt="CAPTEN" className="h-7 w-auto" />
+            <Image src="/logo.png" alt="CAPTEN" width={98} height={28} className="h-7 w-auto" />
           </Link>
 
           {/* Columns */}

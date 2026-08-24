@@ -56,7 +56,7 @@ export function Pricing() {
             className="text-[#6B6A6A] max-w-lg mx-auto leading-snug"
             style={{ fontSize: "20px", fontWeight: 500, letterSpacing: "-0.4px" }}
           >
-            Commence gratuitement jusqu'à ton Aha Moment, passe Pro quand tu es prêt.
+            Commence gratuitement jusqu&apos;à ton Aha Moment, passe Pro quand tu es prêt.
           </p>
         </motion.div>
 

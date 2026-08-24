@@ -203,7 +203,7 @@ export default function CopiloteAssist({ preview = false }: { preview?: boolean 
           <Sparkles size={12} className="text-[#FF5C00]" /> Suggestions instantanées
         </span>
         <span className="text-[10px] font-mono text-[color:var(--app-text-muted)]">
-          {used}/{limit} aujourd'hui
+          {used}/{limit} aujourd&apos;hui
         </span>
       </div>
 
@@ -264,7 +264,7 @@ export default function CopiloteAssist({ preview = false }: { preview?: boolean 
                 Prêt pour ton groupe WhatsApp
               </span>
             </div>
-            <span className="text-[10px] text-black/50 dark:text-white/50 font-medium">À l'instant</span>
+            <span className="text-[10px] text-black/50 dark:text-white/50 font-medium">À l&apos;instant</span>
           </div>
 
           {/* Corps du message */}

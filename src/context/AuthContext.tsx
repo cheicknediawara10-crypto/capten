@@ -57,7 +57,7 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
   const [isLoading, setIsLoading] = useState(true);
   const [isMock, setIsMock] = useState(true);
 
-  const fetchClub = async (userId: string, supabase: any) => {
+  const fetchClub = React.useCallback(async (userId: string, supabase: any) => {
     try {
       const { data, error } = await supabase
         .from('clubs')
@@ -132,9 +132,9 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
     } catch (e) {
       console.error('Error in fetchClub:', e);
     }
-  };
+  }, []);
 
-  const loadSession = async () => {
+  const loadSession = React.useCallback(async () => {
     const supabase = getSupabase();
     if (!supabase) {
       // Mock Fallback session
@@ -226,7 +226,7 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [fetchClub]);
 
   useEffect(() => {
     loadSession();
@@ -248,7 +248,7 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
         subscription.unsubscribe();
       };
     }
-  }, []);
+  }, [loadSession, fetchClub]);
 
   const refreshClub = async () => {
     const supabase = getSupabase();

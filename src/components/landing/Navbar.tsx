@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -29,7 +30,7 @@ export function Navbar() {
 
         {/* Logo */}
         <Link href="/" className="shrink-0 flex items-center">
-          <img src="/logo.png" alt="CAPTEN" className="h-6 w-auto" />
+          <Image src="/logo.png" alt="CAPTEN" width={90} height={24} className="h-6 w-auto" priority />
         </Link>
 
         {/* Desktop nav */}

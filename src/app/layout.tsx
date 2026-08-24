@@ -21,6 +21,7 @@ const dmMono = DM_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://capten.app"),
   title: "Capten — La plateforme des communautés sportives locales",
   description: "Capten — Run clubs, walk clubs, groupes de trail. Gérez votre crew, protégez vos membres et générez des revenus.",
   manifest: "/manifest.json",

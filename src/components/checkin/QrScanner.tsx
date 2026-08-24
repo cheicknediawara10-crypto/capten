@@ -9,6 +9,11 @@ interface Props {
 export default function QrScanner({ onScan }: Props) {
   const divRef = useRef<HTMLDivElement>(null);
   const scannerRef = useRef<any>(null);
+  const onScanRef = useRef(onScan);
+
+  useEffect(() => {
+    onScanRef.current = onScan;
+  }, [onScan]);
 
   useEffect(() => {
     if (!divRef.current) return;
@@ -21,7 +26,7 @@ export default function QrScanner({ onScan }: Props) {
         { facingMode: "environment" },
         { fps: 10, qrbox: { width: 220, height: 220 } },
         (decodedText) => {
-          onScan(decodedText);
+          onScanRef.current(decodedText);
           scanner.stop().catch(() => {});
         },
         () => {}

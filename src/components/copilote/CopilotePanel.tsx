@@ -138,7 +138,7 @@ export default function CopilotePanel({
         <div className="flex items-center gap-2 py-6 text-[color:var(--app-text-muted)] text-[13px]"><Loader2 size={16} className="animate-spin" /> Le Copilote regarde ton crew…</div>
       ) : alerts.length === 0 ? (
         <p className="text-[13px] text-[color:var(--app-text-muted)] py-4 leading-snug">
-          Tout roule. 🖤 Ton Copilote veille — je te préviens dès qu'il y a un truc à faire (nouveau membre, run à rappeler, story prête…).
+          Tout roule. 🖤 Ton Copilote veille — je te préviens dès qu&apos;il y a un truc à faire (nouveau membre, run à rappeler, story prête…).
         </p>
       ) : (
         <div className="space-y-2.5 mt-3">

@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { Star, Check } from "lucide-react";
 
@@ -104,12 +105,12 @@ export function Hero() {
             {/* Mini sidebar */}
             <div className="hidden sm:flex w-[164px] shrink-0 flex-col gap-1 bg-white border-r border-[#F0F0EC] py-5 px-3">
               <div className="flex items-center gap-2 px-2 mb-4">
-                <img src="/logo.png" alt="" className="h-5 w-auto" />
+                <Image src="/logo.png" alt="" width={70} height={20} className="h-5 w-auto" />
               </div>
               {[
-                { l: "Tableau de bord", active: true },
-                { l: "Membres" }, { l: "Les Runs" }, { l: "Statistiques" },
-                { l: "Les Spots" }, { l: "Protection" },
+                { l: "Dashboard", active: true },
+                { l: "Crew" }, { l: "Runs" }, { l: "Messages" },
+                { l: "Spots" }, { l: "Cagnotte" },
               ].map((i) => (
                 <div key={i.l} className={`flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-[11px] font-medium ${i.active ? "bg-[#FF5500]/[0.08] text-[#FF5500]" : "text-[#8A8880]"}`}>
                   <span className={`w-3.5 h-3.5 rounded ${i.active ? "bg-[#FF5500]/30" : "bg-[#E4E3DC]"}`} />

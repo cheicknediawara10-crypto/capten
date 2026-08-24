@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { Check, X } from "lucide-react";
 
@@ -131,10 +132,13 @@ export function WhyCapten() {
                 justifyContent: "center",
               }}
             >
-              <img
+              <Image
                 src="/logo.png"
                 alt="CAPTEN"
-                style={{ height: "38px", width: "auto", filter: "brightness(0) invert(1)" }}
+                width={120}
+                height={38}
+                className="h-[38px] w-auto brightness-0 invert"
+                priority
               />
             </div>
 
@@ -254,10 +258,12 @@ export function WhyCapten() {
         <div className="lg:hidden max-w-md mx-auto">
           <div style={{ background: "rgb(28,27,24)", borderRadius: "24px", boxShadow: SHADOW }} className="p-6">
             <div className="flex items-center justify-center mb-5">
-              <img
+              <Image
                 src="/logo.png"
                 alt="CAPTEN"
-                style={{ height: "34px", width: "auto", filter: "brightness(0) invert(1)" }}
+                width={110}
+                height={34}
+                className="h-[34px] w-auto brightness-0 invert"
               />
             </div>
             <ul className="space-y-3.5">

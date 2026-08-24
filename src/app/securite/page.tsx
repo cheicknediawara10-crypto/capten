@@ -28,7 +28,7 @@ export default function SecuritePage() {
           Protection
         </h1>
         <p className="text-[13px] text-[color:var(--app-text-muted)] font-sans mt-1">
-          Tes réflexes de sécurité et les contacts d'urgence de ton crew.
+          Tes réflexes de sécurité et les contacts d&apos;urgence de ton crew.
         </p>
       </div>
 
@@ -38,7 +38,7 @@ export default function SecuritePage() {
           <span className="w-9 h-9 rounded-xl bg-[#FF5C00] flex items-center justify-center">
             <Siren size={18} className="text-white" />
           </span>
-          <h2 className="text-[13px] font-black uppercase tracking-widest text-white">Numéros d'urgence</h2>
+          <h2 className="text-[13px] font-black uppercase tracking-widest text-white">Numéros d&apos;urgence</h2>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {emergencyLines.map((line, i) => {
@@ -83,7 +83,7 @@ export default function SecuritePage() {
       {/* Réglage */}
       <div className="bg-[var(--app-surface-2)] rounded-3xl px-5 py-4 flex items-center justify-between gap-4">
         <p className="text-[12px] text-[color:var(--app-text-muted)] leading-snug">
-          Personnalise les numéros d'urgence et le contact sécurité de ton crew dans les réglages.
+          Personnalise les numéros d&apos;urgence et le contact sécurité de ton crew dans les réglages.
         </p>
         <Link href="/settings"
           className="shrink-0 inline-flex items-center gap-1.5 h-9 px-4 rounded-full bg-[var(--app-surface)] border border-[color:var(--app-border)] text-[12px] font-bold text-[color:var(--app-text)] hover:border-[#FF5C00] hover:text-[#FF5C00] transition-colors">

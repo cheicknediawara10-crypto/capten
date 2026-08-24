@@ -14,6 +14,11 @@ export default function EventLocationPicker({ onSelect, initialLat = 48.8566, in
   const markerRef = useRef<any>(null);
   const [selected, setSelected] = useState<{ lat: number; lng: number } | null>(null);
 
+  const onSelectRef = useRef(onSelect);
+  useEffect(() => {
+    onSelectRef.current = onSelect;
+  }, [onSelect]);
+
   useEffect(() => {
     if (!mapRef.current || mapInstance.current) return;
 
@@ -69,7 +74,7 @@ export default function EventLocationPicker({ onSelect, initialLat = 48.8566, in
           }
         } catch {}
 
-        onSelect(lat, lng, address);
+        onSelectRef.current(lat, lng, address);
       });
 
       mapInstance.current = map;
@@ -84,7 +89,7 @@ export default function EventLocationPicker({ onSelect, initialLat = 48.8566, in
         mapInstance.current = null;
       }
     };
-  }, []);
+  }, [initialLat, initialLng]);
 
   return (
     <div className="space-y-2">
