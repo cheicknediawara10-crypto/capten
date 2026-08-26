@@ -34,11 +34,13 @@ export default function AppLayoutWrapper({ children }: AppLayoutWrapperProps) {
     cleanPath.startsWith("/mon-espace") ||
     // Pages membres publiques
     cleanPath.startsWith("/join/") ||
-    cleanPath.startsWith("/event/");
+    cleanPath.startsWith("/event/") ||
+    // Cockpit Staff terrain (sans sidebar admin)
+    cleanPath.startsWith("/staff");
 
   if (isPublicPage) {
     return (
-      <div className="min-h-screen bg-white text-[#0F172A] overflow-x-hidden selection:bg-[#FF5500]/20 selection:text-black">
+      <div className="min-h-screen overflow-x-hidden selection:bg-[#FF5500]/20 selection:text-black">
         {children}
       </div>
     );
