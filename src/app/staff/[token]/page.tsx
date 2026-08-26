@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Users, Check, Search, QrCode, ShieldAlert, Phone, AlertCircle, Loader2,
   CheckCircle2, X, RefreshCw, Sparkles, MapPin, Calendar, Camera, UserCheck,
-  ShieldCheck, Activity, ArrowUpRight
+  ShieldCheck, Activity, ArrowUpRight, Download, Maximize2, Share2, MessageCircle
 } from "lucide-react";
 import {
   getStaffCockpitContext,
@@ -15,7 +15,10 @@ import {
   staffGetRunnerIce,
 } from "@/lib/staff/actions";
 import { formatDateShort } from "@/lib/utils/format";
+import { getAppUrl } from "@/lib/domain";
 import dynamic from "next/dynamic";
+
+const QRCodeSVG = dynamic(() => import("qrcode.react").then((m) => ({ default: m.QRCodeSVG })), { ssr: false });
 
 const QrScanner = dynamic(() => import("@/components/checkin/QrScanner"), {
   ssr: false,
@@ -49,6 +52,8 @@ interface IceData {
   } | null;
 }
 
+type TabMode = "qrcode" | "list" | "scanner";
+
 export default function StaffCockpitPage() {
   const { token } = useParams<{ token: string }>();
 
@@ -58,7 +63,7 @@ export default function StaffCockpitPage() {
   const [members, setMembers] = useState<MemberItem[]>([]);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<"all" | "pending" | "checked">("all");
-  const [activeMode, setActiveMode] = useState<"list" | "scanner">("list");
+  const [activeMode, setActiveMode] = useState<TabMode>("qrcode");
 
   // Modal ICE
   const [iceModal, setIceModal] = useState<IceData | null>(null);
@@ -89,7 +94,6 @@ export default function StaffCockpitPage() {
   // 1-tap Manual Check-in
   async function handleManualCheckin(memberId: string) {
     setCheckingInId(memberId);
-    // Optimistic UI update
     setMembers((prev) =>
       prev.map((m) => (m.id === memberId ? { ...m, isCheckedIn: true, checkedInAt: new Date().toISOString() } : m))
     );
@@ -102,7 +106,7 @@ export default function StaffCockpitPage() {
     setCheckingInId(null);
   }
 
-  // Handle QR Scan
+  // Handle QR Scan (Camera)
   async function handleScan(scannedText: string) {
     if (!scannedText) return;
     const res = await staffScanQrCheckin(token, scannedText);
@@ -158,6 +162,7 @@ export default function StaffCockpitPage() {
   const checkedCount = members.filter((m) => m.isCheckedIn).length;
   const totalCount = members.length;
   const progressPercent = totalCount > 0 ? Math.round((checkedCount / totalCount) * 100) : 0;
+  const checkinPublicUrl = `${getAppUrl()}/checkin/${data.event.id}`;
 
   const filteredMembers = members.filter((m) => {
     const full = `${m.firstName} ${m.lastName} ${m.phone}`.toLowerCase();
@@ -169,14 +174,14 @@ export default function StaffCockpitPage() {
   });
 
   return (
-    <div className="min-h-screen bg-[#0C0C0E] text-white font-sans antialiased pb-24 selection:bg-[#FF5500] selection:text-white">
+    <div className="min-h-screen w-full bg-[#0C0C0E] text-white font-sans antialiased pb-24 selection:bg-[#FF5500] selection:text-white">
       
       {/* Glow Top Accent */}
       <div className="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-48 bg-[#FF5500]/10 blur-[100px] pointer-events-none -z-10" />
 
-      {/* Top Navigation & Context Bar */}
-      <header className="border-b border-white/[0.08] bg-[#121215]/80 backdrop-blur-xl sticky top-0 z-30">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-4">
+      {/* Top Header */}
+      <header className="border-b border-white/[0.08] bg-[#121215]/90 backdrop-blur-xl sticky top-0 z-30">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between gap-4">
           
           {/* Club Info */}
           <div className="flex items-center gap-3 min-w-0">
@@ -196,8 +201,8 @@ export default function StaffCockpitPage() {
                   <Sparkles size={9} /> {data.staffLabel || "Co-Capitaine"}
                 </span>
               </div>
-              <p className="text-[11px] text-white/50 truncate font-medium">
-                Accès Terrain Sécurisé · Zéro mot de passe
+              <p className="text-[10px] text-white/50 truncate font-medium">
+                Cockpit Terrain · Zéro mot de passe
               </p>
             </div>
           </div>
@@ -205,19 +210,20 @@ export default function StaffCockpitPage() {
           {/* Quick Refresh */}
           <button
             onClick={loadContext}
-            className="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-white/70 hover:text-white transition-colors border border-white/5"
+            className="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-white/70 hover:text-white transition-colors border border-white/5 flex items-center gap-1.5 text-xs font-bold"
             title="Rafraîchir les présences"
           >
-            <RefreshCw size={15} />
+            <RefreshCw size={13} />
+            <span className="hidden sm:inline">Actualiser</span>
           </button>
         </div>
       </header>
 
-      {/* Main Content Area */}
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 pt-6 space-y-6">
+      {/* Main Container */}
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 pt-5 space-y-5">
         
-        {/* Run Banner & Live Gauge Card */}
-        <div className="bg-gradient-to-b from-[#18181D] to-[#131317] border border-white/10 rounded-[28px] p-6 sm:p-7 shadow-2xl space-y-5">
+        {/* Run Banner & Live Gauge */}
+        <div className="bg-gradient-to-b from-[#18181D] to-[#131317] border border-white/10 rounded-[28px] p-5 sm:p-7 shadow-2xl space-y-5">
           
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="space-y-1.5">
@@ -242,7 +248,7 @@ export default function StaffCockpitPage() {
             </div>
 
             {/* Gauge Counter */}
-            <div className="flex items-center gap-4 bg-white/5 border border-white/10 p-4 rounded-2xl shrink-0">
+            <div className="flex items-center gap-4 bg-white/5 border border-white/10 p-3.5 sm:p-4 rounded-2xl shrink-0">
               <div className="text-right">
                 <p className="text-[10px] font-black uppercase tracking-widest text-white/50">Pointage en direct</p>
                 <p className="text-3xl font-display font-black italic text-white leading-none mt-0.5">
@@ -250,52 +256,140 @@ export default function StaffCockpitPage() {
                   <span className="text-white/40 text-xl font-normal"> / {totalCount}</span>
                 </p>
               </div>
-              <div className="w-12 h-12 rounded-xl bg-[#3DD68C]/10 border border-[#3DD68C]/30 flex items-center justify-center text-[#3DD68C]">
-                <Activity size={22} className="animate-pulse" />
+              <div className="w-11 h-11 rounded-xl bg-[#3DD68C]/10 border border-[#3DD68C]/30 flex items-center justify-center text-[#3DD68C]">
+                <Activity size={20} className="animate-pulse" />
               </div>
             </div>
           </div>
 
           {/* Progress Bar */}
           <div className="space-y-1.5 pt-1">
-            <div className="w-full h-2.5 rounded-full bg-white/10 overflow-hidden p-0.5">
+            <div className="w-full h-2 rounded-full bg-white/10 overflow-hidden p-0.5">
               <div
                 className="h-full rounded-full bg-gradient-to-r from-[#FF5500] to-[#3DD68C] transition-all duration-500"
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
-            <div className="flex justify-between text-[11px] text-white/50 font-bold uppercase tracking-wider">
-              <span>{checkedCount} coureur{checkedCount > 1 ? "s" : ""} présent{checkedCount > 1 ? "s" : ""}</span>
+            <div className="flex justify-between text-[10px] text-white/50 font-bold uppercase tracking-wider">
+              <span>{checkedCount} pointé{checkedCount > 1 ? "s" : ""}</span>
               <span>{progressPercent}% complété</span>
             </div>
           </div>
 
-          {/* Mode Switcher Buttons */}
-          <div className="grid grid-cols-2 gap-3 pt-2 border-t border-white/10">
+          {/* 3 Mode Switcher Tabs */}
+          <div className="grid grid-cols-3 gap-2 pt-2 border-t border-white/10">
+            
+            {/* Tab 1: Afficher le QR Code */}
+            <button
+              onClick={() => setActiveMode("qrcode")}
+              className={`h-12 rounded-xl font-bold text-[11px] sm:text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 sm:gap-2 transition-all ${
+                activeMode === "qrcode"
+                  ? "bg-[#FF5500] text-white shadow-[0_4px_16px_rgba(255,85,0,0.35)] scale-[1.01]"
+                  : "bg-white/5 text-white/60 hover:text-white hover:bg-white/10 border border-white/5"
+              }`}
+            >
+              <QrCode size={16} />
+              <span>Afficher QR Code</span>
+            </button>
+
+            {/* Tab 2: Liste Coureurs */}
             <button
               onClick={() => setActiveMode("list")}
-              className={`h-12 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all ${
+              className={`h-12 rounded-xl font-bold text-[11px] sm:text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 sm:gap-2 transition-all ${
                 activeMode === "list"
                   ? "bg-[#FF5500] text-white shadow-[0_4px_16px_rgba(255,85,0,0.35)] scale-[1.01]"
                   : "bg-white/5 text-white/60 hover:text-white hover:bg-white/10 border border-white/5"
               }`}
             >
-              <Users size={16} /> Liste Coureurs ({totalCount})
+              <Users size={16} />
+              <span>Liste ({totalCount})</span>
             </button>
+
+            {/* Tab 3: Scanner Caméra */}
             <button
               onClick={() => setActiveMode("scanner")}
-              className={`h-12 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all ${
+              className={`h-12 rounded-xl font-bold text-[11px] sm:text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 sm:gap-2 transition-all ${
                 activeMode === "scanner"
                   ? "bg-[#FF5500] text-white shadow-[0_4px_16px_rgba(255,85,0,0.35)] scale-[1.01]"
                   : "bg-white/5 text-white/60 hover:text-white hover:bg-white/10 border border-white/5"
               }`}
             >
-              <QrCode size={16} /> Scanner QR Caméra
+              <Camera size={16} />
+              <span>Scanner Caméra</span>
             </button>
+
           </div>
         </div>
 
-        {/* ── MODE 1 : LISTE & RECHERCHE DES COUREURS ── */}
+        {/* ── TAB 1 : AFFICHER LE QR CODE GÉANT DU RUN ── */}
+        {activeMode === "qrcode" && (
+          <div className="bg-[#18181D] border border-white/10 rounded-[28px] p-6 sm:p-8 text-center space-y-6 shadow-xl">
+            
+            <div className="space-y-1">
+              <span className="px-3 py-1 rounded-full bg-[#FF5500]/10 text-[#FF5500] text-[10px] font-black uppercase tracking-widest border border-[#FF5500]/20">
+                Pointage Rapide au Départ
+              </span>
+              <h2 className="text-xl sm:text-2xl font-display font-black italic uppercase tracking-tight text-white pt-1">
+                Fais scanner ce QR Code aux coureurs
+              </h2>
+              <p className="text-xs text-white/60 max-w-md mx-auto">
+                Les coureurs ouvrent l&apos;appareil photo de leur smartphone, scannent ce QR code et leur présence est validée immédiatement !
+              </p>
+            </div>
+
+            {/* Plaque QR Code Blanche */}
+            <div className="inline-block p-6 sm:p-7 bg-white rounded-3xl shadow-2xl border-4 border-white/20">
+              <QRCodeSVG
+                value={checkinPublicUrl}
+                size={240}
+                fgColor="#1A1918"
+                bgColor="#FFFFFF"
+                level="H"
+                includeMargin={false}
+              />
+            </div>
+
+            {/* Lien Checkin */}
+            <div className="max-w-sm mx-auto space-y-2">
+              <p className="text-[11px] font-mono text-white/40 bg-white/5 py-2 px-3 rounded-xl border border-white/5 truncate">
+                {checkinPublicUrl}
+              </p>
+            </div>
+
+            {/* Boutons d'action QR Code */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+              <a
+                href={`https://wa.me/?text=${encodeURIComponent(
+                  `Lien de check-in pour « ${data.event.title} » : ${checkinPublicUrl} 🖤`
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full sm:w-auto h-11 px-5 rounded-xl bg-[#25D366] hover:bg-[#1EBE5D] text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-sm"
+              >
+                <MessageCircle size={15} /> Envoyer sur WhatsApp
+              </a>
+
+              <button
+                onClick={() => {
+                  const svg = document.querySelector("svg");
+                  if (!svg) return;
+                  const blob = new Blob([svg.outerHTML], { type: "image/svg+xml" });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement("a");
+                  a.href = url;
+                  a.download = `qrcode-${data.event.title.replace(/\s+/g, "-").toLowerCase()}.svg`;
+                  a.click();
+                }}
+                className="w-full sm:w-auto h-11 px-5 rounded-xl bg-white/10 hover:bg-white/15 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all border border-white/10"
+              >
+                <Download size={15} /> Télécharger le QR Code
+              </button>
+            </div>
+
+          </div>
+        )}
+
+        {/* ── TAB 2 : LISTE & RECHERCHE DES COUREURS ── */}
         {activeMode === "list" && (
           <div className="space-y-4">
             
@@ -434,12 +528,12 @@ export default function StaffCockpitPage() {
           </div>
         )}
 
-        {/* ── MODE 2 : SCANNER QR CAMÉRA ── */}
+        {/* ── TAB 3 : SCANNER AVEC LA CAMÉRA ── */}
         {activeMode === "scanner" && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             
             {/* Camera Frame */}
-            <div className="md:col-span-2 bg-[#18181D] border border-white/10 rounded-[28px] p-6 text-center space-y-4">
+            <div className="md:col-span-2 bg-[#18181D] border border-white/10 rounded-[28px] p-6 text-center space-y-4 shadow-xl">
               <div className="flex items-center justify-between">
                 <p className="text-xs font-black uppercase tracking-wider text-white flex items-center gap-2">
                   <Camera size={16} className="text-[#FF5500]" /> Scanner Caméra Actif
@@ -459,7 +553,7 @@ export default function StaffCockpitPage() {
             </div>
 
             {/* Recent Scans Feed */}
-            <div className="bg-[#18181D] border border-white/10 rounded-[28px] p-5 space-y-3 flex flex-col">
+            <div className="bg-[#18181D] border border-white/10 rounded-[28px] p-5 space-y-3 flex flex-col shadow-xl">
               <p className="text-xs font-black uppercase tracking-wider text-white/80 border-b border-white/10 pb-3">
                 Derniers Scans ({recentScans.length})
               </p>
