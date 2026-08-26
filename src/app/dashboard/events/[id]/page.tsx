@@ -6,7 +6,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft, Calendar, MapPin, Users, QrCode, CheckSquare, FileText, List,
   Download, Globe, Lock, Trash2, Loader2, Wifi, Megaphone, Camera, MessageCircle,
-  Luggage, Gauge, Coffee, Bell, Shield
+  Luggage, Gauge, Coffee, Bell, Shield, Sparkles, CreditCard, Link2, Check, Send,
+  UserCheck, UserX, AlertCircle, Phone, Mail, ExternalLink, ArrowUpRight
 } from "lucide-react";
 import Link from "next/link";
 import { formatDateShort } from "@/lib/utils/format";
@@ -16,10 +17,15 @@ import CrewVisualModal from "@/components/visuals/CrewVisualModal";
 import { hasProAccess } from "@/lib/plan-access";
 import { getAppUrl } from "@/lib/domain";
 import { getRunDetail, setRunStatus, deleteRun, setRunFlag, sendRunPushNotification } from "../actions";
+import {
+  validatePaymentByCaptain,
+  cancelInscriptionByCaptain,
+  promoteNextInWaitlist,
+} from "@/lib/evenements/actions";
 
 const QRCodeSVG = dynamic(() => import("qrcode.react").then((m) => ({ default: m.QRCodeSVG })), { ssr: false });
 
-type Tab = "details" | "registrations" | "checkins" | "qr";
+type Tab = "details" | "inscriptions" | "checkins" | "qr";
 
 const STATUS_LABELS: Record<string, { label: string; color: string; bg: string }> = {
   draft:     { label: "Brouillon",  color: "#F59E0B", bg: "rgba(245,158,11,0.14)" },
@@ -44,6 +50,28 @@ interface Event {
   distance_km: number | null;
   affiche_telechargee?: boolean;
   story_telechargee?: boolean;
+  is_evenement?: boolean;
+  jauge_max?: number | null;
+  prix?: number | null;
+  devise?: string;
+  lien_paiement?: string | null;
+  description_evenement?: string | null;
+}
+
+interface Inscription {
+  id: string;
+  event_id: string;
+  nom: string;
+  prenom: string;
+  email: string | null;
+  telephone: string | null;
+  statut_paiement: "en_attente" | "paye" | "rembourse";
+  position_liste_attente: number | null;
+  confirme_par_coureur: boolean;
+  confirme_par_fondateur: boolean;
+  expires_at: string | null;
+  promoted_at: string | null;
+  created_at: string;
 }
 
 interface MembreLite { first_name: string | null; last_name: string | null; phone: string | null }
@@ -51,11 +79,6 @@ const membreName = (m: MembreLite | null) =>
   [m?.first_name, m?.last_name].filter(Boolean).join(" ").trim();
 const membreInitials = (m: MembreLite | null) =>
   membreName(m).split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2) || "?";
-
-interface Registration {
-  id: string;
-  membre_profiles: MembreLite | null;
-}
 
 interface Checkin {
   id: string;
@@ -71,7 +94,8 @@ export default function EventDetailPage() {
   const [club, setClub] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<Tab>("details");
   const [event, setEvent] = useState<Event | null>(null);
-  const [registrations, setRegistrations] = useState<Registration[]>([]);
+  const [inscriptions, setInscriptions] = useState<Inscription[]>([]);
+  const [waitlist, setWaitlist] = useState<Inscription[]>([]);
   const [checkins, setCheckins] = useState<Checkin[]>([]);
   const [loading, setLoading] = useState(true);
   const [liveCount, setLiveCount] = useState(0);
@@ -79,6 +103,7 @@ export default function EventDetailPage() {
   const [visualModal, setVisualModal] = useState<null | "affiche" | "story">(null);
   const [notifying, setNotifying] = useState(false);
   const [notifiedMsg, setNotifiedMsg] = useState<string | null>(null);
+  const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
 
   async function handleSendPush() {
     if (!event) return;
@@ -98,140 +123,117 @@ export default function EventDetailPage() {
     : `https://capten.run/checkin/${id}`;
 
   const loadEvent = useCallback(async () => {
-    // Via server action (session cookies) → borné au crew, fiable sans contexte client.
     const res = await getRunDetail(id);
-    if ("error" in res) { setLoading(false); return; }
-
-    setEvent(res.event as Event);
-    setRegistrations((res.registrations as unknown as Registration[]) || []);
-    setCheckins((res.checkins as unknown as Checkin[]) || []);
-    setLiveCount(((res.checkins as unknown as Checkin[]) || []).filter((c) => c.is_valid).length);
+    if ("error" in res) {
+      if (res.error === "unauth") router.push("/login");
+      else router.push("/dashboard/events");
+      return;
+    }
+    setEvent(res.event);
+    setInscriptions(res.inscriptions || []);
+    setWaitlist(res.waitlist || []);
+    setCheckins(res.checkins);
+    setLiveCount(res.checkins.filter((c) => c.is_valid).length);
     setClub(res.club);
     setLoading(false);
-  }, [id]);
+  }, [id, router]);
 
   useEffect(() => {
     loadEvent();
-
-    // Check-ins "quasi-live" par polling (12 s). Fiable et indépendant du RLS
-    // Realtime — le client navigateur n'a pas de session Supabase. On met en
-    // pause quand l'onglet est masqué (économie), et on rafraîchit au retour.
-    const tick = () => {
-      if (typeof document === "undefined" || document.visibilityState === "visible") loadEvent();
-    };
-    const timer = setInterval(tick, 12000);
-    const onVis = () => { if (document.visibilityState === "visible") loadEvent(); };
-    if (typeof document !== "undefined") document.addEventListener("visibilitychange", onVis);
-
-    return () => {
-      clearInterval(timer);
-      if (typeof document !== "undefined") document.removeEventListener("visibilitychange", onVis);
-    };
-  }, [id, loadEvent]);
+  }, [loadEvent]);
 
   async function togglePublish() {
     if (!event) return;
     setIsPublishing(true);
-    const newStatus = event.status === "published" ? "draft" : "published";
-    const res = await setRunStatus(event.id, newStatus);
-    if (!("error" in res) && res.event) setEvent(res.event as Event);
+    const next = event.status === "published" ? "draft" : "published";
+    const res = await setRunStatus(event.id, next);
+    if ("event" in res && res.event) {
+      setEvent(res.event);
+    }
     setIsPublishing(false);
   }
 
   async function deleteEvent() {
-    if (!confirm("Supprimer ce run ? Cette action est irréversible.")) return;
+    if (!confirm("Supprimer définitivement ce run ?")) return;
     const res = await deleteRun(id);
-    if (!("error" in res)) router.push("/dashboard/events");
-    else alert(res.error);
+    if ("ok" in res) router.push("/dashboard/events");
   }
 
-  const TABS: { key: Tab; label: string; icon: React.ReactNode }[] = [
-    { key: "details", label: "Détails", icon: <FileText size={13} /> },
-    { key: "registrations", label: `Inscrits (${registrations.length})`, icon: <Users size={13} /> },
-    { key: "checkins", label: `Check-ins (${liveCount})`, icon: <CheckSquare size={13} /> },
-    { key: "qr", label: "QR Code", icon: <QrCode size={13} /> },
-  ];
+  // ── Actions Paiements & Liste d'Attente ──
+  async function handleValidatePayment(insId: string) {
+    setActionLoadingId(insId);
+    const res = await validatePaymentByCaptain(insId);
+    if ("ok" in res) {
+      await loadEvent();
+    } else {
+      alert(res.error || "Erreur de validation.");
+    }
+    setActionLoadingId(null);
+  }
+
+  async function handleCancelInscription(insId: string, nom: string) {
+    if (!confirm(`Annuler l'inscription de ${nom} ? Sa place sera libérée et proposée au premier de la liste d'attente.`)) return;
+    setActionLoadingId(insId);
+    const res = await cancelInscriptionByCaptain(insId);
+    if ("ok" in res) {
+      await loadEvent();
+    } else {
+      alert(res.error || "Erreur d'annulation.");
+    }
+    setActionLoadingId(null);
+  }
+
+  async function handlePromoteWaitlist() {
+    if (!event) return;
+    const res = await promoteNextInWaitlist(event.id);
+    if (res.promoted) {
+      alert(`Une place a été proposée à ${res.runner?.prenom} ${res.runner?.nom} par email.`);
+      await loadEvent();
+    } else {
+      alert("Aucun coureur en attente.");
+    }
+  }
+
+  function getWhatsAppRelanceUrl(ins: Inscription) {
+    if (!event) return "#";
+    const text = `Salut ${ins.prenom} ! Ta place pour ${event.title} est réservée. Pense à régler ici : ${event.lien_paiement || getAppUrl() + '/event/' + event.id} 🖤`;
+    const cleanPhone = (ins.telephone || "").replace(/\s+/g, "").replace(/^0/, "+33");
+    if (cleanPhone) {
+      return `https://wa.me/${cleanPhone.replace("+", "")}?text=${encodeURIComponent(text)}`;
+    }
+    return `https://wa.me/?text=${encodeURIComponent(text)}`;
+  }
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
+      <div className="flex items-center justify-center py-32">
         <Loader2 className="animate-spin text-[#FF5500]" size={32} />
       </div>
     );
   }
 
-  if (!event) {
-    return (
-      <div className="text-center py-24">
-        <p className="text-[color:var(--app-text-muted)]">Sortie introuvable.</p>
-        <Link href="/dashboard/events" className="text-[#FF5500] mt-4 inline-block text-sm">← Retour</Link>
-      </div>
-    );
-  }
+  if (!event) return null;
 
   const s = STATUS_LABELS[event.status] || STATUS_LABELS.draft;
-
-  // ── Visuels du Crew ──
-  const runDate = new Date(event.event_date);
   const isPro = hasProAccess(club);
-  const crewName = club?.name || club?.whatsapp_display_name || "Mon Crew";
-  const logoUrl = club?.logo_url || (club?.branding as any)?.logo || null;
-  const slugSafe = club?.slug || "crew";
-  const mins = runDate.getMinutes();
-  const dayTime = `${runDate.toLocaleDateString("fr-FR", { weekday: "long" })} ${runDate.getHours()}H${mins ? String(mins).padStart(2, "0") : ""}`;
-  const dateLabel = runDate.toLocaleDateString("fr-FR", { day: "numeric", month: "long" });
-  const isoDay = runDate.toISOString().slice(0, 10);
+  const isEvenement = !!event.is_evenement;
+  const jaugeMax = event.jauge_max || event.max_participants || 0;
 
-  const afficheVisible = event.status === "draft" || event.status === "published";
-  const storyVisible = event.status === "published" || event.status === "completed";
-  const storyEnabled = event.status === "completed" && liveCount >= 1;
-  const storyTooltip =
-    event.status !== "completed" ? "Disponible après le run" : liveCount < 1 ? "Aucun coureur confirmé pour ce run" : "";
+  // Calculs statistiques
+  const paidCount = inscriptions.filter((i) => i.statut_paiement === "paye" || i.confirme_par_fondateur).length;
+  const waitingPaymentCount = inscriptions.filter((i) => i.statut_paiement !== "paye" && !i.confirme_par_fondateur).length;
 
-  const runData = {
-    crewName,
-    slug: slugSafe,
-    runTitle: event.title,
-    dayTime,
-    location: event.meeting_point_address,
-    distanceKm: event.distance_km,
-    presentCount: liveCount,
-    runDateLabel: dateLabel,
-  };
-
-  const markDownloaded = async (which: "affiche" | "story") => {
-    const field = which === "affiche" ? "affiche_telechargee" : "story_telechargee";
-    await setRunFlag(event.id, field);
-    setEvent((e) => (e ? { ...e, [field]: true } : e));
-  };
-
-  // Export du registre horodaté (CSV) — preuve légale de présence.
-  const exportRegistreCSV = () => {
-    const header = ["Prénom", "Nom", "Téléphone", "Date", "Heure", "Méthode", "Présence validée"];
-    const lines = [header, ...checkins.map((c) => {
-      const d = new Date(c.checked_in_at);
-      const meth = c.method === "qr_code" ? "QR Code" : c.method === "manual" ? "Manuel" : "GPS";
-      return [
-        c.membre_profiles?.first_name || "",
-        c.membre_profiles?.last_name || "",
-        c.membre_profiles?.phone || "",
-        d.toLocaleDateString("fr-FR"),
-        d.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" }),
-        meth,
-        c.is_valid ? "Oui" : "Non",
-      ];
-    })];
-    const csv = lines.map((r) => r.map((f) => `"${String(f).replace(/"/g, '""')}"`).join(";")).join("\n");
-    const blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `registre-${(event.title || "run").replace(/\s+/g, "-").toLowerCase()}-${isoDay}.csv`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
-  };
+  const TABS: { key: Tab; label: string; icon: React.ReactNode; count?: number }[] = [
+    { key: "details", label: "Détails", icon: <FileText size={13} /> },
+    {
+      key: "inscriptions",
+      label: isEvenement ? "Inscriptions & Paiements" : "Inscriptions",
+      icon: <Users size={13} />,
+      count: inscriptions.length,
+    },
+    { key: "checkins", label: "Check-ins", icon: <CheckSquare size={13} />, count: liveCount },
+    { key: "qr", label: "QR Code", icon: <QrCode size={13} /> },
+  ];
 
   return (
     <div className="pb-20 space-y-6">
@@ -253,6 +255,11 @@ export default function EventDetailPage() {
               >
                 {s.label}
               </span>
+              {isEvenement && (
+                <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-[#FF5500] text-white">
+                  <Sparkles size={9} /> Événement
+                </span>
+              )}
               {event.status === "published" && (
                 <span className="flex items-center gap-1 text-[10px] text-[#22C55E] font-bold uppercase tracking-wider">
                   <Wifi size={9} className="animate-pulse" />
@@ -267,60 +274,23 @@ export default function EventDetailPage() {
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">
-          {afficheVisible && (
-            <button
-              onClick={() => isPro && setVisualModal("affiche")}
-              disabled={!isPro}
-              title={!isPro ? "Disponible sur le plan Capten" : ""}
-              className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-[11px] font-black uppercase tracking-widest transition-all border border-[color:var(--app-border)] ${
-                !isPro ? "opacity-40 cursor-not-allowed text-[color:var(--app-text-muted)]" : "text-[color:var(--app-text)] hover:border-[#FF5500] hover:text-[#FF5500]"
-              }`}
-            >
-              <Megaphone size={13} /> Affiche
-            </button>
-          )}
-          {storyVisible && (
-            <button
-              onClick={() => isPro && storyEnabled && setVisualModal("story")}
-              disabled={!isPro || !storyEnabled}
-              title={!isPro ? "Disponible sur le plan Capten" : storyTooltip}
-              className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-[11px] font-black uppercase tracking-widest transition-all border border-[color:var(--app-border)] ${
-                !isPro || !storyEnabled ? "opacity-40 cursor-not-allowed text-[color:var(--app-text-muted)]" : "text-[color:var(--app-text)] hover:border-[#FF5500] hover:text-[#FF5500]"
-              }`}
-            >
-              <Camera size={13} /> Story
-            </button>
-          )}
-          {liveCount >= 1 && (
-            <button
-              onClick={() => (isPro ? exportRegistreCSV() : router.push("/plan"))}
-              title={!isPro ? "Disponible sur le plan Capten" : "Exporter le registre horodaté (CSV)"}
-              className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-[11px] font-black uppercase tracking-widest transition-all border border-[color:var(--app-border)] ${
-                !isPro ? "opacity-40 cursor-not-allowed text-[color:var(--app-text-muted)]" : "text-[color:var(--app-text)] hover:border-[#FF5500] hover:text-[#FF5500]"
-              }`}
-            >
-              <Download size={13} /> Registre
-            </button>
-          )}
           {event.status === "published" && (
             <a
               href={`https://wa.me/?text=${encodeURIComponent(
-                liveCount > 0
-                  ? `Merci à tous pour le run « ${event.title} » ! 🔥\n${liveCount} coureurs étaient présents au RDV 👏\nÀ très vite sur le prochain run du crew ! 🖤`
-                  : `${event.title} 🏃\n📅 ${formatDateShort(event.event_date)}\n📍 ${event.meeting_point_address || "Point de RDV"}\n\nRejoins le run ici : ${getAppUrl()}/event/${event.id} 🖤`
+                `${event.title} 🏃\n📅 ${formatDateShort(event.event_date)}\n📍 ${event.meeting_point_address || "Point de RDV"}\n\nInscriptions : ${getAppUrl()}/event/${event.id} 🖤`
               )}`}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1.5 px-4 py-2 rounded-full text-[11px] font-black uppercase tracking-widest bg-[#25D366] text-white hover:bg-[#1EBE5D] transition-all shadow-sm"
             >
-              <MessageCircle size={13} /> {liveCount > 0 ? "Récap WhatsApp" : "Annoncer"}
+              <MessageCircle size={13} /> Annoncer
             </a>
           )}
           {event.status === "published" && (
             <button
               onClick={handleSendPush}
               disabled={notifying}
-              title="Envoyer une notification push sur l'écran des membres"
+              title="Envoyer une notification push aux membres"
               className="flex items-center gap-1.5 px-4 py-2 rounded-full text-[11px] font-black uppercase tracking-widest bg-[var(--app-surface-2)] text-[color:var(--app-text)] hover:border-[#FF5500] border border-[color:var(--app-border)] transition-all shadow-sm"
             >
               {notifying ? <Loader2 size={13} className="animate-spin" /> : <Bell size={13} className="text-[#FF5500]" />}
@@ -362,6 +332,13 @@ export default function EventDetailPage() {
           >
             {tab.icon}
             {tab.label}
+            {typeof tab.count === "number" && (
+              <span className={`px-1.5 py-0.2 rounded-full text-[9px] font-extrabold ${
+                activeTab === tab.key ? "bg-white/20 text-white" : "bg-[var(--app-surface-2)] text-[color:var(--app-text-muted)]"
+              }`}>
+                {tab.count}
+              </span>
+            )}
           </button>
         ))}
       </div>
@@ -371,6 +348,8 @@ export default function EventDetailPage() {
         {activeTab === "details" && (
           <motion.div key="details" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              
+              {/* Infos générales */}
               <div className="bg-[var(--app-surface)] rounded-[24px] border border-[color:var(--app-border)] p-6 space-y-4">
                 <h3 className="text-[11px] font-black uppercase tracking-widest text-[color:var(--app-text-muted)]">Informations</h3>
                 <div className="space-y-3">
@@ -395,57 +374,50 @@ export default function EventDetailPage() {
                   <div className="flex items-center gap-3">
                     <Users size={16} className="text-[#FF5500] shrink-0" />
                     <div>
-                      <p className="text-[11px] text-[color:var(--app-text-muted)] uppercase tracking-wider">Capacité</p>
+                      <p className="text-[11px] text-[color:var(--app-text-muted)] uppercase tracking-wider">Jauge</p>
                       <p className="text-sm font-semibold text-[color:var(--app-text)]">
-                        {registrations.length}{event.max_participants ? ` / ${event.max_participants}` : ""} inscrits
+                        {inscriptions.length}{jaugeMax ? ` / ${jaugeMax}` : ""} inscrits
                       </p>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Infos Pratiques Anti-Stress */}
-              {(parsePracticalInfo(event.description).bagDrop || parsePracticalInfo(event.description).pace || parsePracticalInfo(event.description).sweeper || parsePracticalInfo(event.description).afterRun) && (
-                <div className="bg-[var(--app-surface)] rounded-[24px] border border-[color:var(--app-border)] p-6 space-y-3">
+              {/* Spécificités Événement */}
+              {isEvenement && (
+                <div className="bg-[var(--app-surface)] rounded-[24px] border border-[#FF5500]/30 p-6 space-y-4 shadow-sm">
                   <h3 className="text-[11px] font-black uppercase tracking-widest text-[#FF5500] flex items-center gap-1.5">
-                    <Luggage size={14} /> Infos Pratiques du Run
+                    <Sparkles size={14} /> Configuration Événement
                   </h3>
-                  <div className="space-y-2 pt-1 text-sm">
-                    {parsePracticalInfo(event.description).bagDrop && (
-                      <div className="flex items-center gap-2 text-[color:var(--app-text)]">
-                        <Luggage size={14} className="text-[#FF5500] shrink-0" />
-                        <span><b className="text-[color:var(--app-text-muted)] font-normal text-[11px] uppercase tracking-wider block">Consigne :</b> {parsePracticalInfo(event.description).bagDrop}</span>
+                  <div className="space-y-3 text-sm">
+                    <div className="flex items-center justify-between pb-2 border-b border-[color:var(--app-border)]">
+                      <span className="text-[color:var(--app-text-muted)]">Prix unitaire</span>
+                      <span className="font-black text-[#FF5500] text-base">{event.prix ? `${event.prix} ${event.devise || "EUR"}` : "Gratuit"}</span>
+                    </div>
+                    {event.description_evenement && (
+                      <div>
+                        <span className="text-[11px] font-bold text-[color:var(--app-text-muted)] uppercase tracking-wider block mb-1">Inclus :</span>
+                        <p className="text-[color:var(--app-text)] font-medium bg-[var(--app-surface-2)] p-3 rounded-xl">{event.description_evenement}</p>
                       </div>
                     )}
-                    {parsePracticalInfo(event.description).pace && (
-                       <div className="flex items-center gap-2 text-[color:var(--app-text)]">
-                        <Gauge size={14} className="text-[#FF5500] shrink-0" />
-                        <span><b className="text-[color:var(--app-text-muted)] font-normal text-[11px] uppercase tracking-wider block">Sas d'Allures :</b> {parsePracticalInfo(event.description).pace}</span>
-                      </div>
-                    )}
-                    {parsePracticalInfo(event.description).sweeper && (
-                      <div className="flex items-center gap-2 text-[#166534] bg-[#DCFCE7]/60 p-2.5 rounded-xl border border-[#22C55E]/30">
-                        <Shield size={14} className="text-[#22C55E] shrink-0" />
-                        <span><b className="text-[#166534] font-bold text-[11px] uppercase tracking-wider block">Serre-file :</b> {parsePracticalInfo(event.description).sweeper}</span>
-                      </div>
-                    )}
-                    {parsePracticalInfo(event.description).afterRun && (
-                      <div className="flex items-center gap-2 text-[color:var(--app-text)]">
-                        <Coffee size={14} className="text-[#22C55E] shrink-0" />
-                        <span><b className="text-[color:var(--app-text-muted)] font-normal text-[11px] uppercase tracking-wider block">After-run :</b> {parsePracticalInfo(event.description).afterRun}</span>
+                    {event.lien_paiement && (
+                      <div>
+                        <span className="text-[11px] font-bold text-[color:var(--app-text-muted)] uppercase tracking-wider block mb-1">Lien de paiement externe :</span>
+                        <a
+                          href={event.lien_paiement}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[#FF5500] hover:underline flex items-center gap-1 text-xs font-mono break-all"
+                        >
+                          {event.lien_paiement} <ExternalLink size={12} />
+                        </a>
                       </div>
                     )}
                   </div>
                 </div>
               )}
 
-              {parsePracticalInfo(event.description).textDescription && (
-                <div className="bg-[var(--app-surface)] rounded-[24px] border border-[color:var(--app-border)] p-6">
-                  <h3 className="text-[11px] font-black uppercase tracking-widest text-[color:var(--app-text-muted)] mb-3">Description</h3>
-                  <p className="text-sm text-[color:var(--app-text)] leading-relaxed whitespace-pre-wrap">{parsePracticalInfo(event.description).textDescription}</p>
-                </div>
-              )}
-
+              {/* Check-in direct */}
               <div className="bg-[var(--app-surface)] rounded-[24px] border border-[color:var(--app-border)] p-6">
                 <h3 className="text-[11px] font-black uppercase tracking-widest text-[color:var(--app-text-muted)] mb-4">Check-in en direct</h3>
                 <div className="flex items-center justify-between">
@@ -458,37 +430,190 @@ export default function EventDetailPage() {
                   </div>
                 </div>
               </div>
+
             </div>
           </motion.div>
         )}
 
-        {/* REGISTRATIONS TAB */}
-        {activeTab === "registrations" && (
-          <motion.div key="registrations" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}>
-            <div className="bg-[var(--app-surface)] rounded-[24px] border border-[color:var(--app-border)] overflow-hidden">
-              {registrations.length === 0 ? (
-                <div className="flex flex-col items-center py-16 text-center">
-                  <div className="text-4xl mb-3">🙋</div>
-                  <p className="text-[13px] text-[color:var(--app-text-muted)]">Aucun inscrit pour l'instant.</p>
+        {/* INSCRIPTIONS & PAIEMENTS TAB */}
+        {activeTab === "inscriptions" && (
+          <motion.div key="inscriptions" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="space-y-6">
+            
+            {/* Compteurs Synthétiques */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="p-4 rounded-2xl bg-[var(--app-surface)] border border-[color:var(--app-border)]">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-[color:var(--app-text-muted)]">Inscrits</p>
+                <p className="text-2xl font-black text-[color:var(--app-text)] mt-1">
+                  {inscriptions.length} {jaugeMax ? `<span className="text-sm font-normal text-[color:var(--app-text-muted)]">/ ${jaugeMax}</span>` : ""}
+                </p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-[var(--app-surface)] border border-[#22C55E]/20">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-[#166534]">Payés / Validés</p>
+                <p className="text-2xl font-black text-[#22C55E] mt-1">{paidCount}</p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-[var(--app-surface)] border border-[#F59E0B]/20">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-[#B45309]">En attente</p>
+                <p className="text-2xl font-black text-[#F59E0B] mt-1">{waitingPaymentCount}</p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-[var(--app-surface)] border border-[color:var(--app-border)]">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-[color:var(--app-text-muted)]">Liste d&apos;attente</p>
+                <p className="text-2xl font-black text-[color:var(--app-text)] mt-1">{waitlist.length}</p>
+              </div>
+            </div>
+
+            {/* Tableau des Inscrits dans la Jauge */}
+            <div className="bg-[var(--app-surface)] rounded-[24px] border border-[color:var(--app-border)] overflow-hidden shadow-sm">
+              <div className="p-4 sm:p-5 border-b border-[color:var(--app-border)] flex items-center justify-between flex-wrap gap-2">
+                <div>
+                  <h3 className="text-[13px] font-black uppercase tracking-tight text-[color:var(--app-text)]">
+                    Inscrits confirmés ({inscriptions.length})
+                  </h3>
+                  <p className="text-[11px] text-[color:var(--app-text-muted)]">
+                    Gestion logistique et validation déclarative des règlements.
+                  </p>
+                </div>
+              </div>
+
+              {inscriptions.length === 0 ? (
+                <div className="py-16 text-center">
+                  <p className="text-3xl mb-2">🏃</p>
+                  <p className="text-sm font-medium text-[color:var(--app-text-muted)]">Aucun inscrit pour le moment.</p>
                 </div>
               ) : (
                 <div className="divide-y divide-[color:var(--app-border)]">
-                  {registrations.map((reg) => (
-                    <div key={reg.id} className="flex items-center gap-4 p-4">
-                      <div className="w-9 h-9 rounded-full bg-[#FF5500]/10 flex items-center justify-center shrink-0">
-                        <span className="text-[11px] font-black text-[#FF5500]">
-                          {membreInitials(reg.membre_profiles)}
-                        </span>
+                  {inscriptions.map((ins) => {
+                    const isPaid = ins.statut_paiement === "paye" || ins.confirme_par_fondateur;
+                    const declaredPaid = ins.confirme_par_coureur && !isPaid;
+
+                    return (
+                      <div key={ins.id} className="p-4 flex items-center justify-between gap-4 flex-wrap sm:flex-nowrap">
+                        <div className="flex items-center gap-3 min-w-[200px]">
+                          <div className="w-10 h-10 rounded-full bg-[#FF5500]/10 flex items-center justify-center shrink-0">
+                            <span className="text-[12px] font-black text-[#FF5500]">
+                              {ins.prenom[0]}{ins.nom[0]}
+                            </span>
+                          </div>
+                          <div>
+                            <p className="text-sm font-bold text-[color:var(--app-text)] leading-tight">
+                              {ins.prenom} {ins.nom}
+                            </p>
+                            <p className="text-[11px] text-[color:var(--app-text-muted)] flex items-center gap-2 mt-0.5">
+                              {ins.telephone && <span className="flex items-center gap-1"><Phone size={10} /> {ins.telephone}</span>}
+                              {ins.email && <span className="flex items-center gap-1 truncate max-w-[160px]"><Mail size={10} /> {ins.email}</span>}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Statut paiement */}
+                        <div className="flex items-center gap-2">
+                          {isPaid ? (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-[#DCFCE7] text-[#166534] border border-[#22C55E]/30">
+                              🟢 Payé (validé)
+                            </span>
+                          ) : declaredPaid ? (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-100 text-amber-900 border border-amber-300 animate-pulse">
+                              🟡 Dit avoir payé
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-red-50 text-red-700 border border-red-200">
+                              🔴 En attente
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Actions du Fondateur */}
+                        <div className="flex items-center gap-2 shrink-0">
+                          {!isPaid && (
+                            <button
+                              onClick={() => handleValidatePayment(ins.id)}
+                              disabled={actionLoadingId === ins.id}
+                              className="px-3 py-1.5 rounded-full bg-[#22C55E] text-white text-[11px] font-bold uppercase tracking-wider hover:bg-[#16A34A] transition-all flex items-center gap-1 shadow-sm"
+                            >
+                              {actionLoadingId === ins.id ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />}
+                              Valider
+                            </button>
+                          )}
+
+                          {!isPaid && (
+                            <a
+                              href={getWhatsAppRelanceUrl(ins)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="px-3 py-1.5 rounded-full border border-[color:var(--app-border)] text-[11px] font-bold text-[color:var(--app-text)] hover:border-[#25D366] hover:text-[#25D366] transition-all flex items-center gap-1"
+                            >
+                              <MessageCircle size={12} className="text-[#25D366]" /> Relancer
+                            </a>
+                          )}
+
+                          <button
+                            onClick={() => handleCancelInscription(ins.id, `${ins.prenom} ${ins.nom}`)}
+                            disabled={actionLoadingId === ins.id}
+                            title="Annuler l'inscription et promouvoir le suivant"
+                            className="p-2 rounded-full text-[color:var(--app-text-muted)] hover:text-[#EF4444] hover:bg-red-50 transition-all"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-[color:var(--app-text)] truncate">{membreName(reg.membre_profiles) || "Membre"}</p>
-                        <p className="text-[11px] text-[color:var(--app-text-muted)]">{reg.membre_profiles?.phone || "—"}</p>
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>
+
+            {/* Vue Liste d'Attente */}
+            {waitlist.length > 0 && (
+              <div className="bg-[var(--app-surface)] rounded-[24px] border border-[color:var(--app-border)] overflow-hidden shadow-sm">
+                <div className="p-4 sm:p-5 border-b border-[color:var(--app-border)] flex items-center justify-between flex-wrap gap-2">
+                  <div>
+                    <h3 className="text-[13px] font-black uppercase tracking-tight text-[color:var(--app-text)] flex items-center gap-2">
+                      <span>Liste d&apos;attente ({waitlist.length})</span>
+                    </h3>
+                    <p className="text-[11px] text-[color:var(--app-text-muted)]">
+                      Coureurs promus automatiquement dès qu&apos;une place se libère.
+                    </p>
+                  </div>
+                  <button
+                    onClick={handlePromoteWaitlist}
+                    className="px-3.5 py-1.5 rounded-full bg-[#FF5500] text-white text-[11px] font-black uppercase tracking-wider hover:bg-[#E04B00] transition-all flex items-center gap-1.5"
+                  >
+                    <ArrowUpRight size={13} /> Proposer une place (#1)
+                  </button>
+                </div>
+
+                <div className="divide-y divide-[color:var(--app-border)]">
+                  {waitlist.map((w, idx) => (
+                    <div key={w.id} className="p-4 flex items-center justify-between gap-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-[var(--app-surface-2)] flex items-center justify-center font-black text-xs text-[color:var(--app-text)]">
+                          #{w.position_liste_attente || idx + 1}
+                        </div>
+                        <div>
+                          <p className="text-sm font-bold text-[color:var(--app-text)]">
+                            {w.prenom} {w.nom}
+                          </p>
+                          <p className="text-[11px] text-[color:var(--app-text-muted)]">
+                            {w.telephone || w.email || "Contact non renseigné"}
+                          </p>
+                        </div>
+                      </div>
+
+                      <button
+                        onClick={() => handleCancelInscription(w.id, `${w.prenom} ${w.nom}`)}
+                        className="p-1.5 text-[color:var(--app-text-muted)] hover:text-[#EF4444] transition-colors"
+                        title="Retirer de la liste d'attente"
+                      >
+                        <Trash2 size={13} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
           </motion.div>
         )}
 
@@ -578,18 +703,6 @@ export default function EventDetailPage() {
           </motion.div>
         )}
       </AnimatePresence>
-
-      {visualModal && (
-        <CrewVisualModal
-          open
-          type={visualModal}
-          onClose={() => setVisualModal(null)}
-          data={runData}
-          logoUrl={logoUrl}
-          fileBaseName={`${visualModal}-${slugSafe}-${isoDay}`}
-          onDownloaded={() => markDownloaded(visualModal)}
-        />
-      )}
     </div>
   );
 }

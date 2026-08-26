@@ -67,7 +67,7 @@ export async function detectAlertsForClub(
   // ── Runs publiés à venir ──
   const { data: upcoming } = await supabase
     .from("events")
-    .select("id, title, event_date, affiche_telechargee")
+    .select("id, title, event_date, affiche_telechargee, is_evenement, jauge_max")
     .eq("club_id", clubId)
     .eq("status", "published")
     .gte("event_date", nowIso)
@@ -112,6 +112,56 @@ export async function detectAlertsForClub(
         dedup_key: `affiche_${e.id}`,
         expires_at: e.event_date,
       });
+    }
+
+    // ── NOUVELLES RÈGLES RUN ÉVÉNEMENT ──
+    for (const e of up.filter((x) => x.is_evenement)) {
+      // Règle A : Paiements en attente (run dans moins de 72h)
+      if (e.event_date <= in3d) {
+        const { count: unpaidCount } = await supabase
+          .from("event_inscriptions")
+          .select("*", { count: "exact", head: true })
+          .eq("event_id", e.id)
+          .is("position_liste_attente", null)
+          .eq("statut_paiement", "en_attente")
+          .eq("confirme_par_fondateur", false);
+
+        if (unpaidCount && unpaidCount > 0) {
+          out.push({
+            category: "admin",
+            priority: 1, // Urgent
+            title: "Paiements en attente 💳",
+            message: `💳 ${unpaidCount} coureur${unpaidCount > 1 ? "s n'ont" : " n'a"} pas encore réglé pour « ${e.title} ». Tu veux les relancer ?`,
+            cta_label: "Relancer les coureurs",
+            cta_href: `/dashboard/events/${e.id}`,
+            dedup_key: `pending_payments_${e.id}_${wk}`,
+            expires_at: e.event_date,
+          });
+        }
+      }
+
+      // Règle B : Événement bientôt complet (> 80% de la jauge)
+      if (e.jauge_max && e.jauge_max > 0) {
+        const { count: regCount } = await supabase
+          .from("event_inscriptions")
+          .select("*", { count: "exact", head: true })
+          .eq("event_id", e.id)
+          .is("position_liste_attente", null);
+
+        const filled = regCount || 0;
+        if (filled / e.jauge_max >= 0.8 && filled < e.jauge_max) {
+          out.push({
+            category: "celebration",
+            priority: 3, // Agréable
+            title: "Événement presque complet 🔥",
+            message: `🔥 « ${e.title} » est presque complet ! ${filled}/${e.jauge_max} places prises.`,
+            cta_label: "Voir les inscrits",
+            cta_href: `/dashboard/events/${e.id}`,
+            dedup_key: `almost_full_${e.id}`,
+            expires_at: e.event_date,
+          });
+        }
+      }
     }
   }
 

@@ -2,14 +2,15 @@
 
 import React, { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Calendar, MapPin, Users, CheckCircle2, Loader2, ArrowRight, Phone, Shield,
-  Luggage, Gauge, Coffee
+  Luggage, Gauge, Coffee, Sparkles, CreditCard, Link2, AlertCircle, X, ExternalLink
 } from "lucide-react";
 import { getSupabase } from "@/lib/supabase";
 import { formatDateShort } from "@/lib/utils/format";
 import { parsePracticalInfo } from "@/lib/utils/practical-info";
+import { registerToEvent, declarePaymentByRunner } from "@/lib/evenements/actions";
 import Link from "next/link";
 
 interface Event {
@@ -22,6 +23,12 @@ interface Event {
   status: string;
   checkin_radius_meters: number;
   club_id: string;
+  is_evenement?: boolean;
+  jauge_max?: number | null;
+  prix?: number | null;
+  devise?: string;
+  lien_paiement?: string | null;
+  description_evenement?: string | null;
   clubs: { name: string; logo_url: string | null; city: string | null } | null;
 }
 
@@ -29,74 +36,91 @@ export default function PublicEventPage() {
   const { id } = useParams<{ id: string }>();
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
-  const [regCount, setRegCount] = useState(0);
-  const [registered, setRegistered] = useState(false);
-  const [registering, setRegistering] = useState(false);
-  const [userId, setUserId] = useState<string | null>(null);
+  const [inscritsCount, setInscritsCount] = useState(0);
+  const [waitlistCount, setWaitlistCount] = useState(0);
+  
+  // États formulaire inscription
+  const [showModal, setShowModal] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [form, setForm] = useState({
+    prenom: "",
+    nom: "",
+    email: "",
+    telephone: "",
+  });
+
+  // État résultat après inscription
+  const [inscriptionResult, setInscriptionResult] = useState<{
+    status: "registered" | "waitlisted";
+    inscriptionId: string;
+    position?: number | null;
+    hasPaid: boolean;
+  } | null>(null);
 
   useEffect(() => {
     async function load() {
       const supabase = getSupabase();
       if (!supabase) { setLoading(false); return; }
 
-      const [{ data: ev }, { count }, { data: { user } }] = await Promise.all([
+      const [{ data: ev }, { count: mainCount }, { count: wlCount }] = await Promise.all([
         supabase.from("events").select("*, clubs(name, logo_url, city)").eq("id", id).single(),
-        supabase.from("event_registrations").select("*", { count: "exact", head: true }).eq("event_id", id).eq("status", "confirmed"),
-        supabase.auth.getUser(),
+        supabase.from("event_inscriptions").select("*", { count: "exact", head: true }).eq("event_id", id).is("position_liste_attente", null),
+        supabase.from("event_inscriptions").select("*", { count: "exact", head: true }).eq("event_id", id).not("position_liste_attente", "is", null),
       ]);
 
       setEvent(ev);
-      setRegCount(count || 0);
-      setUserId(user?.id || null);
-
-      if (user) {
-        const { data: reg } = await supabase
-          .from("event_registrations")
-          .select("id")
-          .eq("event_id", id)
-          .eq("profile_id", user.id)
-          .single();
-        setRegistered(!!reg);
-      }
-
+      setInscritsCount(mainCount || 0);
+      setWaitlistCount(wlCount || 0);
       setLoading(false);
     }
     load();
   }, [id]);
 
-  async function register() {
-    if (!userId || !event) {
-      // Redirect to join page
-      const supabase = getSupabase();
-      if (supabase) {
-        const { data } = await supabase
-          .from("clubs")
-          .select("slug")
-          .eq("id", event!.club_id)
-          .single();
-        if (data) {
-          window.location.href = `/join/${data.slug}`;
-        }
-      }
+  async function handleRegister(e: React.FormEvent) {
+    e.preventDefault();
+    if (!form.prenom.trim() || !form.nom.trim()) {
+      alert("Merci de renseigner ton prénom et ton nom.");
       return;
     }
 
-    setRegistering(true);
-    const supabase = getSupabase();
-    if (!supabase) { setRegistering(false); return; }
-
-    await supabase.from("event_registrations").insert({
-      event_id: event.id,
-      profile_id: userId,
-      status: "confirmed",
+    setSubmitting(true);
+    const res = await registerToEvent({
+      eventId: id,
+      nom: form.nom,
+      prenom: form.prenom,
+      email: form.email,
+      telephone: form.telephone,
     });
 
-    setRegistered(true);
-    setRegCount((c) => c + 1);
-    setRegistering(false);
+    if ("error" in res) {
+      alert(res.error);
+      setSubmitting(false);
+      return;
+    }
+
+    setInscriptionResult({
+      status: res.status as "registered" | "waitlisted",
+      inscriptionId: res.inscription.id,
+      position: res.position,
+      hasPaid: false,
+    });
+
+    if (res.status === "registered") {
+      setInscritsCount((c) => c + 1);
+    } else {
+      setWaitlistCount((c) => c + 1);
+    }
+
+    setSubmitting(false);
   }
 
-  const isFull = event?.max_participants ? regCount >= event.max_participants : false;
+  async function handleDeclarePayment() {
+    if (!inscriptionResult) return;
+    const res = await declarePaymentByRunner(inscriptionResult.inscriptionId);
+    if (!("error" in res)) {
+      setInscriptionResult((prev) => prev ? { ...prev, hasPaid: true } : null);
+    }
+  }
 
   if (loading) {
     return (
@@ -111,7 +135,7 @@ export default function PublicEventPage() {
       <div className="min-h-screen bg-[#F4F4EE] flex flex-col items-center justify-center gap-4 p-8 text-center">
         <p className="text-4xl">🙅</p>
         <h1 className="text-[20px] font-display font-black italic uppercase">Sortie indisponible</h1>
-        <p className="text-[13px] text-[#666562]">Cette sortie n'est pas accessible pour le moment.</p>
+        <p className="text-[13px] text-[#666562]">Cette sortie n&apos;est pas accessible pour le moment.</p>
       </div>
     );
   }
@@ -119,33 +143,67 @@ export default function PublicEventPage() {
   const eventDate = new Date(event.event_date);
   const isPast = eventDate < new Date();
   const practical = parsePracticalInfo(event.description);
+  const isEvenement = !!event.is_evenement;
+  const jaugeMax = event.jauge_max || event.max_participants || 0;
+  const placesRestantes = jaugeMax > 0 ? Math.max(0, jaugeMax - inscritsCount) : null;
+  const isComplet = jaugeMax > 0 && placesRestantes === 0;
 
   return (
-    <div className="min-h-screen bg-[#F4F4EE] pb-32">
+    <div className="min-h-screen bg-[#F4F4EE] pb-32 font-sans">
       {/* Hero */}
       <div className="bg-black text-white px-6 pt-12 pb-10 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-5" style={{
-          backgroundImage: `repeating-linear-gradient(45deg, #FF5500 0, #FF5500 1px, transparent 0, transparent 50%)`,
-          backgroundSize: "20px 20px",
-        }} />
+        <div
+          className="absolute inset-0 opacity-5"
+          style={{
+            backgroundImage: `repeating-linear-gradient(45deg, #FF5500 0, #FF5500 1px, transparent 0, transparent 50%)`,
+            backgroundSize: "20px 20px",
+          }}
+        />
         <div className="relative max-w-lg mx-auto">
-          {/* Club */}
-          {event.clubs && (
-            <div className="flex items-center gap-2 mb-5">
-              <div className="w-7 h-7 rounded-[8px] bg-[#FF5500]/20 flex items-center justify-center overflow-hidden">
-                {event.clubs.logo_url ? (
-                  <img src={event.clubs.logo_url} alt="" className="w-full h-full object-cover" />
-                ) : "🏃"}
+          
+          {/* Badge Événement & Club */}
+          <div className="flex items-center justify-between mb-5 flex-wrap gap-2">
+            {event.clubs && (
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-[8px] bg-[#FF5500]/20 flex items-center justify-center overflow-hidden">
+                  {event.clubs.logo_url ? (
+                    <img src={event.clubs.logo_url} alt="" className="w-full h-full object-cover" />
+                  ) : "🏃"}
+                </div>
+                <span className="text-[11px] font-bold uppercase tracking-widest text-white/60">
+                  {event.clubs.name}
+                </span>
               </div>
-              <span className="text-[11px] font-bold uppercase tracking-widest text-white/60">{event.clubs.name}</span>
-            </div>
-          )}
+            )}
+
+            {isEvenement && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FF5500] text-white text-[10px] font-black uppercase tracking-widest shadow-[0_2px_10px_rgba(255,85,0,0.4)]">
+                <Sparkles size={11} /> Événement
+              </span>
+            )}
+          </div>
 
           <h1 className="text-[32px] font-display font-black italic uppercase text-white leading-tight tracking-tighter">
             {event.title}
           </h1>
 
-          <div className="flex flex-wrap gap-3 mt-4">
+          {/* Prix bien visible pour les événements */}
+          {isEvenement && (
+            <div className="mt-3 flex items-center gap-3">
+              <span className="text-[26px] font-display font-black text-[#FF5500] tracking-tight">
+                {event.prix ? `${event.prix} ${event.devise || "€"}` : "Gratuit"}
+              </span>
+              {jaugeMax > 0 && (
+                <span className={`text-[12px] font-bold px-2.5 py-1 rounded-full ${
+                  isComplet ? "bg-red-500/20 text-red-300" : "bg-white/10 text-white/80"
+                }`}>
+                  {isComplet ? "Complet (Liste d'attente)" : `${placesRestantes} place${placesRestantes! > 1 ? "s" : ""} restante${placesRestantes! > 1 ? "s" : ""}`}
+                </span>
+              )}
+            </div>
+          )}
+
+          <div className="flex flex-wrap gap-3 mt-5">
             <span className="flex items-center gap-1.5 text-[12px] text-white/70">
               <Calendar size={13} className="text-[#FF5500]" />
               {formatDateShort(event.event_date)} · {eventDate.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}
@@ -158,13 +216,44 @@ export default function PublicEventPage() {
             )}
             <span className="flex items-center gap-1.5 text-[12px] text-white/70">
               <Users size={13} className="text-[#FF5500]" />
-              {regCount}{event.max_participants ? ` / ${event.max_participants}` : ""} inscrits
+              {inscritsCount}{jaugeMax ? ` / ${jaugeMax}` : ""} inscrits
+              {waitlistCount > 0 && ` (${waitlistCount} en attente)`}
             </span>
           </div>
         </div>
       </div>
 
       <div className="max-w-lg mx-auto px-5 mt-6 space-y-4">
+
+        {/* Bloc Ce qui est inclus (Run Événement) */}
+        {isEvenement && event.description_evenement && (
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white rounded-[24px] border border-black/5 p-5 space-y-2 shadow-sm"
+          >
+            <h2 className="text-[11px] font-black uppercase tracking-widest text-[#FF5500] flex items-center gap-1.5">
+              <Sparkles size={13} /> Ce qui est inclus
+            </h2>
+            <p className="text-[14px] text-[#111111] leading-relaxed font-medium">
+              {event.description_evenement}
+            </p>
+          </motion.div>
+        )}
+
+        {/* Description générale */}
+        {event.description && !isEvenement && (
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white rounded-[24px] border border-black/5 p-5 shadow-sm"
+          >
+            <p className="text-[13px] text-[#4B5563] leading-relaxed whitespace-pre-wrap">
+              {event.description}
+            </p>
+          </motion.div>
+        )}
+
         {/* Infos Pratiques Anti-Stress */}
         {(practical.bagDrop || practical.pace || practical.sweeper || practical.afterRun) && (
           <motion.div
@@ -178,80 +267,43 @@ export default function PublicEventPage() {
             <div className="space-y-2.5 pt-1">
               {practical.bagDrop && (
                 <div className="flex items-start gap-3 p-3 rounded-2xl bg-[#F8F8F6]">
-                  <span className="w-7 h-7 rounded-xl bg-black/5 flex items-center justify-center text-[#1A1918] shrink-0 mt-0.5">
-                    <Luggage size={14} />
-                  </span>
+                  <Luggage size={16} className="text-[#FF5500] shrink-0 mt-0.5" />
                   <div>
-                    <p className="text-[10.5px] font-bold uppercase tracking-wider text-[#666562]">Consigne sacs</p>
-                    <p className="text-[13px] font-semibold text-[#1A1918]">{practical.bagDrop}</p>
+                    <p className="text-[10px] font-black uppercase tracking-wider text-[#9CA3AF]">Consigne sacs</p>
+                    <p className="text-[12px] font-semibold text-[#111111]">{practical.bagDrop}</p>
                   </div>
                 </div>
               )}
               {practical.pace && (
                 <div className="flex items-start gap-3 p-3 rounded-2xl bg-[#F8F8F6]">
-                  <span className="w-7 h-7 rounded-xl bg-[#FF5500]/10 text-[#FF5500] flex items-center justify-center shrink-0 mt-0.5">
-                    <Gauge size={14} />
-                  </span>
+                  <Gauge size={16} className="text-[#FF5500] shrink-0 mt-0.5" />
                   <div>
-                    <p className="text-[10.5px] font-bold uppercase tracking-wider text-[#666562]">Sas d'Allures & Vibe</p>
-                    <p className="text-[13px] font-semibold text-[#1A1918]">{practical.pace}</p>
+                    <p className="text-[10px] font-black uppercase tracking-wider text-[#9CA3AF]">Sas d&apos;allures</p>
+                    <p className="text-[12px] font-semibold text-[#111111]">{practical.pace}</p>
                   </div>
                 </div>
               )}
               {practical.sweeper && (
-                <div className="flex items-start gap-3 p-3 rounded-2xl bg-[#DCFCE7]/60 border border-[#22C55E]/30">
-                  <span className="w-7 h-7 rounded-xl bg-[#22C55E]/20 text-[#166534] flex items-center justify-center shrink-0 mt-0.5">
-                    <Shield size={14} />
-                  </span>
+                <div className="flex items-start gap-3 p-3 rounded-2xl bg-[#F0FDF4] border border-[#DCFCE7]">
+                  <Shield size={16} className="text-[#166534] shrink-0 mt-0.5" />
                   <div>
-                    <p className="text-[10.5px] font-bold uppercase tracking-wider text-[#166534]">Serre-file & Encadrement</p>
-                    <p className="text-[13px] font-bold text-[#166534]">{practical.sweeper}</p>
-                    <p className="text-[10.5px] text-[#166534]/80 mt-0.5">Veille à ce que personne ne coure seul ou ne soit lâché.</p>
+                    <p className="text-[10px] font-black uppercase tracking-wider text-[#166534]/70">Serre-file officiel</p>
+                    <p className="text-[12px] font-semibold text-[#166534]">{practical.sweeper}</p>
                   </div>
                 </div>
               )}
               {practical.afterRun && (
                 <div className="flex items-start gap-3 p-3 rounded-2xl bg-[#F8F8F6]">
-                  <span className="w-7 h-7 rounded-xl bg-[#22C55E]/10 text-[#22C55E] flex items-center justify-center shrink-0 mt-0.5">
-                    <Coffee size={14} />
-                  </span>
+                  <Coffee size={16} className="text-[#FF5500] shrink-0 mt-0.5" />
                   <div>
-                    <p className="text-[10.5px] font-bold uppercase tracking-wider text-[#666562]">After-run</p>
-                    <p className="text-[13px] font-semibold text-[#1A1918]">{practical.afterRun}</p>
+                    <p className="text-[10px] font-black uppercase tracking-wider text-[#9CA3AF]">After-run</p>
+                    <p className="text-[12px] font-semibold text-[#111111]">{practical.afterRun}</p>
                   </div>
                 </div>
               )}
             </div>
           </motion.div>
         )}
-
-        {/* Description */}
-        {practical.textDescription && (
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-[24px] border border-black/5 p-6"
-          >
-            <h2 className="text-[11px] font-black uppercase tracking-widest text-[#666562] mb-3">Description</h2>
-            <p className="text-[14px] text-[#1A1918] leading-relaxed whitespace-pre-wrap">{practical.textDescription}</p>
-          </motion.div>
-        )}
-
-        {/* Safety reminder */}
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.05 }}
-          className="bg-[#DCFCE7] rounded-[20px] p-4 flex items-start gap-3"
-        >
-          <Shield size={18} className="text-[#22C55E] shrink-0 mt-0.5" />
-          <div>
-            <p className="text-[12px] font-black uppercase tracking-wider text-[#166534]">Ton ICE est requis</p>
-            <p className="text-[11px] text-[#166534]/80 mt-0.5">
-              Assure-toi que ton contact d'urgence est renseigné avant de partir.
-            </p>
-          </div>
-        </motion.div>
 
         {/* Check-in info */}
         {!isPast && (
@@ -280,28 +332,65 @@ export default function PublicEventPage() {
 
       {/* Fixed CTA */}
       {!isPast && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-black/5 p-5">
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-black/5 p-5 z-20">
           <div className="max-w-lg mx-auto">
-            {registered ? (
-              <div className="flex items-center justify-center gap-2 h-14 rounded-full bg-[#DCFCE7] text-[#22C55E]">
-                <CheckCircle2 size={18} />
-                <span className="text-[13px] font-black uppercase tracking-widest">Inscrit !</span>
-              </div>
-            ) : isFull ? (
-              <div className="flex items-center justify-center h-14 rounded-full bg-[#F3F4F6] text-[#9CA3AF]">
-                <span className="text-[13px] font-black uppercase tracking-widest">Complet</span>
-              </div>
+            {inscriptionResult ? (
+              inscriptionResult.status === "registered" ? (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between p-3.5 bg-[#DCFCE7] text-[#166534] rounded-2xl">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 size={18} />
+                      <span className="text-[13px] font-black uppercase tracking-wider">Place Réservée (48h)</span>
+                    </div>
+                    {inscriptionResult.hasPaid && (
+                      <span className="text-[11px] font-bold bg-[#166534] text-white px-2 py-0.5 rounded-full">
+                        Paiement Déclaré ✓
+                      </span>
+                    )}
+                  </div>
+
+                  {event.lien_paiement && !inscriptionResult.hasPaid && (
+                    <div className="flex flex-col gap-2">
+                      <a
+                        href={event.lien_paiement}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full flex items-center justify-center gap-2 h-12 rounded-full bg-[#FF5500] text-white text-[13px] font-black uppercase tracking-widest hover:bg-[#E04B00] transition-all shadow-[0_4px_16px_rgba(255,85,0,0.25)]"
+                      >
+                        Payer maintenant ({event.prix} {event.devise || "€"}) <ExternalLink size={14} />
+                      </a>
+                      <button
+                        type="button"
+                        onClick={handleDeclarePayment}
+                        className="w-full h-10 rounded-full border border-black/10 text-[12px] font-bold text-[#4B5563] hover:text-black transition-colors"
+                      >
+                        ✓ J&apos;ai payé (Informer l&apos;organisateur)
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="p-3.5 bg-amber-50 border border-amber-200 text-amber-900 rounded-2xl text-center">
+                  <p className="text-[13px] font-black uppercase tracking-wider">
+                    Tu es #{inscriptionResult.position} sur la liste d&apos;attente
+                  </p>
+                  <p className="text-[11px] text-amber-700 mt-0.5">
+                    On te prévient par email dès qu&apos;une place se libère.
+                  </p>
+                </div>
+              )
             ) : (
               <button
-                onClick={register}
-                disabled={registering}
-                className="w-full flex items-center justify-center gap-2 h-14 rounded-full bg-[#FF5500] text-white text-[13px] font-black uppercase tracking-widest hover:bg-black transition-all active:scale-95 disabled:opacity-60"
+                onClick={() => setShowModal(true)}
+                className={`w-full flex items-center justify-center gap-2 h-14 rounded-full text-white text-[13px] font-black uppercase tracking-widest transition-all active:scale-95 ${
+                  isComplet
+                    ? "bg-[#1C1B18] hover:bg-[#FF5500]"
+                    : "bg-[#FF5500] hover:bg-[#E04B00] shadow-[0_8px_24px_rgba(255,85,0,0.25)]"
+                }`}
               >
-                {registering ? (
-                  <Loader2 size={16} className="animate-spin" />
-                ) : (
+                {isComplet ? "Rejoindre la liste d'attente" : (
                   <>
-                    {userId ? "S'inscrire" : "Rejoindre pour s'inscrire"}
+                    S&apos;inscrire {event.prix ? `· ${event.prix} ${event.devise || "€"}` : ""}
                     <ArrowRight size={16} />
                   </>
                 )}
@@ -310,6 +399,122 @@ export default function PublicEventPage() {
           </div>
         </div>
       )}
+
+      {/* Modal / Bottom Sheet d'inscription rapide */}
+      <AnimatePresence>
+        {showModal && (
+          <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowModal(false)}
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            />
+
+            <motion.div
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="relative w-full max-w-lg bg-white rounded-t-[32px] sm:rounded-[32px] p-6 sm:p-8 space-y-5 shadow-2xl z-10 max-h-[90vh] overflow-y-auto"
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-[18px] font-display font-black uppercase tracking-tight text-[#111111]">
+                    {isComplet ? "Liste d'attente" : "Inscription au Run"}
+                  </h3>
+                  <p className="text-[12px] text-[#6B7280]">
+                    {event.title} · {formatDateShort(event.event_date)}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="w-8 h-8 rounded-full bg-[#F3F4F6] flex items-center justify-center text-[#6B7280] hover:text-[#111111]"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+
+              <form onSubmit={handleRegister} className="space-y-4">
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-[#6B7280]">Prénom *</label>
+                    <input
+                      type="text"
+                      required
+                      value={form.prenom}
+                      onChange={(e) => setForm({ ...form, prenom: e.target.value })}
+                      placeholder="Thomas"
+                      className="w-full h-11 px-3.5 rounded-xl border border-[#E5E7EB] text-sm font-medium focus:border-[#FF5500] outline-none"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-[#6B7280]">Nom *</label>
+                    <input
+                      type="text"
+                      required
+                      value={form.nom}
+                      onChange={(e) => setForm({ ...form, nom: e.target.value })}
+                      placeholder="Martin"
+                      className="w-full h-11 px-3.5 rounded-xl border border-[#E5E7EB] text-sm font-medium focus:border-[#FF5500] outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-[#6B7280]">Email (pour ta confirmation) *</label>
+                  <input
+                    type="email"
+                    required
+                    value={form.email}
+                    onChange={(e) => setForm({ ...form, email: e.target.value })}
+                    placeholder="thomas.martin@email.com"
+                    className="w-full h-11 px-3.5 rounded-xl border border-[#E5E7EB] text-sm font-medium focus:border-[#FF5500] outline-none"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-[#6B7280]">Téléphone</label>
+                  <input
+                    type="tel"
+                    value={form.telephone}
+                    onChange={(e) => setForm({ ...form, telephone: e.target.value })}
+                    placeholder="06 12 34 56 78"
+                    className="w-full h-11 px-3.5 rounded-xl border border-[#E5E7EB] text-sm font-medium focus:border-[#FF5500] outline-none"
+                  />
+                </div>
+
+                {isEvenement && event.prix && (
+                  <div className="p-3.5 rounded-2xl bg-[#FAFAF8] border border-[#E5E7EB] space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[12px] font-bold text-[#111111]">Montant de l&apos;événement</span>
+                      <span className="text-[14px] font-black text-[#FF5500]">{event.prix} {event.devise || "€"}</span>
+                    </div>
+                    <p className="text-[11px] text-[#6B7280]">
+                      Ta place sera réservée pendant 48h. Tu pourras régler directement via le lien de l&apos;organisateur.
+                    </p>
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="w-full h-12 rounded-full bg-[#FF5500] text-white text-[13px] font-black uppercase tracking-widest hover:bg-[#E04B00] transition-all flex items-center justify-center gap-2 shadow-[0_4px_16px_rgba(255,85,0,0.25)]"
+                >
+                  {submitting ? (
+                    <Loader2 size={16} className="animate-spin" />
+                  ) : isComplet ? (
+                    "Valider mon inscription en liste d'attente"
+                  ) : (
+                    "Confirmer mon inscription"
+                  )}
+                </button>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

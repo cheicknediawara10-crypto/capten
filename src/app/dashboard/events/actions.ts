@@ -43,6 +43,12 @@ export interface NewRunInput {
   is_recurring: boolean;
   checkin_radius_meters: number;
   status: "draft" | "published";
+  is_evenement?: boolean;
+  jauge_max?: number | null;
+  prix?: number | null;
+  devise?: string;
+  lien_paiement?: string | null;
+  description_evenement?: string | null;
 }
 
 /** Crée un run (géocodage de l'adresse côté serveur) + diffuse Web Push. */
@@ -68,6 +74,12 @@ export async function createRun(input: NewRunInput): Promise<{ id: string } | { 
     is_recurring: input.is_recurring,
     checkin_radius_meters: input.checkin_radius_meters,
     status: input.status,
+    is_evenement: !!input.is_evenement,
+    jauge_max: input.jauge_max ?? null,
+    prix: input.prix ?? null,
+    devise: input.devise || "EUR",
+    lien_paiement: input.lien_paiement || null,
+    description_evenement: input.description_evenement || null,
   }).select("id").single();
 
   if (error || !data) return { error: error?.message || "Erreur lors de la création." };
@@ -77,7 +89,7 @@ export async function createRun(input: NewRunInput): Promise<{ id: string } | { 
     try {
       await sendClubPushNotification(club_id, {
         title: `🏃 Nouveau Run : ${input.title || "Prochaine sortie"}`,
-        body: `Inscriptions ouvertes sur Capten !`,
+        body: input.is_evenement ? `Événement à jauge limitée — Places limitées !` : `Inscriptions ouvertes sur Capten !`,
         url: `/event/${(data as any).id}`,
       });
     } catch { /* push non bloquant */ }
@@ -110,7 +122,7 @@ export async function sendRunPushNotification(
 
 /** Détail d'un run + inscrits + check-ins + crew (pour nom/logo/entitlement Pro). Borné au crew. */
 export async function getRunDetail(id: string): Promise<
-  { event: any; registrations: any[]; checkins: any[]; club: any | null }
+  { event: any; registrations: any[]; inscriptions: any[]; waitlist: any[]; checkins: any[]; club: any | null }
   | { error: string }
 > {
   const club_id = await getAuthenticatedCaptainId();
@@ -122,15 +134,24 @@ export async function getRunDetail(id: string): Promise<
   const { data: ev } = await ub(sb, "events").select("*").eq("id", id).maybeSingle();
   if (!ev || (ev as any).club_id !== club_id) return { error: "not_found" };
 
-  const [{ data: regs }, { data: chks }, { data: cm }] = await Promise.all([
+  const [{ data: regs }, { data: allIns }, { data: chks }, { data: cm }] = await Promise.all([
     ub(sb, "membre_club").select("id, membre_profiles(first_name, last_name, phone)").eq("club_id", club_id).eq("is_active", true),
+    ub(sb, "event_inscriptions").select("*").eq("event_id", id).order("created_at", { ascending: true }),
     ub(sb, "membre_checkins").select("id, checked_in_at, is_valid, method, membre_profiles(first_name, last_name, phone)").eq("event_id", id).order("checked_in_at", { ascending: false }),
     ub(sb, "clubs").select("*").eq("id", club_id).maybeSingle(),
   ]);
 
+  const rawInscriptions = (allIns as any[]) || [];
+  const mainInscriptions = rawInscriptions.filter((i) => i.position_liste_attente === null);
+  const waitlist = rawInscriptions
+    .filter((i) => i.position_liste_attente !== null)
+    .sort((a, b) => (a.position_liste_attente || 0) - (b.position_liste_attente || 0));
+
   return {
     event: ev,
     registrations: (regs as any[]) || [],
+    inscriptions: mainInscriptions,
+    waitlist,
     checkins: (chks as any[]) || [],
     club: (cm as any) ?? null,
   };
