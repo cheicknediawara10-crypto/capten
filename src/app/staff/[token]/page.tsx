@@ -5,13 +5,12 @@ import { useParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Users, Check, Search, QrCode, ShieldAlert, Phone, AlertCircle, Loader2,
-  CheckCircle2, X, RefreshCw, Sparkles, MapPin, Calendar, Camera, UserCheck,
-  ShieldCheck, Activity, ArrowUpRight, Download, Maximize2, Share2, MessageCircle
+  CheckCircle2, X, RefreshCw, Sparkles, MapPin, Calendar, Activity,
+  Download, MessageCircle
 } from "lucide-react";
 import {
   getStaffCockpitContext,
   staffSubmitCheckin,
-  staffScanQrCheckin,
   staffGetRunnerIce,
 } from "@/lib/staff/actions";
 import { formatDateShort } from "@/lib/utils/format";
@@ -19,15 +18,6 @@ import { getAppUrl } from "@/lib/domain";
 import dynamic from "next/dynamic";
 
 const QRCodeSVG = dynamic(() => import("qrcode.react").then((m) => ({ default: m.QRCodeSVG })), { ssr: false });
-
-const QrScanner = dynamic(() => import("@/components/checkin/QrScanner"), {
-  ssr: false,
-  loading: () => (
-    <div className="h-72 flex items-center justify-center bg-black/60 rounded-2xl border border-white/10">
-      <Loader2 className="animate-spin text-[#FF5500]" size={32} />
-    </div>
-  ),
-});
 
 interface MemberItem {
   id: string;
@@ -52,7 +42,7 @@ interface IceData {
   } | null;
 }
 
-type TabMode = "qrcode" | "list" | "scanner";
+type TabMode = "qrcode" | "list";
 
 export default function StaffCockpitPage() {
   const { token } = useParams<{ token: string }>();
@@ -68,10 +58,6 @@ export default function StaffCockpitPage() {
   // Modal ICE
   const [iceModal, setIceModal] = useState<IceData | null>(null);
   const [iceLoading, setIceLoading] = useState(false);
-
-  // Scan feedback popup & history
-  const [scanFeedback, setScanFeedback] = useState<{ name: string; already?: boolean } | null>(null);
-  const [recentScans, setRecentScans] = useState<Array<{ name: string; time: string }>>([]);
   const [checkingInId, setCheckingInId] = useState<string | null>(null);
 
   const loadContext = useCallback(async () => {
@@ -104,24 +90,6 @@ export default function StaffCockpitPage() {
       await loadContext();
     }
     setCheckingInId(null);
-  }
-
-  // Handle QR Scan (Camera)
-  async function handleScan(scannedText: string) {
-    if (!scannedText) return;
-    const res = await staffScanQrCheckin(token, scannedText);
-    if ("ok" in res) {
-      const runnerName = res.runnerName || "Coureur";
-      setScanFeedback({ name: runnerName, already: res.already });
-      setRecentScans((prev) => [
-        { name: runnerName, time: new Date().toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit", second: "2-digit" }) },
-        ...prev.slice(0, 7),
-      ]);
-      await loadContext();
-      setTimeout(() => setScanFeedback(null), 3000);
-    } else {
-      alert(res.error || "Erreur de scan");
-    }
   }
 
   // Open ICE Modal
@@ -197,7 +165,7 @@ export default function StaffCockpitPage() {
                 <span className="text-xs font-black uppercase tracking-wider text-white truncate">
                   {data.club.name}
                 </span>
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#FF5500] text-white text-[9px] font-black uppercase tracking-widest shrink-0 shadow-sm">
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#FF5500] text-white text-[9px] font-black uppercase tracking-widest shrink-0 shadow-sm">
                   <Sparkles size={9} /> {data.staffLabel || "Co-Capitaine"}
                 </span>
               </div>
@@ -276,46 +244,33 @@ export default function StaffCockpitPage() {
             </div>
           </div>
 
-          {/* 3 Mode Switcher Tabs */}
-          <div className="grid grid-cols-3 gap-2 pt-2 border-t border-white/10">
+          {/* 2 Mode Switcher Tabs */}
+          <div className="grid grid-cols-2 gap-3 pt-2 border-t border-white/10">
             
             {/* Tab 1: Afficher le QR Code */}
             <button
               onClick={() => setActiveMode("qrcode")}
-              className={`h-12 rounded-xl font-bold text-[11px] sm:text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 sm:gap-2 transition-all ${
+              className={`h-12 rounded-xl font-bold text-xs sm:text-sm uppercase tracking-wider flex items-center justify-center gap-2 transition-all ${
                 activeMode === "qrcode"
                   ? "bg-[#FF5500] text-white shadow-[0_4px_16px_rgba(255,85,0,0.35)] scale-[1.01]"
                   : "bg-white/5 text-white/60 hover:text-white hover:bg-white/10 border border-white/5"
               }`}
             >
-              <QrCode size={16} />
+              <QrCode size={18} />
               <span>Afficher QR Code</span>
             </button>
 
             {/* Tab 2: Liste Coureurs */}
             <button
               onClick={() => setActiveMode("list")}
-              className={`h-12 rounded-xl font-bold text-[11px] sm:text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 sm:gap-2 transition-all ${
+              className={`h-12 rounded-xl font-bold text-xs sm:text-sm uppercase tracking-wider flex items-center justify-center gap-2 transition-all ${
                 activeMode === "list"
                   ? "bg-[#FF5500] text-white shadow-[0_4px_16px_rgba(255,85,0,0.35)] scale-[1.01]"
                   : "bg-white/5 text-white/60 hover:text-white hover:bg-white/10 border border-white/5"
               }`}
             >
-              <Users size={16} />
-              <span>Liste ({totalCount})</span>
-            </button>
-
-            {/* Tab 3: Scanner Caméra */}
-            <button
-              onClick={() => setActiveMode("scanner")}
-              className={`h-12 rounded-xl font-bold text-[11px] sm:text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 sm:gap-2 transition-all ${
-                activeMode === "scanner"
-                  ? "bg-[#FF5500] text-white shadow-[0_4px_16px_rgba(255,85,0,0.35)] scale-[1.01]"
-                  : "bg-white/5 text-white/60 hover:text-white hover:bg-white/10 border border-white/5"
-              }`}
-            >
-              <Camera size={16} />
-              <span>Scanner Caméra</span>
+              <Users size={18} />
+              <span>Liste des Coureurs ({totalCount})</span>
             </button>
 
           </div>
@@ -325,7 +280,7 @@ export default function StaffCockpitPage() {
         {activeMode === "qrcode" && (
           <div className="bg-[#18181D] border border-white/10 rounded-[28px] p-6 sm:p-8 text-center space-y-6 shadow-xl">
             
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               <span className="px-3 py-1 rounded-full bg-[#FF5500]/10 text-[#FF5500] text-[10px] font-black uppercase tracking-widest border border-[#FF5500]/20">
                 Pointage Rapide au Départ
               </span>
@@ -341,7 +296,7 @@ export default function StaffCockpitPage() {
             <div className="inline-block p-6 sm:p-7 bg-white rounded-3xl shadow-2xl border-4 border-white/20">
               <QRCodeSVG
                 value={checkinPublicUrl}
-                size={240}
+                size={260}
                 fgColor="#1A1918"
                 bgColor="#FFFFFF"
                 level="H"
@@ -364,7 +319,7 @@ export default function StaffCockpitPage() {
                 )}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full sm:w-auto h-11 px-5 rounded-xl bg-[#25D366] hover:bg-[#1EBE5D] text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-sm"
+                className="w-full sm:w-auto h-11 px-6 rounded-xl bg-[#25D366] hover:bg-[#1EBE5D] text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-sm"
               >
                 <MessageCircle size={15} /> Envoyer sur WhatsApp
               </a>
@@ -380,7 +335,7 @@ export default function StaffCockpitPage() {
                   a.download = `qrcode-${data.event.title.replace(/\s+/g, "-").toLowerCase()}.svg`;
                   a.click();
                 }}
-                className="w-full sm:w-auto h-11 px-5 rounded-xl bg-white/10 hover:bg-white/15 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all border border-white/10"
+                className="w-full sm:w-auto h-11 px-6 rounded-xl bg-white/10 hover:bg-white/15 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all border border-white/10"
               >
                 <Download size={15} /> Télécharger le QR Code
               </button>
@@ -528,79 +483,7 @@ export default function StaffCockpitPage() {
           </div>
         )}
 
-        {/* ── TAB 3 : SCANNER AVEC LA CAMÉRA ── */}
-        {activeMode === "scanner" && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            
-            {/* Camera Frame */}
-            <div className="md:col-span-2 bg-[#18181D] border border-white/10 rounded-[28px] p-6 text-center space-y-4 shadow-xl">
-              <div className="flex items-center justify-between">
-                <p className="text-xs font-black uppercase tracking-wider text-white flex items-center gap-2">
-                  <Camera size={16} className="text-[#FF5500]" /> Scanner Caméra Actif
-                </p>
-                <span className="px-2.5 py-0.5 rounded-full bg-[#3DD68C]/10 text-[#3DD68C] text-[10px] font-bold uppercase tracking-wider">
-                  En direct
-                </span>
-              </div>
-
-              <div className="overflow-hidden rounded-2xl border-2 border-dashed border-white/20">
-                <QrScanner onScan={handleScan} />
-              </div>
-
-              <p className="text-xs text-white/50">
-                Pointe les téléphones des coureurs en continu. La validation est instantanée.
-              </p>
-            </div>
-
-            {/* Recent Scans Feed */}
-            <div className="bg-[#18181D] border border-white/10 rounded-[28px] p-5 space-y-3 flex flex-col shadow-xl">
-              <p className="text-xs font-black uppercase tracking-wider text-white/80 border-b border-white/10 pb-3">
-                Derniers Scans ({recentScans.length})
-              </p>
-
-              <div className="flex-1 space-y-2 overflow-y-auto max-h-80">
-                {recentScans.length === 0 ? (
-                  <div className="py-12 text-center text-white/30 text-xs">
-                    En attente des premiers scans...
-                  </div>
-                ) : (
-                  recentScans.map((s, idx) => (
-                    <div
-                      key={idx}
-                      className="p-3 rounded-xl bg-white/5 border border-white/5 flex items-center justify-between text-xs"
-                    >
-                      <span className="font-bold text-white truncate">{s.name}</span>
-                      <span className="text-[10px] text-[#3DD68C] font-mono shrink-0">✓ {s.time}</span>
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
-
-          </div>
-        )}
-
       </main>
-
-      {/* Toast Feedback Scan Réussi */}
-      <AnimatePresence>
-        {scanFeedback && (
-          <motion.div
-            initial={{ opacity: 0, y: 50, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="fixed bottom-6 left-4 right-4 max-w-md mx-auto bg-[#3DD68C] text-black font-bold p-4 rounded-2xl shadow-2xl flex items-center gap-3 z-50"
-          >
-            <CheckCircle2 size={26} className="shrink-0" />
-            <div>
-              <p className="text-sm font-black uppercase tracking-tight">
-                {scanFeedback.already ? "Déjà pointé !" : "Présence Validée ✓"}
-              </p>
-              <p className="text-xs font-medium opacity-90">{scanFeedback.name}</p>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {/* Modal Fiche Urgence Médicale ICE */}
       <AnimatePresence>
