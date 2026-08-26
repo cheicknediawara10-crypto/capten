@@ -5,7 +5,8 @@ import { useParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Users, Check, Search, QrCode, ShieldAlert, Phone, AlertCircle, Loader2,
-  CheckCircle2, X, RefreshCw, Sparkles, MapPin, Calendar, Camera, UserCheck
+  CheckCircle2, X, RefreshCw, Sparkles, MapPin, Calendar, Camera, UserCheck,
+  ShieldCheck, Activity, ArrowUpRight
 } from "lucide-react";
 import {
   getStaffCockpitContext,
@@ -19,8 +20,8 @@ import dynamic from "next/dynamic";
 const QrScanner = dynamic(() => import("@/components/checkin/QrScanner"), {
   ssr: false,
   loading: () => (
-    <div className="h-64 flex items-center justify-center bg-black/40 rounded-2xl">
-      <Loader2 className="animate-spin text-[#FF5500]" size={28} />
+    <div className="h-72 flex items-center justify-center bg-black/60 rounded-2xl border border-white/10">
+      <Loader2 className="animate-spin text-[#FF5500]" size={32} />
     </div>
   ),
 });
@@ -56,15 +57,16 @@ export default function StaffCockpitPage() {
   const [data, setData] = useState<any>(null);
   const [members, setMembers] = useState<MemberItem[]>([]);
   const [search, setSearch] = useState("");
-  const [filter, setFilter] = useState<"all" | "checked" | "pending">("all");
+  const [filter, setFilter] = useState<"all" | "pending" | "checked">("all");
   const [activeMode, setActiveMode] = useState<"list" | "scanner">("list");
 
   // Modal ICE
   const [iceModal, setIceModal] = useState<IceData | null>(null);
   const [iceLoading, setIceLoading] = useState(false);
 
-  // Scan feedback popup
+  // Scan feedback popup & history
   const [scanFeedback, setScanFeedback] = useState<{ name: string; already?: boolean } | null>(null);
+  const [recentScans, setRecentScans] = useState<Array<{ name: string; time: string }>>([]);
   const [checkingInId, setCheckingInId] = useState<string | null>(null);
 
   const loadContext = useCallback(async () => {
@@ -105,7 +107,12 @@ export default function StaffCockpitPage() {
     if (!scannedText) return;
     const res = await staffScanQrCheckin(token, scannedText);
     if ("ok" in res) {
-      setScanFeedback({ name: res.runnerName || "Coureur", already: res.already });
+      const runnerName = res.runnerName || "Coureur";
+      setScanFeedback({ name: runnerName, already: res.already });
+      setRecentScans((prev) => [
+        { name: runnerName, time: new Date().toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit", second: "2-digit" }) },
+        ...prev.slice(0, 7),
+      ]);
       await loadContext();
       setTimeout(() => setScanFeedback(null), 3000);
     } else {
@@ -127,19 +134,21 @@ export default function StaffCockpitPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#111111] text-white flex flex-col items-center justify-center gap-3 p-6 text-center">
-        <Loader2 className="animate-spin text-[#FF5500]" size={36} />
-        <p className="text-sm text-white/60 font-medium">Chargement du Cockpit Staff...</p>
+      <div className="min-h-screen bg-[#0C0C0E] text-white flex flex-col items-center justify-center gap-3 p-6 text-center">
+        <Loader2 className="animate-spin text-[#FF5500]" size={40} />
+        <p className="text-sm text-white/60 font-medium tracking-wide">Chargement du Cockpit Staff...</p>
       </div>
     );
   }
 
   if (errorMsg || !data) {
     return (
-      <div className="min-h-screen bg-[#111111] text-white flex flex-col items-center justify-center gap-4 p-6 text-center">
-        <AlertCircle size={40} className="text-red-400" />
-        <h1 className="text-xl font-bold uppercase tracking-tight">Accès Staff Introuvable</h1>
-        <p className="text-sm text-white/60 max-w-sm">
+      <div className="min-h-screen bg-[#0C0C0E] text-white flex flex-col items-center justify-center gap-4 p-6 text-center">
+        <div className="w-16 h-16 rounded-2xl bg-red-500/10 border border-red-500/30 flex items-center justify-center text-red-400">
+          <AlertCircle size={32} />
+        </div>
+        <h1 className="text-2xl font-black uppercase tracking-tight font-display">Accès Staff Introuvable</h1>
+        <p className="text-sm text-white/60 max-w-md">
           {errorMsg || "Ce lien staff a expiré ou a été révoqué par le capitaine."}
         </p>
       </div>
@@ -148,6 +157,7 @@ export default function StaffCockpitPage() {
 
   const checkedCount = members.filter((m) => m.isCheckedIn).length;
   const totalCount = members.length;
+  const progressPercent = totalCount > 0 ? Math.round((checkedCount / totalCount) * 100) : 0;
 
   const filteredMembers = members.filter((m) => {
     const full = `${m.firstName} ${m.lastName} ${m.phone}`.toLowerCase();
@@ -159,162 +169,215 @@ export default function StaffCockpitPage() {
   });
 
   return (
-    <div className="min-h-screen bg-[#141414] text-white font-sans antialiased pb-28">
-      {/* Top Header Staff */}
-      <header className="bg-[#1A1918] border-b border-white/10 px-5 pt-8 pb-5 sticky top-0 z-30 shadow-md">
-        <div className="max-w-md mx-auto space-y-3">
+    <div className="min-h-screen bg-[#0C0C0E] text-white font-sans antialiased pb-24 selection:bg-[#FF5500] selection:text-white">
+      
+      {/* Glow Top Accent */}
+      <div className="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-48 bg-[#FF5500]/10 blur-[100px] pointer-events-none -z-10" />
+
+      {/* Top Navigation & Context Bar */}
+      <header className="border-b border-white/[0.08] bg-[#121215]/80 backdrop-blur-xl sticky top-0 z-30">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-4">
           
-          {/* Badge Staff & Club */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-[#FF5500]/20 flex items-center justify-center overflow-hidden">
-                {data.club.logoUrl ? (
-                  <img src={data.club.logoUrl} alt="" className="w-full h-full object-cover" />
-                ) : "🏃"}
+          {/* Club Info */}
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-9 h-9 rounded-xl bg-[#FF5500]/20 border border-[#FF5500]/30 flex items-center justify-center overflow-hidden shrink-0">
+              {data.club.logoUrl ? (
+                <img src={data.club.logoUrl} alt="" className="w-full h-full object-cover" />
+              ) : (
+                <span className="text-sm">🏃</span>
+              )}
+            </div>
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-black uppercase tracking-wider text-white truncate">
+                  {data.club.name}
+                </span>
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#FF5500] text-white text-[9px] font-black uppercase tracking-widest shrink-0 shadow-sm">
+                  <Sparkles size={9} /> {data.staffLabel || "Co-Capitaine"}
+                </span>
               </div>
-              <span className="text-xs font-bold uppercase tracking-wider text-white/80">
-                {data.club.name}
-              </span>
-            </div>
-
-            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FF5500] text-white text-[10px] font-black uppercase tracking-widest shadow-[0_2px_10px_rgba(255,85,0,0.3)]">
-              <Sparkles size={11} /> {data.staffLabel || "Staff Terrain"}
-            </div>
-          </div>
-
-          {/* Titre du Run & Infos */}
-          <div>
-            <h1 className="text-xl font-display font-black italic uppercase tracking-tight text-white leading-tight">
-              {data.event.title}
-            </h1>
-            <p className="text-xs text-white/60 flex items-center gap-2 mt-1">
-              <span>{formatDateShort(data.event.date)}</span>
-              {data.event.address && <span>· {data.event.address}</span>}
-            </p>
-          </div>
-
-          {/* Compteur Synthétique Live */}
-          <div className="flex items-center justify-between p-3 rounded-2xl bg-white/5 border border-white/10">
-            <div>
-              <p className="text-[10px] font-black uppercase tracking-widest text-white/50">Pointage en direct</p>
-              <p className="text-2xl font-display font-black italic text-white leading-none mt-0.5">
-                <span className="text-[#3DD68C]">{checkedCount}</span>
-                <span className="text-white/40 text-lg font-normal"> / {totalCount}</span>
+              <p className="text-[11px] text-white/50 truncate font-medium">
+                Accès Terrain Sécurisé · Zéro mot de passe
               </p>
             </div>
-            <button
-              onClick={loadContext}
-              className="p-2 rounded-xl bg-white/10 text-white/80 hover:text-white transition-colors"
-              title="Rafraîchir"
-            >
-              <RefreshCw size={14} />
-            </button>
           </div>
 
-          {/* Sélecteur de Mode : Scanner vs Liste */}
-          <div className="grid grid-cols-2 gap-2 pt-1">
-            <button
-              onClick={() => setActiveMode("list")}
-              className={`h-11 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all ${
-                activeMode === "list"
-                  ? "bg-[#FF5500] text-white shadow-[0_4px_12px_rgba(255,85,0,0.3)]"
-                  : "bg-white/5 text-white/60 hover:text-white border border-white/5"
-              }`}
-            >
-              <Users size={15} /> Liste Coureurs ({totalCount})
-            </button>
-            <button
-              onClick={() => setActiveMode("scanner")}
-              className={`h-11 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all ${
-                activeMode === "scanner"
-                  ? "bg-[#FF5500] text-white shadow-[0_4px_12px_rgba(255,85,0,0.3)]"
-                  : "bg-white/5 text-white/60 hover:text-white border border-white/5"
-              }`}
-            >
-              <QrCode size={15} /> Scanner QR
-            </button>
-          </div>
+          {/* Quick Refresh */}
+          <button
+            onClick={loadContext}
+            className="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-white/70 hover:text-white transition-colors border border-white/5"
+            title="Rafraîchir les présences"
+          >
+            <RefreshCw size={15} />
+          </button>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="max-w-md mx-auto px-4 pt-4 space-y-4">
+      {/* Main Content Area */}
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 pt-6 space-y-6">
         
-        {/* MODE 1: LISTE DE POINTAGE */}
-        {activeMode === "list" && (
-          <div className="space-y-3">
-            
-            {/* Barre de Recherche */}
-            <div className="relative">
-              <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/40" />
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Rechercher par prénom, nom ou tél..."
-                className="w-full h-11 pl-10 pr-4 rounded-xl bg-white/5 border border-white/10 text-sm text-white placeholder:text-white/40 focus:border-[#FF5500] outline-none transition-all"
+        {/* Run Banner & Live Gauge Card */}
+        <div className="bg-gradient-to-b from-[#18181D] to-[#131317] border border-white/10 rounded-[28px] p-6 sm:p-7 shadow-2xl space-y-5">
+          
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="space-y-1.5">
+              <div className="flex items-center gap-2 flex-wrap text-xs text-white/60 font-medium">
+                <span className="inline-flex items-center gap-1 bg-white/5 px-2.5 py-1 rounded-lg border border-white/5">
+                  <Calendar size={12} className="text-[#FF5500]" /> {formatDateShort(data.event.date)}
+                </span>
+                {data.event.address && (
+                  <span className="inline-flex items-center gap-1 bg-white/5 px-2.5 py-1 rounded-lg border border-white/5">
+                    <MapPin size={12} className="text-[#FF5500]" /> {data.event.address}
+                  </span>
+                )}
+                {data.event.is_evenement && (
+                  <span className="bg-[#FF5500]/20 text-[#FF5500] border border-[#FF5500]/30 px-2 py-0.5 rounded-lg text-[10px] font-black uppercase tracking-wider">
+                    ⚡ Événement
+                  </span>
+                )}
+              </div>
+              <h1 className="text-2xl sm:text-3xl font-display font-black italic uppercase tracking-tight text-white">
+                {data.event.title}
+              </h1>
+            </div>
+
+            {/* Gauge Counter */}
+            <div className="flex items-center gap-4 bg-white/5 border border-white/10 p-4 rounded-2xl shrink-0">
+              <div className="text-right">
+                <p className="text-[10px] font-black uppercase tracking-widest text-white/50">Pointage en direct</p>
+                <p className="text-3xl font-display font-black italic text-white leading-none mt-0.5">
+                  <span className="text-[#3DD68C]">{checkedCount}</span>
+                  <span className="text-white/40 text-xl font-normal"> / {totalCount}</span>
+                </p>
+              </div>
+              <div className="w-12 h-12 rounded-xl bg-[#3DD68C]/10 border border-[#3DD68C]/30 flex items-center justify-center text-[#3DD68C]">
+                <Activity size={22} className="animate-pulse" />
+              </div>
+            </div>
+          </div>
+
+          {/* Progress Bar */}
+          <div className="space-y-1.5 pt-1">
+            <div className="w-full h-2.5 rounded-full bg-white/10 overflow-hidden p-0.5">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-[#FF5500] to-[#3DD68C] transition-all duration-500"
+                style={{ width: `${progressPercent}%` }}
               />
-              {search && (
-                <button
-                  onClick={() => setSearch("")}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white"
-                >
-                  <X size={14} />
-                </button>
-              )}
+            </div>
+            <div className="flex justify-between text-[11px] text-white/50 font-bold uppercase tracking-wider">
+              <span>{checkedCount} coureur{checkedCount > 1 ? "s" : ""} présent{checkedCount > 1 ? "s" : ""}</span>
+              <span>{progressPercent}% complété</span>
+            </div>
+          </div>
+
+          {/* Mode Switcher Buttons */}
+          <div className="grid grid-cols-2 gap-3 pt-2 border-t border-white/10">
+            <button
+              onClick={() => setActiveMode("list")}
+              className={`h-12 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all ${
+                activeMode === "list"
+                  ? "bg-[#FF5500] text-white shadow-[0_4px_16px_rgba(255,85,0,0.35)] scale-[1.01]"
+                  : "bg-white/5 text-white/60 hover:text-white hover:bg-white/10 border border-white/5"
+              }`}
+            >
+              <Users size={16} /> Liste Coureurs ({totalCount})
+            </button>
+            <button
+              onClick={() => setActiveMode("scanner")}
+              className={`h-12 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all ${
+                activeMode === "scanner"
+                  ? "bg-[#FF5500] text-white shadow-[0_4px_16px_rgba(255,85,0,0.35)] scale-[1.01]"
+                  : "bg-white/5 text-white/60 hover:text-white hover:bg-white/10 border border-white/5"
+              }`}
+            >
+              <QrCode size={16} /> Scanner QR Caméra
+            </button>
+          </div>
+        </div>
+
+        {/* ── MODE 1 : LISTE & RECHERCHE DES COUREURS ── */}
+        {activeMode === "list" && (
+          <div className="space-y-4">
+            
+            {/* Search Bar & Filters */}
+            <div className="flex flex-col sm:flex-row gap-3">
+              <div className="relative flex-1">
+                <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40" />
+                <input
+                  type="text"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Rechercher un prénom, nom ou téléphone..."
+                  className="w-full h-12 pl-11 pr-10 rounded-2xl bg-[#18181D] border border-white/10 text-sm text-white placeholder:text-white/40 focus:border-[#FF5500] outline-none transition-all"
+                />
+                {search && (
+                  <button
+                    onClick={() => setSearch("")}
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/40 hover:text-white"
+                  >
+                    <X size={15} />
+                  </button>
+                )}
+              </div>
+
+              {/* Filter Tabs */}
+              <div className="flex items-center gap-1.5 p-1 bg-[#18181D] border border-white/10 rounded-2xl shrink-0 overflow-x-auto">
+                {[
+                  { key: "all", label: `Tous (${totalCount})` },
+                  { key: "pending", label: `À pointer (${totalCount - checkedCount})` },
+                  { key: "checked", label: `Pointés (${checkedCount})` },
+                ].map((f) => (
+                  <button
+                    key={f.key}
+                    onClick={() => setFilter(f.key as any)}
+                    className={`px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-all ${
+                      filter === f.key
+                        ? "bg-white text-black font-extrabold shadow-sm"
+                        : "text-white/60 hover:text-white"
+                    }`}
+                  >
+                    {f.label}
+                  </button>
+                ))}
+              </div>
             </div>
 
-            {/* Filtres de Statut */}
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
-              {[
-                { key: "all", label: `Tous (${totalCount})` },
-                { key: "pending", label: `À pointer (${totalCount - checkedCount})` },
-                { key: "checked", label: `Pointés (${checkedCount})` },
-              ].map((f) => (
-                <button
-                  key={f.key}
-                  onClick={() => setFilter(f.key as any)}
-                  className={`px-3 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider whitespace-nowrap transition-all ${
-                    filter === f.key
-                      ? "bg-white text-black font-extrabold"
-                      : "bg-white/5 text-white/60 hover:text-white border border-white/5"
-                  }`}
-                >
-                  {f.label}
-                </button>
-              ))}
-            </div>
-
-            {/* Liste des Coureurs */}
-            <div className="space-y-2 pt-1">
+            {/* Coureurs Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
               {filteredMembers.length === 0 ? (
-                <div className="py-12 text-center text-white/40 text-sm">
-                  Aucun coureur trouvé.
+                <div className="col-span-full py-16 text-center bg-[#18181D]/50 border border-white/5 rounded-3xl space-y-2">
+                  <Users size={32} className="mx-auto text-white/20" />
+                  <p className="text-sm font-medium text-white/50">Aucun coureur ne correspond à la recherche.</p>
                 </div>
               ) : (
                 filteredMembers.map((m) => (
                   <div
                     key={m.id}
-                    className={`p-3.5 rounded-2xl border transition-all flex items-center justify-between gap-3 ${
+                    className={`p-4 rounded-2xl border transition-all flex items-center justify-between gap-3 ${
                       m.isCheckedIn
-                        ? "bg-[#3DD68C]/10 border-[#3DD68C]/30"
-                        : "bg-white/5 border-white/10"
+                        ? "bg-[#3DD68C]/[0.08] border-[#3DD68C]/30 hover:border-[#3DD68C]/50"
+                        : "bg-[#18181D] border-white/10 hover:border-white/20"
                     }`}
                   >
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 font-bold text-xs ${
-                        m.isCheckedIn ? "bg-[#3DD68C] text-black" : "bg-white/10 text-white"
-                      }`}>
+                    {/* Runner Avatar & Name */}
+                    <div className="flex items-center gap-3.5 min-w-0">
+                      <div
+                        className={`w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 font-extrabold text-xs shadow-inner ${
+                          m.isCheckedIn
+                            ? "bg-[#3DD68C] text-black"
+                            : "bg-white/10 text-white border border-white/10"
+                        }`}
+                      >
                         {m.firstName[0]}{m.lastName[0]}
                       </div>
                       <div className="min-w-0">
                         <p className="text-sm font-bold text-white truncate">
                           {m.firstName} {m.lastName}
                         </p>
-                        <p className="text-[11px] text-white/50 truncate flex items-center gap-1.5 mt-0.5">
+                        <p className="text-[11px] text-white/50 truncate flex items-center gap-2 mt-0.5">
                           {m.phone && <span>{m.phone}</span>}
                           {m.isCheckedIn && (
-                            <span className="text-[#3DD68C] font-semibold">
+                            <span className="text-[#3DD68C] font-semibold flex items-center gap-0.5">
                               ✓ {m.method === "qr_code" ? "QR" : m.method === "gps" ? "GPS" : "Manuel"}
                             </span>
                           )}
@@ -322,40 +385,41 @@ export default function StaffCockpitPage() {
                       </div>
                     </div>
 
-                    {/* Actions Staff */}
+                    {/* Actions */}
                     <div className="flex items-center gap-2 shrink-0">
                       
-                      {/* Bouton ICE Urgence */}
+                      {/* Emergency ICE Button */}
                       <button
                         onClick={() => handleOpenIce(m.id)}
                         disabled={iceLoading}
-                        className={`p-2 rounded-xl border text-xs font-bold transition-all flex items-center gap-1 ${
+                        className={`h-10 px-3 rounded-xl border text-xs font-bold transition-all flex items-center gap-1.5 ${
                           m.hasIce
-                            ? "bg-red-500/20 text-red-300 border-red-500/40 hover:bg-red-500 hover:text-white"
+                            ? "bg-red-500/15 text-red-300 border-red-500/30 hover:bg-red-500 hover:text-white"
                             : "bg-white/5 text-white/40 border-white/10 hover:text-white"
                         }`}
-                        title="Consulter la fiche ICE"
+                        title="Consulter la fiche d'urgence (ICE)"
                       >
-                        <ShieldAlert size={15} />
-                        <span className="text-[10px] font-black uppercase">ICE</span>
+                        <ShieldAlert size={14} className={m.hasIce ? "text-red-400" : ""} />
+                        <span className="text-[10px] font-black uppercase tracking-wider">ICE</span>
                       </button>
 
-                      {/* Bouton Check-in */}
+                      {/* Check-in Action Button */}
                       {m.isCheckedIn ? (
-                        <div className="w-9 h-9 rounded-xl bg-[#3DD68C]/20 border border-[#3DD68C]/40 text-[#3DD68C] flex items-center justify-center">
-                          <Check size={16} className="stroke-[3]" />
+                        <div className="h-10 px-3.5 rounded-xl bg-[#3DD68C]/20 border border-[#3DD68C]/40 text-[#3DD68C] text-xs font-bold flex items-center gap-1.5">
+                          <Check size={15} className="stroke-[3]" />
+                          <span className="hidden xs:inline">Pointé</span>
                         </div>
                       ) : (
                         <button
                           onClick={() => handleManualCheckin(m.id)}
                           disabled={checkingInId === m.id}
-                          className="px-3.5 h-9 rounded-xl bg-[#FF5500] hover:bg-[#E04B00] text-white text-[11px] font-black uppercase tracking-wider transition-all flex items-center gap-1 shadow-sm active:scale-95"
+                          className="h-10 px-4 rounded-xl bg-[#FF5500] hover:bg-[#E04B00] text-white text-xs font-black uppercase tracking-wider transition-all flex items-center gap-1.5 shadow-md active:scale-95 cursor-pointer"
                         >
                           {checkingInId === m.id ? (
-                            <Loader2 size={13} className="animate-spin" />
+                            <Loader2 size={14} className="animate-spin" />
                           ) : (
                             <>
-                              <Check size={13} /> Pointer
+                              <Check size={14} /> Pointer
                             </>
                           )}
                         </button>
@@ -370,20 +434,55 @@ export default function StaffCockpitPage() {
           </div>
         )}
 
-        {/* MODE 2: SCANNER QR CONTINU */}
+        {/* ── MODE 2 : SCANNER QR CAMÉRA ── */}
         {activeMode === "scanner" && (
-          <div className="space-y-4">
-            <div className="bg-black/60 border border-white/10 rounded-2xl p-4 text-center space-y-3">
-              <p className="text-xs font-bold uppercase tracking-wider text-white/70">
-                Pointe les téléphones des coureurs en continu
-              </p>
-              <div className="overflow-hidden rounded-xl">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            
+            {/* Camera Frame */}
+            <div className="md:col-span-2 bg-[#18181D] border border-white/10 rounded-[28px] p-6 text-center space-y-4">
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-black uppercase tracking-wider text-white flex items-center gap-2">
+                  <Camera size={16} className="text-[#FF5500]" /> Scanner Caméra Actif
+                </p>
+                <span className="px-2.5 py-0.5 rounded-full bg-[#3DD68C]/10 text-[#3DD68C] text-[10px] font-bold uppercase tracking-wider">
+                  En direct
+                </span>
+              </div>
+
+              <div className="overflow-hidden rounded-2xl border-2 border-dashed border-white/20">
                 <QrScanner onScan={handleScan} />
               </div>
-              <p className="text-[11px] text-white/40">
-                Place le QR code du coureur dans le cadre pour le valider instantanément.
+
+              <p className="text-xs text-white/50">
+                Pointe les téléphones des coureurs en continu. La validation est instantanée.
               </p>
             </div>
+
+            {/* Recent Scans Feed */}
+            <div className="bg-[#18181D] border border-white/10 rounded-[28px] p-5 space-y-3 flex flex-col">
+              <p className="text-xs font-black uppercase tracking-wider text-white/80 border-b border-white/10 pb-3">
+                Derniers Scans ({recentScans.length})
+              </p>
+
+              <div className="flex-1 space-y-2 overflow-y-auto max-h-80">
+                {recentScans.length === 0 ? (
+                  <div className="py-12 text-center text-white/30 text-xs">
+                    En attente des premiers scans...
+                  </div>
+                ) : (
+                  recentScans.map((s, idx) => (
+                    <div
+                      key={idx}
+                      className="p-3 rounded-xl bg-white/5 border border-white/5 flex items-center justify-between text-xs"
+                    >
+                      <span className="font-bold text-white truncate">{s.name}</span>
+                      <span className="text-[10px] text-[#3DD68C] font-mono shrink-0">✓ {s.time}</span>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+
           </div>
         )}
 
@@ -393,12 +492,12 @@ export default function StaffCockpitPage() {
       <AnimatePresence>
         {scanFeedback && (
           <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 50, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.95 }}
             className="fixed bottom-6 left-4 right-4 max-w-md mx-auto bg-[#3DD68C] text-black font-bold p-4 rounded-2xl shadow-2xl flex items-center gap-3 z-50"
           >
-            <CheckCircle2 size={24} className="shrink-0" />
+            <CheckCircle2 size={26} className="shrink-0" />
             <div>
               <p className="text-sm font-black uppercase tracking-tight">
                 {scanFeedback.already ? "Déjà pointé !" : "Présence Validée ✓"}
@@ -425,20 +524,20 @@ export default function StaffCockpitPage() {
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="relative w-full max-w-md bg-[#1C1B18] border border-red-500/40 rounded-[28px] p-6 space-y-5 shadow-2xl z-10 max-h-[85vh] overflow-y-auto"
+              className="relative w-full max-w-lg bg-[#18181D] border border-red-500/40 rounded-[28px] p-6 sm:p-7 space-y-5 shadow-2xl z-10 max-h-[85vh] overflow-y-auto"
             >
               {/* Header Alerte Rouge */}
               <div className="flex items-start justify-between">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-10 h-10 rounded-2xl bg-red-500/20 border border-red-500/40 flex items-center justify-center text-red-400">
-                    <ShieldAlert size={20} />
+                <div className="flex items-center gap-3">
+                  <div className="w-11 h-11 rounded-2xl bg-red-500/20 border border-red-500/40 flex items-center justify-center text-red-400">
+                    <ShieldAlert size={22} />
                   </div>
                   <div>
                     <h3 className="text-base font-black uppercase tracking-tight text-white">
-                      Fiche d&apos;Urgence (ICE)
+                      Fiche d&apos;Urgence Médicale (ICE)
                     </h3>
                     <p className="text-xs text-white/60 font-medium">
-                      {iceModal.runner.name}
+                      {iceModal.runner.name} {iceModal.runner.phone && `· ${iceModal.runner.phone}`}
                     </p>
                   </div>
                 </div>
@@ -452,8 +551,8 @@ export default function StaffCockpitPage() {
 
               {iceModal.ice ? (
                 <div className="space-y-4">
-                  {/* Contact d'Urgence */}
-                  <div className="p-4 rounded-2xl bg-red-950/40 border border-red-500/30 space-y-2">
+                  {/* Contact d'Urgence Card */}
+                  <div className="p-5 rounded-2xl bg-red-950/40 border border-red-500/30 space-y-3">
                     <p className="text-[10px] font-black uppercase tracking-widest text-red-300">
                       Contact à prévenir en priorité
                     </p>
@@ -463,7 +562,7 @@ export default function StaffCockpitPage() {
                     </p>
                     <a
                       href={`tel:${iceModal.ice.contactPhone.replace(/\s+/g, "")}`}
-                      className="mt-2 w-full h-12 rounded-xl bg-red-600 hover:bg-red-500 text-white font-black text-sm uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-lg active:scale-95"
+                      className="w-full h-12 rounded-xl bg-red-600 hover:bg-red-500 text-white font-black text-sm uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-lg active:scale-95"
                     >
                       <Phone size={16} /> Appeler {iceModal.ice.contactPhone}
                     </a>
@@ -471,24 +570,24 @@ export default function StaffCockpitPage() {
 
                   {/* Données Médicales */}
                   <div className="space-y-2 text-xs">
-                    <div className="p-3 rounded-xl bg-white/5 border border-white/10 flex justify-between">
+                    <div className="p-3.5 rounded-xl bg-white/5 border border-white/10 flex justify-between">
                       <span className="text-white/50 uppercase font-bold">Groupe Sanguin</span>
                       <span className="font-bold text-white">{iceModal.ice.bloodType}</span>
                     </div>
 
-                    <div className="p-3 rounded-xl bg-white/5 border border-white/10 space-y-1">
+                    <div className="p-3.5 rounded-xl bg-white/5 border border-white/10 space-y-1">
                       <span className="text-white/50 uppercase font-bold block">Allergies connues</span>
                       <span className="font-medium text-white block">{iceModal.ice.allergies}</span>
                     </div>
 
-                    <div className="p-3 rounded-xl bg-white/5 border border-white/10 space-y-1">
+                    <div className="p-3.5 rounded-xl bg-white/5 border border-white/10 space-y-1">
                       <span className="text-white/50 uppercase font-bold block">Remarques médicales</span>
                       <span className="font-medium text-white block">{iceModal.ice.medicalNotes}</span>
                     </div>
                   </div>
                 </div>
               ) : (
-                <div className="p-6 rounded-2xl bg-white/5 text-center text-white/50 text-xs">
+                <div className="p-8 rounded-2xl bg-white/5 text-center text-white/50 text-xs">
                   Ce coureur n&apos;a pas encore complété sa fiche d&apos;urgence ICE.
                 </div>
               )}
