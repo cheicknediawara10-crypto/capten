@@ -65,6 +65,58 @@ export async function getOrCreateStaffToken(eventId: string, label = "Co-Capitai
 }
 
 /**
+ * 1b. Génère ou récupère le lien Staff permanent du Club (depuis les Réglages)
+ */
+export async function getOrCreateClubStandingStaffToken(label = "Co-Capitaine Général") {
+  const clubId = await getAuthenticatedCaptainId();
+  if (!clubId) return { error: "unauth" };
+
+  let sb: ReturnType<typeof createAdminClient>;
+  try {
+    sb = createAdminClient();
+  } catch {
+    return { error: "Service indisponible." };
+  }
+
+  // Recherche d'un token permanent actif existant (event_id null)
+  const { data: existing } = await ub(sb, "club_staff_tokens")
+    .select("*")
+    .eq("club_id", clubId)
+    .is("event_id", null)
+    .eq("is_active", true)
+    .maybeSingle();
+
+  if (existing) {
+    return {
+      token: existing.token,
+      staffUrl: `${getAppUrl()}/staff/${existing.token}`,
+      label: existing.label,
+    };
+  }
+
+  // Création d'un nouveau token permanent
+  const { data: created, error } = await ub(sb, "club_staff_tokens")
+    .insert({
+      club_id: clubId,
+      event_id: null,
+      label,
+      is_active: true,
+    })
+    .select()
+    .single();
+
+  if (error || !created) {
+    return { error: error?.message || "Impossible de générer le lien staff." };
+  }
+
+  return {
+    token: created.token,
+    staffUrl: `${getAppUrl()}/staff/${created.token}`,
+    label: created.label,
+  };
+}
+
+/**
  * 2. Révoque un lien Staff (Action Capitaine)
  */
 export async function revokeStaffToken(tokenString: string) {
@@ -104,14 +156,48 @@ export async function getStaffCockpitContext(tokenString: string) {
     .eq("is_active", true)
     .maybeSingle();
 
-  if (!staffToken || !staffToken.events) {
+  if (!staffToken) {
     return { error: "Lien staff invalide ou expiré." };
   }
 
-  const eventId = staffToken.event_id;
   const clubId = staffToken.club_id;
-  const event = staffToken.events;
   const club = staffToken.clubs;
+  let event = staffToken.events;
+  let eventId = staffToken.event_id;
+
+  // Si token permanent (event_id null), on cherche le prochain run ou le dernier run actif
+  if (!eventId || !event) {
+    const now = new Date().toISOString();
+    const { data: nextEv } = await ub(sb, "events")
+      .select("*")
+      .eq("club_id", clubId)
+      .gte("event_date", now)
+      .order("event_date", { ascending: true })
+      .limit(1)
+      .maybeSingle();
+
+    if (nextEv) {
+      event = nextEv;
+      eventId = nextEv.id;
+    } else {
+      // Sinon le dernier run
+      const { data: lastEv } = await ub(sb, "events")
+        .select("*")
+        .eq("club_id", clubId)
+        .order("event_date", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (lastEv) {
+        event = lastEv;
+        eventId = lastEv.id;
+      }
+    }
+  }
+
+  if (!event || !eventId) {
+    return { error: "Aucun run n'est programmé pour ce crew actuellement." };
+  }
 
   // 2. Récupération des membres du club + check-ins du run + fiches ICE existantes
   const [{ data: rawMembers }, { data: rawCheckins }, { data: rawIce }] = await Promise.all([
@@ -186,7 +272,7 @@ export async function staffSubmitCheckin(tokenString: string, memberId: string) 
 
   // Vérifie le token
   const { data: staffToken } = await ub(sb, "club_staff_tokens")
-    .select("event_id, is_active")
+    .select("event_id, club_id, is_active")
     .eq("token", tokenString)
     .eq("is_active", true)
     .maybeSingle();
@@ -195,7 +281,22 @@ export async function staffSubmitCheckin(tokenString: string, memberId: string) 
     return { error: "Lien staff invalide ou révoqué." };
   }
 
-  const eventId = staffToken.event_id;
+  let eventId = staffToken.event_id;
+  if (!eventId) {
+    const now = new Date().toISOString();
+    const { data: nextEv } = await ub(sb, "events")
+      .select("id")
+      .eq("club_id", staffToken.club_id)
+      .gte("event_date", now)
+      .order("event_date", { ascending: true })
+      .limit(1)
+      .maybeSingle();
+    eventId = nextEv?.id;
+  }
+
+  if (!eventId) {
+    return { error: "Aucun run actif trouvé." };
+  }
 
   // Insert ou ignore si déjà pointé
   const { data: existing } = await ub(sb, "membre_checkins")
@@ -240,8 +341,24 @@ export async function staffScanQrCheckin(tokenString: string, scannedText: strin
     return { error: "Lien staff invalide ou révoqué." };
   }
 
-  const eventId = staffToken.event_id;
+  let eventId = staffToken.event_id;
   const clubId = staffToken.club_id;
+
+  if (!eventId) {
+    const now = new Date().toISOString();
+    const { data: nextEv } = await ub(sb, "events")
+      .select("id")
+      .eq("club_id", clubId)
+      .gte("event_date", now)
+      .order("event_date", { ascending: true })
+      .limit(1)
+      .maybeSingle();
+    eventId = nextEv?.id;
+  }
+
+  if (!eventId) {
+    return { error: "Aucun run actif trouvé." };
+  }
 
   // Le QR peut contenir un ID membre (UUID) ou un numéro de téléphone
   const query = scannedText.trim();

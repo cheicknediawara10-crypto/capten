@@ -11,6 +11,7 @@ import {
 import { getMyClub, saveMyClub } from "@/app/dashboard/club/actions";
 import { getSupabase } from "@/lib/supabase";
 import { useAuth } from "@/context/AuthContext";
+import { getOrCreateClubStandingStaffToken, revokeStaffToken } from "@/lib/staff/actions";
 
 export default function SettingsPage() {
   const { user, refreshClub } = useAuth();
@@ -18,6 +19,11 @@ export default function SettingsPage() {
   const [saving, setSaving] = useState(false);
   const [copied, setCopied] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+
+  // Staff Token State
+  const [staffTokenData, setStaffTokenData] = useState<{ token: string; staffUrl: string; label: string } | null>(null);
+  const [staffCopied, setStaffCopied] = useState(false);
+  const [staffLoading, setStaffLoading] = useState(false);
 
   // Club identity fields
   const [clubId, setClubId] = useState("");
@@ -55,9 +61,30 @@ export default function SettingsPage() {
           setWhatsappLink(c.whatsapp_link || "");
         }
       }
+
+      // Fetch standing staff token
+      const staffRes = await getOrCreateClubStandingStaffToken();
+      if (!("error" in staffRes)) {
+        setStaffTokenData(staffRes);
+      }
+
       setLoading(false);
     })();
   }, []);
+
+  const handleRevokeStaffToken = async () => {
+    if (!staffTokenData) return;
+    if (!confirm("Révoquer ce lien staff général ? Tes co-capitaines ne pourront plus l'utiliser pour pointer.")) return;
+    setStaffLoading(true);
+    await revokeStaffToken(staffTokenData.token);
+    // Regenerate a fresh one
+    const fresh = await getOrCreateClubStandingStaffToken();
+    if (!("error" in fresh)) {
+      setStaffTokenData(fresh);
+      showToast("Lien staff révoqué et régénéré !");
+    }
+    setStaffLoading(false);
+  };
 
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -354,7 +381,93 @@ export default function SettingsPage() {
         </div>
       </form>
 
-      {/* ── SECTION 2 : FORFAIT & ABONNEMENT ── */}
+      {/* ── SECTION 2 : ÉQUIPE & CO-CAPITAINES (DÉLÉGATION STAFF) ── */}
+      <div className="bg-[var(--app-surface)] border border-[color:var(--app-border)] rounded-[28px] p-6 sm:p-8 shadow-sm space-y-6">
+        <div className="flex items-center justify-between border-b border-[color:var(--app-border)] pb-4 flex-wrap gap-2">
+          <div className="flex items-center gap-3">
+            <span className="w-10 h-10 rounded-2xl bg-[#FF5500]/10 flex items-center justify-center text-[#FF5500]">
+              <Sparkles size={20} />
+            </span>
+            <div>
+              <h2 className="text-base font-extrabold uppercase tracking-tight text-[color:var(--app-text)]">
+                2. Équipe &amp; Co-Capitaines (Délégation Staff)
+              </h2>
+              <p className="text-xs text-[color:var(--app-text-muted)]">
+                Permets à tes pacers et co-organisateurs de pointer les coureurs et de voir les fiches d&apos;urgence (ICE).
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <div className="p-5 rounded-2xl bg-[var(--app-surface-2)] border border-[color:var(--app-border)] space-y-3">
+            <div className="flex items-center justify-between">
+              <p className="text-[11px] font-black uppercase tracking-wider text-[color:var(--app-text-muted)]">
+                Lien Magique Staff Permanent (Zéro mot de passe)
+              </p>
+              <span className="px-2 py-0.5 rounded-full bg-[#22C55E]/10 text-[#22C55E] text-[10px] font-bold uppercase">
+                Actif
+              </span>
+            </div>
+
+            {staffTokenData ? (
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                <div className="flex-1 px-3.5 py-2.5 rounded-xl bg-[var(--app-surface)] border border-[color:var(--app-border)] font-mono text-xs font-bold text-[color:var(--app-text)] truncate">
+                  {staffTokenData.staffUrl}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    navigator.clipboard.writeText(staffTokenData.staffUrl);
+                    setStaffCopied(true);
+                    setTimeout(() => setStaffCopied(false), 2500);
+                  }}
+                  className="h-10 px-4 rounded-xl bg-[var(--app-surface)] border border-[color:var(--app-border)] text-xs font-bold text-[color:var(--app-text)] hover:border-[#FF5500] transition-colors flex items-center justify-center gap-1.5 cursor-pointer shrink-0"
+                >
+                  {staffCopied ? <CheckCheck size={14} className="text-[#22C55E]" /> : <Copy size={14} />}
+                  {staffCopied ? "Copié !" : "Copier"}
+                </button>
+                <a
+                  href={`https://wa.me/?text=${encodeURIComponent(
+                    `Salut l'équipe ! Voici votre lien Staff pour pointer les coureurs et voir les fiches d'urgence (ICE) : ${staffTokenData.staffUrl} 🖤`
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="h-10 px-4 rounded-xl bg-[#25D366] hover:bg-[#1EBE5D] text-white text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 shrink-0 transition-all shadow-sm"
+                >
+                  <MessageCircle size={14} /> WhatsApp
+                </a>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 text-xs text-[color:var(--app-text-muted)]">
+                <Loader2 size={14} className="animate-spin text-[#FF5500]" /> Chargement du lien staff...
+              </div>
+            )}
+
+            <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-800 dark:text-emerald-300 text-xs leading-relaxed space-y-1">
+              <p className="font-bold flex items-center gap-1.5">
+                <Shield size={14} className="text-[#22C55E]" /> Sécurité &amp; Confidentialité Totale
+              </p>
+              <p className="text-[11px] opacity-90">
+                Tes co-capitaines arrivent directement sur leur cockpit mobile terrain (Scanner QR + Liste + Appels d&apos;urgence ICE). Ils n&apos;ont <strong>aucun accès à tes réglages de compte, ni à Stripe, ni à la facturation</strong>.
+              </p>
+            </div>
+
+            <div className="flex justify-end pt-1">
+              <button
+                type="button"
+                onClick={handleRevokeStaffToken}
+                disabled={staffLoading}
+                className="text-xs font-bold text-red-500 hover:text-red-600 hover:underline cursor-pointer"
+              >
+                {staffLoading ? "Régénération..." : "Révoquer & régénérer le lien staff"}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ── SECTION 3 : FORFAIT & ABONNEMENT ── */}
       <div className="bg-[var(--app-surface)] border border-[color:var(--app-border)] rounded-[28px] p-6 sm:p-8 shadow-sm space-y-6">
         <div className="flex items-center gap-3 border-b border-[color:var(--app-border)] pb-4">
           <span className="w-10 h-10 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-600">
@@ -362,7 +475,7 @@ export default function SettingsPage() {
           </span>
           <div>
             <h2 className="text-base font-extrabold uppercase tracking-tight text-[color:var(--app-text)]">
-              2. Forfait &amp; Statut du Compte
+              3. Forfait &amp; Statut du Compte
             </h2>
             <p className="text-xs text-[color:var(--app-text-muted)]">
               Détails de ton infrastructure CAPTEN.

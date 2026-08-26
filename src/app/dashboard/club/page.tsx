@@ -3,8 +3,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { Upload, Save, Loader2, Globe, Copy, Check, Link2, ArrowLeft } from "lucide-react";
+import { Upload, Save, Loader2, Globe, Copy, Check, Link2, ArrowLeft, Sparkles, MessageCircle, Shield, CheckCheck } from "lucide-react";
 import { getMyClub, saveMyClub, uploadClubLogo } from "./actions";
+import { getOrCreateClubStandingStaffToken, revokeStaffToken } from "@/lib/staff/actions";
 
 interface Club {
   id: string;
@@ -36,6 +37,11 @@ export default function ClubSettingsPage() {
   const [logoUploading, setLogoUploading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
+  // Staff Token State
+  const [staffTokenData, setStaffTokenData] = useState<{ token: string; staffUrl: string; label: string } | null>(null);
+  const [staffCopied, setStaffCopied] = useState(false);
+  const [staffLoading, setStaffLoading] = useState(false);
+
   useEffect(() => {
     (async () => {
       const emptyClub: Club = {
@@ -53,9 +59,29 @@ export default function ClubSettingsPage() {
       } else {
         setClub({ ...emptyClub, id: res.id });
       }
+
+      // Fetch standing staff token
+      const staffRes = await getOrCreateClubStandingStaffToken();
+      if (!("error" in staffRes)) {
+        setStaffTokenData(staffRes);
+      }
+
       setLoading(false);
     })();
   }, []);
+
+  const handleRevokeStaff = async () => {
+    if (!staffTokenData) return;
+    if (!confirm("Révoquer ce lien staff général ? Tes co-capitaines ne pourront plus pointer avec ce lien.")) return;
+    setStaffLoading(true);
+    await revokeStaffToken(staffTokenData.token);
+    const fresh = await getOrCreateClubStandingStaffToken();
+    if (!("error" in fresh)) {
+      setStaffTokenData(fresh);
+      alert("Lien staff révoqué et régénéré.");
+    }
+    setStaffLoading(false);
+  };
 
   const update = (key: keyof Club, value: string) =>
     setClub((prev) => prev ? { ...prev, [key]: value } : prev);
@@ -271,6 +297,78 @@ export default function ClubSettingsPage() {
           <p className="text-[12px] text-[color:var(--app-text-muted)] leading-relaxed">
             Donne un nom à ton crew puis enregistre : ton lien d&apos;inscription se génère automatiquement.
           </p>
+        )}
+      </motion.div>
+
+      {/* Staff & Co-Capitaines Delegation */}
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.15 }}
+        className="bg-[var(--app-surface)] rounded-[24px] border border-[color:var(--app-border)] p-6 space-y-3"
+      >
+        <div className="flex items-center justify-between">
+          <h2 className="text-[11px] font-black uppercase tracking-widest text-[color:var(--app-text-muted)] flex items-center gap-1.5">
+            <Sparkles size={13} className="text-[#FF5500]" />
+            Lien Staff / Co-Capitaine (Pointage &amp; ICE)
+          </h2>
+          <span className="px-2 py-0.5 rounded-full bg-[#22C55E]/10 text-[#22C55E] text-[10px] font-bold uppercase">
+            Actif
+          </span>
+        </div>
+
+        <p className="text-xs text-[color:var(--app-text-muted)]">
+          Donne ce lien à tes pacers et co-organisateurs pour qu&apos;ils puissent pointer les coureurs et voir les fiches d&apos;urgence (ICE). <strong>Zéro mot de passe requis</strong>.
+        </p>
+
+        {staffTokenData ? (
+          <div className="space-y-2 pt-1">
+            <div className="flex items-center gap-2">
+              <p className="flex-1 text-[12px] font-mono text-[color:var(--app-text-muted)] bg-[var(--app-surface-2)] rounded-[12px] px-4 py-2.5 truncate">
+                {staffTokenData.staffUrl}
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  navigator.clipboard.writeText(staffTokenData.staffUrl);
+                  setStaffCopied(true);
+                  setTimeout(() => setStaffCopied(false), 2500);
+                }}
+                className="flex items-center gap-1.5 px-4 py-2.5 rounded-[12px] bg-[var(--app-surface-2)] border border-[color:var(--app-border)] hover:border-[#FF5500] text-[color:var(--app-text)] text-[11px] font-black uppercase tracking-widest transition-all shrink-0"
+              >
+                {staffCopied ? <CheckCheck size={12} className="text-[#22C55E]" /> : <Copy size={12} />}
+                {staffCopied ? "Copié" : "Copier"}
+              </button>
+              <a
+                href={`https://wa.me/?text=${encodeURIComponent(
+                  `Salut l'équipe ! Voici ton lien Staff pour pointer les coureurs et voir les fiches ICE : ${staffTokenData.staffUrl} 🖤`
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 px-4 py-2.5 rounded-[12px] bg-[#25D366] text-white text-[11px] font-black uppercase tracking-widest hover:bg-[#1EBE5D] transition-all shrink-0 shadow-sm"
+              >
+                <MessageCircle size={12} /> WhatsApp
+              </a>
+            </div>
+
+            <div className="flex items-center justify-between pt-1">
+              <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium flex items-center gap-1">
+                <Shield size={11} /> Zéro accès à Stripe ni à tes réglages sensibles
+              </span>
+              <button
+                type="button"
+                onClick={handleRevokeStaff}
+                disabled={staffLoading}
+                className="text-[10px] text-red-500 hover:underline font-bold"
+              >
+                {staffLoading ? "Régénération..." : "Révoquer ce lien"}
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="flex items-center gap-2 text-xs text-[color:var(--app-text-muted)]">
+            <Loader2 size={13} className="animate-spin text-[#FF5500]" /> Chargement...
+          </div>
         )}
       </motion.div>
 
