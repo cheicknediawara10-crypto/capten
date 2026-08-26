@@ -38,7 +38,7 @@ export default function MentionsLegalesPage() {
           <section className="space-y-4">
             <h2 className="text-xl font-bold uppercase tracking-wide text-black border-b border-black/5 pb-2">1. Éditeur de la plateforme</h2>
             <p>
-              Le site et l'application CAPTEN sont édités par <strong>Cheickne DIAWARA</strong>, entrepreneur individuel (EI), immatriculé au Registre National des Entreprises (RNE) sous le numéro SIREN 888&nbsp;490&nbsp;547 (SIRET du siège : 888&nbsp;490&nbsp;547&nbsp;00047), code APE 6201Z (programmation informatique). Date d'immatriculation : 24 août 2026.
+              Le site et l'application CAPTEN sont édités par <strong>Cheickne DIAWARA</strong>, entrepreneur individuel (EI), immatriculé au Registre National des Entreprises (RNE) sous le numéro SIREN 888&nbsp;490&nbsp;547.
             </p>
             <p>
               <strong>Siège social :</strong> 1 rue d'Oradour sur Glane, 93420 Villepinte, France.<br />
