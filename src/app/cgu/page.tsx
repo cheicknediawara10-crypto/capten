@@ -27,7 +27,7 @@ export default function CGUPage() {
             Conditions Générales d'Utilisation
           </h1>
           <p className="text-xs text-[#71717A] font-mono uppercase tracking-wider">
-            Dernière mise à jour : 17 Juin 2026
+            Dernière mise à jour : 26 Août 2026
           </p>
         </div>
       </div>
@@ -37,6 +37,9 @@ export default function CGUPage() {
         <div className="space-y-10 text-[15px] leading-relaxed text-[#52525B]">
           <section className="space-y-4">
             <h2 className="text-xl font-bold uppercase tracking-wide text-black border-b border-black/5 pb-2">1. Objet des CGU</h2>
+            <p>
+              La plateforme CAPTEN est éditée par Cheickne DIAWARA, entrepreneur individuel (EI), immatriculé au RNE sous le numéro SIREN 888&nbsp;490&nbsp;547, dont le siège est situé 1 rue d'Oradour sur Glane, 93420 Villepinte, France (ci-après « CAPTEN » ou « l'Éditeur »).
+            </p>
             <p>
               Les présentes Conditions Générales d'Utilisation (ci-après « CGU ») ont pour objet de définir les conditions dans lesquelles la plateforme CAPTEN met à la disposition des fondateurs de run clubs (ci-après « Captains ») des outils d'inscription, de décharges juridiques, de pointage GPS et de gestion de cagnottes.
             </p>

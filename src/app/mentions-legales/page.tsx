@@ -38,11 +38,11 @@ export default function MentionsLegalesPage() {
           <section className="space-y-4">
             <h2 className="text-xl font-bold uppercase tracking-wide text-black border-b border-black/5 pb-2">1. Éditeur de la plateforme</h2>
             <p>
-              Le site et l'application CAPTEN sont édités par la société CAPTEN SAS, société par actions simplifiée au capital social de 1 000 €, immatriculée au Registre du Commerce et des Sociétés (RCS) de Paris sous le numéro 999 888 777 RCS Paris.
+              Le site et l'application CAPTEN sont édités par <strong>Cheickne DIAWARA</strong>, entrepreneur individuel (EI), immatriculé au Registre National des Entreprises (RNE) sous le numéro SIREN 888&nbsp;490&nbsp;547 (SIRET du siège : 888&nbsp;490&nbsp;547&nbsp;00047), code APE 6201Z (programmation informatique). Date d'immatriculation : 24 août 2026.
             </p>
             <p>
-              <strong>Siège social :</strong> 10 Rue de la Paix, 75002 Paris, France.<br />
-              <strong>Directeur de la publication :</strong> Alexandre Dupont, Président de CAPTEN SAS.<br />
+              <strong>Siège social :</strong> 1 rue d'Oradour sur Glane, 93420 Villepinte, France.<br />
+              <strong>Directeur de la publication :</strong> Cheickne DIAWARA.<br />
               <strong>Contact e-mail :</strong> info.captenfr@gmail.com
             </p>
           </section>
@@ -75,7 +75,7 @@ export default function MentionsLegalesPage() {
           <section className="space-y-4">
             <h2 className="text-xl font-bold uppercase tracking-wide text-black border-b border-black/5 pb-2">4. Propriété intellectuelle</h2>
             <p>
-              L'intégralité des éléments constitutifs de la plateforme CAPTEN (notamment l'interface, les logos, les illustrations graphiques, les icônes, les codes sources, les textes et les bases de données) est protégée par le droit d'auteur et appartient de manière exclusive à la société CAPTEN SAS.
+              L'intégralité des éléments constitutifs de la plateforme CAPTEN (notamment l'interface, les logos, les illustrations graphiques, les icônes, les codes sources, les textes et les bases de données) est protégée par le droit d'auteur et appartient de manière exclusive à Cheickne DIAWARA, éditeur de CAPTEN.
             </p>
             <p>
               Toute reproduction, distribution ou représentation totale ou partielle du contenu de ce site, sans autorisation expresse écrite de l'éditeur, est interdite et constituerait une contrefaçon sanctionnée par les articles L. 335-2 et suivants du Code de la propriété intellectuelle.

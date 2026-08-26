@@ -27,7 +27,7 @@ export default function RGPDPage() {
             Politique de Confidentialité (RGPD)
           </h1>
           <p className="text-xs text-[#71717A] font-mono uppercase tracking-wider">
-            Dernière mise à jour : 17 Juin 2026
+            Dernière mise à jour : 26 Août 2026
           </p>
         </div>
       </div>
@@ -36,7 +36,17 @@ export default function RGPDPage() {
       <main className="max-w-3xl mx-auto px-6 py-16">
         <div className="space-y-10 text-[15px] leading-relaxed text-[#52525B]">
           <section className="space-y-4">
-            <h2 className="text-xl font-bold uppercase tracking-wide text-black border-b border-black/5 pb-2">1. Nature des données collectées</h2>
+            <h2 className="text-xl font-bold uppercase tracking-wide text-black border-b border-black/5 pb-2">1. Responsable du traitement</h2>
+            <p>
+              Le responsable du traitement des données personnelles collectées sur CAPTEN est <strong>Cheickne DIAWARA</strong>, entrepreneur individuel (EI), immatriculé au Registre National des Entreprises (RNE) sous le numéro SIREN 888&nbsp;490&nbsp;547, dont le siège est situé 1 rue d'Oradour sur Glane, 93420 Villepinte, France.
+            </p>
+            <p>
+              Pour toute question relative à vos données, vous pouvez le contacter à l'adresse : info.captenfr@gmail.com.
+            </p>
+          </section>
+
+          <section className="space-y-4">
+            <h2 className="text-xl font-bold uppercase tracking-wide text-black border-b border-black/5 pb-2">2. Nature des données collectées</h2>
             <p>
               Dans le cadre de l'utilisation de CAPTEN, nous collectons les types d'informations suivantes pour assurer la sécurité des runs :
             </p>
@@ -48,14 +58,14 @@ export default function RGPDPage() {
           </section>
 
           <section className="space-y-4">
-            <h2 className="text-xl font-bold uppercase tracking-wide text-black border-b border-black/5 pb-2">2. Confidentialité des fiches de sécurité</h2>
+            <h2 className="text-xl font-bold uppercase tracking-wide text-black border-b border-black/5 pb-2">3. Confidentialité des fiches de sécurité</h2>
             <p className="font-semibold text-black bg-[#FF5500]/5 border border-[#FF5500]/10 p-4 rounded-lg">
               ⚠️ Les données médicales et de contact d'urgence (Fiches ICE) sont strictement confidentielles. Elles ne sont accessibles qu'aux fondateurs du club (Captains) en 2 clics sur le terrain en cas d'accident. Elles sont totalement invisibles pour les autres membres du club et les tiers.
             </p>
           </section>
 
           <section className="space-y-4">
-            <h2 className="text-xl font-bold uppercase tracking-wide text-black border-b border-black/5 pb-2">3. Géolocalisation (Pointage GPS)</h2>
+            <h2 className="text-xl font-bold uppercase tracking-wide text-black border-b border-black/5 pb-2">4. Géolocalisation (Pointage GPS)</h2>
             <p>
               Le check-in GPS utilise la géolocalisation de votre smartphone uniquement pour valider votre présence à moins de 50 mètres du départ :
             </p>
@@ -66,7 +76,7 @@ export default function RGPDPage() {
           </section>
 
           <section className="space-y-4">
-            <h2 className="text-xl font-bold uppercase tracking-wide text-black border-b border-black/5 pb-2">4. Destinataires et conservation des données</h2>
+            <h2 className="text-xl font-bold uppercase tracking-wide text-black border-b border-black/5 pb-2">5. Destinataires et conservation des données</h2>
             <p>
               Vos données ne sont ni vendues, ni louées, ni partagées avec des tiers à des fins publicitaires. Elles sont hébergées de manière sécurisée en Europe sur les serveurs de notre prestataire technique Supabase.
             </p>
@@ -76,7 +86,7 @@ export default function RGPDPage() {
           </section>
 
           <section className="space-y-4">
-            <h2 className="text-xl font-bold uppercase tracking-wide text-black border-b border-black/5 pb-2">5. Vos droits (RGPD)</h2>
+            <h2 className="text-xl font-bold uppercase tracking-wide text-black border-b border-black/5 pb-2">6. Vos droits (RGPD)</h2>
             <p>
               Conformément à la réglementation européenne sur la protection des données (RGPD), vous disposez des droits suivants :
             </p>
