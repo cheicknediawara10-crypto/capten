@@ -7,7 +7,7 @@ import {
   ArrowLeft, Calendar, MapPin, Users, QrCode, CheckSquare, FileText, List,
   Download, Globe, Lock, Trash2, Loader2, Wifi, Megaphone, Camera, MessageCircle,
   Luggage, Gauge, Coffee, Bell, Shield, Sparkles, CreditCard, Link2, Check, Send,
-  UserCheck, UserX, AlertCircle, Phone, Mail, ExternalLink, ArrowUpRight
+  UserCheck, UserX, AlertCircle, Phone, Mail, ExternalLink, ArrowUpRight, X
 } from "lucide-react";
 import Link from "next/link";
 import { formatDateShort } from "@/lib/utils/format";
@@ -22,6 +22,7 @@ import {
   cancelInscriptionByCaptain,
   promoteNextInWaitlist,
 } from "@/lib/evenements/actions";
+import { getOrCreateStaffToken, revokeStaffToken } from "@/lib/staff/actions";
 
 const QRCodeSVG = dynamic(() => import("qrcode.react").then((m) => ({ default: m.QRCodeSVG })), { ssr: false });
 
@@ -104,6 +105,34 @@ export default function EventDetailPage() {
   const [notifying, setNotifying] = useState(false);
   const [notifiedMsg, setNotifiedMsg] = useState<string | null>(null);
   const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
+
+  // Modal Staff / Co-Capitaine
+  const [staffModalOpen, setStaffModalOpen] = useState(false);
+  const [staffData, setStaffData] = useState<{ token: string; staffUrl: string; label: string } | null>(null);
+  const [staffLoading, setStaffLoading] = useState(false);
+  const [staffCopied, setStaffCopied] = useState(false);
+
+  async function handleOpenStaffModal() {
+    if (!event) return;
+    setStaffLoading(true);
+    const res = await getOrCreateStaffToken(event.id);
+    if ("error" in res) {
+      alert(res.error);
+    } else {
+      setStaffData(res);
+      setStaffModalOpen(true);
+    }
+    setStaffLoading(false);
+  }
+
+  async function handleRevokeStaff() {
+    if (!staffData) return;
+    if (!confirm("Révoquer ce lien staff ? Les co-capitaines ne pourront plus pointer avec ce lien.")) return;
+    await revokeStaffToken(staffData.token);
+    setStaffModalOpen(false);
+    setStaffData(null);
+    alert("Lien staff révoqué.");
+  }
 
   async function handleSendPush() {
     if (!event) return;
@@ -274,6 +303,17 @@ export default function EventDetailPage() {
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">
+          {event.status === "published" && (
+            <button
+              onClick={handleOpenStaffModal}
+              disabled={staffLoading}
+              title="Générer un lien pour tes co-capitaines et pacers"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-full text-[11px] font-black uppercase tracking-widest bg-[var(--app-surface-2)] text-[color:var(--app-text)] hover:border-[#FF5500] border border-[color:var(--app-border)] transition-all shadow-sm"
+            >
+              {staffLoading ? <Loader2 size={13} className="animate-spin" /> : <Sparkles size={13} className="text-[#FF5500]" />}
+              Lien Staff / Pacer
+            </button>
+          )}
           {event.status === "published" && (
             <a
               href={`https://wa.me/?text=${encodeURIComponent(
@@ -701,6 +741,103 @@ export default function EventDetailPage() {
               </div>
             </div>
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Modal Partage Lien Staff / Pacer */}
+      <AnimatePresence>
+        {staffModalOpen && staffData && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setStaffModalOpen(false)}
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            />
+
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="relative w-full max-w-md bg-[var(--app-surface)] border border-[color:var(--app-border)] rounded-[28px] p-6 sm:p-7 space-y-5 shadow-2xl z-10"
+            >
+              <div className="flex items-start justify-between">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-10 h-10 rounded-2xl bg-[#FF5500]/10 flex items-center justify-center text-[#FF5500]">
+                    <Sparkles size={20} />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-black uppercase tracking-tight text-[color:var(--app-text)]">
+                      Lien Staff / Co-Capitaine
+                    </h3>
+                    <p className="text-xs text-[color:var(--app-text-muted)] font-medium">
+                      Pour tes pacers et organisateurs terrain
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setStaffModalOpen(false)}
+                  className="w-8 h-8 rounded-full bg-[var(--app-surface-2)] flex items-center justify-center text-[color:var(--app-text-muted)] hover:text-[color:var(--app-text)]"
+                >
+                  <X size={15} />
+                </button>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-[var(--app-surface-2)] border border-[color:var(--app-border)] space-y-2">
+                <p className="text-[11px] font-bold uppercase tracking-wider text-[color:var(--app-text-muted)]">
+                  Lien direct terrain
+                </p>
+                <div className="flex items-center gap-2 bg-[var(--app-surface)] p-2.5 rounded-xl border border-[color:var(--app-border)]">
+                  <input
+                    type="text"
+                    readOnly
+                    value={staffData.staffUrl}
+                    className="w-full text-xs font-mono bg-transparent outline-none text-[color:var(--app-text)] truncate"
+                  />
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(staffData.staffUrl);
+                      setStaffCopied(true);
+                      setTimeout(() => setStaffCopied(false), 2500);
+                    }}
+                    className="px-3 py-1.5 rounded-lg bg-[#FF5500] text-white text-[11px] font-black uppercase tracking-wider hover:bg-[#E04B00] transition-colors shrink-0"
+                  >
+                    {staffCopied ? "Copié !" : "Copier"}
+                  </button>
+                </div>
+              </div>
+
+              <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-800 dark:text-emerald-300 text-xs leading-relaxed space-y-1">
+                <p className="font-bold flex items-center gap-1.5">
+                  <Shield size={14} className="text-[#22C55E]" /> Accès Terrain Sécurisé
+                </p>
+                <p className="text-[11px] opacity-90">
+                  Ce lien permet à tes co-capitaines de pointer les coureurs au départ et d&apos;accéder aux fiches d&apos;urgence (ICE). Il ne donne <strong>aucun accès à tes réglages sensibles ni à Stripe</strong>.
+                </p>
+              </div>
+
+              <div className="space-y-2 pt-1">
+                <a
+                  href={`https://wa.me/?text=${encodeURIComponent(
+                    `Salut l'équipe ! Voici le lien Staff pour pointer les coureurs et voir les fiches ICE ce soir pour « ${event.title} » : ${staffData.staffUrl} 🖤`
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full h-11 rounded-full bg-[#25D366] hover:bg-[#1EBE5D] text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-sm"
+                >
+                  <MessageCircle size={15} /> Partager sur WhatsApp
+                </a>
+
+                <button
+                  onClick={handleRevokeStaff}
+                  className="w-full h-10 rounded-full border border-red-500/20 text-red-500 text-xs font-bold hover:bg-red-500/10 transition-colors"
+                >
+                  Révoquer ce lien staff
+                </button>
+              </div>
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
     </div>
