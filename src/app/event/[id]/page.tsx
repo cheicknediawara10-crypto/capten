@@ -7,10 +7,9 @@ import {
   Calendar, MapPin, Users, CheckCircle2, Loader2, ArrowRight, Phone, Shield,
   Luggage, Gauge, Coffee, Sparkles, CreditCard, Link2, AlertCircle, X, ExternalLink
 } from "lucide-react";
-import { getSupabase } from "@/lib/supabase";
 import { formatDateShort } from "@/lib/utils/format";
 import { parsePracticalInfo } from "@/lib/utils/practical-info";
-import { registerToEvent, declarePaymentByRunner } from "@/lib/evenements/actions";
+import { registerToEvent, declarePaymentByRunner, getPublicEventInfo } from "@/lib/evenements/actions";
 import Link from "next/link";
 
 interface Event {
@@ -59,18 +58,13 @@ export default function PublicEventPage() {
 
   useEffect(() => {
     async function load() {
-      const supabase = getSupabase();
-      if (!supabase) { setLoading(false); return; }
-
-      const [{ data: ev }, { count: mainCount }, { count: wlCount }] = await Promise.all([
-        supabase.from("events").select("*, clubs(name, logo_url, city)").eq("id", id).single(),
-        supabase.from("event_inscriptions").select("*", { count: "exact", head: true }).eq("event_id", id).is("position_liste_attente", null),
-        supabase.from("event_inscriptions").select("*", { count: "exact", head: true }).eq("event_id", id).not("position_liste_attente", "is", null),
-      ]);
-
-      setEvent(ev);
-      setInscritsCount(mainCount || 0);
-      setWaitlistCount(wlCount || 0);
+      // Passe par une server action (clé service) : aucune lecture directe des
+      // inscriptions par la clé anon → zéro fuite de PII des autres coureurs.
+      const res = await getPublicEventInfo(id);
+      if ("error" in res) { setEvent(null); setLoading(false); return; }
+      setEvent(res.event);
+      setInscritsCount(res.mainCount);
+      setWaitlistCount(res.waitlistCount);
       setLoading(false);
     }
     load();
@@ -493,6 +487,9 @@ export default function PublicEventPage() {
                     </div>
                     <p className="text-[11px] text-[#6B7280]">
                       Ta place sera réservée pendant 48h. Tu pourras régler directement via le lien de l&apos;organisateur.
+                    </p>
+                    <p className="text-[10px] text-[#9CA3AF] leading-snug pt-1 border-t border-[#EEEEEA] mt-1">
+                      Le paiement se fait directement auprès de l&apos;organisateur, via son propre outil. Capten n&apos;encaisse aucun montant et n&apos;est pas responsable du paiement ni des remboursements.
                     </p>
                   </div>
                 )}

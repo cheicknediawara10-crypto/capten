@@ -9,6 +9,35 @@ function ub(supabase: ReturnType<typeof createAdminClient>, table: string): any 
   return supabase.from(table as Parameters<ReturnType<typeof createAdminClient>["from"]>[0]);
 }
 
+/**
+ * Infos PUBLIQUES d'un run pour la page d'inscription (côté coureur).
+ * Passe par la clé service (jamais la clé anon) : on ne renvoie QUE l'événement
+ * public + deux COMPTEURS. Aucune donnée personnelle des autres inscrits (nom,
+ * email, téléphone) ne transite — contrairement à une lecture directe anon.
+ */
+export async function getPublicEventInfo(eventId: string) {
+  if (!eventId) return { error: "not_found" };
+  let sb: ReturnType<typeof createAdminClient>;
+  try { sb = createAdminClient(); } catch { return { error: "Service indisponible." }; }
+
+  const { data: event } = await ub(sb, "events")
+    .select("*, clubs(name, logo_url, city)")
+    .eq("id", eventId)
+    .maybeSingle();
+
+  // Ne jamais exposer un brouillon : uniquement les runs publiés/terminés.
+  if (!event || (event.status !== "published" && event.status !== "completed")) {
+    return { error: "not_found" };
+  }
+
+  const [{ count: mainCount }, { count: wlCount }] = await Promise.all([
+    ub(sb, "event_inscriptions").select("id", { count: "exact", head: true }).eq("event_id", eventId).is("position_liste_attente", null),
+    ub(sb, "event_inscriptions").select("id", { count: "exact", head: true }).eq("event_id", eventId).not("position_liste_attente", "is", null),
+  ]);
+
+  return { event, mainCount: mainCount || 0, waitlistCount: wlCount || 0 };
+}
+
 export interface RegisterInput {
   eventId: string;
   nom: string;
@@ -42,54 +71,64 @@ export async function registerToEvent(input: RegisterInput) {
   const isEvenement = !!event.is_evenement;
   const jaugeMax = event.jauge_max || 0;
 
-  // 2. Vérification du nombre d'inscrits actuels (hors liste d'attente)
-  const { count: currentCount } = await ub(sb, "event_inscriptions")
-    .select("*", { count: "exact", head: true })
-    .eq("event_id", input.eventId)
-    .is("position_liste_attente", null);
+  // 2. Inscription ATOMIQUE (anti-surbooking) via la fonction SQL à verrou d'avis.
+  //    Fallback count-then-insert si la fonction n'est pas encore déployée en base.
+  let inscription: any = null;
+  const { data: rpcRow, error: rpcErr } = await (sb as any).rpc("register_event_inscription", {
+    p_event_id: input.eventId,
+    p_membre_id: input.membreId || null,
+    p_nom: input.nom,
+    p_prenom: input.prenom,
+    p_email: input.email || null,
+    p_telephone: input.telephone || null,
+  });
 
-  const activeCount = currentCount || 0;
-  const isFull = isEvenement && jaugeMax > 0 && activeCount >= jaugeMax;
-
-  let positionListeAttente: number | null = null;
-  let expiresAt: string | null = null;
-
-  if (isFull) {
-    // Calcul du prochain rang sur la liste d'attente
-    const { count: waitlistCount } = await ub(sb, "event_inscriptions")
-      .select("*", { count: "exact", head: true })
+  if (!rpcErr && rpcRow) {
+    inscription = Array.isArray(rpcRow) ? rpcRow[0] : rpcRow;
+  } else {
+    // Fallback : la fonction atomique n'existe pas encore (SQL non exécuté).
+    const { count: currentCount } = await ub(sb, "event_inscriptions")
+      .select("id", { count: "exact", head: true })
       .eq("event_id", input.eventId)
-      .not("position_liste_attente", "is", null);
+      .is("position_liste_attente", null);
+    const activeCount = currentCount || 0;
+    const full = isEvenement && jaugeMax > 0 && activeCount >= jaugeMax;
 
-    positionListeAttente = (waitlistCount || 0) + 1;
-  } else if (isEvenement) {
-    // Réservation temporaire de 48 heures pour les événements payants
-    expiresAt = new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString();
+    let positionListeAttente: number | null = null;
+    let expiresAt: string | null = null;
+    if (full) {
+      const { count: waitlistCount } = await ub(sb, "event_inscriptions")
+        .select("id", { count: "exact", head: true })
+        .eq("event_id", input.eventId)
+        .not("position_liste_attente", "is", null);
+      positionListeAttente = (waitlistCount || 0) + 1;
+    } else if (isEvenement) {
+      expiresAt = new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString();
+    }
+
+    const { data: ins, error: insErr } = await ub(sb, "event_inscriptions")
+      .insert({
+        event_id: input.eventId,
+        membre_id: input.membreId || null,
+        nom: input.nom.trim(),
+        prenom: input.prenom.trim(),
+        email: input.email?.trim() || null,
+        telephone: input.telephone?.trim() || null,
+        statut_paiement: "en_attente",
+        position_liste_attente: positionListeAttente,
+        confirme_par_coureur: false,
+        confirme_par_fondateur: false,
+        expires_at: expiresAt,
+      })
+      .select()
+      .single();
+    if (insErr || !ins) return { error: insErr?.message || "Impossible de valider l'inscription." };
+    inscription = ins;
   }
 
-  // 3. Insertion de l'inscription
-  const { data: inscription, error: insErr } = await ub(sb, "event_inscriptions")
-    .insert({
-      event_id: input.eventId,
-      membre_id: input.membreId || null,
-      nom: input.nom.trim(),
-      prenom: input.prenom.trim(),
-      email: input.email?.trim() || null,
-      telephone: input.telephone?.trim() || null,
-      statut_paiement: "en_attente",
-      position_liste_attente: positionListeAttente,
-      confirme_par_coureur: false,
-      confirme_par_fondateur: false,
-      expires_at: expiresAt,
-    })
-    .select()
-    .single();
+  const isFull = inscription.position_liste_attente !== null;
 
-  if (insErr || !inscription) {
-    return { error: insErr?.message || "Impossible de valider l'inscription." };
-  }
-
-  // 4. Envoi de l'email si applicable
+  // 3. Email de réservation (uniquement inscrit + événement + email fourni)
   if (input.email && !isFull && isEvenement) {
     const formattedDate = new Date(event.event_date).toLocaleDateString("fr-FR", {
       weekday: "long",
@@ -109,11 +148,21 @@ export async function registerToEvent(input: RegisterInput) {
     });
   }
 
+  // 4. Places restantes : recompté frais après insertion (source de vérité fiable).
+  let remainingSpots: number | null = null;
+  if (jaugeMax > 0) {
+    const { count: activeNow } = await ub(sb, "event_inscriptions")
+      .select("id", { count: "exact", head: true })
+      .eq("event_id", input.eventId)
+      .is("position_liste_attente", null);
+    remainingSpots = Math.max(0, jaugeMax - (activeNow || 0));
+  }
+
   return {
     status: isFull ? "waitlisted" : "registered",
     inscription,
-    position: positionListeAttente,
-    remainingSpots: jaugeMax > 0 ? Math.max(0, jaugeMax - (activeCount + (isFull ? 0 : 1))) : null,
+    position: inscription.position_liste_attente,
+    remainingSpots,
   };
 }
 
