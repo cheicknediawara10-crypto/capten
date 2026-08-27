@@ -135,6 +135,7 @@ export default function JoinPage() {
   const [iceName, setIceName]         = useState("");
   const [icePhone, setIcePhone]       = useState("");
   const [iceRelation, setIceRelation] = useState("");
+  const [iceConsent, setIceConsent]   = useState(false); // consentement explicite données santé (RGPD art. 9)
 
   // Step: waiver
   const [waiverChecked, setWaiverChecked] = useState(false);
@@ -186,6 +187,13 @@ export default function JoinPage() {
     setError("");
     if (step === "infos" && !validateInfos()) return;
     if (step === "pin"   && !validatePin())   return;
+    // Données de santé (art. 9 RGPD) : pas de collecte ICE sans consentement explicite.
+    if (step === "ice" && (iceName || icePhone) && !iceConsent) {
+      setError(isEn
+        ? "Please confirm your explicit consent to store emergency & health data."
+        : "Merci de confirmer ton consentement explicite pour la collecte des données d'urgence et de santé.");
+      return;
+    }
     setStep(STEPS[stepIndex + 1] as Step);
   }
 
@@ -211,6 +219,7 @@ export default function JoinPage() {
         ice_name:    iceName,
         ice_phone:   icePhone,
         ice_relation: iceRelation,
+        ice_consent: iceConsent,
         waiver_hash: hashHex,
       });
       if ("error" in res) { setError(res.error); return; }
@@ -418,6 +427,24 @@ export default function JoinPage() {
                     <input type="text" value={iceRelation} onChange={(e) => setIceRelation(e.target.value)}
                       placeholder={isEn ? "Sister, Partner, Friend..." : "Sœur, conjoint, ami…"} className="capten-input" />
                   </Field>
+
+                  {(iceName || icePhone) && (
+                    <label className="flex items-start gap-3 cursor-pointer bg-[#FAFAF8] border border-[#E8E8E8] rounded-2xl p-3.5">
+                      <div
+                        onClick={() => setIceConsent((c) => !c)}
+                        className={`w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 mt-0.5 transition-colors cursor-pointer ${
+                          iceConsent ? "bg-[#FF5500] border-[#FF5500]" : "border-[#D0D0D0]"
+                        }`}
+                      >
+                        {iceConsent && <CheckCircle2 className="w-3 h-3 text-white" />}
+                      </div>
+                      <span className="text-[11px] text-[#374151] leading-relaxed">
+                        {isEn
+                          ? "I explicitly consent to Capten collecting my emergency contact and health data (e.g. blood type, allergies, medical notes) so my crew captain can access it solely in a medical emergency. Legal basis: my explicit consent and the protection of my vital interests (GDPR art. 9). I can withdraw this consent at any time from my space."
+                          : "Je consens explicitement à ce que Capten collecte mon contact d'urgence et mes données de santé (groupe sanguin, allergies, notes médicales) afin que le capitaine de mon crew puisse y accéder uniquement en cas d'urgence médicale. Base légale : mon consentement explicite et la sauvegarde de mes intérêts vitaux (RGPD art. 9). Je peux retirer ce consentement à tout moment depuis mon espace."}
+                      </span>
+                    </label>
+                  )}
 
                   <ErrorBox error={error} />
                   <div className="flex gap-3">

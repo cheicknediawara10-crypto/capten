@@ -11,6 +11,7 @@ import { formatDateShort } from "@/lib/utils/format";
 import LogoutButton from "./LogoutButton";
 import PushNotificationPrompt from "@/components/push/PushNotificationPrompt";
 import SuggestSpotModal from "./SuggestSpotModal";
+import WithdrawIceButton from "./WithdrawIceButton";
 
 type MembreProfile = {
   id: string; first_name: string; last_name: string;
@@ -419,6 +420,12 @@ export default async function ProfilPage({
                 <p className="text-[11px] text-[#9CA3AF] text-center">
                   Appuie pour appeler en cas d'urgence
                 </p>
+                <div className="pt-3 mt-1 border-t border-[#EEEEEA] flex flex-col items-center gap-1.5">
+                  <WithdrawIceButton />
+                  <p className="text-[10px] text-[#9CA3AF] text-center leading-snug max-w-[260px]">
+                    Données de santé conservées sur la base de ton consentement (RGPD art. 9), accessibles à ton capitaine uniquement en cas d'urgence. Retrait possible à tout moment.
+                  </p>
+                </div>
               </div>
             ) : (
               <div className="text-center py-8">

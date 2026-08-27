@@ -2,7 +2,7 @@
 
 import { createAdminClient } from "@/lib/supabase/admin";
 import { verifyPin, hashPin } from "@/lib/membre-auth";
-import { setMembreCookie, clearMembreCookie } from "@/lib/membre-session";
+import { setMembreCookie, clearMembreCookie, getMembreSession } from "@/lib/membre-session";
 import { rateLimit } from "@/lib/rate-limit";
 import { headers } from "next/headers";
 import { randomBytes } from "crypto";
@@ -71,6 +71,20 @@ export async function logoutMembre() {
   await clearMembreCookie();
 }
 
+/**
+ * Retrait du consentement données de santé (RGPD art. 7§3 + droit à l'effacement).
+ * Supprime la fiche ICE du coureur connecté (contact d'urgence + données médicales).
+ */
+export async function withdrawIceConsent(): Promise<{ ok: true } | { error: string }> {
+  const membreId = await getMembreSession();
+  if (!membreId) return { error: "Session introuvable, reconnecte-toi." };
+  let supabase: ReturnType<typeof createAdminClient>;
+  try { supabase = createAdminClient(); } catch { return { error: "Service indisponible." }; }
+  const { error } = await ub(supabase, "membre_ice").delete().eq("membre_id", membreId);
+  if (error) return { error: "Impossible de retirer le consentement. Réessaie." };
+  return { ok: true };
+}
+
 type RegisterResult = { success: true; membreId: string } | { error: string };
 
 export async function registerMembre(data: {
@@ -84,12 +98,13 @@ export async function registerMembre(data: {
   ice_name: string;
   ice_phone: string;
   ice_relation: string;
+  ice_consent?: boolean;
   waiver_hash: string;
   ip_address?: string;
 }): Promise<RegisterResult> {
   const {
     first_name, last_name, date_of_birth, phone, email, pin, club_id,
-    ice_name, ice_phone, ice_relation, waiver_hash, ip_address,
+    ice_name, ice_phone, ice_relation, ice_consent, waiver_hash, ip_address,
   } = data;
 
   if (!first_name || !last_name || !date_of_birth || pin?.length !== 4 || !club_id) {
@@ -159,12 +174,15 @@ export async function registerMembre(data: {
 
   await Promise.all([
     ub(supabase, "membre_club").insert({ membre_id: membreId, club_id }),
-    ice_name && ice_phone
+    // Données de santé (art. 9 RGPD) : jamais stockées sans consentement explicite.
+    ice_name && ice_phone && ice_consent
       ? ub(supabase, "membre_ice").insert({
           membre_id: membreId,
           contact_name: ice_name,
           contact_phone: ice_phone,
           relationship: ice_relation || null,
+          consent_sante_at: new Date().toISOString(),
+          consent_sante_version: "sante-v1",
         })
       : null,
     waiver_hash
