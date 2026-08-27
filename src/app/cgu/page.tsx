@@ -75,17 +75,34 @@ export default function CGUPage() {
           </section>
 
           <section className="space-y-4">
-            <h2 className="text-xl font-bold uppercase tracking-wide text-black border-b border-black/5 pb-2">4. Responsabilité</h2>
+            <h2 className="text-xl font-bold uppercase tracking-wide text-black border-b border-black/5 pb-2">4. Protection des Données &amp; Accord de Sous-traitance (DPA — Art. 28 RGPD)</h2>
             <p>
-              Le Captain est seul responsable du contenu publié, des parcours planifiés et de la gestion des membres de son club. CAPTEN agit exclusivement en tant que prestataire technique d'hébergement et d'automatisation.
+              Dans le cadre de l&apos;utilisation des services, l&apos;Organisateur (Captain) agit en qualité de <strong>Responsable du Traitement</strong> des données personnelles de ses membres, et CAPTEN agit en qualité de <strong>Sous-traitant technique</strong> au sens de l&apos;article 28 du Règlement Général sur la Protection des Données (RGPD).
             </p>
+            <div className="bg-[#FAFAFA] border border-black/10 rounded-2xl p-5 space-y-3 text-sm">
+              <h3 className="font-bold text-black uppercase tracking-wider text-xs">Engagements de CAPTEN en qualité de sous-traitant :</h3>
+              <ul className="list-disc pl-5 space-y-1.5 text-[#52525B]">
+                <li><strong>Instructions :</strong> Ne traiter les données des membres que pour les besoins stricts de l&apos;exécution des fonctionnalités demandées par le Captain.</li>
+                <li><strong>Confidentialité &amp; Sécurité :</strong> Garantir la stricte confidentialité des données et mettre en œuvre les mesures techniques adaptées (chiffrement, clés d&apos;accès isolées, Row Level Security).</li>
+                <li><strong>Sous-traitants ultérieurs :</strong> Recourir exclusivement à des prestataires de confiance (Supabase pour l&apos;hébergement de base de données en UE, Resend pour les notifications email, Vercel pour l&apos;infrastructure web, Stripe pour la facturation).</li>
+                <li><strong>Notification des failles :</strong> Alerter le Captain sans délai et au plus tard dans les 72 heures en cas de violation de données constatée.</li>
+                <li><strong>Droit à l&apos;oubli &amp; Fin de contrat :</strong> Supprimer l&apos;intégralité des données du crew et de ses membres en cas de résiliation ou sur simple demande.</li>
+              </ul>
+            </div>
+          </section>
+
+          <section className="space-y-4">
+            <h2 className="text-xl font-bold uppercase tracking-wide text-black border-b border-black/5 pb-2">5. Responsabilité, Sécurité &amp; Assurance</h2>
             <p>
-              CAPTEN ne saurait être tenu pour responsable en cas d'accident survenu lors d'une session, de non-respect du code de la route par les membres, ou d'indisponibilité technique momentanée des services.
+              Le Captain est seul responsable de l&apos;organisation effective de ses sorties, des parcours choisis, de l&apos;encadrement sur le terrain et du respect des règles de circulation. CAPTEN agit exclusivement en tant qu&apos;outil technologique de gestion logistique et de registre.
+            </p>
+            <p className="font-semibold text-black bg-[#FF5500]/5 border border-[#FF5500]/10 p-4 rounded-xl text-sm">
+              ⚠️ <strong>Rappel d&apos;Assurance :</strong> La signature dématérialisée d&apos;une décharge de responsabilité atteste de l&apos;aptitude physique du membre et formalise son acceptation des risques inhérents à l&apos;activité, mais ne se substitue en aucun cas à une assurance Responsabilité Civile (RC) organisateur. CAPTEN est un outil d&apos;organisation et de traçabilité, non un organisme assureur.
             </p>
           </section>
 
           <section className="space-y-4">
-            <h2 className="text-xl font-bold uppercase tracking-wide text-black border-b border-black/5 pb-2">5. Modification des Conditions</h2>
+            <h2 className="text-xl font-bold uppercase tracking-wide text-black border-b border-black/5 pb-2">6. Modification des Conditions</h2>
             <p>
               CAPTEN se réserve le droit de modifier les présentes CGU à tout moment afin de les adapter aux évolutions réglementaires et techniques. Les utilisateurs seront informés de toute modification substantielle par e-mail ou via la plateforme.
             </p>
