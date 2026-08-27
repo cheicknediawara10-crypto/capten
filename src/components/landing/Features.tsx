@@ -17,8 +17,8 @@ const COLS = [
   },
   {
     icon: Heart,
-    title: "Fiche Santé",
-    description: "Chaque membre renseigne son contact prioritaire et ses infos médicales en 30 secondes.",
+    title: "Contact d'Urgence",
+    description: "Chaque membre renseigne son contact prioritaire joignable en 1 clic en cas d'incident sur le parcours.",
   },
 ];
 

@@ -63,7 +63,7 @@ export default function SecuritePage() {
       {/* Réflexes protection */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[
-          { icon: <Users size={18} />, title: 'Fiches ICE', desc: 'Contact prioritaire et infos médicales, en 1 clic.', href: '/dashboard/members', cta: 'Voir les membres' },
+          { icon: <Users size={18} />, title: 'Fiches ICE', desc: 'Contact d\'urgence d\'un proche, accessible en 1 clic sur le terrain.', href: '/dashboard/members', cta: 'Voir les membres' },
           { icon: <FileText size={18} />, title: 'Décharges signées', desc: 'Chaque membre signe une décharge horodatée — preuve légale.', href: '/dashboard/members', cta: 'Vérifier' },
           { icon: <ShieldCheck size={18} />, title: 'Check-in au RDV', desc: 'Valide qui est présent au départ, personne derrière.', href: '/dashboard/events', cta: 'Les runs' },
         ].map((c) => (

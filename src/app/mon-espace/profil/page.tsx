@@ -19,7 +19,6 @@ type MembreProfile = {
 };
 type MembreIce = {
   contact_name: string; contact_phone: string; relationship: string | null;
-  blood_type: string | null; allergies: string | null; medical_notes: string | null;
 };
 type CrewSpot = {
   id: string; nom: string; categorie: string; adresse: string | null;
@@ -63,7 +62,7 @@ async function getMembreData(membreId: string) {
       .eq("is_active", true),
 
     ub(supabase, "membre_ice")
-      .select("contact_name, contact_phone, relationship, blood_type, allergies, medical_notes")
+      .select("contact_name, contact_phone, relationship")
       .eq("membre_id", membreId)
       .maybeSingle(),
 
@@ -406,9 +405,6 @@ export default async function ProfilPage({
                 <div className="bg-[#F5F5F3] rounded-xl p-4 space-y-3">
                   <Row label="Nom" value={ice.contact_name} />
                   {ice.relationship && <Row label="Relation" value={ice.relationship} />}
-                  {ice.blood_type && <Row label="Groupe sanguin" value={ice.blood_type} />}
-                  {ice.allergies && <Row label="Allergies" value={ice.allergies} />}
-                  {ice.medical_notes && <Row label="Notes médicales" value={ice.medical_notes} />}
                 </div>
                 <a
                   href={`tel:${ice.contact_phone}`}
@@ -423,7 +419,7 @@ export default async function ProfilPage({
                 <div className="pt-3 mt-1 border-t border-[#EEEEEA] flex flex-col items-center gap-1.5">
                   <WithdrawIceButton />
                   <p className="text-[10px] text-[#9CA3AF] text-center leading-snug max-w-[260px]">
-                    Données de santé conservées sur la base de ton consentement (RGPD art. 9), accessibles à ton capitaine uniquement en cas d'urgence. Retrait possible à tout moment.
+                    Coordonnées de ton proche accessibles uniquement à ton capitaine en cas d&apos;incident sur le terrain. Suppression possible à tout moment.
                   </p>
                 </div>
               </div>

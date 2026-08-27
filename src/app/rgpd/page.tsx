@@ -52,15 +52,15 @@ export default function RGPDPage() {
             </p>
             <ul className="list-disc pl-6 space-y-2">
               <li><strong>Données du profil :</strong> Prénom, nom, adresse e-mail et numéro de téléphone portable.</li>
-              <li><strong>Fiches de sécurité ICE (In Case of Emergency) :</strong> Groupe sanguin, allergies majeures, antécédents médicaux pertinents et coordonnées du contact d'urgence à prévenir en cas d'accident.</li>
+              <li><strong>Contact d'urgence (ICE — In Case of Emergency) :</strong> les coordonnées (nom, téléphone, lien de parenté) d'un proche à prévenir en cas d'incident pendant un run. Capten ne collecte aucune donnée de santé (ni groupe sanguin, ni antécédents médicaux).</li>
               <li><strong>Signatures des décharges :</strong> Horodatage de la signature et adresse IP du signataire pour preuve légale.</li>
             </ul>
           </section>
 
           <section className="space-y-4">
-            <h2 className="text-xl font-bold uppercase tracking-wide text-black border-b border-black/5 pb-2">3. Confidentialité des fiches de sécurité</h2>
+            <h2 className="text-xl font-bold uppercase tracking-wide text-black border-b border-black/5 pb-2">3. Confidentialité des contacts d&apos;urgence</h2>
             <p className="font-semibold text-black bg-[#FF5500]/5 border border-[#FF5500]/10 p-4 rounded-lg">
-              ⚠️ Les données médicales et de contact d'urgence (Fiches ICE) sont strictement confidentielles. Elles ne sont accessibles qu'aux fondateurs du club (Captains) en 2 clics sur le terrain en cas d'accident. Elles sont totalement invisibles pour les autres membres du club et les tiers.
+              ⚠️ Les coordonnées du contact d&apos;urgence (ICE) sont strictement confidentielles. Elles ne sont accessibles qu&apos;au fondateur du club (Captain) et à ses co-capitaines désignés, uniquement en cas d&apos;incident sur le terrain. Elles sont totalement invisibles pour les autres membres du club et les tiers. Capten ne collecte aucune donnée de santé (ni groupe sanguin, ni allergies, ni antécédents médicaux).
             </p>
           </section>
 

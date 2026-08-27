@@ -6,15 +6,15 @@ import { Trash2, Loader2 } from "lucide-react";
 import { withdrawIceConsent } from "../actions";
 
 /**
- * Retrait du consentement données de santé (RGPD art. 7§3) : supprime la fiche
- * ICE du coureur. Confirmation avant action (suppression irréversible).
+ * Suppression du contact d'urgence (RGPD droit à l'effacement) : supprime
+ * la fiche ICE du coureur. Confirmation avant action.
  */
 export default function WithdrawIceButton() {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
   function handleWithdraw() {
-    if (!confirm("Retirer ton consentement supprimera définitivement ta fiche d'urgence (contact + données de santé). Continuer ?")) {
+    if (!confirm("Supprimer définitivement ton contact d'urgence ? Ton capitaine ne pourra plus le joindre en cas d'incident.")) {
       return;
     }
     startTransition(async () => {
@@ -34,7 +34,7 @@ export default function WithdrawIceButton() {
         ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
         : <Trash2 className="w-3.5 h-3.5" />
       }
-      Retirer mon consentement & supprimer ma fiche ICE
+      Supprimer mon contact d&apos;urgence
     </button>
   );
 }

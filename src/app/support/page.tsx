@@ -50,7 +50,7 @@ export default function SupportPage() {
   const faqs = [
     {
       q: "Que faire en cas d'accident ou de malaise pendant un run ?",
-      a: "Ouvre la fiche du membre depuis Membres ou Protection : le contact d'urgence (ICE), le groupe sanguin et les allergies s'affichent en 1 clic. Appelle le 112 ou le 15 en priorité si l'état le nécessite."
+      a: "Ouvre la fiche du membre depuis Membres ou Protection : le contact d'urgence (ICE) s'affiche en 1 clic pour joindre un proche. Appelle le 112 ou le 15 en priorité si l'état le nécessite."
     },
     {
       q: "Un membre n'a pas signé sa décharge, peut-il courir ?",

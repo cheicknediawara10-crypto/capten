@@ -72,8 +72,8 @@ export async function logoutMembre() {
 }
 
 /**
- * Retrait du consentement données de santé (RGPD art. 7§3 + droit à l'effacement).
- * Supprime la fiche ICE du coureur connecté (contact d'urgence + données médicales).
+ * Suppression du contact d'urgence (RGPD droit à l'effacement).
+ * Supprime la fiche ICE du coureur connecté.
  */
 export async function withdrawIceConsent(): Promise<{ ok: true } | { error: string }> {
   const membreId = await getMembreSession();
@@ -81,7 +81,7 @@ export async function withdrawIceConsent(): Promise<{ ok: true } | { error: stri
   let supabase: ReturnType<typeof createAdminClient>;
   try { supabase = createAdminClient(); } catch { return { error: "Service indisponible." }; }
   const { error } = await ub(supabase, "membre_ice").delete().eq("membre_id", membreId);
-  if (error) return { error: "Impossible de retirer le consentement. Réessaie." };
+  if (error) return { error: "Impossible de supprimer le contact d'urgence. Réessaie." };
   return { ok: true };
 }
 
@@ -174,15 +174,13 @@ export async function registerMembre(data: {
 
   await Promise.all([
     ub(supabase, "membre_club").insert({ membre_id: membreId, club_id }),
-    // Données de santé (art. 9 RGPD) : jamais stockées sans consentement explicite.
+    // Contact d'urgence (ICE) enregistré avec accord du membre
     ice_name && ice_phone && ice_consent
       ? ub(supabase, "membre_ice").insert({
           membre_id: membreId,
           contact_name: ice_name,
           contact_phone: ice_phone,
           relationship: ice_relation || null,
-          consent_sante_at: new Date().toISOString(),
-          consent_sante_version: "sante-v1",
         })
       : null,
     waiver_hash

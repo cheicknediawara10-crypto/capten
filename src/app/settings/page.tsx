@@ -161,7 +161,7 @@ export default function SettingsPage() {
   const FAQS = [
     {
       q: "Comment un nouveau coureur s'inscrit à mon crew ?",
-      a: "Partage-lui simplement ton lien d'inscription unique (/join/...). En 30 secondes chrono, il signe la décharge légale du club, renseigne son contact médical d'urgence et crée son passeport coureur.",
+      a: "Partage-lui simplement ton lien d'inscription unique (/join/...). En 30 secondes chrono, il signe la décharge légale du club, renseigne son contact d'urgence et crée son passeport coureur.",
     },
     {
       q: "Que faire si un coureur a oublié son code PIN ?",

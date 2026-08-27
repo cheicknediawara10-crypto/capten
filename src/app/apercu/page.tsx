@@ -351,7 +351,7 @@ export default function ApercuPage() {
           </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {[{ I: Users, t: "Fiches ICE", d: "Contact prioritaire et infos médicales, en 1 clic.", cta: "Voir les membres" }, { I: FileText, t: "Décharges signées", d: "Chaque membre signe une décharge horodatée — preuve légale.", cta: "Vérifier" }, { I: ShieldCheck, t: "Check-in au RDV", d: "Valide qui est présent au départ, personne derrière.", cta: "Les runs" }].map((c) => (
+          {[{ I: Users, t: "Fiches ICE", d: "Contact prioritaire joignable en 1 clic sur le terrain.", cta: "Voir les membres" }, { I: FileText, t: "Décharges signées", d: "Chaque membre signe une décharge horodatée — preuve légale.", cta: "Vérifier" }, { I: ShieldCheck, t: "Check-in au RDV", d: "Valide qui est présent au départ, personne derrière.", cta: "Les runs" }].map((c) => (
             <div key={c.t} className="rounded-3xl p-5 flex flex-col" style={cardStyle}>
               <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-3" style={{ background: "rgba(255,106,26,0.1)", color: ORANGE }}><c.I size={18} /></div>
               <h3 className="text-[15px] font-black uppercase tracking-tight mb-1" style={{ color: TXT }}>{c.t}</h3>

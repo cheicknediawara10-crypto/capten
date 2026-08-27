@@ -413,7 +413,8 @@ export async function staffScanQrCheckin(tokenString: string, scannedText: strin
 }
 
 /**
- * 6. Récupère la fiche d'urgence médicale (ICE) d'un coureur pour le Staff
+ * 6. Récupère le contact d'urgence (ICE) d'un coureur pour le Staff
+ *    Aucune donnée de santé n'est collectée — uniquement le contact d'un proche.
  */
 export async function staffGetRunnerIce(tokenString: string, memberId: string) {
   let sb: ReturnType<typeof createAdminClient>;
@@ -435,7 +436,7 @@ export async function staffGetRunnerIce(tokenString: string, memberId: string) {
 
   const [{ data: profile }, { data: ice }] = await Promise.all([
     ub(sb, "membre_profiles").select("first_name, last_name, phone").eq("id", memberId).single(),
-    ub(sb, "membre_ice").select("*").eq("membre_id", memberId).maybeSingle(),
+    ub(sb, "membre_ice").select("contact_name, contact_phone, relationship, membre_id").eq("membre_id", memberId).maybeSingle(),
   ]);
 
   if (!profile) return { error: "Coureur introuvable." };
@@ -449,9 +450,6 @@ export async function staffGetRunnerIce(tokenString: string, memberId: string) {
       contactName: ice.contact_name,
       contactPhone: ice.contact_phone,
       relationship: ice.relationship || "Non précisé",
-      bloodType: ice.blood_type || "Non renseigné",
-      allergies: ice.allergies || "Aucune connue",
-      medicalNotes: ice.medical_notes || "Aucune note",
     } : null,
   };
 }

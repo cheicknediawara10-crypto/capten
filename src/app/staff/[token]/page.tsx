@@ -36,9 +36,6 @@ interface IceData {
     contactName: string;
     contactPhone: string;
     relationship: string;
-    bloodType: string;
-    allergies: string;
-    medicalNotes: string;
   } | null;
 }
 
@@ -485,7 +482,7 @@ export default function StaffCockpitPage() {
 
       </main>
 
-      {/* Modal Fiche Urgence Médicale ICE */}
+      {/* Modal Contact d'Urgence (ICE) */}
       <AnimatePresence>
         {iceModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -503,7 +500,7 @@ export default function StaffCockpitPage() {
               exit={{ scale: 0.95, opacity: 0 }}
               className="relative w-full max-w-lg bg-[#18181D] border border-red-500/40 rounded-[28px] p-6 sm:p-7 space-y-5 shadow-2xl z-10 max-h-[85vh] overflow-y-auto"
             >
-              {/* Header Alerte Rouge */}
+              {/* Header */}
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-11 h-11 rounded-2xl bg-red-500/20 border border-red-500/40 flex items-center justify-center text-red-400">
@@ -511,7 +508,7 @@ export default function StaffCockpitPage() {
                   </div>
                   <div>
                     <h3 className="text-base font-black uppercase tracking-tight text-white">
-                      Fiche d&apos;Urgence Médicale (ICE)
+                      Contact d&apos;Urgence (ICE)
                     </h3>
                     <p className="text-xs text-white/60 font-medium">
                       {iceModal.runner.name} {iceModal.runner.phone && `· ${iceModal.runner.phone}`}
@@ -527,45 +524,24 @@ export default function StaffCockpitPage() {
               </div>
 
               {iceModal.ice ? (
-                <div className="space-y-4">
-                  {/* Contact d'Urgence Card */}
-                  <div className="p-5 rounded-2xl bg-red-950/40 border border-red-500/30 space-y-3">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-red-300">
-                      Contact à prévenir en priorité
-                    </p>
-                    <p className="text-base font-bold text-white">
-                      {iceModal.ice.contactName}{" "}
-                      <span className="text-xs text-white/60 font-normal">({iceModal.ice.relationship})</span>
-                    </p>
-                    <a
-                      href={`tel:${iceModal.ice.contactPhone.replace(/\s+/g, "")}`}
-                      className="w-full h-12 rounded-xl bg-red-600 hover:bg-red-500 text-white font-black text-sm uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-lg active:scale-95"
-                    >
-                      <Phone size={16} /> Appeler {iceModal.ice.contactPhone}
-                    </a>
-                  </div>
-
-                  {/* Données Médicales */}
-                  <div className="space-y-2 text-xs">
-                    <div className="p-3.5 rounded-xl bg-white/5 border border-white/10 flex justify-between">
-                      <span className="text-white/50 uppercase font-bold">Groupe Sanguin</span>
-                      <span className="font-bold text-white">{iceModal.ice.bloodType}</span>
-                    </div>
-
-                    <div className="p-3.5 rounded-xl bg-white/5 border border-white/10 space-y-1">
-                      <span className="text-white/50 uppercase font-bold block">Allergies connues</span>
-                      <span className="font-medium text-white block">{iceModal.ice.allergies}</span>
-                    </div>
-
-                    <div className="p-3.5 rounded-xl bg-white/5 border border-white/10 space-y-1">
-                      <span className="text-white/50 uppercase font-bold block">Remarques médicales</span>
-                      <span className="font-medium text-white block">{iceModal.ice.medicalNotes}</span>
-                    </div>
-                  </div>
+                <div className="p-5 rounded-2xl bg-red-950/40 border border-red-500/30 space-y-3">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-red-300">
+                    Personne à prévenir en priorité
+                  </p>
+                  <p className="text-base font-bold text-white">
+                    {iceModal.ice.contactName}{" "}
+                    <span className="text-xs text-white/60 font-normal">({iceModal.ice.relationship})</span>
+                  </p>
+                  <a
+                    href={`tel:${iceModal.ice.contactPhone.replace(/\s+/g, "")}`}
+                    className="w-full h-12 rounded-xl bg-red-600 hover:bg-red-500 text-white font-black text-sm uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-lg active:scale-95"
+                  >
+                    <Phone size={16} /> Appeler {iceModal.ice.contactPhone}
+                  </a>
                 </div>
               ) : (
                 <div className="p-8 rounded-2xl bg-white/5 text-center text-white/50 text-xs">
-                  Ce coureur n&apos;a pas encore complété sa fiche d&apos;urgence ICE.
+                  Ce coureur n&apos;a pas encore renseigné de contact d&apos;urgence.
                 </div>
               )}
             </motion.div>

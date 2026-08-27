@@ -11,7 +11,7 @@ const ITEMS = [
   },
   {
     q: "Comment fonctionne la collecte des fiches d'urgence ?",
-    a: "À l'inscription, chaque membre renseigne son contact prioritaire et ses informations médicales en 30 secondes. Ces fiches sont accessibles en 1 clic depuis ton tableau de bord, même sans réseau.",
+    a: "À l'inscription, chaque membre renseigne son contact prioritaire joignable en 1 clic en 30 secondes. Ces informations sont accessibles instantanément depuis ton tableau de bord en cas d'incident.",
   },
   {
     q: "Comment fonctionnent Les Spots du Crew ?",

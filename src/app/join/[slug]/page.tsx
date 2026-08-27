@@ -187,11 +187,11 @@ export default function JoinPage() {
     setError("");
     if (step === "infos" && !validateInfos()) return;
     if (step === "pin"   && !validatePin())   return;
-    // Données de santé (art. 9 RGPD) : pas de collecte ICE sans consentement explicite.
+    // Contact d'urgence (ICE) : enregistrement validé par le coureur
     if (step === "ice" && (iceName || icePhone) && !iceConsent) {
       setError(isEn
-        ? "Please confirm your explicit consent to store emergency & health data."
-        : "Merci de confirmer ton consentement explicite pour la collecte des données d'urgence et de santé.");
+        ? "Please confirm your consent to store your emergency contact details."
+        : "Merci d'accepter l'enregistrement de ton contact d'urgence pour continuer.");
       return;
     }
     setStep(STEPS[stepIndex + 1] as Step);
@@ -440,8 +440,8 @@ export default function JoinPage() {
                       </div>
                       <span className="text-[11px] text-[#374151] leading-relaxed">
                         {isEn
-                          ? "I explicitly consent to Capten collecting my emergency contact and health data (e.g. blood type, allergies, medical notes) so my crew captain can access it solely in a medical emergency. Legal basis: my explicit consent and the protection of my vital interests (GDPR art. 9). I can withdraw this consent at any time from my space."
-                          : "Je consens explicitement à ce que Capten collecte mon contact d'urgence et mes données de santé (groupe sanguin, allergies, notes médicales) afin que le capitaine de mon crew puisse y accéder uniquement en cas d'urgence médicale. Base légale : mon consentement explicite et la sauvegarde de mes intérêts vitaux (RGPD art. 9). Je peux retirer ce consentement à tout moment depuis mon espace."}
+                          ? "I consent to Capten storing my emergency contact details (name, phone, relationship) so my crew captain or co-captain can reach them in case of an incident during a run. I can update or delete this information at any time from my profile."
+                          : "J'accepte que Capten enregistre les coordonnées de mon contact d'urgence (nom, téléphone, lien de parenté) afin que le capitaine ou co-capitaine de mon crew puisse le joindre en cas d'incident pendant une sortie. Je peux modifier ou supprimer ces informations à tout moment depuis mon profil."}
                       </span>
                     </label>
                   )}
@@ -467,7 +467,7 @@ export default function JoinPage() {
                   </div>
 
                   <div className="bg-[#F5F5F3] rounded-2xl p-4 max-h-48 overflow-y-auto text-xs text-[#6B7280] leading-relaxed space-y-2">
-                    <p className="font-bold text-[#374151]">{isEn ? "Liability Waiver & Medical Agreement — " : "Décharge de responsabilité — "}{club.name}</p>
+                    <p className="font-bold text-[#374151]">{isEn ? "Liability Waiver & Physical Fitness Agreement — " : "Décharge de responsabilité — "}{club.name}</p>
                     {isEn ? (
                       <>
                         <p>By joining this club and taking part in its athletic activities, I acknowledge that running and physical activities involve inherent outdoor risks.</p>
