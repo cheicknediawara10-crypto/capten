@@ -252,31 +252,26 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Transparence Facturation & Membres Actifs (60j) */}
+      {/* Transparence — Membres Actifs (60j) */}
       <div className={`${card} rounded-3xl p-6 sm:p-7 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5`}>
         <div className="space-y-1.5 max-w-xl">
           <div className="flex items-center gap-2">
             <span className="text-[11px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full bg-[#FF5500]/10 text-[#FF5500]">
-              Tarification Juste &amp; Anti-Saisonnière
-            </span>
-            <span className={`text-[11px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full ${
-              (activeCount || 0) < 25 ? "bg-[#22C55E]/10 text-[#22C55E]" : "bg-[#FF5500] text-white"
-            }`}>
-              {(activeCount || 0) < 25 ? "Plan Gratuit (< 25 actifs)" : "Plan PRO (29,99€/mois)"}
+              Ton Crew en chiffres
             </span>
           </div>
           <h3 className="text-[16px] font-black uppercase tracking-tight text-[color:var(--app-text)] pt-1">
-            {memberCount} membres enregistrés · {activeCount || 0} coureurs actifs (60 derniers jours)
+            {memberCount} membres inscrits · {activeCount || 0} coureurs actifs (60 derniers jours)
           </h3>
           <p className="text-[12px] text-[color:var(--app-text-muted)] leading-relaxed">
-            Tu ne paies que pour les coureurs qui viennent vraiment. Si ton crew ralentit l&apos;hiver et passe sous 25 actifs, ton plan repasse automatiquement à 0€ sans que tu aies besoin de résilier.
+            Les coureurs actifs sont ceux ayant participé à au moins 1 run dans les 60 derniers jours. Ce compteur t&apos;aide à suivre la santé de ton crew.
           </p>
         </div>
         <Link
           href="/plan"
           className="shrink-0 h-11 px-5 rounded-full border border-[color:var(--app-border)] hover:border-[#FF5500] hover:text-[#FF5500] text-[12px] font-bold text-[color:var(--app-text)] flex items-center gap-2 transition-all"
         >
-          Détails de mon plan <ArrowRight size={14} />
+          Mon plan <ArrowRight size={14} />
         </Link>
       </div>
 
