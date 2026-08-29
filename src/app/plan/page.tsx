@@ -491,25 +491,28 @@ export default function PlanPage() {
         })}
       </div>
 
-      {/* FAQ Pricing */}
+      {/* FAQ Pricing & Modèle Anti-Saison */}
       <div className="max-w-4xl mx-auto mt-12 bg-[var(--app-surface)] border border-[color:var(--app-border)] rounded-3xl p-7 sm:p-8 space-y-4 text-left">
         <div className="flex items-center gap-2 text-[#FF5500]">
           <HelpCircle size={20} />
           <h3 className="text-[16px] font-display italic font-black uppercase text-[color:var(--app-text)]">
-            Questions fréquentes sur le plan PRO
+            Comment fonctionne la tarification par membre actif ?
           </h3>
         </div>
+        <p className="text-[13px] text-[color:var(--app-text-muted)] leading-relaxed">
+          Un <strong>membre actif</strong> est un coureur ayant participé à <strong>au moins 1 run dans les 60 derniers jours</strong>.
+        </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
           <div className="p-4 rounded-2xl bg-[var(--app-surface-2)] border border-[color:var(--app-border)] space-y-1.5">
-            <p className="text-[12px] font-black uppercase text-[color:var(--app-text)]">💰 C&apos;est combien exactement ?</p>
+            <p className="text-[12px] font-black uppercase text-[#22C55E]">🟢 Moins de 25 actifs → GRATUIT (0€)</p>
             <p className="text-[11px] text-[color:var(--app-text-muted)] leading-snug">
-              29,99€/mois ou 299,90€/an. Runs et membres illimités. Aucune commission sur les événements payants de ton crew.
+              Ex : Ton crew a 100 membres inscrits, mais 18 actifs en hiver → Tu ne paies rien. Zéro stress de payer pour des coureurs absents.
             </p>
           </div>
           <div className="p-4 rounded-2xl bg-[var(--app-surface-2)] border border-[color:var(--app-border)] space-y-1.5">
-            <p className="text-[12px] font-black uppercase text-[color:var(--app-text)]">🚫 Et si je veux résilier ?</p>
+            <p className="text-[12px] font-black uppercase text-[#FF5500]">👑 Plus de 25 actifs → CAPTEN PRO (29,99€)</p>
             <p className="text-[11px] text-[color:var(--app-text-muted)] leading-snug">
-              Tu peux résilier à tout moment depuis cette page. Aucun engagement, aucun frais cachés. Tu repasses en gratuit et tu gardes tes données.
+              Ex : En rentrée ou au printemps, 40 à 100 coureurs courent → Accès à tous les outils pros (GPS automatique, Copilote IA, Visuels).
             </p>
           </div>
         </div>

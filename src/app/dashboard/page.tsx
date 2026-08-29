@@ -252,26 +252,47 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Transparence — Membres Actifs (60j) */}
-      <div className={`${card} rounded-3xl p-6 sm:p-7 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5`}>
-        <div className="space-y-1.5 max-w-xl">
+      {/* Modèle Tarifaire Anti-Saison & Santé du Crew */}
+      <div className={`${card} rounded-3xl p-6 sm:p-7 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6`}>
+        <div className="space-y-3 max-w-xl">
           <div className="flex items-center gap-2">
             <span className="text-[11px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full bg-[#FF5500]/10 text-[#FF5500]">
-              Ton Crew en chiffres
+              Tarification Juste &amp; Anti-Saison
+            </span>
+            <span className={`text-[11px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full ${
+              (activeCount || 0) < 25
+                ? "bg-[#22C55E]/10 text-[#22C55E] border border-[#22C55E]/20"
+                : "bg-[#FF5500] text-white"
+            }`}>
+              {(activeCount || 0) < 25 ? "🟢 Plan Actuel : GRATUIT (0€)" : "👑 Plan Actuel : PRO (29,99€/mois)"}
             </span>
           </div>
-          <h3 className="text-[16px] font-black uppercase tracking-tight text-[color:var(--app-text)] pt-1">
-            {memberCount} membres inscrits · {activeCount || 0} coureurs actifs (60 derniers jours)
-          </h3>
+
+          <div className="grid grid-cols-2 gap-4 py-1">
+            <div className="p-3.5 rounded-2xl bg-[var(--app-surface-2)] border border-[color:var(--app-border)]">
+              <p className="text-[10px] font-black uppercase tracking-wider text-[color:var(--app-text-muted)]">Inscrits au total</p>
+              <p className="text-2xl font-black text-[color:var(--app-text)] mt-0.5">{memberCount}</p>
+              <p className="text-[10px] text-[color:var(--app-text-muted)] mt-0.5">Membres enregistrés</p>
+            </div>
+            <div className="p-3.5 rounded-2xl bg-[var(--app-surface-2)] border border-[color:var(--app-border)]">
+              <p className="text-[10px] font-black uppercase tracking-wider text-[#FF5500]">Actifs (60 jours)</p>
+              <p className="text-2xl font-black text-[color:var(--app-text)] mt-0.5">{activeCount || 0}</p>
+              <p className="text-[10px] text-[color:var(--app-text-muted)] mt-0.5">≥ 1 run ces 60 derniers jours</p>
+            </div>
+          </div>
+
           <p className="text-[12px] text-[color:var(--app-text-muted)] leading-relaxed">
-            Les coureurs actifs sont ceux ayant participé à au moins 1 run dans les 60 derniers jours. Ce compteur t&apos;aide à suivre la santé de ton crew.
+            {(activeCount || 0) < 25
+              ? "Moins de 25 coureurs actifs → Ton plan est 100% gratuit. L'hiver ou en basse saison, tu ne paies jamais pour des coureurs qui ne viennent pas."
+              : "Plus de 25 coureurs actifs → Ton club tourne à plein régime avec toutes les fonctionnalités PRO débloquées."}
           </p>
         </div>
+
         <Link
           href="/plan"
-          className="shrink-0 h-11 px-5 rounded-full border border-[color:var(--app-border)] hover:border-[#FF5500] hover:text-[#FF5500] text-[12px] font-bold text-[color:var(--app-text)] flex items-center gap-2 transition-all"
+          className="shrink-0 h-12 px-6 rounded-full bg-[#FF5500] hover:bg-[#E04B00] text-white text-[12px] font-black uppercase tracking-wider flex items-center gap-2 transition-all shadow-sm"
         >
-          Mon plan <ArrowRight size={14} />
+          Gérer mon plan <ArrowRight size={14} />
         </Link>
       </div>
 
