@@ -128,6 +128,17 @@ export async function registerToEvent(input: RegisterInput) {
     inscription = ins;
   }
 
+  // pace_group : la fonction atomique RPC ne le prend pas en paramètre → on le
+  // pose après coup pour couvrir le chemin RPC (le fallback l'a déjà inséré).
+  if (input.paceGroup && inscription && !inscription.pace_group) {
+    const { data: upd } = await ub(sb, "event_inscriptions")
+      .update({ pace_group: input.paceGroup.trim() })
+      .eq("id", inscription.id)
+      .select()
+      .single();
+    if (upd) inscription = upd;
+  }
+
   const isFull = inscription.position_liste_attente !== null;
 
   // 3. Email de réservation (uniquement inscrit + événement + email fourni)
