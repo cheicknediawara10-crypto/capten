@@ -19,11 +19,10 @@ La proposition de valeur est binaire : Éliminer 100% de la charge mentale logis
 * Messages WhatsApp (templates copier-coller)
 * Spots du Crew (basique)
 
-### Plan Captain Pro : 29,99€ / mois (débloqué aussi pendant l'essai)
-* **Check-in GPS automatique** (le meilleur levier de conversion — loss aversion)
+### Plan Captain Pro : 29,99€ / mois ou 299€ / an (débloqué aussi pendant l'essai)
+* **Check-in 1-clic par proximité GPS** (sans QR code)
 * Visuels du Crew (stories & affiches Instagram)
-* Copilote IA
-* Export du registre horodaté (CSV)
+* Copilote IA (Accueil nouveaux, météo & alertes)
 * Stats avancées de présence & rétention
 * Spots VIP (avantages négociés)
 
@@ -46,7 +45,6 @@ Pour protéger la marge brute face aux coûts de session Meta, le plan Pro inclu
 2. Badges et système de niveaux
 3. Programme ambassadeur / parrainage
 4. Portefeuilles virtuels (Wallet) et refacturation automatisée de messages
-5. Tarif annuel (simplifié à mensuel en V1)
 
 ### 🟢 SPRINT REQUIS POUR LA PHASE 1 :
 1. **Table `clubs` (Supabase) :** Champs `stripe_subscription_status` (Text), `plan` (enum: 'discovery'|'pro'), `whatsapp_messages_sent_this_month` (Integer).

@@ -121,7 +121,6 @@ export async function POST(request: Request) {
       // clubId dans la metadata de l'abonnement → le webhook peut résoudre le club
       sessionParams.subscription_data = {
         metadata: { clubId, planName },
-        ...(isYearly ? {} : { trial_period_days: 21 }),
       };
       sessionParams.success_url = `${origin}/plan?success=true&session_id={CHECKOUT_SESSION_ID}&planName=${planName}&billingInterval=${intervalText}`;
       sessionParams.cancel_url = `${origin}/plan?cancelled=true`;
