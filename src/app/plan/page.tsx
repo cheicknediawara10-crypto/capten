@@ -291,12 +291,13 @@ export default function PlanPage() {
       name: "GRATUIT",
       price: "0€",
       period: "/mois",
-      billingNote: "",
+      billingNote: "Membres et sorties 100% illimités.",
       desc: "Cours ensemble, gratuitement.",
       features: [
         { t: "Runs & membres illimités", d: "", included: true },
-        { t: "Check-in par QR Code", d: "", included: true },
-        { t: "Fiches ICE & décharges", d: "", included: true },
+        { t: "Sas d'allures (Paces) & Tracé Strava/GPX", d: "", included: true },
+        { t: "Check-in par QR Code & Invité Express", d: "", included: true },
+        { t: "Fiches Contact d'Urgence (ICE) & Décharges", d: "", included: true },
         { t: "Messages WhatsApp (templates)", d: "", included: true },
       ],
       button: currentPlan === "GRATUIT" ? "PLAN ACTUEL" : "COMMENCER GRATUITEMENT",
@@ -304,17 +305,18 @@ export default function PlanPage() {
     },
     {
       name: "CAPTEN",
-      price: "29,99€",
-      period: "/mois",
-      billingNote: "14 jours offerts à la création du crew — sans carte bancaire.",
+      price: billingInterval === "yearly" ? "299€" : "29,99€",
+      period: billingInterval === "yearly" ? "/an" : "/mois",
+      billingNote: billingInterval === "yearly"
+        ? "Soit 24,90€/mois · 2 mois offerts chaque année"
+        : "14 jours offerts à la création du crew — sans engagement.",
       desc: "Le confort d'une équipe de pros dans ta poche.",
-      tag: "Populaire",
+      tag: billingInterval === "yearly" ? "2 MOIS OFFERTS" : "Populaire",
       features: [
-        { t: "Check-in GPS automatique", d: "", included: true },
-        { t: "Visuels du Crew (stories & affiches)", d: "", included: true },
-        { t: "Copilote IA", d: "", included: true },
-        { t: "Export du registre horodaté (CSV)", d: "", included: true },
-        { t: "Stats avancées", d: "", included: true },
+        { t: "Check-in 1-clic par proximité GPS (sans QR code)", d: "", included: true },
+        { t: "Studio de Visuels du Crew (stories Instagram & affiches)", d: "", included: true },
+        { t: "Copilote IA (Accueil nouveaux, météo & alertes bienveillance)", d: "", included: true },
+        { t: "Stats d'assiduité avancées", d: "", included: true },
         { t: "Spots VIP & avantages négociés", d: "", included: true },
       ],
       button: currentPlan === "CAPTEN" ? "PLAN ACTUEL" : "Passer à Captain Pro",
@@ -331,6 +333,32 @@ export default function PlanPage() {
         </h1>
         <p className="text-[13px] text-[color:var(--app-text-muted)] mt-2">Ton plan Capten et ta facturation.</p>
       </header>
+
+      {/* INTERVAL TOGGLE */}
+      <div className="flex items-center justify-center gap-2 max-w-md mx-auto p-1.5 rounded-full bg-[var(--app-surface-2)] border border-[color:var(--app-border)]">
+        <button
+          type="button"
+          onClick={() => setBillingInterval('monthly')}
+          className={`flex-1 py-2.5 rounded-full text-[11px] font-black uppercase tracking-wider transition-all ${
+            billingInterval === 'monthly'
+              ? 'bg-[#FF5500] text-white shadow-sm'
+              : 'text-[color:var(--app-text-muted)] hover:text-[color:var(--app-text)]'
+          }`}
+        >
+          Mensuel (29,99€)
+        </button>
+        <button
+          type="button"
+          onClick={() => setBillingInterval('yearly')}
+          className={`flex-1 py-2.5 rounded-full text-[11px] font-black uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 ${
+            billingInterval === 'yearly'
+              ? 'bg-[#FF5500] text-white shadow-sm'
+              : 'text-[color:var(--app-text-muted)] hover:text-[color:var(--app-text)]'
+          }`}
+        >
+          Annuel (299€) <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-[#22C55E] text-white">-17%</span>
+        </button>
+      </div>
 
       {/* PRICING GRID */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto items-stretch">
