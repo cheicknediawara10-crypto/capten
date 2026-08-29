@@ -6,12 +6,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Users, Check, Search, QrCode, ShieldAlert, Phone, AlertCircle, Loader2,
   CheckCircle2, X, RefreshCw, Sparkles, MapPin, Calendar, Activity,
-  Download, MessageCircle
+  Download, MessageCircle, UserPlus
 } from "lucide-react";
 import {
   getStaffCockpitContext,
   staffSubmitCheckin,
   staffGetRunnerIce,
+  staffAddGuest,
 } from "@/lib/staff/actions";
 import { formatDateShort } from "@/lib/utils/format";
 import { getAppUrl } from "@/lib/domain";
@@ -57,6 +58,11 @@ export default function StaffCockpitPage() {
   const [iceLoading, setIceLoading] = useState(false);
   const [checkingInId, setCheckingInId] = useState<string | null>(null);
 
+  // Modal Invité Express
+  const [showGuestModal, setShowGuestModal] = useState(false);
+  const [guestForm, setGuestForm] = useState({ firstName: "", lastName: "", phone: "", icePhone: "" });
+  const [guestSaving, setGuestSaving] = useState(false);
+
   const loadContext = useCallback(async () => {
     if (!token) return;
     const res = await getStaffCockpitContext(token);
@@ -99,6 +105,25 @@ export default function StaffCockpitPage() {
       setIceModal(res as IceData);
     }
     setIceLoading(false);
+  }
+
+  // Create & check-in guest on the spot
+  async function handleCreateGuest(e: React.FormEvent) {
+    e.preventDefault();
+    if (!guestForm.firstName.trim()) {
+      alert("Le prénom de l'invité est obligatoire.");
+      return;
+    }
+    setGuestSaving(true);
+    const res = await staffAddGuest(token, guestForm);
+    if ("error" in res) {
+      alert(res.error);
+    } else if (res.member) {
+      setMembers((prev) => [res.member, ...prev]);
+      setShowGuestModal(false);
+      setGuestForm({ firstName: "", lastName: "", phone: "", icePhone: "" });
+    }
+    setGuestSaving(false);
   }
 
   if (loading) {
@@ -366,25 +391,37 @@ export default function StaffCockpitPage() {
                 )}
               </div>
 
-              {/* Filter Tabs */}
-              <div className="flex items-center gap-1.5 p-1 bg-[#18181D] border border-white/10 rounded-2xl shrink-0 overflow-x-auto">
-                {[
-                  { key: "all", label: `Tous (${totalCount})` },
-                  { key: "pending", label: `À pointer (${totalCount - checkedCount})` },
-                  { key: "checked", label: `Pointés (${checkedCount})` },
-                ].map((f) => (
-                  <button
-                    key={f.key}
-                    onClick={() => setFilter(f.key as any)}
-                    className={`px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-all ${
-                      filter === f.key
-                        ? "bg-white text-black font-extrabold shadow-sm"
-                        : "text-white/60 hover:text-white"
-                    }`}
-                  >
-                    {f.label}
-                  </button>
-                ))}
+              {/* Filter Tabs & Guest Button */}
+              <div className="flex items-center gap-2 shrink-0">
+                <div className="flex items-center gap-1.5 p-1 bg-[#18181D] border border-white/10 rounded-2xl shrink-0 overflow-x-auto">
+                  {[
+                    { key: "all", label: `Tous (${totalCount})` },
+                    { key: "pending", label: `À pointer (${totalCount - checkedCount})` },
+                    { key: "checked", label: `Pointés (${checkedCount})` },
+                  ].map((f) => (
+                    <button
+                      key={f.key}
+                      onClick={() => setFilter(f.key as any)}
+                      className={`px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-all ${
+                        filter === f.key
+                          ? "bg-white text-black font-extrabold shadow-sm"
+                          : "text-white/60 hover:text-white"
+                      }`}
+                    >
+                      {f.label}
+                    </button>
+                  ))}
+                </div>
+
+                <button
+                  onClick={() => setShowGuestModal(true)}
+                  className="h-12 px-4 rounded-2xl bg-[#FF5500] hover:bg-[#E04B00] text-white text-xs font-black uppercase tracking-wider flex items-center gap-1.5 transition-all shadow-md active:scale-95 shrink-0"
+                  title="Ajouter un invité de dernière minute sur le trottoir"
+                >
+                  <UserPlus size={15} />
+                  <span className="hidden sm:inline">+ Invité Express</span>
+                  <span className="sm:hidden">+ Invité</span>
+                </button>
               </div>
             </div>
 
@@ -544,6 +581,122 @@ export default function StaffCockpitPage() {
                   Ce coureur n&apos;a pas encore renseigné de contact d&apos;urgence.
                 </div>
               )}
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Modal Invité Express (Sur le trottoir) */}
+      <AnimatePresence>
+        {showGuestModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowGuestModal(false)}
+              className="absolute inset-0 bg-black/80 backdrop-blur-md"
+            />
+
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="relative w-full max-w-md bg-[#18181D] border border-white/15 rounded-[28px] p-6 sm:p-7 space-y-5 shadow-2xl z-10"
+            >
+              <div className="flex items-start justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-11 h-11 rounded-2xl bg-[#FF5500]/20 border border-[#FF5500]/40 flex items-center justify-center text-[#FF5500]">
+                    <UserPlus size={22} />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-black uppercase tracking-tight text-white">
+                      Invité Express
+                    </h3>
+                    <p className="text-xs text-white/60 font-medium">
+                      Ajout en 3s sur le trottoir &amp; pointé d&apos;office
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowGuestModal(false)}
+                  className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white/60 hover:text-white"
+                >
+                  <X size={15} />
+                </button>
+              </div>
+
+              <form onSubmit={handleCreateGuest} className="space-y-4">
+                <div className="space-y-1.5">
+                  <label className="text-[11px] font-black uppercase tracking-wider text-white/70">
+                    Prénom de l&apos;invité <span className="text-[#FF5500]">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    autoFocus
+                    placeholder="Ex: Baptiste"
+                    value={guestForm.firstName}
+                    onChange={(e) => setGuestForm((f) => ({ ...f, firstName: e.target.value }))}
+                    className="w-full h-12 px-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 text-sm focus:border-[#FF5500] outline-none"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <label className="text-[11px] font-black uppercase tracking-wider text-white/70">
+                      Nom (facultatif)
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Ex: Dupont"
+                      value={guestForm.lastName}
+                      onChange={(e) => setGuestForm((f) => ({ ...f, lastName: e.target.value }))}
+                      className="w-full h-11 px-3.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 text-xs focus:border-[#FF5500] outline-none"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-[11px] font-black uppercase tracking-wider text-white/70">
+                      Téléphone
+                    </label>
+                    <input
+                      type="tel"
+                      placeholder="06 12 34 56 78"
+                      value={guestForm.phone}
+                      onChange={(e) => setGuestForm((f) => ({ ...f, phone: e.target.value }))}
+                      className="w-full h-11 px-3.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 text-xs focus:border-[#FF5500] outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-[11px] font-black uppercase tracking-wider text-red-400">
+                    Numéro d&apos;urgence du proche (conseillé)
+                  </label>
+                  <input
+                    type="tel"
+                    placeholder="Ex: Numéro d'un proche en cas d'incident"
+                    value={guestForm.icePhone}
+                    onChange={(e) => setGuestForm((f) => ({ ...f, icePhone: e.target.value }))}
+                    className="w-full h-11 px-3.5 rounded-xl bg-red-950/20 border border-red-500/30 text-white placeholder:text-white/30 text-xs focus:border-red-500 outline-none"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={guestSaving}
+                  className="w-full h-12 rounded-xl bg-[#FF5500] hover:bg-[#E04B00] text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-lg active:scale-95 cursor-pointer disabled:opacity-50 mt-2"
+                >
+                  {guestSaving ? (
+                    <Loader2 size={16} className="animate-spin" />
+                  ) : (
+                    <>
+                      <Check size={16} /> Ajouter &amp; Pointer au départ
+                    </>
+                  )}
+                </button>
+              </form>
             </motion.div>
           </div>
         )}

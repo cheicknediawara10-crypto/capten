@@ -453,3 +453,111 @@ export async function staffGetRunnerIce(tokenString: string, memberId: string) {
     } : null,
   };
 }
+
+/**
+ * 7. Ajout express d'un invité / coureur de dernière minute sur le trottoir par le Staff
+ */
+export async function staffAddGuest(
+  tokenString: string,
+  guestData: { firstName: string; lastName?: string; phone?: string; icePhone?: string }
+) {
+  let sb: ReturnType<typeof createAdminClient>;
+  try {
+    sb = createAdminClient();
+  } catch {
+    return { error: "Service indisponible." };
+  }
+
+  const { data: staffToken } = await ub(sb, "club_staff_tokens")
+    .select("event_id, club_id, is_active")
+    .eq("token", tokenString)
+    .eq("is_active", true)
+    .maybeSingle();
+
+  if (!staffToken || !staffToken.is_active) {
+    return { error: "Lien staff invalide ou révoqué." };
+  }
+
+  let eventId = staffToken.event_id;
+  const clubId = staffToken.club_id;
+
+  if (!eventId) {
+    const now = new Date().toISOString();
+    const { data: nextEv } = await ub(sb, "events")
+      .select("id")
+      .eq("club_id", clubId)
+      .gte("event_date", now)
+      .order("event_date", { ascending: true })
+      .limit(1)
+      .maybeSingle();
+    eventId = nextEv?.id;
+  }
+
+  if (!eventId) {
+    return { error: "Aucun run actif trouvé." };
+  }
+
+  const firstName = guestData.firstName.trim();
+  const lastName = (guestData.lastName || "").trim() || "Invité";
+
+  if (!firstName) {
+    return { error: "Le prénom est obligatoire." };
+  }
+
+  // 1. Créer le profil membre rapide
+  const { data: newProfile, error: profileErr } = await ub(sb, "membre_profiles")
+    .insert({
+      first_name: firstName,
+      last_name: lastName,
+      date_of_birth: "2000-01-01",
+      phone: guestData.phone?.trim() || null,
+      pin_hash: "GUEST_EXPRESS",
+      pin_salt: "GUEST_EXPRESS",
+    })
+    .select("id")
+    .single();
+
+  if (profileErr || !newProfile) {
+    return { error: "Erreur lors de l'enregistrement de l'invité." };
+  }
+
+  const membreId = newProfile.id;
+
+  // 2. Attacher au club
+  await ub(sb, "membre_club").insert({
+    membre_id: membreId,
+    club_id: clubId,
+  });
+
+  // 3. Si numéro d'urgence fourni, enregistrer ICE
+  if (guestData.icePhone?.trim()) {
+    await ub(sb, "membre_ice").insert({
+      membre_id: membreId,
+      contact_name: "Contact Urgence",
+      contact_phone: guestData.icePhone.trim(),
+      relationship: "Proche",
+    });
+  }
+
+  // 4. Pointer directement pour le run en cours
+  await ub(sb, "membre_checkins").insert({
+    membre_id: membreId,
+    event_id: eventId,
+    method: "manual",
+    is_valid: true,
+  });
+
+  return {
+    ok: true,
+    member: {
+      id: membreId,
+      firstName,
+      lastName,
+      phone: guestData.phone?.trim() || "",
+      isCheckedIn: true,
+      checkedInAt: new Date().toISOString(),
+      method: "manual",
+      hasIce: !!guestData.icePhone?.trim(),
+    },
+  };
+}
