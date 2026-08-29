@@ -135,7 +135,7 @@ export default function JoinPage() {
   const [iceName, setIceName]         = useState("");
   const [icePhone, setIcePhone]       = useState("");
   const [iceRelation, setIceRelation] = useState("");
-  const [iceConsent, setIceConsent]   = useState(false); // consentement explicite données santé (RGPD art. 9)
+  const [iceConsent, setIceConsent]   = useState(false); // accord d'enregistrement du contact d'urgence (donnée ordinaire, hors art. 9)
 
   // Step: waiver
   const [waiverChecked, setWaiverChecked] = useState(false);
