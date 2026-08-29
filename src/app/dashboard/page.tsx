@@ -275,9 +275,9 @@ export default function DashboardPage() {
               <p className="text-[10px] text-[color:var(--app-text-muted)] mt-0.5">Membres enregistrés</p>
             </div>
             <div className="p-3.5 rounded-2xl bg-[var(--app-surface-2)] border border-[color:var(--app-border)]">
-              <p className="text-[10px] font-black uppercase tracking-wider text-[#FF5500]">Actifs (60 jours)</p>
+              <p className="text-[10px] font-black uppercase tracking-wider text-[#FF5500]">Actifs (30 jours)</p>
               <p className="text-2xl font-black text-[color:var(--app-text)] mt-0.5">{activeCount || 0}</p>
-              <p className="text-[10px] text-[color:var(--app-text-muted)] mt-0.5">≥ 1 run ces 60 derniers jours</p>
+              <p className="text-[10px] text-[color:var(--app-text-muted)] mt-0.5">≥ 1 run ces 30 derniers jours</p>
             </div>
           </div>
 

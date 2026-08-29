@@ -500,7 +500,7 @@ export default function PlanPage() {
           </h3>
         </div>
         <p className="text-[13px] text-[color:var(--app-text-muted)] leading-relaxed">
-          Un <strong>membre actif</strong> est un coureur ayant participé à <strong>au moins 1 run dans les 60 derniers jours</strong>.
+          Un <strong>membre actif</strong> est un coureur ayant participé à <strong>au moins 1 run dans les 30 derniers jours (les 4 dernières semaines)</strong>.
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
           <div className="p-4 rounded-2xl bg-[var(--app-surface-2)] border border-[color:var(--app-border)] space-y-1.5">

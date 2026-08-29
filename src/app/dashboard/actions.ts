@@ -36,7 +36,7 @@ export async function getDashboardData(): Promise<
 
   if (membreIds.length) {
     const eightWeeksAgo = new Date(Date.now() - 8 * 7 * 86400000).toISOString();
-    const sixtyDaysAgo = new Date(Date.now() - 60 * 86400000).toISOString();
+    const thirtyDaysAgo = new Date(Date.now() - 30 * 86400000).toISOString();
     
     const [{ data: chk }, { data: actRows }] = await Promise.all([
       ub(sb, "membre_checkins")
@@ -46,7 +46,7 @@ export async function getDashboardData(): Promise<
       ub(sb, "membre_checkins")
         .select("membre_id")
         .in("membre_id", membreIds).eq("is_valid", true)
-        .gte("checked_in_at", sixtyDaysAgo),
+        .gte("checked_in_at", thirtyDaysAgo),
     ]);
 
     const rows = ((chk as any[]) || []) as { membre_id: string; checked_in_at: string }[];
