@@ -46,6 +46,7 @@ export default function PublicEventPage() {
     nom: "",
     email: "",
     telephone: "",
+    paceGroup: "🟢 Cool (6:00 - 6:30/km)",
   });
 
   // État résultat après inscription
@@ -295,6 +296,23 @@ export default function PublicEventPage() {
                   </div>
                 </div>
               )}
+              {practical.routeUrl && (
+                <a
+                  href={practical.routeUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between p-3.5 rounded-2xl bg-[#FF5500]/10 border border-[#FF5500]/20 hover:bg-[#FF5500]/20 transition-all text-[#FF5500] group"
+                >
+                  <div className="flex items-center gap-3">
+                    <MapPin size={18} className="text-[#FF5500] shrink-0" />
+                    <div>
+                      <p className="text-[10px] font-black uppercase tracking-wider text-[#FF5500]/80">Tracé officiel</p>
+                      <p className="text-[12px] font-bold text-[#111111] group-hover:text-[#FF5500]">Voir le parcours (Strava / GPX)</p>
+                    </div>
+                  </div>
+                  <ExternalLink size={15} />
+                </a>
+              )}
             </div>
           </motion.div>
         )}
@@ -477,6 +495,35 @@ export default function PublicEventPage() {
                     placeholder="06 12 34 56 78"
                     className="w-full h-11 px-3.5 rounded-xl border border-[#E5E7EB] text-sm font-medium focus:border-[#FF5500] outline-none"
                   />
+                </div>
+
+                {/* Choix du Sas d'allure (Anti-lâchage) */}
+                <div className="space-y-1.5 pt-1">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-[#6B7280]">
+                    Ton Sas d&apos;Allure estimé (Anti-lâchage 🏃)
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {[
+                      { id: "cool", label: "🟢 Cool", sub: "6:00 - 6:30/km" },
+                      { id: "tempo", label: "🟡 Rythmé", sub: "5:15 - 5:45/km" },
+                      { id: "fast", label: "🔴 Fast", sub: "sub-5:00/km" },
+                      { id: "walk", label: "🚶 Run & Walk", sub: "Tous niveaux" },
+                    ].map((p) => (
+                      <button
+                        key={p.id}
+                        type="button"
+                        onClick={() => setForm({ ...form, paceGroup: `${p.label} (${p.sub})` })}
+                        className={`p-2.5 rounded-xl border text-left transition-all ${
+                          form.paceGroup === `${p.label} (${p.sub})`
+                            ? "border-[#FF5500] bg-[#FF5500]/10 text-[#111111]"
+                            : "border-[#E5E7EB] bg-white text-[#6B7280] hover:border-[#D1D5DB]"
+                        }`}
+                      >
+                        <p className="text-[11px] font-black">{p.label}</p>
+                        <p className="text-[10px] text-[#9CA3AF] font-medium">{p.sub}</p>
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
                 {isEvenement && event.prix && (

@@ -9,7 +9,7 @@ function ub(supabase: ReturnType<typeof createAdminClient>, table: string): any 
 
 export async function getDashboardData(): Promise<
   {
-    memberCount: number; slug: string | null; upcoming: any[]; sessionCount: number;
+    memberCount: number; activeCount: number; slug: string | null; upcoming: any[]; sessionCount: number;
     checkinCount: number; weekly: number[]; regulars: number; club: any | null;
   }
   | { error: string }
@@ -32,13 +32,22 @@ export async function getDashboardData(): Promise<
   let checkinCount = 0;
   const weekly = Array(8).fill(0);
   let regulars = 0;
+  let activeCount = 0;
 
   if (membreIds.length) {
     const eightWeeksAgo = new Date(Date.now() - 8 * 7 * 86400000).toISOString();
-    const { data: chk } = await ub(sb, "membre_checkins")
-      .select("membre_id, checked_in_at")
-      .in("membre_id", membreIds).eq("is_valid", true)
-      .gte("checked_in_at", eightWeeksAgo);
+    const sixtyDaysAgo = new Date(Date.now() - 60 * 86400000).toISOString();
+    
+    const [{ data: chk }, { data: actRows }] = await Promise.all([
+      ub(sb, "membre_checkins")
+        .select("membre_id, checked_in_at")
+        .in("membre_id", membreIds).eq("is_valid", true)
+        .gte("checked_in_at", eightWeeksAgo),
+      ub(sb, "membre_checkins")
+        .select("membre_id")
+        .in("membre_id", membreIds).eq("is_valid", true)
+        .gte("checked_in_at", sixtyDaysAgo),
+    ]);
 
     const rows = ((chk as any[]) || []) as { membre_id: string; checked_in_at: string }[];
     checkinCount = rows.length;
@@ -52,10 +61,14 @@ export async function getDashboardData(): Promise<
       if (t >= fourWeeks) recent.add(r.membre_id);
     }
     regulars = recent.size;
+
+    const activeSet = new Set(((actRows as any[]) || []).map((r) => r.membre_id));
+    activeCount = activeSet.size;
   }
 
   return {
     memberCount: membreIds.length,
+    activeCount,
     slug: (clubRow as any)?.slug ?? null,
     upcoming: (events as any[]) || [],
     sessionCount: sessions.count || 0,

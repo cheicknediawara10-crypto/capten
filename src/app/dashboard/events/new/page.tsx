@@ -24,6 +24,7 @@ export default function NewEventPage() {
     pace: "",
     sweeper: "Présent — Personne n'est jamais lâché 🛡️",
     after_run: "",
+    route_url: "",
     event_date: "",
     event_time: "",
     meeting_point_address: "",
@@ -62,6 +63,7 @@ export default function NewEventPage() {
       pace: form.pace,
       sweeper: form.sweeper,
       afterRun: form.after_run,
+      routeUrl: form.route_url,
     });
 
     // Création via server action : auth (cookies) + géocodage + insert côté serveur.
@@ -278,6 +280,23 @@ export default function NewEventPage() {
                 </button>
               ))}
             </div>
+          </div>
+
+          {/* Tracé GPX / Strava / Komoot */}
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--app-text-muted)] flex items-center gap-1">
+              <MapPin size={11} /> 5. Lien du Tracé (Strava Route, Komoot ou OpenRunner)
+            </label>
+            <input
+              type="url"
+              value={form.route_url}
+              onChange={(e) => update("route_url", e.target.value)}
+              placeholder="Ex : https://www.strava.com/routes/312... ou https://www.komoot.com/tour/..."
+              className="w-full h-11 px-4 rounded-[12px] border border-[color:var(--app-border)] text-sm font-medium focus:border-[#FF5500] focus:ring-2 focus:ring-[#FF5500]/20 outline-none transition-all"
+            />
+            <p className="text-[11px] text-[color:var(--app-text-muted)]">
+              Permet aux coureurs de charger la trace sur leur Garmin ou Apple Watch et évite 20 DM sur Instagram avant le run.
+            </p>
           </div>
         </motion.div>
 

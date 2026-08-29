@@ -10,6 +10,7 @@ export interface PracticalInfo {
   pace?: string | null;
   sweeper?: string | null;
   afterRun?: string | null;
+  routeUrl?: string | null;
   textDescription?: string | null;
 }
 
@@ -17,10 +18,11 @@ const BAG_TAG = "🎒 Consigne :";
 const PACE_TAG = "⚡ Allure :";
 const SWEEPER_TAG = "🛡️ Serre-file :";
 const AFTER_TAG = "🍻 After-run :";
+const ROUTE_TAG = "🗺️ Tracé :";
 
 export function formatPracticalDescription(
   description: string | null | undefined,
-  info: { bagDrop?: string | null; pace?: string | null; sweeper?: string | null; afterRun?: string | null }
+  info: { bagDrop?: string | null; pace?: string | null; sweeper?: string | null; afterRun?: string | null; routeUrl?: string | null }
 ): string {
   const parts: string[] = [];
   const cleanDesc = (description || "").trim();
@@ -31,6 +33,7 @@ export function formatPracticalDescription(
   if (info.pace?.trim()) tags.push(`${PACE_TAG} ${info.pace.trim()}`);
   if (info.sweeper?.trim()) tags.push(`${SWEEPER_TAG} ${info.sweeper.trim()}`);
   if (info.afterRun?.trim()) tags.push(`${AFTER_TAG} ${info.afterRun.trim()}`);
+  if (info.routeUrl?.trim()) tags.push(`${ROUTE_TAG} ${info.routeUrl.trim()}`);
 
   if (tags.length > 0) {
     if (parts.length > 0) parts.push("\n");
@@ -42,7 +45,7 @@ export function formatPracticalDescription(
 
 export function parsePracticalInfo(description: string | null | undefined): PracticalInfo {
   if (!description) {
-    return { bagDrop: null, pace: null, sweeper: null, afterRun: null, textDescription: null };
+    return { bagDrop: null, pace: null, sweeper: null, afterRun: null, routeUrl: null, textDescription: null };
   }
 
   const lines = description.split("\n");
@@ -50,6 +53,7 @@ export function parsePracticalInfo(description: string | null | undefined): Prac
   let pace: string | null = null;
   let sweeper: string | null = null;
   let afterRun: string | null = null;
+  let routeUrl: string | null = null;
   const descLines: string[] = [];
 
   for (const line of lines) {
@@ -62,6 +66,8 @@ export function parsePracticalInfo(description: string | null | undefined): Prac
       sweeper = trimmed.replace(SWEEPER_TAG, "").trim();
     } else if (trimmed.startsWith(AFTER_TAG)) {
       afterRun = trimmed.replace(AFTER_TAG, "").trim();
+    } else if (trimmed.startsWith(ROUTE_TAG)) {
+      routeUrl = trimmed.replace(ROUTE_TAG, "").trim();
     } else if (trimmed === "---") {
       // separator, skip
     } else {
@@ -74,6 +80,7 @@ export function parsePracticalInfo(description: string | null | undefined): Prac
     pace,
     sweeper,
     afterRun,
+    routeUrl,
     textDescription: descLines.join("\n").trim() || null,
   };
 }

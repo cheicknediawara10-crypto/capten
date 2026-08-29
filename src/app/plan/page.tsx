@@ -491,6 +491,33 @@ export default function PlanPage() {
         })}
       </div>
 
+      {/* Encart Anti-Saisonnalité & Transparence Membres Actifs */}
+      <div className="max-w-4xl mx-auto mt-12 bg-[var(--app-surface)] border border-[color:var(--app-border)] rounded-3xl p-7 sm:p-8 space-y-4 text-left">
+        <div className="flex items-center gap-2 text-[#FF5500]">
+          <HelpCircle size={20} />
+          <h3 className="text-[16px] font-display italic font-black uppercase text-[color:var(--app-text)]">
+            Comment fonctionne la tarification anti-saisonnière ?
+          </h3>
+        </div>
+        <p className="text-[13px] text-[color:var(--app-text-muted)] leading-relaxed">
+          Chez Capten, nous ne comptons <strong>PAS les inscrits inactifs ou fantômes</strong>. Nous comptons uniquement les <strong>membres actifs</strong>, c&apos;est-à-dire les coureurs ayant participé à au moins 1 run au cours des <strong>60 derniers jours</strong>.
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+          <div className="p-4 rounded-2xl bg-[var(--app-surface-2)] border border-[color:var(--app-border)] space-y-1.5">
+            <p className="text-[12px] font-black uppercase text-[#22C55E]">☀️ En Haute Saison (Printemps / Été)</p>
+            <p className="text-[11px] text-[color:var(--app-text-muted)] leading-snug">
+              Ton crew réunit 30, 50 ou 100 coureurs actifs → Tu profites de toutes les fonctions PRO pour 29,99€/mois sans limite.
+            </p>
+          </div>
+          <div className="p-4 rounded-2xl bg-[var(--app-surface-2)] border border-[color:var(--app-border)] space-y-1.5">
+            <p className="text-[12px] font-black uppercase text-[#FF5500]">❄️ En Basse Saison (Automne / Hiver)</p>
+            <p className="text-[11px] text-[color:var(--app-text-muted)] leading-snug">
+              Ton crew ralentit et passe sous 25 actifs → Ton plan repasse automatiquement à 0€ sans rien casser ni perdre de données.
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* STRIPE UPGRADE MODAL */}
       {selectedPlan && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">

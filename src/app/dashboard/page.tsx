@@ -49,6 +49,7 @@ export default function DashboardPage() {
 
   const [loading, setLoading] = useState(true);
   const [memberCount, setMemberCount] = useState(0);
+  const [activeCount, setActiveCount] = useState(0);
   const [sessionCount, setSessionCount] = useState(0);
   const [checkinCount, setCheckinCount] = useState(0);
   const [weekly, setWeekly] = useState<number[]>(Array(8).fill(0));
@@ -67,6 +68,7 @@ export default function DashboardPage() {
       if (!("error" in res)) {
         setClub(res.club);
         setMemberCount(res.memberCount);
+        setActiveCount((res as any).activeCount || 0);
         setSlug(res.slug);
         setUpcoming((res.upcoming as UpcomingEvent[]) || []);
         setSessionCount(res.sessionCount);
@@ -248,6 +250,34 @@ export default function DashboardPage() {
             {regulars > 0 ? `${regulars} membre${regulars > 1 ? 's' : ''} cour${regulars > 1 ? 'ent' : 't'} chaque semaine` : 'Suis la régularité de ton crew'}
           </p>
         </div>
+      </div>
+
+      {/* Transparence Facturation & Membres Actifs (60j) */}
+      <div className={`${card} rounded-3xl p-6 sm:p-7 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5`}>
+        <div className="space-y-1.5 max-w-xl">
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full bg-[#FF5500]/10 text-[#FF5500]">
+              Tarification Juste &amp; Anti-Saisonnière
+            </span>
+            <span className={`text-[11px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full ${
+              (activeCount || 0) < 25 ? "bg-[#22C55E]/10 text-[#22C55E]" : "bg-[#FF5500] text-white"
+            }`}>
+              {(activeCount || 0) < 25 ? "Plan Gratuit (< 25 actifs)" : "Plan PRO (29,99€/mois)"}
+            </span>
+          </div>
+          <h3 className="text-[16px] font-black uppercase tracking-tight text-[color:var(--app-text)] pt-1">
+            {memberCount} membres enregistrés · {activeCount || 0} coureurs actifs (60 derniers jours)
+          </h3>
+          <p className="text-[12px] text-[color:var(--app-text-muted)] leading-relaxed">
+            Tu ne paies que pour les coureurs qui viennent vraiment. Si ton crew ralentit l&apos;hiver et passe sous 25 actifs, ton plan repasse automatiquement à 0€ sans que tu aies besoin de résilier.
+          </p>
+        </div>
+        <Link
+          href="/plan"
+          className="shrink-0 h-11 px-5 rounded-full border border-[color:var(--app-border)] hover:border-[#FF5500] hover:text-[#FF5500] text-[12px] font-bold text-[color:var(--app-text)] flex items-center gap-2 transition-all"
+        >
+          Détails de mon plan <ArrowRight size={14} />
+        </Link>
       </div>
 
       {/* Accès rapide */}
