@@ -176,7 +176,7 @@ export default function DashboardPage() {
           <Link href="/dashboard/members">
             <Ring pct={memberCount / goal}>
               <span className="text-[40px] font-display italic font-black text-[color:var(--app-text)] leading-none">{loading ? '—' : memberCount}</span>
-              <span className="text-[10px] uppercase tracking-widest text-[color:var(--app-text-muted)] mt-1.5">membres actifs</span>
+              <span className="text-[10px] uppercase tracking-widest text-[color:var(--app-text-muted)] mt-1.5">membres inscrits</span>
             </Ring>
           </Link>
           <div className="hidden sm:block w-px self-stretch bg-[color:var(--app-border)]" />

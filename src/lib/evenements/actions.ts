@@ -45,6 +45,7 @@ export interface RegisterInput {
   email?: string | null;
   telephone?: string | null;
   membreId?: string | null;
+  paceGroup?: string | null;
 }
 
 /**
@@ -114,6 +115,7 @@ export async function registerToEvent(input: RegisterInput) {
         prenom: input.prenom.trim(),
         email: input.email?.trim() || null,
         telephone: input.telephone?.trim() || null,
+        pace_group: input.paceGroup?.trim() || null,
         statut_paiement: "en_attente",
         position_liste_attente: positionListeAttente,
         confirme_par_coureur: false,

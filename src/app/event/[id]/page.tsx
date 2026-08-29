@@ -85,6 +85,7 @@ export default function PublicEventPage() {
       prenom: form.prenom,
       email: form.email,
       telephone: form.telephone,
+      paceGroup: form.paceGroup,
     });
 
     if ("error" in res) {
@@ -250,7 +251,7 @@ export default function PublicEventPage() {
         )}
 
         {/* Infos Pratiques Anti-Stress */}
-        {(practical.bagDrop || practical.pace || practical.sweeper || practical.afterRun) && (
+        {(practical.bagDrop || practical.pace || practical.sweeper || practical.afterRun || practical.routeUrl) && (
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
