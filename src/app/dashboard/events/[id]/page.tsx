@@ -70,6 +70,7 @@ interface Inscription {
   position_liste_attente: number | null;
   confirme_par_coureur: boolean;
   confirme_par_fondateur: boolean;
+  pace_group?: string | null;
   expires_at: string | null;
   promoted_at: string | null;
   created_at: string;
@@ -514,6 +515,24 @@ export default function EventDetailPage() {
                   <p className="text-[11px] text-[color:var(--app-text-muted)]">
                     Gestion logistique et validation déclarative des règlements.
                   </p>
+                  {/* Répartition des Sas d'allures */}
+                  {(() => {
+                    const paceCounts = inscriptions.reduce((acc: Record<string, number>, ins) => {
+                      if (ins.pace_group) acc[ins.pace_group] = (acc[ins.pace_group] || 0) + 1;
+                      return acc;
+                    }, {});
+                    const entries = Object.entries(paceCounts);
+                    if (entries.length === 0) return null;
+                    return (
+                      <div className="flex flex-wrap gap-1.5 pt-2">
+                        {entries.map(([p, count]) => (
+                          <span key={p} className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#FF5500]/10 text-[#FF5500]">
+                            {p} · <span className="font-black">{count}</span>
+                          </span>
+                        ))}
+                      </div>
+                    );
+                  })()}
                 </div>
               </div>
 
@@ -537,9 +556,16 @@ export default function EventDetailPage() {
                             </span>
                           </div>
                           <div>
-                            <p className="text-sm font-bold text-[color:var(--app-text)] leading-tight">
-                              {ins.prenom} {ins.nom}
-                            </p>
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <p className="text-sm font-bold text-[color:var(--app-text)] leading-tight">
+                                {ins.prenom} {ins.nom}
+                              </p>
+                              {ins.pace_group && (
+                                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#FF5500]/10 text-[#FF5500]">
+                                  {ins.pace_group}
+                                </span>
+                              )}
+                            </div>
                             <p className="text-[11px] text-[color:var(--app-text-muted)] flex items-center gap-2 mt-0.5">
                               {ins.telephone && <span className="flex items-center gap-1"><Phone size={10} /> {ins.telephone}</span>}
                               {ins.email && <span className="flex items-center gap-1 truncate max-w-[160px]"><Mail size={10} /> {ins.email}</span>}
@@ -632,9 +658,16 @@ export default function EventDetailPage() {
                           #{w.position_liste_attente || idx + 1}
                         </div>
                         <div>
-                          <p className="text-sm font-bold text-[color:var(--app-text)]">
-                            {w.prenom} {w.nom}
-                          </p>
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <p className="text-sm font-bold text-[color:var(--app-text)]">
+                              {w.prenom} {w.nom}
+                            </p>
+                            {w.pace_group && (
+                              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#FF5500]/10 text-[#FF5500]">
+                                {w.pace_group}
+                              </span>
+                            )}
+                          </div>
                           <p className="text-[11px] text-[color:var(--app-text-muted)]">
                             {w.telephone || w.email || "Contact non renseigné"}
                           </p>
