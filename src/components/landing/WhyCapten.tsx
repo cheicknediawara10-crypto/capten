@@ -7,7 +7,7 @@ import { Check, X } from "lucide-react";
 
 const FEATURES = [
   "Fiche d'urgence accessible en 1 clic",
-  "Registre horodaté automatique par GPS",
+  "Check-in 1-clic par proximité GPS",
   "Rappels automatiques avant chaque départ",
   "1 seul lien fixe partagé dans le groupe",
   "100 % Web (0 application à installer)",
