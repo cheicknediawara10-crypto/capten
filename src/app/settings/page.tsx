@@ -148,11 +148,15 @@ export default function SettingsPage() {
     setSaving(false);
   };
 
-  const joinUrl = typeof window !== "undefined" && slug 
-    ? `${window.location.origin}/join/${slug}` 
-    : `https://www.capten.app/join/${slug || "ton-crew"}`;
+  // Garde-fou : pas de lien tant que le crew n'a pas de slug (sinon on partagerait
+  // un /join/ton-crew mort). Le slug est généré dès que le nom du crew est enregistré.
+  const hasJoinLink = !!slug;
+  const joinUrl = hasJoinLink
+    ? `${typeof window !== "undefined" ? window.location.origin : "https://www.capten.app"}/join/${slug}`
+    : "";
 
   const copyJoinUrl = () => {
+    if (!joinUrl) return;
     navigator.clipboard.writeText(joinUrl);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -346,28 +350,34 @@ export default function SettingsPage() {
           <p className="text-[10px] font-black uppercase tracking-widest text-[#FF5500]">
             🔗 Ton Lien Public d&apos;Adhésion
           </p>
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-            <div className="flex-1 px-3.5 py-2 rounded-xl bg-[var(--app-surface)] border border-[color:var(--app-border)] font-mono text-xs font-bold text-[color:var(--app-text)] truncate">
-              {joinUrl}
+          {hasJoinLink ? (
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+              <div className="flex-1 px-3.5 py-2 rounded-xl bg-[var(--app-surface)] border border-[color:var(--app-border)] font-mono text-xs font-bold text-[color:var(--app-text)] truncate">
+                {joinUrl}
+              </div>
+              <button
+                type="button"
+                onClick={copyJoinUrl}
+                className="h-10 px-4 rounded-xl bg-[var(--app-surface)] border border-[color:var(--app-border)] text-xs font-bold text-[color:var(--app-text)] hover:border-[#FF5500] transition-colors flex items-center justify-center gap-1.5 cursor-pointer shrink-0"
+              >
+                {copied ? <CheckCheck size={14} className="text-[#22C55E]" /> : <Copy size={14} />}
+                {copied ? "Lien copié !" : "Copier le lien"}
+              </button>
+              <a
+                href={joinUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="h-10 px-3.5 rounded-xl bg-[#FF5500] text-white text-xs font-black uppercase tracking-wider hover:bg-[#E04B00] transition-colors flex items-center justify-center gap-1.5 shrink-0"
+              >
+                <ExternalLink size={13} />
+                Aperçu
+              </a>
             </div>
-            <button
-              type="button"
-              onClick={copyJoinUrl}
-              className="h-10 px-4 rounded-xl bg-[var(--app-surface)] border border-[color:var(--app-border)] text-xs font-bold text-[color:var(--app-text)] hover:border-[#FF5500] transition-colors flex items-center justify-center gap-1.5 cursor-pointer shrink-0"
-            >
-              {copied ? <CheckCheck size={14} className="text-[#22C55E]" /> : <Copy size={14} />}
-              {copied ? "Lien copié !" : "Copier le lien"}
-            </button>
-            <a
-              href={joinUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="h-10 px-3.5 rounded-xl bg-[#FF5500] text-white text-xs font-black uppercase tracking-wider hover:bg-[#E04B00] transition-colors flex items-center justify-center gap-1.5 shrink-0"
-            >
-              <ExternalLink size={13} />
-              Aperçu
-            </a>
-          </div>
+          ) : (
+            <p className="text-xs font-medium text-[color:var(--app-text-muted)] leading-snug">
+              Renseigne le <strong className="text-[color:var(--app-text)]">nom de ton crew</strong> ci-dessus et enregistre pour activer ton lien d&apos;inscription. Tu pourras ensuite le partager à tes coureurs.
+            </p>
+          )}
         </div>
 
         <div className="flex justify-end pt-2">
