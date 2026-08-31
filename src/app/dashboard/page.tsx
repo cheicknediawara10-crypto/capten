@@ -255,18 +255,9 @@ export default function DashboardPage() {
       {/* Modèle Tarifaire Anti-Saison & Santé du Crew */}
       <div className={`${card} rounded-3xl p-6 sm:p-7 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6`}>
         <div className="space-y-3 max-w-xl">
-          <div className="flex items-center gap-2">
-            <span className="text-[11px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full bg-[#FF5500]/10 text-[#FF5500]">
-              Tarification Juste &amp; Anti-Saison
-            </span>
-            <span className={`text-[11px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full ${
-              (activeCount || 0) < 25
-                ? "bg-[#22C55E]/10 text-[#22C55E] border border-[#22C55E]/20"
-                : "bg-[#FF5500] text-white"
-            }`}>
-              {(activeCount || 0) < 25 ? "🟢 Plan Actuel : GRATUIT (0€)" : "👑 Plan Actuel : PRO (29,99€/mois)"}
-            </span>
-          </div>
+          <span className="inline-block text-[11px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full bg-[#FF5500]/10 text-[#FF5500]">
+            Santé de ton crew
+          </span>
 
           <div className="grid grid-cols-2 gap-4 py-1">
             <div className="p-3.5 rounded-2xl bg-[var(--app-surface-2)] border border-[color:var(--app-border)]">
@@ -282,9 +273,7 @@ export default function DashboardPage() {
           </div>
 
           <p className="text-[12px] text-[color:var(--app-text-muted)] leading-relaxed">
-            {(activeCount || 0) < 25
-              ? "Moins de 25 coureurs actifs → Ton plan est 100% gratuit. L'hiver ou en basse saison, tu ne paies jamais pour des coureurs qui ne viennent pas."
-              : "Plus de 25 coureurs actifs → Ton club tourne à plein régime avec toutes les fonctionnalités PRO débloquées."}
+            Ce compteur t&apos;aide à suivre l&apos;engagement réel de ton crew, sortie après sortie. Ton plan et tes fonctionnalités se gèrent depuis « Gérer mon plan ».
           </p>
         </div>
 

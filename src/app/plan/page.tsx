@@ -519,28 +519,28 @@ export default function PlanPage() {
         })}
       </div>
 
-      {/* FAQ Pricing & Modèle Anti-Saison */}
+      {/* FAQ Pricing — honnête (flat 29,99€, PAS de facturation par membre actif) */}
       <div className="max-w-4xl mx-auto mt-12 bg-[var(--app-surface)] border border-[color:var(--app-border)] rounded-3xl p-7 sm:p-8 space-y-4 text-left">
         <div className="flex items-center gap-2 text-[#FF5500]">
           <HelpCircle size={20} />
           <h3 className="text-[16px] font-display italic font-black uppercase text-[color:var(--app-text)]">
-            Comment fonctionne la tarification par membre actif ?
+            Comment fonctionne l&apos;abonnement ?
           </h3>
         </div>
         <p className="text-[13px] text-[color:var(--app-text-muted)] leading-relaxed">
-          Un <strong>membre actif</strong> est un coureur ayant participé à <strong>au moins 1 run dans les 30 derniers jours (les 4 dernières semaines)</strong>.
+          À la création de ton crew, tu as <strong>14 jours de Captain Pro offerts, sans carte bancaire</strong>. Ensuite, tu choisis : rester en Découverte (gratuit, 100% fonctionnel) ou passer en Captain Pro. <strong>Runs et membres illimités dans tous les cas.</strong>
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
           <div className="p-4 rounded-2xl bg-[var(--app-surface-2)] border border-[color:var(--app-border)] space-y-1.5">
-            <p className="text-[12px] font-black uppercase text-[#22C55E]">🟢 Moins de 25 actifs → GRATUIT (0€)</p>
+            <p className="text-[12px] font-black uppercase text-[#22C55E]">Découverte — Gratuit</p>
             <p className="text-[11px] text-[color:var(--app-text-muted)] leading-snug">
-              Ex : Ton crew a 100 membres inscrits, mais 18 actifs en hiver → Tu ne paies rien. Zéro stress de payer pour des coureurs absents.
+              Check-in par QR Code, fiches d&apos;urgence, décharges signées, messages. De quoi organiser sereinement, sans limite de membres ni de runs.
             </p>
           </div>
           <div className="p-4 rounded-2xl bg-[var(--app-surface-2)] border border-[color:var(--app-border)] space-y-1.5">
-            <p className="text-[12px] font-black uppercase text-[#FF5500]">👑 Plus de 25 actifs → CAPTEN PRO (29,99€)</p>
+            <p className="text-[12px] font-black uppercase text-[#FF5500]">Captain Pro — 29,99€/mois (ou 299€/an)</p>
             <p className="text-[11px] text-[color:var(--app-text-muted)] leading-snug">
-              Ex : En rentrée ou au printemps, 40 à 100 coureurs courent → Accès à tous les outils pros (GPS automatique, Copilote IA, Visuels).
+              Tout le gratuit + check-in 1-clic par proximité GPS, Visuels du Crew, Copilote IA et stats avancées. Résiliable à tout moment.
             </p>
           </div>
         </div>
