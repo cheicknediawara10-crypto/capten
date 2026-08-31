@@ -43,11 +43,16 @@ export function Navbar() {
           ))}
         </nav>
 
-        {/* Desktop CTA */}
-        <div className="hidden md:flex items-center gap-3">
+        {/* Desktop CTA — une porte par rôle */}
+        <div className="hidden md:flex items-center gap-4">
           <a href="/mon-espace"
             className="text-[13px] font-medium text-[#6B7280] hover:text-[#111111] transition-colors">
-            Espace membre
+            Espace coureur
+          </a>
+          <span className="w-px h-4 bg-[#E8E8E8]" aria-hidden />
+          <a href="/login"
+            className="text-[13px] font-medium text-[#374151] hover:text-[#111111] transition-colors">
+            Espace capitaine
           </a>
           <a href="/login?mode=signup"
             className="inline-flex items-center h-9 px-4 rounded-xl bg-[#FF5500] text-white text-[13px] font-semibold hover:bg-[#E04B00] transition-colors">
@@ -78,10 +83,14 @@ export function Navbar() {
                 {l.label}
               </a>
             ))}
-            <div className="pt-2 space-y-2">
+            <div className="pt-2 space-y-3 border-t border-[#F0F0EC] mt-2">
               <a href="/mon-espace"
                 className="block text-sm font-medium text-[#6B7280]">
-                Espace membre
+                Espace coureur <span className="text-[#B0ADA6]">— je suis membre d&apos;un crew</span>
+              </a>
+              <a href="/login"
+                className="block text-sm font-medium text-[#374151]">
+                Espace capitaine <span className="text-[#B0ADA6]">— je gère mon crew</span>
               </a>
               <a href="/login?mode=signup"
                 className="inline-flex items-center justify-center w-full h-10 rounded-xl bg-[#FF5500] text-white text-sm font-semibold hover:bg-[#E04B00] transition-colors">
