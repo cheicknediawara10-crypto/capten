@@ -2,7 +2,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { MapPinned, MapPin, Heart, Gauge, Route, UserPlus } from "lucide-react";
+import { MapPin, Heart, Gauge, Route, UserPlus } from "lucide-react";
 
 const COLS = [
   {
@@ -29,11 +29,6 @@ const COLS = [
     icon: UserPlus,
     title: "Invité Express",
     description: "Un pote imprévu sur le trottoir ? Ajoute-le en 3 secondes depuis ton cockpit, sans formulaire ni friction.",
-  },
-  {
-    icon: MapPinned,
-    title: "Les Spots du Crew",
-    description: "Tes adresses (cafés, shops, kinés) avec avantages négociés pour tes membres. Ton crew a son identité locale.",
   },
 ];
 

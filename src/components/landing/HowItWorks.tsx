@@ -32,7 +32,7 @@ export function HowItWorks() {
           className="text-[#6B6A6A] leading-snug mb-8 max-w-lg mx-auto"
           style={{ fontSize: "20px", fontWeight: 500, letterSpacing: "-0.4px" }}
         >
-          Centralise tes sorties, sécurise tes membres et génère des revenus pour ton club.
+          Centralise tes sorties, sécurise tes membres et facilite les cotisations de ton club.
           Tout est géré au même endroit, sans imposer la moindre application à ta communauté.
         </p>
 
