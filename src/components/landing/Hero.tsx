@@ -44,8 +44,9 @@ export function Hero() {
         className="text-[#6B6A6A] max-w-xl mx-auto mb-8"
         style={{ fontSize: "18px", fontWeight: 500, letterSpacing: "-0.3px", lineHeight: 1.5 }}
       >
+        Fini les 200 messages WhatsApp et les Google Forms avant chaque run.
         Inscriptions, présences GPS, fiches d&apos;urgence, registre légal : Capten
-        automatise toute la logistique de ton crew. Tes coureurs n&apos;ont rien à
+        automatise toute la logistique de ton crew — tes coureurs n&apos;ont rien à
         installer. Toi, tu cours.
       </motion.p>
 

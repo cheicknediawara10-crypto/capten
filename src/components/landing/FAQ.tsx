@@ -14,6 +14,18 @@ const ITEMS = [
     a: "À l'inscription, chaque membre renseigne son contact prioritaire joignable en 1 clic en 30 secondes. Ces informations sont accessibles instantanément depuis ton tableau de bord en cas d'incident.",
   },
   {
+    q: "Comment fonctionne le sas d'allure ?",
+    a: "À l'inscription, chaque coureur choisit son rythme (Cool, Rythmé, Fast ou Run & Walk). Tu vois la répartition en direct dans ton cockpit — fini le tri des groupes au mégaphone au départ, et les débutants savent qu'ils ne se feront pas lâcher.",
+  },
+  {
+    q: "Je peux partager le tracé de mon parcours ?",
+    a: "Oui. À la création d'un run, tu colles ton lien Strava, Komoot, OpenRunner ou GPX. Il s'affiche sur la page publique du run : tes coureurs chargent la trace sur leur montre (Garmin, Apple Watch…) en une seconde. Fini les « c'est quel parcours ? » en DM avant chaque départ.",
+  },
+  {
+    q: "Et si un coureur arrive à la dernière minute au départ ?",
+    a: "Depuis ton cockpit, tu l'ajoutes en 3 secondes avec le bouton « Invité Express » — sans formulaire ni inscription complète. Le pote imprévu est compté dans le run et ta liste reste propre.",
+  },
+  {
     q: "Comment fonctionnent Les Spots du Crew ?",
     a: "Tu ajoutes les adresses préférées de ton crew (cafés, shops running, kinés) depuis ton tableau de bord. Tu peux négocier un avantage avec le gérant (à l'oral) et l'afficher sur la page de ton club. Tes membres montrent leur carte CAPTEN pour en bénéficier. Zéro paiement, zéro commission, zéro complication.",
   },
