@@ -12,14 +12,14 @@ const FREE: { label: string; ok: boolean }[] = [
   { label: "Check-in par QR Code", ok: true },
   { label: "Fiches ICE & décharges", ok: true },
   { label: "Messages WhatsApp (templates)", ok: true },
-  { label: "Check-in GPS automatique", ok: false },
+  { label: "Check-in 1-clic par proximité GPS", ok: false },
   { label: "Visuels & Copilote IA", ok: false },
   { label: "Export registre (CSV)", ok: false },
 ];
 
 const PRO = [
   "Tout le gratuit, sans limite",
-  "Check-in GPS automatique",
+  "Check-in 1-clic par proximité GPS",
   "Visuels du Crew (stories & affiches)",
   "Copilote IA",
   "Export du registre horodaté (CSV)",
@@ -155,6 +155,9 @@ export function Pricing() {
                   /mois
                 </span>
               </div>
+              <p className="text-[#FF5500] mb-1" style={{ fontSize: "15px", fontWeight: 600 }}>
+                ou 299€/an — 2 mois offerts (-17%)
+              </p>
               <p className="text-white/40" style={{ fontSize: "15px", fontWeight: 500 }}>
                 Sans engagement · résiliable à tout moment
               </p>

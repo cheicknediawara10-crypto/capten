@@ -2,23 +2,38 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { MapPinned, MapPin, Heart } from "lucide-react";
+import { MapPinned, MapPin, Heart, Gauge, Route, UserPlus } from "lucide-react";
 
 const COLS = [
   {
-    icon: MapPinned,
-    title: "Les Spots du Crew",
-    description: "Tes adresses préférées (cafés, shops, kinés) avec avantages exclusifs pour tes membres. Ton crew a son identité locale.",
+    icon: Heart,
+    title: "Contact d'urgence",
+    description: "Chaque coureur renseigne son contact prioritaire, joignable en 1 clic si un incident survient sur le parcours.",
   },
   {
     icon: MapPin,
-    title: "Check-in GPS instantané",
-    description: "Valide les présences réelles au point de rendez-vous et mesure l'engagement de ton crew sortie après sortie.",
+    title: "Check-in 1-clic par GPS",
+    description: "Le coureur valide sa présence d'un geste au point de départ. Registre horodaté, zéro appel manuel, zéro fantôme.",
   },
   {
-    icon: Heart,
-    title: "Contact d'Urgence",
-    description: "Chaque membre renseigne son contact prioritaire joignable en 1 clic en cas d'incident sur le parcours.",
+    icon: Gauge,
+    title: "Sas d'allure",
+    description: "Chacun choisit son rythme à l'inscription (Cool, Rythmé, Fast). Fini le tri au mégaphone et la peur du débutant de se faire lâcher.",
+  },
+  {
+    icon: Route,
+    title: "Tracé Strava en 1 clic",
+    description: "Partage le parcours (Strava, Komoot, GPX). Tes coureurs le chargent sur leur montre en une seconde — zéro DM avant le départ.",
+  },
+  {
+    icon: UserPlus,
+    title: "Invité Express",
+    description: "Un pote imprévu sur le trottoir ? Ajoute-le en 3 secondes depuis ton cockpit, sans formulaire ni friction.",
+  },
+  {
+    icon: MapPinned,
+    title: "Les Spots du Crew",
+    description: "Tes adresses (cafés, shops, kinés) avec avantages négociés pour tes membres. Ton crew a son identité locale.",
   },
 ];
 
@@ -35,8 +50,8 @@ export function Features() {
           className="text-[#1C1B18] leading-[1.12] text-center mb-14"
           style={{ fontSize: "30px", fontWeight: 1000, letterSpacing: "-1.2px" }}
         >
-          Automatise ton registre de présence, centralise les fiches d&apos;urgence de tes coureurs et crée l&apos;identité locale de ton crew.{" "}
-          Zéro friction : tes membres n&apos;ont rien à installer, tu gères tout depuis ton espace.
+          Sécurise tes coureurs, automatise la présence et donne à chacun son allure et son parcours — sans jamais imposer d&apos;appli à ta communauté.{" "}
+          Zéro friction : tes membres n&apos;ont rien à installer, tu pilotes tout depuis ton cockpit.
         </motion.p>
 
         {/* 3 columns */}
