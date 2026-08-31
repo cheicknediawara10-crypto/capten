@@ -74,7 +74,7 @@ export function Footer() {
 
         {/* Bottom */}
         <div className="mt-6 pt-5 border-t border-[#F0F0F0] flex items-center justify-between">
-          <p className="text-[12px] text-[#9CA3AF]">© 2026 CAPTEN</p>
+          <p className="text-[12px] text-[#9CA3AF]">© {new Date().getFullYear()} CAPTEN</p>
           <p className="text-[12px] text-[#C0BCBA]">Fait avec ❤️ pour les capitaines de Run Club</p>
         </div>
       </div>

@@ -27,7 +27,7 @@ export default function RGPDPage() {
             Politique de Confidentialité (RGPD)
           </h1>
           <p className="text-xs text-[#71717A] font-mono uppercase tracking-wider">
-            Dernière mise à jour : 26 Août 2026
+            Dernière mise à jour : 31 Août 2026
           </p>
         </div>
       </div>
