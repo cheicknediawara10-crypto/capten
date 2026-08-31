@@ -519,7 +519,7 @@ export default function PlanPage() {
         })}
       </div>
 
-      {/* FAQ Pricing — honnête (flat 29,99€, PAS de facturation par membre actif) */}
+      {/* FAQ Pricing — honnête : forfait fixe, jamais indexé sur le nombre de coureurs */}
       <div className="max-w-4xl mx-auto mt-12 bg-[var(--app-surface)] border border-[color:var(--app-border)] rounded-3xl p-7 sm:p-8 space-y-4 text-left">
         <div className="flex items-center gap-2 text-[#FF5500]">
           <HelpCircle size={20} />

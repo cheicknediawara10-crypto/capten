@@ -252,7 +252,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Modèle Tarifaire Anti-Saison & Santé du Crew */}
+      {/* Santé du crew — transparence (aucune promesse de prix) */}
       <div className={`${card} rounded-3xl p-6 sm:p-7 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6`}>
         <div className="space-y-3 max-w-xl">
           <span className="inline-block text-[11px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full bg-[#FF5500]/10 text-[#FF5500]">
