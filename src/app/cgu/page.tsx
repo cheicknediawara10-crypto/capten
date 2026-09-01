@@ -84,7 +84,7 @@ export default function CGUPage() {
               <ul className="list-disc pl-5 space-y-1.5 text-[#52525B]">
                 <li><strong>Instructions :</strong> Ne traiter les données des membres que pour les besoins stricts de l&apos;exécution des fonctionnalités demandées par le Captain.</li>
                 <li><strong>Confidentialité &amp; Sécurité :</strong> Garantir la stricte confidentialité des données et mettre en œuvre les mesures techniques adaptées (chiffrement, clés d&apos;accès isolées, Row Level Security).</li>
-                <li><strong>Sous-traitants ultérieurs :</strong> Recourir exclusivement à des prestataires de confiance (Supabase pour l&apos;hébergement de base de données en UE, Resend pour les notifications email, Vercel pour l&apos;infrastructure web, Stripe pour la facturation).</li>
+                <li><strong>Sous-traitants ultérieurs :</strong> Recourir exclusivement à des prestataires de confiance (Supabase pour l&apos;hébergement de base de données en UE, Resend pour les notifications email, Vercel pour l&apos;infrastructure web, Stripe pour la facturation, et Google — Gemini — pour l&apos;assistant de rédaction du Copilote, limité à des données agrégées et non personnelles, à l&apos;exclusion de toute donnée identifiant un membre).</li>
                 <li><strong>Notification des failles :</strong> Alerter le Captain sans délai et au plus tard dans les 72 heures en cas de violation de données constatée.</li>
                 <li><strong>Droit à l&apos;oubli &amp; Fin de contrat :</strong> Supprimer l&apos;intégralité des données du crew et de ses membres en cas de résiliation ou sur simple demande.</li>
               </ul>
