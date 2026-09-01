@@ -23,12 +23,12 @@ export default function LandingPage() {
         <SocialProof />
         <ProblemCards />
         <HowItWorks />
+        <RunnerExperience />
         <Features />
         <WhyCapten />
-        <RunnerExperience />
-        <SpotsSection />
         <Pricing />
         <FAQ />
+        <SpotsSection />
       </main>
       <Footer />
     </div>
