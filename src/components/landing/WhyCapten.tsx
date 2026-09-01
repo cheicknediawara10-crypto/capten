@@ -8,7 +8,7 @@ import { Check, X } from "lucide-react";
 const FEATURES = [
   "Fiche d'urgence accessible en 1 clic",
   "Check-in 1-clic par proximité GPS",
-  "Rappels automatiques avant chaque départ",
+  "Messages de rappel WhatsApp prêts en 1 clic",
   "1 seul lien fixe partagé dans le groupe",
   "100 % Web (0 application à installer)",
   "Historique complet et archives des runs",
