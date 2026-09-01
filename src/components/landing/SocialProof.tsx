@@ -4,11 +4,16 @@ import React from "react";
 import { motion } from "framer-motion";
 import { ShieldCheck, Lock, Percent, Unlock } from "lucide-react";
 
-// ⚠️ Témoignages : NE JAMAIS en inventer (fausse preuve sociale = interdit).
-// Remplir avec de VRAIS retours de capitaines pilotes (prénom, crew, ville).
-// Tant que ce tableau est vide → on affiche uniquement des signaux de confiance
-// FACTUELS (ci-dessous), zéro fausse citation.
-const TESTIMONIALS: { quote: string; name: string; crew: string }[] = [];
+// ⚠️ Témoignages : uniquement de VRAIS retours de capitaines (jamais inventés).
+// Chaque citation doit être validée par la personne avant mise en ligne publique.
+const TESTIMONIALS: { quote: string; name: string; crew: string }[] = [
+  {
+    quote:
+      "Mon crew est 100 % filles, et on se retrouve parfois à plus de 100 au départ. Capten, c'est exactement ce qu'il me faut pour gérer tout ce monde sans y passer mes soirées.",
+    name: "Sasaa",
+    crew: "Coach & fondatrice d'un run club 100 % filles",
+  },
+];
 
 const TRUST = [
   { icon: ShieldCheck, label: "Fait en France" },
@@ -17,37 +22,62 @@ const TRUST = [
   { icon: Unlock, label: "Sans engagement, résiliable en 1 clic" },
 ];
 
+function initials(name: string) {
+  return name.trim().slice(0, 2).toUpperCase();
+}
+
 export function SocialProof() {
+  const hasTestimonials = TESTIMONIALS.length > 0;
+  const single = TESTIMONIALS.length === 1;
+
   return (
-    <section className="px-5 bg-white">
-      <div className="max-w-[1000px] mx-auto border-y border-[#EEEDE7] py-6">
-        {TESTIMONIALS.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+    <section className="py-10 px-5 bg-white">
+      <div className="max-w-[1000px] mx-auto space-y-7">
+        {hasTestimonials && (
+          <motion.div
+            initial={{ opacity: 0, y: 18 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className={`grid gap-5 ${single ? "grid-cols-1 max-w-2xl mx-auto" : "grid-cols-1 sm:grid-cols-3"}`}
+          >
             {TESTIMONIALS.map((t) => (
-              <figure key={t.name} className="rounded-2xl border border-[#EAE9E2] bg-[#FAFAF8] p-5">
-                <blockquote className="text-[15px] text-[#1C1B18] leading-snug font-medium">« {t.quote} »</blockquote>
-                <figcaption className="mt-3 text-[12px] text-[#8A8880]">
-                  <span className="font-bold text-[#1C1B18]">{t.name}</span> — {t.crew}
+              <figure
+                key={t.name}
+                className="rounded-2xl border border-[#EAE9E2] bg-[#FAFAF8] p-6 sm:p-7 text-center"
+              >
+                <blockquote className="text-[#1C1B18] leading-snug font-medium" style={{ fontSize: single ? "19px" : "15px" }}>
+                  « {t.quote} »
+                </blockquote>
+                <figcaption className="mt-5 flex items-center justify-center gap-3">
+                  <span className="w-10 h-10 rounded-full bg-[#FF5500]/[0.12] text-[#FF5500] flex items-center justify-center shrink-0" style={{ fontSize: "14px", fontWeight: 1000 }}>
+                    {initials(t.name)}
+                  </span>
+                  <span className="text-left leading-tight">
+                    <span className="block text-[14px] font-extrabold text-[#1C1B18]">{t.name}</span>
+                    <span className="block text-[12px] text-[#8A8880]">{t.crew}</span>
+                  </span>
                 </figcaption>
               </figure>
             ))}
-          </div>
-        ) : (
-          <motion.ul
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="flex flex-wrap items-center justify-center gap-x-7 gap-y-3"
-          >
-            {TRUST.map((t) => (
-              <li key={t.label} className="inline-flex items-center gap-2 text-[13px] font-medium text-[#6B6A6A]">
-                <t.icon className="w-4 h-4 text-[#FF5500] shrink-0" strokeWidth={2} />
-                {t.label}
-              </li>
-            ))}
-          </motion.ul>
+          </motion.div>
         )}
+
+        {/* Signaux de confiance factuels — toujours affichés */}
+        <motion.ul
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className={`flex flex-wrap items-center justify-center gap-x-7 gap-y-3 ${hasTestimonials ? "border-t border-[#EEEDE7] pt-7" : "border-y border-[#EEEDE7] py-6"}`}
+        >
+          {TRUST.map((t) => (
+            <li key={t.label} className="inline-flex items-center gap-2 text-[13px] font-medium text-[#6B6A6A]">
+              <t.icon className="w-4 h-4 text-[#FF5500] shrink-0" strokeWidth={2} />
+              {t.label}
+            </li>
+          ))}
+        </motion.ul>
       </div>
     </section>
   );
