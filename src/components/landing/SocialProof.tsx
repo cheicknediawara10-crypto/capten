@@ -2,18 +2,23 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { ShieldCheck, Lock, Percent, Unlock } from "lucide-react";
+import { ShieldCheck, Lock, Percent, Unlock, Instagram } from "lucide-react";
 
 // ⚠️ Témoignages : uniquement de VRAIS retours de capitaines (jamais inventés).
 // Chaque citation doit être validée par la personne avant mise en ligne publique.
-const TESTIMONIALS: { quote: string; name: string; crew: string }[] = [
+const TESTIMONIALS: { quote: string; name: string; crew: string; instagram?: string }[] = [
   {
     quote:
       "Mon crew est 100 % filles, et on se retrouve parfois à plus de 100 au départ. Capten, c'est exactement ce qu'il me faut pour gérer tout ce monde sans y passer mes soirées.",
     name: "Sasaa",
     crew: "Coach & fondatrice d'un run club 100 % filles",
+    instagram: "https://www.instagram.com/coachsasaa",
   },
 ];
+
+function igHandle(url: string) {
+  try { return "@" + new URL(url).pathname.replace(/\//g, ""); } catch { return ""; }
+}
 
 const TRUST = [
   { icon: ShieldCheck, label: "Fait en France" },
@@ -56,6 +61,17 @@ export function SocialProof() {
                   <span className="text-left leading-tight">
                     <span className="block text-[14px] font-extrabold text-[#1C1B18]">{t.name}</span>
                     <span className="block text-[12px] text-[#8A8880]">{t.crew}</span>
+                    {t.instagram && (
+                      <a
+                        href={t.instagram}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 mt-1 text-[12px] font-semibold text-[#FF5500] hover:underline"
+                      >
+                        <Instagram className="w-3.5 h-3.5 shrink-0" strokeWidth={2} />
+                        {igHandle(t.instagram)}
+                      </a>
+                    )}
                   </span>
                 </figcaption>
               </figure>
