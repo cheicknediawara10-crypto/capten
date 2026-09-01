@@ -3,10 +3,12 @@
 import React from "react";
 import { Navbar } from "@/components/landing/Navbar";
 import { Hero } from "@/components/landing/Hero";
+import { SocialProof } from "@/components/landing/SocialProof";
 import { ProblemCards } from "@/components/landing/ProblemCards";
 import { HowItWorks } from "@/components/landing/HowItWorks";
 import { Features } from "@/components/landing/Features";
 import { WhyCapten } from "@/components/landing/WhyCapten";
+import { RunnerExperience } from "@/components/landing/RunnerExperience";
 import { SpotsSection } from "@/components/landing/SpotsSection";
 import { Pricing } from "@/components/landing/Pricing";
 import { FAQ } from "@/components/landing/FAQ";
@@ -18,10 +20,12 @@ export default function LandingPage() {
       <Navbar />
       <main>
         <Hero />
+        <SocialProof />
         <ProblemCards />
         <HowItWorks />
         <Features />
         <WhyCapten />
+        <RunnerExperience />
         <SpotsSection />
         <Pricing />
         <FAQ />

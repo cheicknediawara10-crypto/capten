@@ -22,18 +22,18 @@ const dmMono = DM_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://capten.app"),
-  title: "Capten — La plateforme des communautés sportives locales",
-  description: "Capten — Run clubs, walk clubs, groupes de trail. Gérez votre crew, protégez vos membres et générez des revenus.",
+  title: "Capten — Le logiciel des Run Clubs",
+  description: "Le logiciel des capitaines de run clubs : inscriptions, présences GPS et fiches d'urgence — sans app pour tes coureurs. Essai 14 jours, sans carte bancaire.",
   manifest: "/manifest.json",
   openGraph: {
-    title: "Capten — La plateforme des communautés sportives locales",
-    description: "Capten — Run clubs, walk clubs, groupes de trail. Gérez votre crew, protégez vos membres et générez des revenus.",
+    title: "Capten — Le logiciel des Run Clubs",
+    description: "Le logiciel des capitaines de run clubs : inscriptions, présences GPS et fiches d'urgence — sans app pour tes coureurs. Essai 14 jours, sans carte bancaire.",
     images: [
       {
         url: "/dashboard-preview.png",
         width: 1200,
         height: 630,
-        alt: "Capten — La plateforme des communautés sportives locales",
+        alt: "Capten — Le logiciel des Run Clubs",
       }
     ]
   }

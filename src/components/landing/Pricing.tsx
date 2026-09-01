@@ -161,6 +161,9 @@ export function Pricing() {
               <p className="text-white/40" style={{ fontSize: "15px", fontWeight: 500 }}>
                 Sans engagement · résiliable à tout moment
               </p>
+              <p className="text-white/70 mt-3 leading-snug" style={{ fontSize: "14px", fontWeight: 500 }}>
+                Pour les capitaines qui veulent <span className="text-white font-semibold">gagner 2 h par semaine</span> et faire grandir leur crew.
+              </p>
             </div>
 
             <ul className="flex flex-col gap-3.5 mb-8 flex-1">

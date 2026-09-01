@@ -6,6 +6,14 @@ import { ChevronDown } from "lucide-react";
 
 const ITEMS = [
   {
+    q: "Combien ça coûte ?",
+    a: "Tu as 14 jours de Captain Pro offerts à la création de ton crew, sans carte bancaire. Ensuite, le plan Découverte reste gratuit et 100% fonctionnel, ou tu passes en Captain Pro à 29,99€/mois (ou 299€/an, 2 mois offerts). Runs et membres illimités dans tous les cas — résiliable à tout moment.",
+  },
+  {
+    q: "Mes coureurs doivent-ils payer ou installer une app ?",
+    a: "Non, jamais. Pour tes coureurs, Capten est 100% gratuit et sans app : ils s'inscrivent en 20 secondes via ton lien, directement depuis leur navigateur. Seul toi, le capitaine, as un espace de gestion. C'est ce qui fait qu'ils jouent le jeu, contrairement à une énième appli à télécharger.",
+  },
+  {
     q: "Est-ce que mes membres doivent se créer un compte sur le logiciel ?",
     a: "Non. Tes membres n'ont rien à installer. Ils s'inscrivent via un lien unique que tu leur partages. Ensuite, ils accèdent à leur espace avec leur nom, date de naissance et code PIN à 4 chiffres — rien à mémoriser de plus.",
   },
