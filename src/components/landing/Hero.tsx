@@ -17,7 +17,7 @@ export function Hero() {
         transition={{ duration: 0.35 }}
         className="text-[13px] font-medium text-[#6B6A6A] mb-6 flex items-center justify-center gap-1.5 flex-wrap"
       >
-        Le logiciel de gestion des fondateurs de Run Clubs, Walk Social, Rando &amp; Trail
+        Le logiciel des fondateurs de Run Clubs
         <span className="inline-flex items-center gap-1 text-[#FF5500] font-semibold">
           <Star className="w-3 h-3 fill-[#FF5500] shrink-0" />
           100 % Web
@@ -76,11 +76,16 @@ export function Hero() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.4, delay: 0.25 }}
-        className="flex items-center justify-center gap-x-5 gap-y-2 flex-wrap mt-6"
+        className="flex items-center justify-center gap-2.5 flex-wrap mt-7"
       >
         {REASSURANCE.map((r) => (
-          <li key={r} className="inline-flex items-center gap-1.5 text-[13px] font-medium text-[#8A8880]">
-            <Check className="w-3.5 h-3.5 text-[#FF5500]" strokeWidth={2.5} />
+          <li
+            key={r}
+            className="inline-flex items-center gap-2 rounded-full bg-[#FAFAF8] border border-[#EAE9E2] pl-2 pr-3.5 py-1.5 text-[13px] font-semibold text-[#52514E]"
+          >
+            <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-[#FF5500]/[0.12]">
+              <Check className="w-2.5 h-2.5 text-[#FF5500]" strokeWidth={3.5} />
+            </span>
             {r}
           </li>
         ))}
