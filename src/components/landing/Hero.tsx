@@ -3,9 +3,9 @@
 import React from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { Star, Check } from "lucide-react";
+import { Check } from "lucide-react";
 
-const REASSURANCE = ["Gratuit pour toujours", "Sans carte bancaire", "Prêt en 2 minutes"];
+const REASSURANCE = ["Sans carte bancaire", "Sans app à installer", "Prêt en 2 minutes"];
 
 export function Hero() {
   return (
@@ -18,10 +18,6 @@ export function Hero() {
         className="text-[13px] font-medium text-[#6B6A6A] mb-6 flex items-center justify-center gap-1.5 flex-wrap"
       >
         Le logiciel des fondateurs de Run Clubs
-        <span className="inline-flex items-center gap-1 text-[#FF5500] font-semibold">
-          <Star className="w-3 h-3 fill-[#FF5500] shrink-0" />
-          100 % Web
-        </span>
       </motion.p>
 
       {/* H1 */}
