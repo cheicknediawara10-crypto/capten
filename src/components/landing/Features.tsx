@@ -2,7 +2,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { MapPin, Heart, Gauge, Route, UserPlus } from "lucide-react";
+import { MapPin, Heart, Gauge, Route, UserPlus, Sparkles } from "lucide-react";
 
 const COLS = [
   {
@@ -29,6 +29,11 @@ const COLS = [
     icon: UserPlus,
     title: "Invité Express",
     description: "Un pote imprévu sur le trottoir ? Ajoute-le en 3 secondes depuis ton cockpit, sans formulaire ni friction.",
+  },
+  {
+    icon: Sparkles,
+    title: "Copilote du capitaine",
+    description: "Tes annonces, relances et messages WhatsApp prêts à envoyer en 1 clic. La charge mentale de la semaine, en moins.",
   },
 ];
 
